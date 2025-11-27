@@ -26,6 +26,9 @@ model User {
   memberships Membership[]
   sessions    Session[]
   projectMembers ProjectMember[]
+  apiTokens   ApiToken[]
+  clientApplications ClientApplication[]
+  authSessions AuthSession[]
 
   @@map("users")
 }
@@ -137,5 +140,75 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
+}
+
+model ApiToken {
+  id           String    @id @default(cuid())
+  token        String    @unique
+  name         String
+  description  String?
+  keyPrefix    String    @default("sk")
+  permissions  String?   @default("[]") // JSON string of permissions array
+  isActive     Boolean   @default(true)
+  lastUsedAt   DateTime?
+  expiresAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  // Relations
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("api_tokens")
+}
+
+model ClientApplication {
+  id                String   @id @default(cuid())
+  clientId          String   @unique
+  name              String
+  description       String?
+  redirectUris      String   // JSON array of allowed redirect URIs
+  allowedScopes     String   @default("[]") // JSON array of allowed scopes
+  defaultScopes     String   @default("[]") // JSON array of default scopes
+  skipConsent       Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  secret            String?  // For confidential clients
+  logoUrl           String?
+  homepageUrl       String?
+  privacyPolicyUrl  String?
+  tosUrl           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  createdBy         String
+  creator           User     @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  authSessions      AuthSession[]
+
+  @@map("client_applications")
+}
+
+model AuthSession {
+  id           String   @id @default(cuid())
+  sessionId    String   @unique
+  clientId     String
+  userId       String
+  state        String?
+  redirectUri  String
+  scope        String?
+  responseType String   @default("code")
+  codeChallenge String? // PKCE
+  codeChallengeMethod String? // PKCE
+  authCode     String?  @unique
+  authCodeExpiresAt DateTime?
+  isCompleted  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  client       ClientApplication @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("auth_sessions")
 }
 

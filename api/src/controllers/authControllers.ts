@@ -3,6 +3,7 @@ import { validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 import { config, prisma } from '../config/database';
 import { AuthenticatedRequest } from '../middlewares/authMiddlewares';
 
@@ -585,6 +586,255 @@ export class AuthController {
       res.status(500).json({
         error: 'Internal server error',
         code: 'CHANGE_PASSWORD_ERROR'
+      });
+    }
+  };
+
+  /**
+   * GET /api/v1/auth/authorize
+   * OAuth2 Authorization endpoint with dynamic client validation
+   */
+  public authorize = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { client_id, redirect_uri, response_type, state, scope, code_challenge, code_challenge_method } = req.query;
+
+      // Validate required parameters
+      if (!client_id || !redirect_uri || response_type !== 'code') {
+        const errorUrl = new URL(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/error`);
+        errorUrl.searchParams.set('error', 'invalid_request');
+        errorUrl.searchParams.set('error_description', 'Missing required parameters');
+        if (state) errorUrl.searchParams.set('state', state as string);
+        return res.redirect(errorUrl.toString());
+      }
+
+      // Validate client application
+      const client = await prisma.clientApplication.findUnique({
+        where: { clientId: client_id as string }
+      });
+
+      if (!client || !client.isActive) {
+        const errorUrl = new URL(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/error`);
+        errorUrl.searchParams.set('error', 'invalid_client');
+        errorUrl.searchParams.set('error_description', 'Client not found or inactive');
+        if (state) errorUrl.searchParams.set('state', state as string);
+        return res.redirect(errorUrl.toString());
+      }
+
+      // Validate redirect URI
+      const allowedUris = JSON.parse(client.redirectUris);
+      if (!allowedUris.includes(redirect_uri as string)) {
+        const errorUrl = new URL(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/error`);
+        errorUrl.searchParams.set('error', 'invalid_redirect_uri');
+        errorUrl.searchParams.set('error_description', 'Redirect URI not allowed');
+        if (state) errorUrl.searchParams.set('state', state as string);
+        return res.redirect(errorUrl.toString());
+      }
+
+      // Validate scope
+      const allowedScopes = JSON.parse(client.allowedScopes);
+      const requestedScopes = (scope as string || '').split(' ').filter(s => s);
+      const validScopes = requestedScopes.filter(s => allowedScopes.includes(s));
+      const finalScopes = validScopes.length > 0 ? validScopes : JSON.parse(client.defaultScopes);
+
+      // Create authorization session
+      const sessionId = uuidv4();
+      const authCode = crypto.randomBytes(32).toString('hex');
+      
+      await prisma.authSession.create({
+        data: {
+          id: uuidv4(),
+          sessionId,
+          clientId: client.id,
+          userId: '', // Will be set after authentication
+          state: state as string || undefined,
+          redirectUri: redirect_uri as string,
+          scope: finalScopes.join(' '),
+          responseType: response_type as string,
+          codeChallenge: code_challenge as string || undefined,
+          codeChallengeMethod: code_challenge_method as string || undefined,
+          authCode,
+          authCodeExpiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+        }
+      });
+
+      // Redirect to login page with OAuth2 parameters
+      const loginUrl = new URL(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login`);
+      loginUrl.searchParams.set('session_id', sessionId);
+      loginUrl.searchParams.set('client_id', client_id as string);
+      loginUrl.searchParams.set('redirect_uri', redirect_uri as string);
+      loginUrl.searchParams.set('response_type', response_type as string);
+      loginUrl.searchParams.set('scope', finalScopes.join(' '));
+      if (state) loginUrl.searchParams.set('state', state as string);
+      
+      // Add client info for display
+      loginUrl.searchParams.set('client_name', client.name);
+      loginUrl.searchParams.set('client_logo', client.logoUrl || '');
+      loginUrl.searchParams.set('skip_consent', client.skipConsent.toString());
+
+      res.redirect(loginUrl.toString());
+    } catch (error) {
+      console.error('Authorization error:', error);
+      const errorUrl = new URL(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/error`);
+      errorUrl.searchParams.set('error', 'server_error');
+      errorUrl.searchParams.set('error_description', 'Internal server error');
+      return res.redirect(errorUrl.toString());
+    }
+  };
+
+  /**
+   * POST /api/v1/auth/token
+   * OAuth2 Token endpoint - exchange authorization code for tokens
+   */
+  public exchangeToken = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { grant_type, code, client_id, client_secret, redirect_uri } = req.body;
+
+      if (grant_type !== 'authorization_code' || !code || !client_id) {
+        res.status(400).json({
+          error: 'invalid_request',
+          error_description: 'Missing required parameters'
+        });
+        return;
+      }
+
+      // Decode and validate authorization code
+      let authData;
+      try {
+        authData = JSON.parse(Buffer.from(code, 'base64').toString());
+      } catch (error) {
+        res.status(400).json({
+          error: 'invalid_grant',
+          error_description: 'Invalid authorization code'
+        });
+        return;
+      }
+
+      // Check if code is expired (5 minutes)
+      if (Date.now() - authData.timestamp > 5 * 60 * 1000) {
+        res.status(400).json({
+          error: 'invalid_grant',
+          error_description: 'Authorization code expired'
+        });
+        return;
+      }
+
+      // In a real implementation, validate client_id and client_secret
+      // against registered applications in database
+      const validClients = {
+        'demo-app': 'demo-secret',
+        'test-app': 'test-secret',
+      };
+
+      if (client_secret && validClients[client_id as keyof typeof validClients] !== client_secret) {
+        res.status(401).json({
+          error: 'invalid_client',
+          error_description: 'Invalid client credentials'
+        });
+        return;
+      }
+
+      // Return tokens to client application
+      res.status(200).json({
+        access_token: authData.tokens.accessToken,
+        refresh_token: authData.tokens.refreshToken,
+        id_token: authData.tokens.idToken,
+        token_type: 'Bearer',
+        expires_in: 86400, // 24 hours
+        scope: authData.scope || 'read write'
+      });
+
+    } catch (error) {
+      console.error('Token exchange error:', error);
+      res.status(500).json({
+        error: 'server_error',
+        error_description: 'Internal server error'
+      });
+    }
+  };
+
+  /**
+   * POST /api/v1/auth/revoke
+   * OAuth2 Token revocation endpoint
+   */
+  public revokeToken = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { token, token_type_hint } = req.body;
+
+      if (!token) {
+        res.status(400).json({
+          error: 'invalid_request',
+          error_description: 'Token is required'
+        });
+        return;
+      }
+
+      // In a real implementation, add token to blacklist
+      // or remove from database/session store
+      
+      res.status(200).json({});
+    } catch (error) {
+      console.error('Token revocation error:', error);
+      res.status(500).json({
+        error: 'server_error',
+        error_description: 'Internal server error'
+      });
+    }
+  };
+
+  /**
+   * GET /api/v1/auth/userinfo
+   * OAuth2 Userinfo endpoint
+   */
+  public getUserInfo = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        res.status(401).json({
+          error: 'invalid_token',
+          error_description: 'Access token is required'
+        });
+        return;
+      }
+
+      const token = authHeader.substring(7);
+      
+      // Verify access token
+      const decoded = jwt.verify(token, config.jwt.secret) as any;
+      
+      // Get user information
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.sub },
+        include: { profile: true }
+      });
+
+      if (!user || user.status !== 'ACTIVE') {
+        res.status(401).json({
+          error: 'invalid_token',
+          error_description: 'User not found or inactive'
+        });
+        return;
+      }
+
+      // Return user info according to OAuth2 userinfo endpoint spec
+      res.status(200).json({
+        sub: user.id,
+        email: user.email,
+        email_verified: user.emailVerified || false,
+        name: user.profile?.firstName && user.profile?.lastName 
+          ? `${user.profile.firstName} ${user.profile.lastName}`
+          : user.email,
+        given_name: user.profile?.firstName,
+        family_name: user.profile?.lastName,
+        picture: user.profile?.avatar,
+        role: user.role,
+        updated_at: user.updatedAt
+      });
+
+    } catch (error) {
+      console.error('Userinfo error:', error);
+      res.status(401).json({
+        error: 'invalid_token',
+        error_description: 'Invalid or expired access token'
       });
     }
   };

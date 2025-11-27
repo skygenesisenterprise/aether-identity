@@ -35,10 +35,14 @@ app.get('/health', (req: Request, res: Response) => {
 // API routes
 import authRoutes from './routes/authRoutes';
 import accountRoutes from './routes/accountRoutes';
+import apiTokenRoutes from './routes/apiTokenRoutes';
+import clientApplicationRoutes from './routes/clientApplicationRoutes';
 
 // API v1 routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/accounts', accountRoutes);
+app.use('/api/v1/api-tokens', apiTokenRoutes);
+app.use('/api/v1/clients', clientApplicationRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {

@@ -36,9 +36,13 @@ app.get('/health', (req, res) => {
 // API routes
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const accountRoutes_1 = __importDefault(require("./routes/accountRoutes"));
+const apiTokenRoutes_1 = __importDefault(require("./routes/apiTokenRoutes"));
+const clientApplicationRoutes_1 = __importDefault(require("./routes/clientApplicationRoutes"));
 // API v1 routes
 app.use('/api/v1/auth', authRoutes_1.default);
 app.use('/api/v1/accounts', accountRoutes_1.default);
+app.use('/api/v1/api-tokens', apiTokenRoutes_1.default);
+app.use('/api/v1/clients', clientApplicationRoutes_1.default);
 // 404 handler
 app.use((req, res) => {
     res.status(404).json({

@@ -24,14 +24,39 @@ export default function UnifiedAuthForm() {
   const [error, setError] = useState("")
   const [activeTab, setActiveTab] = useState<"login" | "register">("login")
   const [isMounted, setIsMounted] = useState(false)
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null)
+  const [clientId, setClientId] = useState<string | null>(null)
+  const [state, setState] = useState<string | null>(null)
+  const [clientName, setClientName] = useState<string | null>(null)
+  const [clientLogo, setClientLogo] = useState<string | null>(null)
+  const [skipConsent, setSkipConsent] = useState<boolean>(false)
+  const [sessionId, setSessionId] = useState<string | null>(null)
 
   useEffect(() => {
     setIsMounted(true)
+    
+    // Parse URL parameters for SSO flow (comme Google/Microsoft)
+    const urlParams = new URLSearchParams(window.location.search)
+    const redirect = urlParams.get('redirect_uri')
+    const client = urlParams.get('client_id')
+    const stateParam = urlParams.get('state')
+    const session = urlParams.get('session_id')
+    const clientNameParam = urlParams.get('client_name')
+    const clientLogoParam = urlParams.get('client_logo')
+    const skipConsentParam = urlParams.get('skip_consent')
+    
+    if (redirect) setRedirectUrl(redirect)
+    if (client) setClientId(client)
+    if (stateParam) setState(stateParam)
+    if (session) setSessionId(session)
+    if (clientNameParam) setClientName(clientNameParam)
+    if (clientLogoParam) setClientLogo(clientLogoParam)
+    if (skipConsentParam) setSkipConsent(skipConsentParam === 'true')
   }, [])
 
   // Set page title
   useEffect(() => {
-    document.title = "Sky Genesis Enterprise - Unified Account"
+    document.title = "Sky Genesis Enterprise - Identity Provider"
   }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -40,14 +65,14 @@ export default function UnifiedAuthForm() {
     setError("")
 
     try {
-      // Utiliser l'API Prisma existante
-      const response = await fetch("http://localhost:8080/api/v1/accounts/authenticate", {
+      // Utiliser l'API Aether Identity comme un vrai Identity Provider
+      const response = await fetch("http://localhost:8080/api/v1/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          identifier: identifier || email,
+          email: identifier || email,
           password,
         }),
       })
@@ -58,23 +83,39 @@ export default function UnifiedAuthForm() {
         throw new Error(data.error || "Authentication failed")
       }
 
-      // Store tokens and user data
-      localStorage.setItem("authToken", data.data.tokens.accessToken)
-      localStorage.setItem("refreshToken", data.data.tokens.refreshToken)
-      localStorage.setItem("idToken", data.data.tokens.idToken || "")
-      localStorage.setItem("user", JSON.stringify(data.data.account))
-      localStorage.setItem("memberships", JSON.stringify(data.data.memberships))
+       // Store tokens and user data
+       localStorage.setItem("authToken", data.data.tokens.accessToken)
+       localStorage.setItem("refreshToken", data.data.tokens.refreshToken)
+       localStorage.setItem("idToken", data.data.tokens.idToken || "")
+       localStorage.setItem("user", JSON.stringify(data.data.user))
+       localStorage.setItem("memberships", JSON.stringify(data.data.user.memberships || []))
 
-      // Show success toast
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue sur Sky Genesis Enterprise",
-      })
+       // Show success toast
+       toast({
+         title: "Connexion réussie",
+         description: "Bienvenue sur Sky Genesis Enterprise",
+       })
 
-      // Redirect to dashboard using Next.js router
-      setTimeout(() => {
-        router.push("/home")
-      }, 1000)
+       // Handle SSO redirect or default redirect
+       setTimeout(() => {
+         if (redirectUrl && clientId) {
+           // SSO flow: redirect back to client application with authorization code
+           const authCode = btoa(JSON.stringify({
+             user: data.data.user,
+             tokens: data.data.tokens,
+             timestamp: Date.now()
+           }))
+           
+           const redirectUrlWithCode = new URL(redirectUrl)
+           redirectUrlWithCode.searchParams.set('code', authCode)
+           if (state) redirectUrlWithCode.searchParams.set('state', state)
+           
+           window.location.href = redirectUrlWithCode.toString()
+         } else {
+           // Default flow: redirect to dashboard
+           router.push("/home")
+         }
+       }, 1000)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An error occurred during login"
       setError(errorMessage)
@@ -117,7 +158,7 @@ export default function UnifiedAuthForm() {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/api/v1/accounts/register", {
+      const response = await fetch("http://localhost:8080/api/v1/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -126,10 +167,6 @@ export default function UnifiedAuthForm() {
           email,
           password,
           fullName,
-          profile: {
-            firstName: fullName.split(' ')[0],
-            lastName: fullName.split(' ').slice(1).join(' '),
-          }
         }),
       })
 
@@ -143,19 +180,35 @@ export default function UnifiedAuthForm() {
       localStorage.setItem("authToken", data.data.tokens.accessToken)
       localStorage.setItem("refreshToken", data.data.tokens.refreshToken)
       localStorage.setItem("idToken", data.data.tokens.idToken || "")
-      localStorage.setItem("user", JSON.stringify(data.data.account))
-      localStorage.setItem("memberships", JSON.stringify(data.data.memberships))
+      localStorage.setItem("user", JSON.stringify(data.data.user))
+      localStorage.setItem("memberships", JSON.stringify(data.data.user.memberships || []))
 
-      // Show success toast
-      toast({
-        title: "Inscription réussie",
-        description: "Votre compte a été créé avec succès",
-      })
+       // Show success toast
+       toast({
+         title: "Inscription réussie",
+         description: "Votre compte a été créé avec succès",
+       })
 
-      // Redirect to dashboard using Next.js router
-      setTimeout(() => {
-        router.push("/home")
-      }, 1000)
+       // Handle SSO redirect or default redirect
+       setTimeout(() => {
+         if (redirectUrl && clientId) {
+           // SSO flow: redirect back to client application with authorization code
+           const authCode = btoa(JSON.stringify({
+             user: data.data.account,
+             tokens: data.data.tokens,
+             timestamp: Date.now()
+           }))
+           
+           const redirectUrlWithCode = new URL(redirectUrl)
+           redirectUrlWithCode.searchParams.set('code', authCode)
+           if (state) redirectUrlWithCode.searchParams.set('state', state)
+           
+           window.location.href = redirectUrlWithCode.toString()
+         } else {
+           // Default flow: redirect to dashboard
+           router.push("/home")
+         }
+       }, 1000)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An error occurred during registration"
       setError(errorMessage)
@@ -245,11 +298,41 @@ export default function UnifiedAuthForm() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <CardTitle className="text-2xl font-bold text-black">Sky Genesis Enterprise</CardTitle>
+            <div className="space-y-2 text-center">
+              {/* Client logo if available */}
+              {clientLogo && (
+                <div className="flex justify-center mb-4">
+                  <img 
+                    src={clientLogo} 
+                    alt={clientName || 'Application'} 
+                    className="h-12 w-12 rounded-lg object-contain"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
+                </div>
+              )}
+              
+              <CardTitle className="text-2xl font-bold text-black">
+                {clientName ? `Connectez-vous à ${clientName}` : 'Sky Genesis Identity'}
+              </CardTitle>
+              
               <CardDescription className="text-gray-600">
-                Unified Account System - Single Sign-On
+                {clientId 
+                  ? `Utilisez votre compte Aether Identity pour accéder à ${clientName}`
+                  : 'Identity Provider - Single Sign-On'
+                }
               </CardDescription>
+              
+              {/* Security badge */}
+              {clientId && (
+                <div className="flex items-center justify-center gap-2 mt-2 text-sm text-gray-500">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                  </svg>
+                  Connexion sécurisée via Aether Identity
+                </div>
+              )}
             </div>
           </CardHeader>
 

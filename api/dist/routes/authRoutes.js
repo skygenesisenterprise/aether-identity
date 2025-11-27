@@ -91,4 +91,41 @@ router.post('/change-password', [
     (0, express_validator_1.body)('currentPassword').notEmpty().withMessage('Current password is required'),
     (0, express_validator_1.body)('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters'),
 ], authController.changePassword);
+/**
+ * @route   GET /api/v1/auth/authorize
+ * @desc    OAuth2 Authorization endpoint - redirects to login page
+ * @access  Public
+ */
+router.get('/authorize', [
+// query('client_id').notEmpty().withMessage('Client ID is required'),
+// query('redirect_uri').isURL().withMessage('Valid redirect URI is required'),
+// query('response_type').equals('code').withMessage('Response type must be code'),
+], authController.authorize);
+/**
+ * @route   POST /api/v1/auth/token
+ * @desc    OAuth2 Token endpoint - exchange authorization code for tokens
+ * @access  Public
+ */
+router.post('/token', [
+    (0, express_validator_1.body)('grant_type').equals('authorization_code').withMessage('Grant type must be authorization_code'),
+    (0, express_validator_1.body)('code').notEmpty().withMessage('Authorization code is required'),
+    (0, express_validator_1.body)('client_id').notEmpty().withMessage('Client ID is required'),
+    (0, express_validator_1.body)('client_secret').optional().notEmpty().withMessage('Client secret cannot be empty'),
+    (0, express_validator_1.body)('redirect_uri').optional().isURL().withMessage('Valid redirect URI is required'),
+], authController.exchangeToken);
+/**
+ * @route   POST /api/v1/auth/revoke
+ * @desc    OAuth2 Token revocation endpoint
+ * @access  Public
+ */
+router.post('/revoke', [
+    (0, express_validator_1.body)('token').notEmpty().withMessage('Token is required'),
+    (0, express_validator_1.body)('token_type_hint').optional().isIn(['access_token', 'refresh_token']).withMessage('Invalid token type hint'),
+], authController.revokeToken);
+/**
+ * @route   GET /api/v1/auth/userinfo
+ * @desc    OAuth2 Userinfo endpoint - get user info from access token
+ * @access  Public
+ */
+router.get('/userinfo', authController.getUserInfo);
 exports.default = router;
