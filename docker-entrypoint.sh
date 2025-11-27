@@ -25,13 +25,22 @@ echo "🚀 Starting Aether Identity services..."
 # Start backend API
 echo "🔧 Starting backend API on port 8080..."
 cd /app/backend
-pnpm start:api &
+if [ -f "dist/server.js" ]; then
+    node dist/server.js &
+else
+    echo "❌ Backend server.js not found!"
+    exit 1
+fi
 BACKEND_PID=$!
 
 # Start frontend
 echo "🎨 Starting frontend on port 3000..."
 cd /app/frontend
-pnpm start &
+if [ -f ".next/standalone/server.js" ]; then
+    node .next/standalone/server.js &
+else
+    pnpm start &
+fi
 FRONTEND_PID=$!
 
 # Function to handle shutdown

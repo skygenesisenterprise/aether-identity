@@ -45,12 +45,15 @@ COPY --from=frontend-builder /app/public /app/frontend/public
 COPY --from=frontend-builder /app/node_modules /app/frontend/node_modules
 COPY --from=frontend-builder /app/package.json /app/frontend/package.json
 COPY --from=frontend-builder /app/next.config.ts /app/frontend/next.config.ts
+# Copy standalone server
+COPY --from=frontend-builder /app/.next/standalone /app/frontend/.next/standalone
 
 # Copy built backend
 COPY --from=backend-builder /app/api/dist /app/backend/dist
 COPY --from=backend-builder /app/api/prisma /app/backend/prisma
 COPY --from=backend-builder /app/node_modules /app/backend/node_modules
 COPY --from=backend-builder /app/package.json /app/backend/package.json
+COPY --from=backend-builder /app/api/package.backend.json /app/backend/package.json
 
 # Create database directory and ensure proper permissions
 RUN mkdir -p /app/backend/data && \
