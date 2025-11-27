@@ -59,6 +59,14 @@ router.post('/', [
     }
     return true;
   }),
+  body('defaultRedirectUrl').optional().custom((value) => {
+    if (!value) return true;
+    const urlPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/.*)?$|^https?:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/.*)?$/;
+    if (!urlPattern.test(value)) {
+      throw new Error('Default redirect URL must be valid');
+    }
+    return true;
+  }),
 ], clientApplicationController.createClient);
 
 /**

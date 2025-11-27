@@ -452,13 +452,14 @@ class AuthController {
         };
         /**
          * GET /api/v1/auth/authorize
-         * OAuth2 Authorization endpoint with dynamic client validation
+         * OAuth2 Authorization endpoint with dynamic client validation and redirect URLs
          */
         this.authorize = async (req, res) => {
             try {
-                const { client_id, redirect_uri, response_type, state, scope, code_challenge, code_challenge_method } = req.query;
+                const { client_id, redirect_uri, response_type, state, scope, code_challenge, code_challenge_method, final_redirect_url // Dynamic final redirect URL
+                 } = req.query;
                 // Validate required parameters
-                if (!client_id || !redirect_uri || response_type !== 'code') {
+                if (!client_id || response_type !== 'code') {
                     const errorUrl = new URL(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/error`);
                     errorUrl.searchParams.set('error', 'invalid_request');
                     errorUrl.searchParams.set('error_description', 'Missing required parameters');
@@ -478,12 +479,47 @@ class AuthController {
                         errorUrl.searchParams.set('state', state);
                     return res.redirect(errorUrl.toString());
                 }
-                // Validate redirect URI
-                const allowedUris = JSON.parse(client.redirectUris);
-                if (!allowedUris.includes(redirect_uri)) {
+                // Determine redirect URI with priority:
+                // 1. final_redirect_url (highest priority - dynamic)
+                // 2. redirect_uri (OAuth2 standard)
+                // 3. client.defaultRedirectUrl (fallback)
+                let finalRedirectUri;
+                if (final_redirect_url) {
+                    // Validate dynamic final redirect URL
+                    try {
+                        const url = new URL(final_redirect_url);
+                        finalRedirectUri = url.toString();
+                    }
+                    catch {
+                        const errorUrl = new URL(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/error`);
+                        errorUrl.searchParams.set('error', 'invalid_redirect_uri');
+                        errorUrl.searchParams.set('error_description', 'Invalid final redirect URL format');
+                        if (state)
+                            errorUrl.searchParams.set('state', state);
+                        return res.redirect(errorUrl.toString());
+                    }
+                }
+                else if (redirect_uri) {
+                    // Validate standard redirect URI against allowed URIs
+                    const allowedUris = JSON.parse(client.redirectUris);
+                    if (!allowedUris.includes(redirect_uri)) {
+                        const errorUrl = new URL(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/error`);
+                        errorUrl.searchParams.set('error', 'invalid_redirect_uri');
+                        errorUrl.searchParams.set('error_description', 'Redirect URI not allowed');
+                        if (state)
+                            errorUrl.searchParams.set('state', state);
+                        return res.redirect(errorUrl.toString());
+                    }
+                    finalRedirectUri = redirect_uri;
+                }
+                else if (client.defaultRedirectUrl) {
+                    // Use client's default redirect URL
+                    finalRedirectUri = client.defaultRedirectUrl;
+                }
+                else {
                     const errorUrl = new URL(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/error`);
                     errorUrl.searchParams.set('error', 'invalid_redirect_uri');
-                    errorUrl.searchParams.set('error_description', 'Redirect URI not allowed');
+                    errorUrl.searchParams.set('error_description', 'No redirect URI specified');
                     if (state)
                         errorUrl.searchParams.set('state', state);
                     return res.redirect(errorUrl.toString());
@@ -503,7 +539,8 @@ class AuthController {
                         clientId: client.id,
                         userId: '', // Will be set after authentication
                         state: state || undefined,
-                        redirectUri: redirect_uri,
+                        redirectUri: redirect_uri || client.defaultRedirectUrl || '',
+                        finalRedirectUrl: final_redirect_url || undefined,
                         scope: finalScopes.join(' '),
                         responseType: response_type,
                         codeChallenge: code_challenge || undefined,
@@ -516,11 +553,13 @@ class AuthController {
                 const loginUrl = new URL(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login`);
                 loginUrl.searchParams.set('session_id', sessionId);
                 loginUrl.searchParams.set('client_id', client_id);
-                loginUrl.searchParams.set('redirect_uri', redirect_uri);
+                loginUrl.searchParams.set('redirect_uri', finalRedirectUri);
                 loginUrl.searchParams.set('response_type', response_type);
                 loginUrl.searchParams.set('scope', finalScopes.join(' '));
                 if (state)
                     loginUrl.searchParams.set('state', state);
+                if (final_redirect_url)
+                    loginUrl.searchParams.set('final_redirect_url', final_redirect_url);
                 // Add client info for display
                 loginUrl.searchParams.set('client_name', client.name);
                 loginUrl.searchParams.set('client_logo', client.logoUrl || '');

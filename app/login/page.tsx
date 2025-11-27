@@ -25,6 +25,7 @@ export default function UnifiedAuthForm() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login")
   const [isMounted, setIsMounted] = useState(false)
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null)
+  const [finalRedirectUrl, setFinalRedirectUrl] = useState<string | null>(null)
   const [clientId, setClientId] = useState<string | null>(null)
   const [state, setState] = useState<string | null>(null)
   const [clientName, setClientName] = useState<string | null>(null)
@@ -38,6 +39,7 @@ export default function UnifiedAuthForm() {
     // Parse URL parameters for SSO flow (comme Google/Microsoft)
     const urlParams = new URLSearchParams(window.location.search)
     const redirect = urlParams.get('redirect_uri')
+    const finalRedirect = urlParams.get('final_redirect_url')
     const client = urlParams.get('client_id')
     const stateParam = urlParams.get('state')
     const session = urlParams.get('session_id')
@@ -46,6 +48,7 @@ export default function UnifiedAuthForm() {
     const skipConsentParam = urlParams.get('skip_consent')
     
     if (redirect) setRedirectUrl(redirect)
+    if (finalRedirect) setFinalRedirectUrl(finalRedirect)
     if (client) setClientId(client)
     if (stateParam) setState(stateParam)
     if (session) setSessionId(session)
@@ -98,7 +101,7 @@ export default function UnifiedAuthForm() {
 
        // Handle SSO redirect or default redirect
        setTimeout(() => {
-         if (redirectUrl && clientId) {
+         if ((redirectUrl || finalRedirectUrl) && clientId) {
            // SSO flow: redirect back to client application with authorization code
            const authCode = btoa(JSON.stringify({
              user: data.data.user,
@@ -106,7 +109,13 @@ export default function UnifiedAuthForm() {
              timestamp: Date.now()
            }))
            
-           const redirectUrlWithCode = new URL(redirectUrl)
+           // Priority: final_redirect_url > redirect_uri
+           const targetUrl = finalRedirectUrl || redirectUrl
+           if (!targetUrl) {
+             console.error('No redirect URL available')
+             return
+           }
+           const redirectUrlWithCode = new URL(targetUrl)
            redirectUrlWithCode.searchParams.set('code', authCode)
            if (state) redirectUrlWithCode.searchParams.set('state', state)
            
@@ -314,7 +323,7 @@ export default function UnifiedAuthForm() {
               )}
               
               <CardTitle className="text-2xl font-bold text-black">
-                {clientName ? `Connectez-vous à ${clientName}` : 'Sky Genesis Identity'}
+                {clientName ? `Connectez-vous à ${clientName}` : 'Sky Genesis Enterprise'}
               </CardTitle>
               
               <CardDescription className="text-gray-600">

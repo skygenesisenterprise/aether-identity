@@ -24,7 +24,7 @@ class ClientApplicationController {
                     });
                     return;
                 }
-                const { name, description, redirectUris, allowedScopes, defaultScopes, skipConsent, logoUrl, homepageUrl, privacyPolicyUrl, tosUrl, isConfidential } = req.body;
+                const { name, description, redirectUris, defaultRedirectUrl, allowedScopes, defaultScopes, skipConsent, logoUrl, homepageUrl, privacyPolicyUrl, tosUrl, isConfidential } = req.body;
                 const userId = req.user?.id;
                 if (!userId) {
                     res.status(401).json({
@@ -44,6 +44,7 @@ class ClientApplicationController {
                         name,
                         description,
                         redirectUris: JSON.stringify(redirectUris || []),
+                        defaultRedirectUrl,
                         allowedScopes: JSON.stringify(allowedScopes || ['read', 'write']),
                         defaultScopes: JSON.stringify(defaultScopes || ['read']),
                         skipConsent: skipConsent || false,
@@ -74,6 +75,7 @@ class ClientApplicationController {
                         name: client.name,
                         description: client.description,
                         redirectUris: JSON.parse(client.redirectUris),
+                        defaultRedirectUrl: client.defaultRedirectUrl,
                         allowedScopes: JSON.parse(client.allowedScopes),
                         defaultScopes: JSON.parse(client.defaultScopes),
                         skipConsent: client.skipConsent,

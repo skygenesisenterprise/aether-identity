@@ -168,6 +168,7 @@ model ClientApplication {
   name              String
   description       String?
   redirectUris      String   // JSON array of allowed redirect URIs
+  defaultRedirectUrl String?  // Default redirect URL after auth
   allowedScopes     String   @default("[]") // JSON array of allowed scopes
   defaultScopes     String   @default("[]") // JSON array of default scopes
   skipConsent       Boolean  @default(false)
@@ -195,6 +196,7 @@ model AuthSession {
   userId       String
   state        String?
   redirectUri  String
+  finalRedirectUrl String? // Final dynamic redirect URL
   scope        String?
   responseType String   @default("code")
   codeChallenge String? // PKCE
