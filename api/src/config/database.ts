@@ -7,8 +7,8 @@ export const config = {
     url: process.env.DATABASE_URL || 'file:./prisma/dev.db',
   },
   jwt: {
-    secret: process.env.JWT_SECRET || 'your-secret-key',
-    expiresIn: process.env.JWT_EXPIRES_IN || '24h',
+    secret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+    expiresIn: (process.env.JWT_EXPIRES_IN || '24h') as string,
   },
   cors: {
     origin: process.env.API_CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
@@ -20,13 +20,7 @@ export const config = {
   },
 };
 
-export const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: 'file:../prisma/dev.db',
-    },
-  },
-});
+export const prisma = new PrismaClient();
 
 export const connectDatabase = async (): Promise<void> => {
   try {

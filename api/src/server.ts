@@ -33,9 +33,15 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 // API routes
+import authRoutes from './routes/authRoutes';
+import accountRoutes from './routes/accountRoutes';
+
+// API v1 routes
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/accounts', accountRoutes);
 
 // 404 handler
-app.use('*', (req: Request, res: Response) => {
+app.use((req: Request, res: Response) => {
   res.status(404).json({
     error: 'Route not found',
     path: req.originalUrl,

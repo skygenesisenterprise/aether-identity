@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  aether-identity:
+    build: .
+    ports:
+      - "3000:3000"  # Frontend
+      - "8080:8080"  # Backend API
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/dev.db
+      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+      - JWT_EXPIRES_IN=24h
+      - API_CORS_ORIGINS=http://localhost:3000,http://localhost:8080
+      - PORT=8080
+      - NEXT_TELEMETRY_DISABLED=1
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  data:
+    driver: local
+  logs:
+    driver: local
