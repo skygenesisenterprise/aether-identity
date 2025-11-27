@@ -21,10 +21,19 @@ exports.config = {
         max: 100, // limit each IP to 100 requests per windowMs
     },
 };
-exports.prisma = new client_1.PrismaClient();
+// Try to create Prisma client with fallback
+let prisma;
+try {
+    exports.prisma = prisma = new client_1.PrismaClient();
+}
+catch (error) {
+    console.error('Error creating Prisma client:', error);
+    // Fallback for build environment
+    exports.prisma = prisma = {};
+}
 const connectDatabase = async () => {
     try {
-        await exports.prisma.$connect();
+        await prisma.$connect();
         console.log('✅ Database connected successfully');
     }
     catch (error) {
@@ -35,7 +44,7 @@ const connectDatabase = async () => {
 exports.connectDatabase = connectDatabase;
 const disconnectDatabase = async () => {
     try {
-        await exports.prisma.$disconnect();
+        await prisma.$disconnect();
         console.log('✅ Database disconnected successfully');
     }
     catch (error) {

@@ -20,7 +20,17 @@ export const config = {
   },
 };
 
-export const prisma = new PrismaClient();
+// Try to create Prisma client with fallback
+let prisma: any;
+try {
+  prisma = new PrismaClient();
+} catch (error) {
+  console.error('Error creating Prisma client:', error);
+  // Fallback for build environment
+  prisma = {} as any;
+}
+
+export { prisma };
 
 export const connectDatabase = async (): Promise<void> => {
   try {

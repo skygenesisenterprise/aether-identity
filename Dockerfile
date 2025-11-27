@@ -21,6 +21,9 @@ RUN pnpm run build
 # Backend build stage  
 FROM base AS backend-builder
 COPY . .
+# Generate Prisma client first
+RUN pnpm db:generate --schema api/prisma/schema.prisma
+# Then build API
 RUN pnpm run build:api
 
 # Production stage with both services
@@ -29,8 +32,8 @@ FROM node:20-alpine AS production
 # Install pnpm
 RUN npm install -g pnpm
 
-# Install additional dependencies for Prisma
-RUN apk add --no-cache sqlite
+# Install additional dependencies for Prisma and curl for health check
+RUN apk add --no-cache sqlite curl
 
 # Create app directories
 WORKDIR /app
@@ -49,8 +52,9 @@ COPY --from=backend-builder /app/api/prisma /app/backend/prisma
 COPY --from=backend-builder /app/node_modules /app/backend/node_modules
 COPY --from=backend-builder /app/package.json /app/backend/package.json
 
-# Create database directory
-RUN mkdir -p /app/backend/data
+# Create database directory and ensure proper permissions
+RUN mkdir -p /app/backend/data && \
+    chown -R node:node /app/backend
 
 # Copy startup scripts
 COPY docker-compose.yml /app/

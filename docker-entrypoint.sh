@@ -3,6 +3,14 @@
 # Initialize Prisma database
 echo "🗄️  Initializing Prisma database..."
 cd /app/backend
+
+# Generate Prisma client first (ensure it's available)
+echo "📦 Generating Prisma client..."
+pnpm db:generate --schema ./prisma/schema.prisma
+
+# Wait a moment for the client to be properly generated
+sleep 2
+
 if [ ! -f "data/dev.db" ]; then
     echo "Creating new database..."
     pnpm db:push --schema ./prisma/schema.prisma
