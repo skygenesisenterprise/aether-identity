@@ -18,6 +18,7 @@ if [ ! -f "data/dev.db" ]; then
     npx prisma db push --schema prisma/schema.prisma
 fi
 
+# Start backend
 if [ -f "dist/server.js" ]; then
     node dist/server.js &
 else
@@ -33,13 +34,9 @@ BACKEND_PID=$!
 echo "🎨 Starting Next.js frontend on port 3000..."
 cd /app/frontend
 
-# Next.js 16 does not create a standalone server.
-# `pnpm start` calls: next start
-# Use pnpm to start Next.js
-if command -v pnpm >/dev/null 2>&1; then
-    pnpm start &
-elif [ -f "node_modules/.bin/next" ]; then
-    node node_modules/.bin/next start &
+# Always use the local next binary
+if [ -f "node_modules/.bin/next" ]; then
+    node node_modules/.bin/next start -p 3000 -H 0.0.0.0 &
 else
     echo "❌ ERROR: Next.js binary not found!"
     exit 1
