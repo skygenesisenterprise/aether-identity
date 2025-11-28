@@ -1,28 +1,6 @@
 #!/bin/sh
 set -e
 
-echo "🗄️ Initializing Prisma database..."
-cd /app/backend
-
-# Prisma client was already generated during the build step,
-# but generating again ensures schema consistency.
-echo "📦 Generating Prisma client..."
-pnpm db:generate
-
-# Give some time for generation to complete
-sleep 2
-
-# Initialize or update the database
-if [ ! -f "data/dev.db" ]; then
-    echo "🆕 Creating new SQLite database..."
-    pnpm db:push
-else
-    echo "🔄 Applying Prisma schema to existing database..."
-    pnpm db:push
-fi
-
-echo "🚀 Starting Aether Identity services..."
-
 ###########################################
 # Start Backend API
 ###########################################
