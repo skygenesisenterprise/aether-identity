@@ -34,9 +34,8 @@ BACKEND_PID=$!
 echo "🎨 Starting Next.js frontend on port 3000..."
 cd /app/frontend
 
-# Always use the local next binary
 if [ -f "node_modules/.bin/next" ]; then
-    node node_modules/.bin/next start -p 3000 -H 0.0.0.0 &
+    sh node_modules/.bin/next start -p 3000 -H 0.0.0.0 &
 else
     echo "❌ ERROR: Next.js binary not found!"
     exit 1
