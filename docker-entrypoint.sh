@@ -17,14 +17,21 @@ fi
 BACKEND_PID=$!
 
 ###########################################
-# Start Frontend (Next.js 16)
+# Start Frontend (Next.js 16 - Turbopack)
 ###########################################
 echo "🎨 Starting Next.js frontend on port 3000..."
 cd /app/frontend
 
-# Next.js 16 (Turbopack) has NO .next/standalone build.
-# Use `pnpm start`, which runs: next start
-pnpm start &
+# Next.js 16 does not create a standalone server.
+# `pnpm start` calls: next start
+# BUT pnpm needs to be installed, so we use: node_modules/.bin/next
+if [ -f "node_modules/.bin/next" ]; then
+    node node_modules/.bin/next start &
+else
+    echo "❌ ERROR: Next.js binary not found!"
+    exit 1
+fi
+
 FRONTEND_PID=$!
 
 ###########################################
