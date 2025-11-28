@@ -46,7 +46,6 @@ COPY --from=frontend-builder ./public /app/frontend/public
 COPY --from=backend-builder ./api/dist /app/backend/dist
 COPY --from=backend-builder ./api/prisma /app/backend/prisma
 COPY --from=backend-builder ./node_modules /app/backend/node_modules
-COPY --from=backend-builder ./package.json /app/backend/package.json
 COPY --from=backend-builder ./api/package.backend.json /app/backend/package.json
 
 # Create database directory and ensure proper permissions
