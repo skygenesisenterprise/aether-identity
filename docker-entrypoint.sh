@@ -6,17 +6,17 @@ cd /app/backend
 
 # Generate Prisma client first (ensure it's available)
 echo "📦 Generating Prisma client..."
-pnpm db:generate --schema ./prisma/schema.prisma
+pnpm db:generate
 
-# Wait a moment for the client to be properly generated
+# Wait a moment for client to be properly generated
 sleep 2
 
 if [ ! -f "data/dev.db" ]; then
     echo "Creating new database..."
-    pnpm db:push --schema ./prisma/schema.prisma
+    pnpm db:push
 else
     echo "Database exists, applying migrations..."
-    pnpm db:push --schema ./prisma/schema.prisma
+    pnpm db:push
 fi
 
 # Start both services in background

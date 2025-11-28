@@ -1,5 +1,5 @@
 # Multi-stage build for frontend and backend
-FROM node:20-alpine AS base
+FROM node:20-bullseye AS base
 
 # Install pnpm globally
 RUN npm install -g pnpm
@@ -17,6 +17,7 @@ RUN pnpm install --frozen-lockfile
 FROM base AS frontend-builder
 COPY . .
 RUN pnpm run build
+RUN ls -la .next || echo "Build failed - no .next directory"
 
 # Backend build stage  
 FROM base AS backend-builder
@@ -29,9 +30,6 @@ RUN pnpm run build:api
 # Production stage with both services
 FROM node:20-alpine AS production
 
-# Install pnpm
-RUN npm install -g pnpm
-
 # Install additional dependencies for Prisma and curl for health check
 RUN apk add --no-cache sqlite curl
 
@@ -39,21 +37,17 @@ RUN apk add --no-cache sqlite curl
 WORKDIR /app
 RUN mkdir -p /app/frontend /app/backend
 
-# Copy built frontend
-COPY --from=frontend-builder /app/.next /app/frontend/.next
-COPY --from=frontend-builder /app/public /app/frontend/public
-COPY --from=frontend-builder /app/node_modules /app/frontend/node_modules
-COPY --from=frontend-builder /app/package.json /app/frontend/package.json
-COPY --from=frontend-builder /app/next.config.ts /app/frontend/next.config.ts
-# Copy standalone server
-COPY --from=frontend-builder /app/.next/standalone /app/frontend/.next/standalone
+# Copy built frontend (standalone mode)
+COPY --from=frontend-builder ./.next/standalone /app/frontend/
+COPY --from=frontend-builder ./.next/static /app/frontend/.next/static
+COPY --from=frontend-builder ./public /app/frontend/public
 
 # Copy built backend
-COPY --from=backend-builder /app/api/dist /app/backend/dist
-COPY --from=backend-builder /app/api/prisma /app/backend/prisma
-COPY --from=backend-builder /app/node_modules /app/backend/node_modules
-COPY --from=backend-builder /app/package.json /app/backend/package.json
-COPY --from=backend-builder /app/api/package.backend.json /app/backend/package.json
+COPY --from=backend-builder ./api/dist /app/backend/dist
+COPY --from=backend-builder ./api/prisma /app/backend/prisma
+COPY --from=backend-builder ./node_modules /app/backend/node_modules
+COPY --from=backend-builder ./package.json /app/backend/package.json
+COPY --from=backend-builder ./api/package.backend.json /app/backend/package.json
 
 # Create database directory and ensure proper permissions
 RUN mkdir -p /app/backend/data && \
@@ -77,4 +71,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8080/health || exit 1
 
 # Start both services
+WORKDIR /app
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
