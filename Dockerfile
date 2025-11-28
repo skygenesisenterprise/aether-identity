@@ -45,8 +45,9 @@ COPY --from=frontend-builder ./public /app/frontend/public
 # Copy built backend
 COPY --from=backend-builder ./api/dist /app/backend/dist
 COPY --from=backend-builder ./api/prisma /app/backend/prisma
-COPY --from=backend-builder ./node_modules /app/backend/node_modules
 COPY --from=backend-builder ./api/package.backend.json /app/backend/package.json
+# Copy essential node_modules for backend runtime
+COPY --from=backend-builder ./node_modules /app/backend/node_modules
 
 # Create database directory and ensure proper permissions
 RUN mkdir -p /app/backend/data && \
