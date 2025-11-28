@@ -7,7 +7,7 @@
     "dev:api": "ts-node-dev --respawn --transpile-only api/src/server.ts",
     "build": "next build",
     "build:api": "tsc --project api/tsconfig.json",
-    "start": "next start",
+    "start": "next start -H 0.0.0.0",
     "start:api": "node api/dist/server.js",
     "lint": "eslint",
     "db:generate": "prisma generate --schema api/prisma/schema.prisma",
