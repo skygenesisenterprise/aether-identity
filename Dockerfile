@@ -31,7 +31,7 @@ RUN test -d .next || (echo "Frontend build failed" && exit 1)
 FROM node:20-alpine AS production
 
 # Required system libs
-RUN apk add --no-cache sqlite openssl1.1-compat curl
+RUN apk add --no-cache sqlite curl
 
 # Install pnpm
 RUN npm install -g pnpm
