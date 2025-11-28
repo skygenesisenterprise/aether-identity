@@ -37,7 +37,7 @@
     "morgan": "^1.10.1",
     "next": "16.0.5",
     "next-auth": "^4.24.13",
-    "prisma": "^5.22.0",
+    "prisma": "^7.0.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "swagger-ui-dist": "^5.30.3",
