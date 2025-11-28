@@ -1,66 +1,75 @@
 #!/bin/sh
+set -e
 
-# Initialize Prisma database
-echo "🗄️  Initializing Prisma database..."
+echo "🗄️ Initializing Prisma database..."
 cd /app/backend
 
-# Generate Prisma client first (ensure it's available)
+# Prisma client was already generated during the build step,
+# but generating again ensures schema consistency.
 echo "📦 Generating Prisma client..."
 pnpm db:generate
 
-# Wait a moment for client to be properly generated
+# Give some time for generation to complete
 sleep 2
 
+# Initialize or update the database
 if [ ! -f "data/dev.db" ]; then
-    echo "Creating new database..."
+    echo "🆕 Creating new SQLite database..."
     pnpm db:push
 else
-    echo "Database exists, applying migrations..."
+    echo "🔄 Applying Prisma schema to existing database..."
     pnpm db:push
 fi
 
-# Start both services in background
 echo "🚀 Starting Aether Identity services..."
 
-# Start backend API
+###########################################
+# Start Backend API
+###########################################
 echo "🔧 Starting backend API on port 8080..."
 cd /app/backend
+
 if [ -f "dist/server.js" ]; then
     node dist/server.js &
 else
-    echo "❌ Backend server.js not found!"
+    echo "❌ ERROR: dist/server.js not found!"
     exit 1
 fi
+
 BACKEND_PID=$!
 
-# Start frontend
-echo "🎨 Starting frontend on port 3000..."
+###########################################
+# Start Frontend (Next.js 16)
+###########################################
+echo "🎨 Starting Next.js frontend on port 3000..."
 cd /app/frontend
-if [ -f ".next/standalone/server.js" ]; then
-    node .next/standalone/server.js &
-else
-    pnpm start &
-fi
+
+# Next.js 16 (Turbopack) has NO .next/standalone build.
+# Use `pnpm start`, which runs: next start
+pnpm start &
 FRONTEND_PID=$!
 
-# Function to handle shutdown
+###########################################
+# Graceful shutdown
+###########################################
 cleanup() {
     echo "🛑 Shutting down services..."
-    kill $BACKEND_PID 2>/dev/null
-    kill $FRONTEND_PID 2>/dev/null
-    wait
+    
+    kill "$BACKEND_PID" 2>/dev/null || true
+    kill "$FRONTEND_PID" 2>/dev/null || true
+    
+    wait || true
     echo "✅ All services stopped"
 }
 
-# Trap signals
 trap cleanup SIGTERM SIGINT
 
-# Wait for services
+echo ""
 echo "📊 Services are running:"
-echo "  Frontend: http://localhost:3000"
-echo "  Backend API: http://localhost:8080"
-echo "  Health Check: http://localhost:8080/health"
-echo "  API Documentation: http://localhost:8080/api/v1/docs"
+echo "  ➜ Frontend:        http://localhost:3000"
+echo "  ➜ Backend API:     http://localhost:8080"
+echo "  ➜ Health Check:    http://localhost:8080/health"
+echo "  ➜ API Docs:        http://localhost:8080/api/v1/docs"
 echo ""
 echo "Press Ctrl+C to stop all services"
 
