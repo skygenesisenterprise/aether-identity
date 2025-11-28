@@ -24,8 +24,10 @@ cd /app/frontend
 
 # Next.js 16 does not create a standalone server.
 # `pnpm start` calls: next start
-# BUT pnpm needs to be installed, so we use: node_modules/.bin/next
-if [ -f "node_modules/.bin/next" ]; then
+# Use pnpm to start Next.js
+if command -v pnpm >/dev/null 2>&1; then
+    pnpm start &
+elif [ -f "node_modules/.bin/next" ]; then
     node node_modules/.bin/next start &
 else
     echo "❌ ERROR: Next.js binary not found!"

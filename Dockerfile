@@ -15,7 +15,10 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 COPY . .
 
-# Build backend (no Prisma generate here)
+# Generate Prisma client first
+RUN npx prisma generate --schema api/prisma/schema.prisma
+
+# Build backend
 RUN pnpm run build:api
 
 # Build Next.js frontend
@@ -31,10 +34,10 @@ RUN test -d .next || (echo "Frontend build failed" && exit 1)
 FROM node:20-alpine AS production
 
 # Required system libs
-RUN apk add --no-cache sqlite curl
+RUN apk add --no-cache sqlite curl openssl
 
 # Install pnpm
-RUN npm install -g pnpm
+RUN npm install -g pnpm && pnpm --version
 
 WORKDIR /app
 
@@ -63,7 +66,7 @@ WORKDIR /app/backend
 RUN pnpm install --prod --ignore-scripts
 
 # Regenerate Prisma for linux-musl
-RUN pnpm prisma generate
+RUN npx prisma generate --schema /app/backend/prisma/schema.prisma
 
 WORKDIR /app/frontend
 RUN pnpm install --prod --ignore-scripts
