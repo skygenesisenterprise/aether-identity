@@ -73,11 +73,10 @@ RUN pnpm install --prod --ignore-scripts
 
 
 #############################################
-# DB directory
-#############################################
+# DB directory with proper permissions
 RUN mkdir -p /app/backend/data && \
-    chown -R node:node /app/backend
-
+    chown -R node:node /app/backend && \
+    chmod -R 755 /app/backend/data
 
 #############################################
 # Entrypoint

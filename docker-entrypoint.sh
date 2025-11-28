@@ -7,6 +7,17 @@ set -e
 echo "🔧 Starting backend API on port 8080..."
 cd /app/backend
 
+# Ensure database directory exists and has correct permissions
+mkdir -p data
+chown -R node:node data
+chmod -R 755 data
+
+# Initialize database if it doesn't exist
+if [ ! -f "data/dev.db" ]; then
+    echo "📄 Initializing database..."
+    npx prisma db push --schema prisma/schema.prisma
+fi
+
 if [ -f "dist/server.js" ]; then
     node dist/server.js &
 else
