@@ -37,9 +37,17 @@ import authRoutes from './routes/authRoutes';
 import accountRoutes from './routes/accountRoutes';
 import apiTokenRoutes from './routes/apiTokenRoutes';
 import clientApplicationRoutes from './routes/clientApplicationRoutes';
+import ssoRoutes from './routes/ssoRoutes';
+import mfaRoutes from './routes/mfaRoutes';
+import totpRoutes from './routes/totpRoutes';
+import qrcodeRoutes from './routes/qrcodeRoutes';
 
 // API v1 routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/auth/sso', ssoRoutes);
+app.use('/api/v1/mfa', mfaRoutes);
+app.use('/api/v1/totp', totpRoutes);
+app.use('/api/v1/qrcode', qrcodeRoutes);
 app.use('/api/v1/accounts', accountRoutes);
 app.use('/api/v1/api-tokens', apiTokenRoutes);
 app.use('/api/v1/clients', clientApplicationRoutes);

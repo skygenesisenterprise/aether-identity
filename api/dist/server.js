@@ -38,8 +38,16 @@ const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const accountRoutes_1 = __importDefault(require("./routes/accountRoutes"));
 const apiTokenRoutes_1 = __importDefault(require("./routes/apiTokenRoutes"));
 const clientApplicationRoutes_1 = __importDefault(require("./routes/clientApplicationRoutes"));
+const ssoRoutes_1 = __importDefault(require("./routes/ssoRoutes"));
+const mfaRoutes_1 = __importDefault(require("./routes/mfaRoutes"));
+const totpRoutes_1 = __importDefault(require("./routes/totpRoutes"));
+const qrcodeRoutes_1 = __importDefault(require("./routes/qrcodeRoutes"));
 // API v1 routes
 app.use('/api/v1/auth', authRoutes_1.default);
+app.use('/api/v1/auth/sso', ssoRoutes_1.default);
+app.use('/api/v1/mfa', mfaRoutes_1.default);
+app.use('/api/v1/totp', totpRoutes_1.default);
+app.use('/api/v1/qrcode', qrcodeRoutes_1.default);
 app.use('/api/v1/accounts', accountRoutes_1.default);
 app.use('/api/v1/api-tokens', apiTokenRoutes_1.default);
 app.use('/api/v1/clients', clientApplicationRoutes_1.default);

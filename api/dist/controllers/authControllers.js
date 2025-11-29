@@ -19,7 +19,7 @@ class AuthController {
             if (this.handleValidationErrors(req, res))
                 return;
             try {
-                const { email, password } = req.body;
+                const { email, password, sessionId } = req.body;
                 // Find user by email
                 const user = await database_1.prisma.user.findUnique({
                     where: { email },
@@ -56,15 +56,43 @@ class AuthController {
                     });
                     return;
                 }
-                // Generate tokens
+                // Check if MFA is required
+                if (user.mfaEnabled) {
+                    if (!sessionId) {
+                        // Create temporary session for MFA verification
+                        const tempSessionId = (0, uuid_1.v4)();
+                        res.status(200).json({
+                            success: true,
+                            requiresMFA: true,
+                            data: {
+                                userId: user.id,
+                                sessionId: tempSessionId,
+                                mfaMethod: user.mfaMethod,
+                                message: 'MFA verification required'
+                            }
+                        });
+                        return;
+                    }
+                    // MFA flow - user has provided sessionId
+                    res.status(200).json({
+                        success: true,
+                        requiresMFA: true,
+                        data: {
+                            userId: user.id,
+                            sessionId,
+                            mfaMethod: user.mfaMethod,
+                            message: 'Please complete MFA verification'
+                        }
+                    });
+                    return;
+                }
+                // No MFA required - generate tokens
                 const tokens = this.generateTokens(user);
                 // Update last login
                 await database_1.prisma.user.update({
                     where: { id: user.id },
                     data: { lastLoginAt: new Date() }
                 });
-                // Store refresh token (in a real app, you'd store this in a separate table)
-                // For now, we'll just return it
                 res.status(200).json({
                     success: true,
                     data: {
@@ -98,6 +126,81 @@ class AuthController {
                 res.status(500).json({
                     error: 'Internal server error',
                     code: 'LOGIN_ERROR'
+                });
+            }
+        };
+        /**
+         * POST /api/v1/auth/login-complete
+         * Complete login after MFA verification
+         */
+        this.completeLogin = async (req, res) => {
+            if (this.handleValidationErrors(req, res))
+                return;
+            try {
+                const { userId, sessionId } = req.body;
+                // Find user
+                const user = await database_1.prisma.user.findUnique({
+                    where: { id: userId },
+                    include: {
+                        profile: true,
+                        memberships: {
+                            include: {
+                                organization: true
+                            }
+                        }
+                    }
+                });
+                if (!user) {
+                    res.status(401).json({
+                        error: 'User not found',
+                        code: 'USER_NOT_FOUND'
+                    });
+                    return;
+                }
+                // Generate tokens
+                const tokens = this.generateTokens(user);
+                // Update last login
+                await database_1.prisma.user.update({
+                    where: { id: user.id },
+                    data: { lastLoginAt: new Date() }
+                });
+                // Clean up MFA session
+                await database_1.prisma.mfaSession.deleteMany({
+                    where: { sessionId }
+                });
+                res.status(200).json({
+                    success: true,
+                    data: {
+                        user: {
+                            id: user.id,
+                            email: user.email,
+                            fullName: user.profile?.firstName && user.profile?.lastName
+                                ? `${user.profile.firstName} ${user.profile.lastName}`
+                                : user.email,
+                            avatar: user.profile?.avatar,
+                            role: user.role,
+                            status: user.status,
+                            lastLoginAt: user.lastLoginAt,
+                            memberships: user.memberships.map(membership => ({
+                                id: membership.id,
+                                organization: {
+                                    id: membership.organization.id,
+                                    name: membership.organization.name,
+                                    slug: membership.organization.slug
+                                },
+                                role: membership.role,
+                                joinedAt: membership.joinedAt
+                            }))
+                        },
+                        tokens
+                    }
+                });
+            }
+            catch (error) {
+                console.error('Complete login error:', error);
+                res.status(500).json({
+                    error: 'Internal server error',
+                    code: 'COMPLETE_LOGIN_ERROR'
                 });
             }
         };

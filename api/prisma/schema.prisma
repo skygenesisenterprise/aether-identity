@@ -22,6 +22,15 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  // MFA fields
+  mfaEnabled   Boolean  @default(false)
+  mfaMethod    String?  // TOTP, SMS, EMAIL, BACKUP_CODES
+  mfaSecret    String?  // For TOTP
+  phoneNumber  String?  // For SMS MFA
+  backupCodes  String?  // JSON array of backup codes
+  mfaCreatedAt DateTime? // When MFA was first enabled
+  lastMfaUsed  DateTime? // Last time MFA was used
+
   // Relations
   profile     UserProfile?
   memberships Membership[]
@@ -30,6 +39,7 @@ model User {
   apiTokens   ApiToken[]
   clientApplications ClientApplication[]
   authSessions AuthSession[]
+  mfaSessions  MfaSession[]
 
   @@map("users")
 }
@@ -205,6 +215,8 @@ model AuthSession {
   authCode     String?  @unique
   authCodeExpiresAt DateTime?
   isCompleted  Boolean  @default(false)
+  mfaRequired  Boolean  @default(false)
+  mfaVerified  Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   
@@ -213,5 +225,26 @@ model AuthSession {
   user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("auth_sessions")
+}
+
+model MfaSession {
+  id           String   @id @default(cuid())
+  userId       String
+  sessionId    String   @unique
+  method       String   // TOTP, SMS, EMAIL, BACKUP_CODE
+  code         String?
+  codeExpiresAt DateTime?
+  attempts     Int      @default(0)
+  maxAttempts  Int      @default(3)
+  isVerified   Boolean  @default(false)
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("mfa_sessions")
 }
 

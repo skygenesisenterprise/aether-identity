@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { AuthController } from '../controllers/authControllers';
 import { authMiddleware } from '../middlewares/authMiddlewares';
@@ -102,6 +102,17 @@ router.post('/change-password', [
 ], authController.changePassword);
 
 /**
+ * @route   POST /api/v1/auth/login-complete
+ * @desc    Complete login after MFA verification
+ * @access  Public
+ */
+router.post('/login-complete', [
+  authRateLimit,
+  body('userId').notEmpty().withMessage('User ID is required'),
+  body('sessionId').notEmpty().withMessage('Session ID is required'),
+], authController.completeLogin);
+
+/**
  * @route   GET /api/v1/auth/authorize
  * @desc    OAuth2 Authorization endpoint - redirects to login page
  * @access  Public
@@ -141,5 +152,71 @@ router.post('/revoke', [
  * @access  Public
  */
 router.get('/userinfo', authController.getUserInfo);
+
+/**
+ * @route   GET /api/v1/debug/curl
+ * @desc    Debug endpoint for curl users with examples
+ * @access  Public
+ */
+router.get('/debug/curl', (req: Request, res: Response) => {
+  res.status(200).json({
+    message: '🎯 Aether Identity SSO - Debug Mode',
+    service_info: {
+      name: 'Aether Identity SSO',
+      version: '1.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      timestamp: new Date().toISOString()
+    },
+    curl_examples: {
+      register_user: {
+        command: 'curl -X POST https://sso.skygenesisenterprise.net/api/v1/auth/register -H "Content-Type: application/json" -d \'{"email":"test@example.com","password":"password123","fullName":"Test User"}\'',
+        description: 'Register a new user account'
+      },
+      login_user: {
+        command: 'curl -X POST https://sso.skygenesisenterprise.net/api/v1/auth/login -H "Content-Type: application/json" -d \'{"email":"test@example.com","password":"password123"}\'',
+        description: 'Authenticate user and get tokens'
+      },
+      oauth_authorize: {
+        command: 'curl -X GET "https://sso.skygenesisenterprise.net/api/v1/auth/authorize?client_id=demo&redirect_uri=https://example.com/callback&response_type=code&state=xyz123"',
+        description: 'Initiate OAuth2 authorization flow'
+      },
+      create_client: {
+        command: 'curl -X POST https://sso.skygenesisenterprise.net/api/v1/clients -H "Content-Type: application/json" -d \'{"name":"My App","redirectUris":["https://example.com/callback"],"allowedScopes":["read","profile"]}\'',
+        description: 'Register a new OAuth2 client application'
+      },
+      get_userinfo: {
+        command: 'curl -X GET https://sso.skygenesisenterprise.net/api/v1/auth/userinfo -H "Authorization: Bearer YOUR_TOKEN"',
+        description: 'Get user information from access token'
+      },
+      health_check: {
+        command: 'curl -I https://sso.skygenesisenterprise.net/health',
+        description: 'Check service health status'
+      }
+    },
+    available_endpoints: [
+      { method: 'POST', path: '/api/v1/auth/register', description: 'Register new user' },
+      { method: 'POST', path: '/api/v1/auth/login', description: 'User authentication' },
+      { method: 'GET', path: '/api/v1/auth/authorize', description: 'OAuth2 authorization' },
+      { method: 'POST', path: '/api/v1/auth/token', description: 'Exchange auth code for tokens' },
+      { method: 'GET', path: '/api/v1/auth/userinfo', description: 'Get user info from token' },
+      { method: 'POST', path: '/api/v1/clients', description: 'Register OAuth2 client' },
+      { method: 'GET', path: '/api/v1/accounts', description: 'List user accounts' },
+      { method: 'GET', path: '/api/v1/api-tokens', description: 'List API tokens' },
+      { method: 'GET', path: '/health', description: 'Service health check' },
+      { method: 'GET', path: '/api/v1/debug/curl', description: 'This debug endpoint' }
+    ],
+    documentation: {
+      api_docs: 'https://wiki.skygenesisenterprise.com',
+      github: 'https://github.com/skygenesisenterprise/aether-identity',
+      support: 'support@aether-identity.com'
+    },
+    tips: [
+      'Use -v flag with curl for verbose output',
+      'Check X-* headers for debug information',
+      'Use -H "Content-Type: application/json" for POST requests',
+      'Add -i flag to include HTTP headers in response'
+    ]
+  });
+});
 
 export default router;
