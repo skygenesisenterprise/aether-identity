@@ -13,15 +13,29 @@ const nextConfig: NextConfig = {
   },
 
   async rewrites() {
-    const backendUrl = process.env.BACKEND_URL || 
-                     (process.env.NODE_ENV === 'production' 
-                       ? process.env.API_BASE_URL || 'http://backend:8080'
-                       : 'http://localhost:8080');
-    
+    const backendUrl =
+      process.env.BACKEND_URL ||
+      (process.env.NODE_ENV === "production"
+        ? process.env.API_BASE_URL || "http://backend:8080"
+        : "http://localhost:8080");
+
     return [
+      // Proxy full API v1 to backend
       {
-        source: '/api/v1/:path*',
+        source: "/api/v1/:path*",
         destination: `${backendUrl}/api/v1/:path*`,
+      },
+
+      // Proxy health check directly
+      {
+        source: "/health",
+        destination: `${backendUrl}/health`,
+      },
+
+      // Proxy ALL other backend API namespaces if needed later
+      {
+        source: "/api/:path*",
+        destination: `${backendUrl}/:path*`,
       },
     ];
   },
