@@ -1,10 +1,10 @@
 version: '3.8'
 
 services:
-  aether-identity:
+  # Backend API service
+  backend:
     build: .
     ports:
-      - "3000:3000"  # Frontend
       - "8080:8080"  # Backend API
     environment:
       - NODE_ENV=production
@@ -25,8 +25,20 @@ services:
       retries: 3
       start_period: 40s
 
+  # Frontend service
+  frontend:
+    build: .
+    ports:
+      - "3000:3000"  # Frontend
+    environment:
+      - NODE_ENV=production
+      - BACKEND_URL=http://backend:8080
+      - API_BASE_URL=http://backend:8080
+      - NEXT_TELEMETRY_DISABLED=1
+    depends_on:
+      - backend
+    restart: unless-stopped
+
 volumes:
   data:
-    driver: local
   logs:
-    driver: local

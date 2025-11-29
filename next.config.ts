@@ -16,8 +16,11 @@ const nextConfig: NextConfig = {
     const backendUrl =
       process.env.BACKEND_URL ||
       (process.env.NODE_ENV === "production"
-        ? process.env.API_BASE_URL || "http://backend:8080"
+        ? process.env.API_BASE_URL || "http://localhost:8080"
         : "http://localhost:8080");
+
+    console.log('Next.js rewrites - backendUrl:', backendUrl);
+    console.log('Next.js rewrites - NODE_ENV:', process.env.NODE_ENV);
 
     return [
       // Proxy full API v1 to backend
