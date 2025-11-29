@@ -22,6 +22,12 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  // Security fields
+  failedLoginAttempts Int      @default(0)
+  lockedUntil      DateTime?
+  passwordChangedAt DateTime @default(now())
+  lastPasswordChange DateTime?
+
   // MFA fields
   mfaEnabled   Boolean  @default(false)
   mfaMethod    String?  // TOTP, SMS, EMAIL, BACKUP_CODES
@@ -40,6 +46,10 @@ model User {
   clientApplications ClientApplication[]
   authSessions AuthSession[]
   mfaSessions  MfaSession[]
+  userRoles UserRole[]
+  auditLogs   AuditLog[]
+  ssoSessions SsoSession[]
+  refreshTokens RefreshToken[]
 
   @@map("users")
 }
@@ -225,6 +235,130 @@ model AuthSession {
   user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("auth_sessions")
+}
+
+// Enhanced RBAC Models
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  permissions String   // JSON string of permissions array
+  isSystem    Boolean  @default(false) // System roles cannot be deleted
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userRoles UserRole[]
+  rolePermissions RolePermission[]
+  
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  resource    String   // Resource type (user, organization, project, etc.)
+  action      String   // Action type (read, write, delete, manage, etc.)
+  category    String   // Category for grouping
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  rolePermissions RolePermission[]
+  
+  @@map("permissions")
+}
+
+model RolePermission {
+  id          String   @id @default(cuid())
+  roleId      String
+  permissionId String
+  createdAt   DateTime @default(now())
+
+  // Relations
+  role        Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission  Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model UserRole {
+  id          String   @id @default(cuid())
+  userId      String
+  roleId      String
+  assignedBy  String?
+  assignedAt  DateTime @default(now())
+  expiresAt   DateTime? // Role expiration for temporary assignments
+  isActive   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+// Enhanced Session Management
+model SsoSession {
+  id           String   @id @default(cuid())
+  sessionId    String   @unique
+  userId       String
+  clientIp    String?
+  userAgent    String?
+  isActive    Boolean  @default(true)
+  expiresAt    DateTime
+  lastAccessAt DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sso_sessions")
+}
+
+// Token Management
+model RefreshToken {
+  id           String   @id @default(cuid())
+  userId       String
+  token        String   @unique
+  jti          String   @unique // JWT ID for revocation
+  expiresAt    DateTime
+  isRevoked    Boolean  @default(false)
+  revokedAt    DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+// Audit Logging
+model AuditLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  action       String   // LOGIN, LOGOUT, TOKEN_REFRESH, ROLE_CHANGE, etc.
+  resource     String?  // Resource being accessed
+  details      String?  // JSON string with additional details
+  ipAddress    String?
+  userAgent    String?
+  success      Boolean
+  errorMessage String?
+  createdAt    DateTime @default(now())
+
+  // Relations
+  user         User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
 }
 
 model MfaSession {

@@ -5,8 +5,17 @@ import { requiresAuthentication } from './app/lib/navigation-config';
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // Debug logs
-  console.log('Proxy middleware - pathname:', pathname);
+  // Debug logs (uniquement en développement)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Middleware - pathname:', pathname);
+    console.log('Middleware - NODE_ENV:', process.env.NODE_ENV);
+    console.log('Middleware - BACKEND_URL:', process.env.BACKEND_URL);
+  }
+
+  // Ne pas intercepter les requêtes API (gérées par next.config.ts rewrites)
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
 
   // Pages publiques (layout avec fond animé, sans sidebar/header)
   const publicPaths = ['/login', '/register', '/forgot-password'];
@@ -15,7 +24,7 @@ export function proxy(request: NextRequest) {
   // Pages admin (layout admin indépendant)
   const isAdminPath = pathname.startsWith('/admin');
 
-  // Vérifier l'authentification via localStorage (cookies ou headers)
+  // Vérifier l'authentification via cookies ou headers
   const token = request.cookies.get('authToken')?.value || 
                 request.headers.get('authorization')?.replace('Bearer ', '');
 
@@ -31,8 +40,16 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  // Continue with the request
-  return NextResponse.next();
+  // Ajouter des headers pour la production
+  const response = NextResponse.next();
+  
+  // En production, s'assurer que les headers sont correctement configurés
+  if (process.env.NODE_ENV === 'production') {
+    response.headers.set('X-Forwarded-Proto', 'https');
+    response.headers.set('X-Forwarded-Host', request.headers.get('host') || '');
+  }
+
+  return response;
 }
 
 export const config = {
