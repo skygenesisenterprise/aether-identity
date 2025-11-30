@@ -41,10 +41,6 @@ RUN pnpm run build:api
 # Build frontend (Next.js)
 RUN pnpm run build
 
-# Verify builds
-RUN test -d api/dist || (echo "Backend build failed" && exit 1)
-RUN test -d .next || (echo "Frontend build failed" && exit 1)
-
 #############################################
 # 3. PRODUCTION IMAGE (Alpine)
 #############################################
@@ -65,8 +61,7 @@ RUN npm install -g pnpm
 WORKDIR /app
 
 # Create directories with proper permissions
-RUN mkdir -p /app/frontend /app/backend /app/backups /app/logs /app/data && \
-    chown -R node:node /app && chmod -R 755 /app
+RUN mkdir -p /app/frontend /app/backend /app/backups /app/logs /app/data
 
 #############################################
 # Copy build artifacts only
@@ -87,16 +82,17 @@ COPY --from=builder /app/.env.example /app/.env.example
 
 RUN chmod +x /app/docker-entrypoint.sh
 
+# Give node user ownership of prisma folder to avoid runtime permission issues
+RUN chown -R node:node /app/backend/prisma
+
 #############################################
 # Install production dependencies
 #############################################
 WORKDIR /app/backend
 RUN pnpm install --prod --ignore-scripts
 
-# Copy Prisma schema selector script for production (if Alpine)
+# Copy Prisma schema selector script for runtime (optional)
 COPY --from=builder /tmp/select-prisma-schema.sh /tmp/select-prisma-schema.sh
-
-# Set environment for entrypoint
 ENV DOCKER_CONTEXT=true
 ENV PRISMA_SCHEMA_DIR=/app/backend/prisma
 

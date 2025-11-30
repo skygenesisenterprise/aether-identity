@@ -26,106 +26,29 @@ wait_for_postgres() {
         done
 
         echo "✅ PostgreSQL is ready!"
-    else
-        echo "📁 SQLite detected, skipping PostgreSQL wait"
     fi
 }
 
 #############################################
-# Check if database is empty
-#############################################
-is_database_empty() {
-    if [ "$DATABASE_PROVIDER" = "postgresql" ]; then
-        COUNT=$(psql "$DATABASE_URL" -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='public';" 2>/dev/null | tr -d ' ')
-        echo "${COUNT:-0}"
-    else
-        DB_FILE=$(echo "$DATABASE_URL" | sed 's|file:||')
-        if [ -f "$DB_FILE" ]; then
-            COUNT=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';" 2>/dev/null | tr -d ' ')
-            echo "${COUNT:-0}"
-        else
-            echo "0"
-        fi
-    fi
-}
-
-#############################################
-# Check existing users
-#############################################
-check_existing_users() {
-    if [ "$DATABASE_PROVIDER" = "postgresql" ]; then
-        COUNT=$(psql "$DATABASE_URL" -t -c "SELECT COUNT(*) FROM \"users\";" 2>/dev/null | tr -d ' ')
-        echo "${COUNT:-0}"
-    else
-        DB_FILE=$(echo "$DATABASE_URL" | sed 's|file:||')
-        if [ -f "$DB_FILE" ]; then
-            COUNT=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM users;" 2>/dev/null | tr -d ' ')
-            echo "${COUNT:-0}"
-        else
-            echo "0"
-        fi
-    fi
-}
-
-#############################################
-# Create database backup
-#############################################
-create_backup() {
-    if [ "$BACKUP_ENABLED" = "true" ] && [ "$DATABASE_PROVIDER" = "postgresql" ]; then
-        mkdir -p /app/backups
-        BACKUP_FILE="/app/backups/backup-$(date +%Y%m%d-%H%M%S).sql"
-        echo "💾 Creating backup at $BACKUP_FILE..."
-        pg_dump "$DATABASE_URL" > "$BACKUP_FILE"
-        echo "✅ Backup created"
-        echo "$BACKUP_FILE"
-    else
-        echo ""
-    fi
-}
-
-#############################################
-# Apply Prisma migrations if needed
+# Apply migrations
 #############################################
 apply_migrations() {
     echo "📦 Applying Prisma migrations..."
-
-    # Regenerate Prisma client for Alpine (musl) if needed
-    if [ "$DOCKER_CONTEXT" = "true" ]; then
-        echo "🔧 Generating Prisma client for production..."
-        DATABASE_PROVIDER=${DATABASE_PROVIDER:-postgresql} /tmp/select-prisma-schema.sh generate
-    fi
-
-    # Determine migration status
-    STATUS=$(npx prisma migrate status --schema /app/backend/prisma/schema.prisma 2>&1 || echo "error")
-
-    if echo "$STATUS" | grep -q "Your database is up to date"; then
-        echo "✅ Database is up to date"
-    else
-        echo "🔄 Applying pending migrations..."
-        if [ "$NODE_ENV" = "production" ]; then
-            npx prisma migrate deploy --schema /app/backend/prisma/schema.prisma
-        else
-            npx prisma migrate dev --name init --schema /app/backend/prisma/schema.prisma --accept-data-loss
-        fi
-        echo "✅ Migrations applied"
-    fi
+    npx prisma migrate deploy --schema /app/backend/prisma/schema.prisma
+    echo "✅ Migrations applied"
 }
 
 #############################################
 # Seed initial data if needed
 #############################################
 seed_data() {
-    USER_COUNT=$(check_existing_users)
-    if [ "$USER_COUNT" -eq 0 ]; then
+    USER_COUNT=$(psql "$DATABASE_URL" -t -c "SELECT COUNT(*) FROM \"users\";" 2>/dev/null | tr -d ' ' || echo "0")
+    if [ "$USER_COUNT" -eq 0 ] && [ -f "/app/backend/dist/scripts/seed.js" ]; then
         echo "🌱 Seeding initial data..."
-        if [ -f "/app/backend/dist/scripts/seed.js" ]; then
-            node /app/backend/dist/scripts/seed.js
-            echo "✅ Seeding completed"
-        else
-            echo "⚠️ Seed script not found, skipping"
-        fi
+        node /app/backend/dist/scripts/seed.js
+        echo "✅ Seeding completed"
     else
-        echo "✅ Users exist, skipping seeding"
+        echo "✅ Users exist or seed script missing, skipping"
     fi
 }
 
@@ -134,31 +57,12 @@ seed_data() {
 #############################################
 initialize_database() {
     wait_for_postgres
-    TABLE_COUNT=$(is_database_empty)
-
-    if [ "$TABLE_COUNT" -eq 0 ]; then
-        echo "🎯 First deployment detected..."
-        BACKUP_FILE=""
-        if [ "$DATABASE_PROVIDER" = "postgresql" ] && [ "$BACKUP_ENABLED" = "true" ]; then
-            BACKUP_FILE=$(create_backup)
-        fi
-        apply_migrations
-        seed_data
-        echo "✅ First deployment completed"
-    else
-        echo "🔄 Existing database detected..."
-        BACKUP_FILE=""
-        if [ "$AUTO_BACKUP_BEFORE_MIGRATION" = "true" ]; then
-            BACKUP_FILE=$(create_backup)
-        fi
-        apply_migrations
-        seed_data
-        echo "✅ Database update completed"
-    fi
+    apply_migrations
+    seed_data
 }
 
 #############################################
-# Start backend
+# Start services
 #############################################
 start_backend() {
     echo "🔧 Starting backend on port ${BACKEND_PORT:-8080}..."
@@ -173,9 +77,6 @@ start_backend() {
     echo "✅ Backend running (PID $BACKEND_PID)"
 }
 
-#############################################
-# Start frontend
-#############################################
 start_frontend() {
     echo "🎨 Starting frontend on port ${FRONTEND_PORT:-3000}..."
     cd /app/frontend
@@ -189,13 +90,10 @@ start_frontend() {
     echo "✅ Frontend running (PID $FRONTEND_PID)"
 }
 
-#############################################
-# Cleanup function
-#############################################
 cleanup() {
     echo "🛑 Shutting down services..."
-    if [ -n "$BACKEND_PID" ]; then kill "$BACKEND_PID" 2>/dev/null || true; fi
-    if [ -n "$FRONTEND_PID" ]; then kill "$FRONTEND_PID" 2>/dev/null || true; fi
+    [ -n "$BACKEND_PID" ] && kill "$BACKEND_PID" 2>/dev/null || true
+    [ -n "$FRONTEND_PID" ] && kill "$FRONTEND_PID" 2>/dev/null || true
     wait || true
     echo "✅ All services stopped"
 }
@@ -203,7 +101,7 @@ cleanup() {
 trap cleanup SIGTERM SIGINT
 
 #############################################
-# Main execution
+# Main
 #############################################
 initialize_database
 start_backend
