@@ -37,6 +37,10 @@ RUN DATABASE_PROVIDER=${DATABASE_PROVIDER:-sqlite} /tmp/select-prisma-schema.sh 
 # Build backend
 RUN pnpm run build:api
 
+# Generate Prisma Client for TypeScript build
+WORKDIR /app/api
+RUN npx prisma generate --schema prisma/schema.prisma
+
 # Build frontend (Next.js)
 RUN pnpm run build
 
@@ -73,6 +77,7 @@ COPY --from=builder /app/package.json /app/frontend/package.json
 COPY --from=builder /app/api/dist /app/backend/dist
 COPY --from=builder /app/api/prisma /app/backend/prisma
 COPY --from=builder /app/api/package.backend.json /app/backend/package.json
+COPY --from=builder /app/api/node_modules/.prisma /app/backend/node_modules/.prisma
 
 # Scripts and env
 COPY --from=builder /app/docker-entrypoint.sh /app/docker-entrypoint.sh
@@ -82,16 +87,14 @@ RUN chmod +x /app/docker-entrypoint.sh
 #############################################
 # Install production dependencies
 #############################################
-# Backend only (Prisma included)
+# Backend only (avec Prisma)
 WORKDIR /app/backend
 RUN pnpm install --prod
-# Give ownership to node
 RUN chown -R node:node /app/backend
 
 # Frontend dependencies (prod only, no Prisma)
 WORKDIR /app/frontend
 RUN pnpm install --prod --ignore-scripts
-# Give ownership to node
 RUN chown -R node:node /app/frontend
 
 #############################################
