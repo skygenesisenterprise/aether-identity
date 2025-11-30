@@ -212,12 +212,135 @@ main() {
 }
 
 # Execute main function
+main() {
+    # Wait for database
+    wait_for_postgres
+    
+    # Check if database is empty
+    TABLE_COUNT=$(is_database_empty)
+    
+    if [ "$TABLE_COUNT" -eq 0 ]; then
+        echo "🎯 First deployment detected - initializing database..."
+        
+        # Create backup if enabled and PostgreSQL
+        if [ "$DATABASE_PROVIDER" = "postgresql" ] && [ "$BACKUP_ENABLED" = "true" ]; then
+            create_backup
+        fi
+        
+        # Apply initial migrations
+        apply_migrations
+        
+        # Seed initial data
+        seed_data
+        
+        echo "✅ First deployment completed successfully"
+    else
+        echo "🔄 Existing database detected - applying safe updates..."
+        
+        # Create backup before migration if enabled
+        BACKUP_FILE=""
+        if [ "$AUTO_BACKUP_BEFORE_MIGRATION" = "true" ]; then
+            BACKUP_FILE=$(create_backup)
+        fi
+        
+        # Validate schema
+        echo "🔍 Validating database schema..."
+        if ! npx prisma validate --schema /app/backend/prisma/schema.prisma; then
+            echo "❌ Schema validation failed"
+            if [ -n "$BACKUP_FILE" ] && [ "$REQUIRE_MIGRATION_BACKUP" = "true" ]; then
+                echo "🔄 Restoring from backup due to validation failure..."
+                psql "$DATABASE_URL" < "$BACKUP_FILE"
+            fi
+            exit 1
+        fi
+        
+        # Apply migrations
+        apply_migrations
+        
+        # Check if seeding is needed
+        seed_data
+        
+        echo "✅ Database update completed successfully"
+    fi
+    
+    # Final health check
+    echo "🏥 Performing final health check..."
+    if [ "$DATABASE_PROVIDER" = "postgresql" ]; then
+        if ! psql "$DATABASE_URL" -c "SELECT 1;" > /dev/null 2>&1; then
+            echo "❌ Final health check failed"
+            exit 1
+        fi
+    fi
+    echo "✅ Final health check passed"
+    
+    echo "🚀 Starting application services..."
+}
+
+# Function to start backend
+start_backend() {
+    echo "🔧 Starting backend API on port ${BACKEND_PORT:-8080}..."
+    cd /app/backend
+    
+    if [ -f "dist/server.js" ]; then
+        node dist/server.js &
+        BACKEND_PID=$!
+        echo "✅ Backend started with PID: $BACKEND_PID"
+        return $BACKEND_PID
+    else
+        echo "❌ ERROR: dist/server.js not found!"
+        exit 1
+    fi
+}
+
+# Function to start frontend
+start_frontend() {
+    echo "🎨 Starting Next.js frontend on port ${FRONTEND_PORT:-3000}..."
+    cd /app/frontend
+    
+    if [ -f "node_modules/.bin/next" ]; then
+        sh node_modules/.bin/next start -p ${FRONTEND_PORT:-3000} -H 0.0.0.0 &
+        FRONTEND_PID=$!
+        echo "✅ Frontend started with PID: $FRONTEND_PID"
+        return $FRONTEND_PID
+    else
+        echo "❌ ERROR: Next.js binary not found!"
+        exit 1
+    fi
+}
+
+# Cleanup function
+cleanup() {
+    echo "🛑 Shutting down services..."
+    if [ -n "$BACKEND_PID" ]; then
+        kill "$BACKEND_PID" 2>/dev/null || true
+        echo "✅ Backend stopped"
+    fi
+    if [ -n "$FRONTEND_PID" ]; then
+        kill "$FRONTEND_PID" 2>/dev/null || true
+        echo "✅ Frontend stopped"
+    fi
+    wait || true
+    echo "✅ All services stopped"
+}
+
+# Trap signals for cleanup
+trap cleanup SIGTERM SIGINT
+
+# Execute main function
 main
 
-# Start the application
-if [ -f "dist/server.js" ]; then
-    exec node dist/server.js
-else
-    echo "❌ ERROR: dist/server.js not found!"
-    exit 1
-fi
+# Start both services
+BACKEND_PID=$(start_backend)
+FRONTEND_PID=$(start_frontend)
+
+echo ""
+echo "📊 Services running:"
+echo "  ➜ Frontend:        http://localhost:${FRONTEND_PORT:-3000}"
+echo "  ➜ Backend API:     http://localhost:${BACKEND_PORT:-8080}"
+echo "  ➜ Health Check:    http://localhost:${BACKEND_PORT:-8080}/health"
+echo "  ➜ API Docs:        http://localhost:${BACKEND_PORT:-8080}/api/v1/docs"
+echo ""
+echo "Press Ctrl+C to stop all services"
+
+# Wait for all processes
+wait

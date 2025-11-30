@@ -74,6 +74,13 @@ copy_schema() {
     local target_schema=$2
     
     log_info "Copying schema from $source_schema to $target_schema"
+    
+    # Remove target file if it exists to avoid "Plan mode" error
+    if [ -f "$target_schema" ]; then
+        rm -f "$target_schema"
+        log_info "Removed existing target schema"
+    fi
+    
     cp "$source_schema" "$target_schema"
     log_success "Schema copied successfully"
 }
