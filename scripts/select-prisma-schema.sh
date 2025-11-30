@@ -68,21 +68,65 @@ validate_schema() {
     log_success "Schema file found: $schema_file"
 }
 
-# Function to copy schema
+# Function to copy schema with retry mechanism
 copy_schema() {
     local source_schema=$1
     local target_schema=$2
+    local max_retries=3
+    local retry_count=0
     
     log_info "Copying schema from $source_schema to $target_schema"
     
-    # Remove target file if it exists to avoid "Plan mode" error
-    if [ -f "$target_schema" ]; then
-        rm -f "$target_schema"
-        log_info "Removed existing target schema"
-    fi
-    
-    cp "$source_schema" "$target_schema"
-    log_success "Schema copied successfully"
+    while [ $retry_count -lt $max_retries ]; do
+        # Try to remove target file first to avoid "Plan mode" error
+        if [ -f "$target_schema" ]; then
+            if ! rm -f "$target_schema" 2>/dev/null; then
+                log_warning "Cannot remove $target_schema directly, trying with sudo..."
+                if ! sudo rm -f "$target_schema" 2>/dev/null; then
+                    log_warning "Cannot remove $target_schema, trying to overwrite directly..."
+                    # Try to copy with force flag as fallback
+                    if ! cp -f "$source_schema" "$target_schema" 2>/dev/null; then
+                        retry_count=$((retry_count + 1))
+                        if [ $retry_count -lt $max_retries ]; then
+                            log_warning "Copy attempt $retry_count failed, retrying in 2 seconds..."
+                            sleep 2
+                            continue
+                        else
+                            log_error "Failed to copy schema after $max_retries attempts. Please check permissions for $target_schema"
+                            # Try alternative approach: create temp file and move
+                            local temp_schema="${target_schema}.tmp.$$"
+                            if cp "$source_schema" "$temp_schema" && mv "$temp_schema" "$target_schema"; then
+                                log_success "Schema copied successfully using temp file approach"
+                                return 0
+                            else
+                                rm -f "$temp_schema" 2>/dev/null
+                                exit 1
+                            fi
+                        fi
+                    else
+                        log_success "Schema overwritten successfully"
+                        return 0
+                    fi
+                fi
+            fi
+            log_info "Removed existing target schema"
+        fi
+        
+        # Copy the schema
+        if cp "$source_schema" "$target_schema"; then
+            log_success "Schema copied successfully"
+            return 0
+        else
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+                log_warning "Copy attempt $retry_count failed, retrying in 2 seconds..."
+                sleep 2
+            else
+                log_error "Failed to copy schema from $source_schema to $target_schema after $max_retries attempts"
+                exit 1
+            fi
+        fi
+    done
 }
 
 # Function to validate Prisma schema

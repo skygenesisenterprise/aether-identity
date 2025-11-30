@@ -90,42 +90,109 @@ create_backup() {
     fi
 }
 
-# Function to apply migrations
+# Function to apply migrations with retry mechanism
 apply_migrations() {
     echo "📦 Applying database migrations..."
+    local max_retries=3
+    local retry_count=0
     
-    # Generate Prisma client with dynamic schema selection
-    echo "🔧 Selecting and generating Prisma client..."
-    DATABASE_PROVIDER=${DATABASE_PROVIDER:-sqlite} /tmp/select-prisma-schema.sh generate
-    
-    # Check migration status
-    echo "📊 Checking migration status..."
-    MIGRATION_STATUS=$(npx prisma migrate status --schema /app/backend/prisma/schema.prisma 2>&1 || echo "error")
-    
-    if echo "$MIGRATION_STATUS" | grep -q "Your database is up to date"; then
-        echo "✅ Database is up to date - no migration needed"
-        return 0
-    elif echo "$MIGRATION_STATUS" | grep -q "error\|Can't find"; then
-        echo "🎯 No migration history detected - initializing database..."
+    while [ $retry_count -lt $max_retries ]; do
+        # Generate Prisma client with dynamic schema selection
+        echo "🔧 Selecting and generating Prisma client..."
+        if ! DATABASE_PROVIDER=${DATABASE_PROVIDER:-sqlite} /tmp/select-prisma-schema.sh generate; then
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+                echo "⚠️ Prisma client generation failed, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
+                sleep 5
+                continue
+            else
+                echo "❌ Failed to generate Prisma client after $max_retries attempts"
+                exit 1
+            fi
+        fi
         
-        if [ "$NODE_ENV" = "production" ]; then
-            # Production: use db push for initial setup
-            npx prisma db push --schema /app/backend/prisma/schema.prisma
-            echo "📝 Creating initial migration..."
-            npx prisma migrate dev --name init --schema /app/backend/prisma/schema.prisma --accept-data-loss
+        # Check migration status
+        echo "📊 Checking migration status..."
+        MIGRATION_STATUS=$(npx prisma migrate status --schema /app/backend/prisma/schema.prisma 2>&1 || echo "error")
+        
+        if echo "$MIGRATION_STATUS" | grep -q "Your database is up to date"; then
+            echo "✅ Database is up to date - no migration needed"
+            return 0
+        elif echo "$MIGRATION_STATUS" | grep -q "error\|Can't find"; then
+            echo "🎯 No migration history detected - initializing database..."
+            
+            if [ "$NODE_ENV" = "production" ]; then
+                # Production: use db push for initial setup
+                if ! npx prisma db push --schema /app/backend/prisma/schema.prisma; then
+                    retry_count=$((retry_count + 1))
+                    if [ $retry_count -lt $max_retries ]; then
+                        echo "⚠️ Database push failed, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
+                        sleep 5
+                        continue
+                    else
+                        echo "❌ Failed to push database schema after $max_retries attempts"
+                        exit 1
+                    fi
+                fi
+                echo "📝 Creating initial migration..."
+                if ! npx prisma migrate dev --name init --schema /app/backend/prisma/schema.prisma --accept-data-loss; then
+                    retry_count=$((retry_count + 1))
+                    if [ $retry_count -lt $max_retries ]; then
+                        echo "⚠️ Initial migration failed, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
+                        sleep 5
+                        continue
+                    else
+                        echo "❌ Failed to create initial migration after $max_retries attempts"
+                        exit 1
+                    fi
+                fi
+            else
+                # Development: use migrate dev
+                if ! npx prisma migrate dev --name init --schema /app/backend/prisma/schema.prisma --accept-data-loss; then
+                    retry_count=$((retry_count + 1))
+                    if [ $retry_count -lt $max_retries ]; then
+                        echo "⚠️ Development migration failed, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
+                        sleep 5
+                        continue
+                    else
+                        echo "❌ Failed to run development migration after $max_retries attempts"
+                        exit 1
+                    fi
+                fi
+            fi
         else
-            # Development: use migrate dev
-            npx prisma migrate dev --name init --schema /app/backend/prisma/schema.prisma --accept-data-loss
+            echo "🔄 Applying pending migrations..."
+            if [ "$NODE_ENV" = "production" ]; then
+                if ! npx prisma migrate deploy --schema /app/backend/prisma/schema.prisma; then
+                    retry_count=$((retry_count + 1))
+                    if [ $retry_count -lt $max_retries ]; then
+                        echo "⚠️ Migration deploy failed, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
+                        sleep 5
+                        continue
+                    else
+                        echo "❌ Failed to deploy migrations after $max_retries attempts"
+                        exit 1
+                    fi
+                fi
+            else
+                if ! npx prisma migrate dev --schema /app/backend/prisma/schema.prisma; then
+                    retry_count=$((retry_count + 1))
+                    if [ $retry_count -lt $max_retries ]; then
+                        echo "⚠️ Migration dev failed, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
+                        sleep 5
+                        continue
+                    else
+                        echo "❌ Failed to run dev migration after $max_retries attempts"
+                        exit 1
+                    fi
+                fi
+            fi
+            echo "✅ Migrations applied successfully"
         fi
-    else
-        echo "🔄 Applying pending migrations..."
-        if [ "$NODE_ENV" = "production" ]; then
-            npx prisma migrate deploy --schema /app/backend/prisma/schema.prisma
-        else
-            npx prisma migrate dev --schema /app/backend/prisma/schema.prisma
-        fi
-        echo "✅ Migrations applied successfully"
-    fi
+        
+        # If we reach here, migration was successful
+        return 0
+    done
 }
 
 # Function to seed data
@@ -146,8 +213,8 @@ seed_data() {
     fi
 }
 
-# Main execution flow
-main() {
+# Function to initialize database
+initialize_database() {
     # Wait for database
     wait_for_postgres
     
@@ -207,105 +274,86 @@ main() {
         fi
     fi
     echo "✅ Final health check passed"
-    
-    echo "🚀 Starting application server..."
 }
 
-# Execute main function
+# Main execution flow
 main() {
-    # Wait for database
-    wait_for_postgres
+    echo "🚀 Starting Aether Identity initialization..."
     
-    # Check if database is empty
-    TABLE_COUNT=$(is_database_empty)
-    
-    if [ "$TABLE_COUNT" -eq 0 ]; then
-        echo "🎯 First deployment detected - initializing database..."
-        
-        # Create backup if enabled and PostgreSQL
-        if [ "$DATABASE_PROVIDER" = "postgresql" ] && [ "$BACKUP_ENABLED" = "true" ]; then
-            create_backup
-        fi
-        
-        # Apply initial migrations
-        apply_migrations
-        
-        # Seed initial data
-        seed_data
-        
-        echo "✅ First deployment completed successfully"
-    else
-        echo "🔄 Existing database detected - applying safe updates..."
-        
-        # Create backup before migration if enabled
-        BACKUP_FILE=""
-        if [ "$AUTO_BACKUP_BEFORE_MIGRATION" = "true" ]; then
-            BACKUP_FILE=$(create_backup)
-        fi
-        
-        # Validate schema
-        echo "🔍 Validating database schema..."
-        if ! npx prisma validate --schema /app/backend/prisma/schema.prisma; then
-            echo "❌ Schema validation failed"
-            if [ -n "$BACKUP_FILE" ] && [ "$REQUIRE_MIGRATION_BACKUP" = "true" ]; then
-                echo "🔄 Restoring from backup due to validation failure..."
-                psql "$DATABASE_URL" < "$BACKUP_FILE"
-            fi
-            exit 1
-        fi
-        
-        # Apply migrations
-        apply_migrations
-        
-        # Check if seeding is needed
-        seed_data
-        
-        echo "✅ Database update completed successfully"
-    fi
-    
-    # Final health check
-    echo "🏥 Performing final health check..."
-    if [ "$DATABASE_PROVIDER" = "postgresql" ]; then
-        if ! psql "$DATABASE_URL" -c "SELECT 1;" > /dev/null 2>&1; then
-            echo "❌ Final health check failed"
-            exit 1
-        fi
-    fi
-    echo "✅ Final health check passed"
+    # Initialize database
+    initialize_database
     
     echo "🚀 Starting application services..."
 }
 
-# Function to start backend
+# Function to start backend with retry
 start_backend() {
     echo "🔧 Starting backend API on port ${BACKEND_PORT:-8080}..."
     cd /app/backend
+    local max_retries=3
+    local retry_count=0
     
-    if [ -f "dist/server.js" ]; then
+    while [ $retry_count -lt $max_retries ]; do
+        if [ ! -f "dist/server.js" ]; then
+            echo "❌ ERROR: dist/server.js not found!"
+            exit 1
+        fi
+        
+        # Start backend in background
         node dist/server.js &
         BACKEND_PID=$!
-        echo "✅ Backend started with PID: $BACKEND_PID"
-        return $BACKEND_PID
-    else
-        echo "❌ ERROR: dist/server.js not found!"
-        exit 1
-    fi
+        
+        # Wait a moment and check if process is still running
+        sleep 3
+        if kill -0 "$BACKEND_PID" 2>/dev/null; then
+            echo "✅ Backend started successfully with PID: $BACKEND_PID"
+            return $BACKEND_PID
+        else
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+                echo "⚠️ Backend failed to start, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
+                sleep 5
+            else
+                echo "❌ Failed to start backend after $max_retries attempts"
+                exit 1
+            fi
+        fi
+    done
 }
 
-# Function to start frontend
+# Function to start frontend with retry
 start_frontend() {
     echo "🎨 Starting Next.js frontend on port ${FRONTEND_PORT:-3000}..."
     cd /app/frontend
+    local max_retries=3
+    local retry_count=0
     
-    if [ -f "node_modules/.bin/next" ]; then
+    while [ $retry_count -lt $max_retries ]; do
+        if [ ! -f "node_modules/.bin/next" ]; then
+            echo "❌ ERROR: Next.js binary not found!"
+            exit 1
+        fi
+        
+        # Start frontend in background
         sh node_modules/.bin/next start -p ${FRONTEND_PORT:-3000} -H 0.0.0.0 &
         FRONTEND_PID=$!
-        echo "✅ Frontend started with PID: $FRONTEND_PID"
-        return $FRONTEND_PID
-    else
-        echo "❌ ERROR: Next.js binary not found!"
-        exit 1
-    fi
+        
+        # Wait a moment and check if process is still running
+        sleep 5
+        if kill -0 "$FRONTEND_PID" 2>/dev/null; then
+            echo "✅ Frontend started successfully with PID: $FRONTEND_PID"
+            return $FRONTEND_PID
+        else
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+                echo "⚠️ Frontend failed to start, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
+                sleep 5
+            else
+                echo "❌ Failed to start frontend after $max_retries attempts"
+                exit 1
+            fi
+        fi
+    done
 }
 
 # Cleanup function
