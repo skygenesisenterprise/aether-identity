@@ -6,13 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.tokenService = exports.TokenService = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const crypto_1 = __importDefault(require("crypto"));
+const keyManagementService_1 = require("./keyManagementService");
 class TokenService {
     constructor() {
         this.accessTokenExpiry = '15m';
         this.refreshTokenExpiry = '30d';
         this.idTokenExpiry = '15m';
-        this.issuer = 'https://sso.skygenesisenterprise.com';
-        this.audience = 'api.skygenesisenterprise.com';
+        this.issuer = 'https://sso.skygenesisenterprise.net';
+        this.audience = 'api.skygenesisenterprise.net';
         this.privateKey = '';
         this.publicKey = '';
     }
@@ -39,9 +40,9 @@ class TokenService {
         const options = {
             expiresIn: this.accessTokenExpiry,
             algorithm: 'RS256',
-            keyid: this.getKeyId()
+            keyid: keyManagementService_1.keyManagementService.getCurrentKeyId()
         };
-        return jsonwebtoken_1.default.sign(claims, this.getPrivateKey(), options);
+        return jsonwebtoken_1.default.sign(claims, keyManagementService_1.keyManagementService.getPrivateKey(), options);
     }
     /**
      * Generate OAuth2/OIDC compliant ID token
@@ -71,9 +72,9 @@ class TokenService {
         const options = {
             expiresIn: this.idTokenExpiry,
             algorithm: 'RS256',
-            keyid: this.getKeyId()
+            keyid: keyManagementService_1.keyManagementService.getCurrentKeyId()
         };
-        return jsonwebtoken_1.default.sign(claims, this.getPrivateKey(), options);
+        return jsonwebtoken_1.default.sign(claims, keyManagementService_1.keyManagementService.getPrivateKey(), options);
     }
     /**
      * Generate refresh token
@@ -91,10 +92,10 @@ class TokenService {
         const options = {
             expiresIn: this.refreshTokenExpiry,
             algorithm: 'RS256',
-            keyid: this.getKeyId(),
+            keyid: keyManagementService_1.keyManagementService.getCurrentKeyId(),
             jwtid: jti
         };
-        return jsonwebtoken_1.default.sign(claims, this.getPrivateKey(), options);
+        return jsonwebtoken_1.default.sign(claims, keyManagementService_1.keyManagementService.getPrivateKey(), options);
     }
     /**
      * Verify access token
@@ -105,7 +106,7 @@ class TokenService {
             issuer: this.issuer,
             audience: this.audience
         };
-        return jsonwebtoken_1.default.verify(token, this.getPublicKey(), options);
+        return jsonwebtoken_1.default.verify(token, keyManagementService_1.keyManagementService.getPublicKey(), options);
     }
     /**
      * Verify ID token
@@ -118,7 +119,7 @@ class TokenService {
         if (clientId) {
             options.audience = clientId;
         }
-        return jsonwebtoken_1.default.verify(token, this.getPublicKey(), options);
+        return jsonwebtoken_1.default.verify(token, keyManagementService_1.keyManagementService.getPublicKey(), options);
     }
     /**
      * Verify refresh token
@@ -128,7 +129,7 @@ class TokenService {
             algorithms: ['RS256'],
             issuer: this.issuer
         };
-        const decoded = jsonwebtoken_1.default.verify(token, this.getPublicKey(), options);
+        const decoded = jsonwebtoken_1.default.verify(token, keyManagementService_1.keyManagementService.getPublicKey(), options);
         if (decoded.type !== 'refresh') {
             throw new Error('Invalid token type');
         }

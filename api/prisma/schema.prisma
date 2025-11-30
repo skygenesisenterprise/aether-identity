@@ -50,6 +50,7 @@ model User {
   auditLogs   AuditLog[]
   ssoSessions SsoSession[]
   refreshTokens RefreshToken[]
+  webhooks    Webhook[]
 
   @@map("users")
 }
@@ -380,5 +381,47 @@ model MfaSession {
   user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("mfa_sessions")
+}
+
+// Webhook System
+model Webhook {
+  id          String   @id @default(cuid())
+  url         String
+  secret      String   // HMAC secret for signature verification
+  events      String   // JSON array of events to subscribe to
+  isActive    Boolean  @default(true)
+  description String?
+  timeout     Int      @default(30000) // Timeout in milliseconds
+  retryCount  Int      @default(3) // Number of retries
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  creator     User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  deliveries  WebhookDelivery[]
+
+  @@map("webhooks")
+}
+
+model WebhookDelivery {
+  id          String   @id @default(cuid())
+  webhookId   String
+  eventType   String   // user.created, user.updated, etc.
+  payload     String   // JSON payload
+  response    String?  // Response from webhook endpoint
+  statusCode  Int?
+  success     Boolean  @default(false)
+  attempts    Int      @default(0)
+  maxAttempts Int      @default(3)
+  nextRetryAt DateTime?
+  deliveredAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  webhook     Webhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@map("webhook_deliveries")
 }
 

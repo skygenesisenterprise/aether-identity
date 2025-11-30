@@ -41,6 +41,12 @@ import ssoRoutes from './routes/ssoRoutes';
 import mfaRoutes from './routes/mfaRoutes';
 import totpRoutes from './routes/totpRoutes';
 import qrcodeRoutes from './routes/qrcodeRoutes';
+import oidcRoutes from './routes/oidcRoutes';
+import webhookRoutes from './routes/webhookRoutes';
+import roleRoutes from './routes/roleRoutes';
+
+// OIDC well-known endpoints
+app.use('/.well-known', oidcRoutes);
 
 // API v1 routes
 app.use('/api/v1/auth', authRoutes);
@@ -51,6 +57,8 @@ app.use('/api/v1/qrcode', qrcodeRoutes);
 app.use('/api/v1/accounts', accountRoutes);
 app.use('/api/v1/api-tokens', apiTokenRoutes);
 app.use('/api/v1/clients', clientApplicationRoutes);
+app.use('/api/v1/webhooks', webhookRoutes);
+app.use('/api/v1/roles', roleRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {

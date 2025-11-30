@@ -6,7 +6,7 @@ exports.config = {
     port: process.env.PORT ? parseInt(process.env.PORT) : 8080,
     nodeEnv: process.env.NODE_ENV || 'development',
     database: {
-        url: process.env.DATABASE_URL || 'file:./prisma/dev.db',
+        url: process.env.DATABASE_URL || 'file:./api/prisma/dev.db',
     },
     jwt: {
         secret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',

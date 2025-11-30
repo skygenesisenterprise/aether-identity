@@ -1,6 +1,6 @@
 import jwt, { SignOptions, VerifyOptions } from 'jsonwebtoken';
 import crypto from 'crypto';
-
+import { keyManagementService } from './keyManagementService';
 
 export interface TokenClaims {
   sub: string;
@@ -39,8 +39,8 @@ export class TokenService {
   private readonly accessTokenExpiry = '15m';
   private readonly refreshTokenExpiry = '30d';
   private readonly idTokenExpiry = '15m';
-  private readonly issuer = 'https://sso.skygenesisenterprise.com';
-  private readonly audience = 'api.skygenesisenterprise.com';
+  private readonly issuer = 'https://sso.skygenesisenterprise.net';
+  private readonly audience = 'api.skygenesisenterprise.net';
 
   /**
    * Generate OAuth2/OIDC compliant access token
@@ -66,10 +66,10 @@ export class TokenService {
     const options: SignOptions = {
       expiresIn: this.accessTokenExpiry,
       algorithm: 'RS256',
-      keyid: this.getKeyId()
+      keyid: keyManagementService.getCurrentKeyId()
     };
 
-    return jwt.sign(claims, this.getPrivateKey(), options);
+    return jwt.sign(claims, keyManagementService.getPrivateKey(), options);
   }
 
   /**
@@ -102,10 +102,10 @@ export class TokenService {
     const options: SignOptions = {
       expiresIn: this.idTokenExpiry,
       algorithm: 'RS256',
-      keyid: this.getKeyId()
+      keyid: keyManagementService.getCurrentKeyId()
     };
 
-    return jwt.sign(claims, this.getPrivateKey(), options);
+    return jwt.sign(claims, keyManagementService.getPrivateKey(), options);
   }
 
   /**
@@ -126,11 +126,11 @@ export class TokenService {
     const options: SignOptions = {
       expiresIn: this.refreshTokenExpiry,
       algorithm: 'RS256',
-      keyid: this.getKeyId(),
+      keyid: keyManagementService.getCurrentKeyId(),
       jwtid: jti
     };
 
-    return jwt.sign(claims, this.getPrivateKey(), options);
+    return jwt.sign(claims, keyManagementService.getPrivateKey(), options);
   }
 
   /**
@@ -143,7 +143,7 @@ export class TokenService {
       audience: this.audience
     };
 
-    return jwt.verify(token, this.getPublicKey(), options) as AccessTokenClaims;
+    return jwt.verify(token, keyManagementService.getPublicKey(), options) as AccessTokenClaims;
   }
 
   /**
@@ -159,7 +159,7 @@ export class TokenService {
       options.audience = clientId;
     }
 
-    return jwt.verify(token, this.getPublicKey(), options) as IdTokenClaims;
+    return jwt.verify(token, keyManagementService.getPublicKey(), options) as IdTokenClaims;
   }
 
   /**
@@ -171,7 +171,7 @@ export class TokenService {
       issuer: this.issuer
     };
 
-    const decoded = jwt.verify(token, this.getPublicKey(), options) as RefreshTokenClaims;
+    const decoded = jwt.verify(token, keyManagementService.getPublicKey(), options) as RefreshTokenClaims;
     
     if (decoded.type !== 'refresh') {
       throw new Error('Invalid token type');
@@ -313,7 +313,7 @@ export class TokenService {
   /**
    * Get public key for verification
    */
-  private getPublicKey(): string {
+  public getPublicKey(): string {
     if (process.env.JWT_PUBLIC_KEY) {
       return process.env.JWT_PUBLIC_KEY;
     }
@@ -326,7 +326,7 @@ export class TokenService {
   /**
    * Get key ID for key rotation support
    */
-  private getKeyId(): string {
+  public getKeyId(): string {
     return process.env.JWT_KEY_ID || 'default-key';
   }
 
