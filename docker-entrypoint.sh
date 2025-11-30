@@ -35,8 +35,6 @@ wait_for_postgres() {
 apply_migrations() {
     echo "📦 Applying Prisma migrations..."
     cd /app/backend
-    # Assure que les permissions sont correctes
-    chmod -R 755 node_modules
     npx prisma migrate deploy --schema prisma/schema.prisma
     echo "✅ Migrations applied"
 }
