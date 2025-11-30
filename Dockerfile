@@ -8,7 +8,7 @@ RUN npm install -g pnpm
 
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Copy workspace package files and install dependencies
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
@@ -79,19 +79,20 @@ COPY --from=builder /app/docker-entrypoint.sh /app/docker-entrypoint.sh
 COPY --from=builder /app/.env.example /app/.env.example
 RUN chmod +x /app/docker-entrypoint.sh
 
-# Give node user ownership of backend folders
-RUN chown -R node:node /app/backend
-
 #############################################
 # Install production dependencies
 #############################################
-# Backend only (with Prisma)
+# Backend only (Prisma included)
 WORKDIR /app/backend
-RUN pnpm install --prod --ignore-scripts
+RUN pnpm install --prod
+# Give ownership to node
+RUN chown -R node:node /app/backend
 
 # Frontend dependencies (prod only, no Prisma)
 WORKDIR /app/frontend
 RUN pnpm install --prod --ignore-scripts
+# Give ownership to node
+RUN chown -R node:node /app/frontend
 
 #############################################
 # Default environment variables
