@@ -1,394 +1,221 @@
 #!/bin/sh
 set -e
 
-echo "🚀 Starting Aether Identity Backend..."
+echo "🚀 Starting Aether Identity..."
 echo "📍 Environment: $NODE_ENV"
 echo "🗄️  Database Provider: $DATABASE_PROVIDER"
 echo "🔗 Database URL: $(echo $DATABASE_URL | sed 's|://.*@|://***:***@|')"
 
-cd /app/backend
-
-# Function to wait for PostgreSQL
+#############################################
+# Wait for PostgreSQL if needed
+#############################################
 wait_for_postgres() {
     if [ "$DATABASE_PROVIDER" = "postgresql" ]; then
-        echo "⏳ Waiting for PostgreSQL to be ready..."
+        echo "⏳ Waiting for PostgreSQL..."
         MAX_RETRIES=${POSTGRES_HEALTH_CHECK_RETRIES:-30}
         RETRY_COUNT=0
-        
-        while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-            if pg_isready -h ${POSTGRES_HOST:-postgres} -p ${POSTGRES_PORT:-5432} -U ${POSTGRES_USER:-aether_user} -d ${POSTGRES_DB:-aether_identity}; then
-                echo "✅ PostgreSQL is ready!"
-                break
-            fi
-            
+
+        until pg_isready -h "${POSTGRES_HOST:-postgres}" -p "${POSTGRES_PORT:-5432}" -U "${POSTGRES_USER:-aether_user}" -d "${POSTGRES_DB:-aether_identity}" > /dev/null 2>&1; do
             RETRY_COUNT=$((RETRY_COUNT + 1))
-            echo "⏳ Attempt $RETRY_COUNT/$MAX_RETRIES: PostgreSQL not ready, waiting..."
+            echo "⏳ Attempt $RETRY_COUNT/$MAX_RETRIES: PostgreSQL not ready..."
+            if [ "$RETRY_COUNT" -ge "$MAX_RETRIES" ]; then
+                echo "❌ PostgreSQL connection failed after $MAX_RETRIES attempts"
+                exit 1
+            fi
             sleep 2
         done
-        
-        if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-            echo "❌ PostgreSQL connection failed after $MAX_RETRIES attempts"
-            exit 1
-        fi
-        
-        # Test database connection
-        echo "🔍 Testing database connection..."
-        if ! psql "$DATABASE_URL" -c "SELECT 1;" > /dev/null 2>&1; then
-            echo "❌ Database connection test failed"
-            exit 1
-        fi
-        echo "✅ Database connection successful"
+
+        echo "✅ PostgreSQL is ready!"
     else
-        echo "📁 SQLite database detected - skipping PostgreSQL wait"
+        echo "📁 SQLite detected, skipping PostgreSQL wait"
     fi
 }
 
-# Function to check if database is empty
+#############################################
+# Check if database is empty
+#############################################
 is_database_empty() {
     if [ "$DATABASE_PROVIDER" = "postgresql" ]; then
-        TABLE_COUNT=$(psql "$DATABASE_URL" -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public';" 2>/dev/null | tr -d ' ' || echo "0")
-        echo "$TABLE_COUNT"
+        COUNT=$(psql "$DATABASE_URL" -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='public';" 2>/dev/null | tr -d ' ')
+        echo "${COUNT:-0}"
     else
-        # For SQLite, check if database file exists and has tables
         DB_FILE=$(echo "$DATABASE_URL" | sed 's|file:||')
         if [ -f "$DB_FILE" ]; then
-            TABLE_COUNT=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';" 2>/dev/null | tr -d ' ' || echo "0")
-            echo "$TABLE_COUNT"
+            COUNT=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';" 2>/dev/null | tr -d ' ')
+            echo "${COUNT:-0}"
         else
             echo "0"
         fi
     fi
 }
 
-# Function to check if users exist
+#############################################
+# Check existing users
+#############################################
 check_existing_users() {
     if [ "$DATABASE_PROVIDER" = "postgresql" ]; then
-        USER_COUNT=$(psql "$DATABASE_URL" -t -c "SELECT COUNT(*) FROM \"users\";" 2>/dev/null | tr -d ' ' || echo "0")
-        echo "$USER_COUNT"
+        COUNT=$(psql "$DATABASE_URL" -t -c "SELECT COUNT(*) FROM \"users\";" 2>/dev/null | tr -d ' ')
+        echo "${COUNT:-0}"
     else
         DB_FILE=$(echo "$DATABASE_URL" | sed 's|file:||')
         if [ -f "$DB_FILE" ]; then
-            USER_COUNT=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM users;" 2>/dev/null | tr -d ' ' || echo "0")
-            echo "$USER_COUNT"
+            COUNT=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM users;" 2>/dev/null | tr -d ' ')
+            echo "${COUNT:-0}"
         else
             echo "0"
         fi
     fi
 }
 
-# Function to create backup
+#############################################
+# Create database backup
+#############################################
 create_backup() {
     if [ "$BACKUP_ENABLED" = "true" ] && [ "$DATABASE_PROVIDER" = "postgresql" ]; then
-        echo "💾 Creating backup..."
-        BACKUP_FILE="/app/backups/backup-$(date +%Y%m%d-%H%M%S).sql"
         mkdir -p /app/backups
+        BACKUP_FILE="/app/backups/backup-$(date +%Y%m%d-%H%M%S).sql"
+        echo "💾 Creating backup at $BACKUP_FILE..."
         pg_dump "$DATABASE_URL" > "$BACKUP_FILE"
-        echo "✅ Backup created: $BACKUP_FILE"
+        echo "✅ Backup created"
         echo "$BACKUP_FILE"
     else
         echo ""
     fi
 }
 
-# Function to apply migrations with retry mechanism
+#############################################
+# Apply Prisma migrations if needed
+#############################################
 apply_migrations() {
-    echo "📦 Applying database migrations..."
-    local max_retries=3
-    local retry_count=0
-    
-    while [ $retry_count -lt $max_retries ]; do
-        # Generate Prisma client with dynamic schema selection
-        echo "🔧 Selecting and generating Prisma client..."
-        if ! DATABASE_PROVIDER=${DATABASE_PROVIDER:-sqlite} /tmp/select-prisma-schema.sh generate; then
-            retry_count=$((retry_count + 1))
-            if [ $retry_count -lt $max_retries ]; then
-                echo "⚠️ Prisma client generation failed, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
-                sleep 5
-                continue
-            else
-                echo "❌ Failed to generate Prisma client after $max_retries attempts"
-                exit 1
-            fi
-        fi
-        
-        # Check migration status
-        echo "📊 Checking migration status..."
-        MIGRATION_STATUS=$(npx prisma migrate status --schema /app/backend/prisma/schema.prisma 2>&1 || echo "error")
-        
-        if echo "$MIGRATION_STATUS" | grep -q "Your database is up to date"; then
-            echo "✅ Database is up to date - no migration needed"
-            return 0
-        elif echo "$MIGRATION_STATUS" | grep -q "error\|Can't find"; then
-            echo "🎯 No migration history detected - initializing database..."
-            
-            if [ "$NODE_ENV" = "production" ]; then
-                # Production: use db push for initial setup
-                if ! npx prisma db push --schema /app/backend/prisma/schema.prisma; then
-                    retry_count=$((retry_count + 1))
-                    if [ $retry_count -lt $max_retries ]; then
-                        echo "⚠️ Database push failed, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
-                        sleep 5
-                        continue
-                    else
-                        echo "❌ Failed to push database schema after $max_retries attempts"
-                        exit 1
-                    fi
-                fi
-                echo "📝 Creating initial migration..."
-                if ! npx prisma migrate dev --name init --schema /app/backend/prisma/schema.prisma --accept-data-loss; then
-                    retry_count=$((retry_count + 1))
-                    if [ $retry_count -lt $max_retries ]; then
-                        echo "⚠️ Initial migration failed, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
-                        sleep 5
-                        continue
-                    else
-                        echo "❌ Failed to create initial migration after $max_retries attempts"
-                        exit 1
-                    fi
-                fi
-            else
-                # Development: use migrate dev
-                if ! npx prisma migrate dev --name init --schema /app/backend/prisma/schema.prisma --accept-data-loss; then
-                    retry_count=$((retry_count + 1))
-                    if [ $retry_count -lt $max_retries ]; then
-                        echo "⚠️ Development migration failed, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
-                        sleep 5
-                        continue
-                    else
-                        echo "❌ Failed to run development migration after $max_retries attempts"
-                        exit 1
-                    fi
-                fi
-            fi
-        else
-            echo "🔄 Applying pending migrations..."
-            if [ "$NODE_ENV" = "production" ]; then
-                if ! npx prisma migrate deploy --schema /app/backend/prisma/schema.prisma; then
-                    retry_count=$((retry_count + 1))
-                    if [ $retry_count -lt $max_retries ]; then
-                        echo "⚠️ Migration deploy failed, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
-                        sleep 5
-                        continue
-                    else
-                        echo "❌ Failed to deploy migrations after $max_retries attempts"
-                        exit 1
-                    fi
-                fi
-            else
-                if ! npx prisma migrate dev --schema /app/backend/prisma/schema.prisma; then
-                    retry_count=$((retry_count + 1))
-                    if [ $retry_count -lt $max_retries ]; then
-                        echo "⚠️ Migration dev failed, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
-                        sleep 5
-                        continue
-                    else
-                        echo "❌ Failed to run dev migration after $max_retries attempts"
-                        exit 1
-                    fi
-                fi
-            fi
-            echo "✅ Migrations applied successfully"
-        fi
-        
-        # If we reach here, migration was successful
-        return 0
-    done
-}
+    echo "📦 Applying Prisma migrations..."
 
-# Function to seed data
-seed_data() {
-    echo "🌱 Checking if seeding is needed..."
-    USER_COUNT=$(check_existing_users)
-    
-    if [ "$USER_COUNT" -eq 0 ]; then
-        echo "🌱 No users found - running seeding..."
-        if [ -f "/app/backend/dist/scripts/seed.js" ]; then
-            node /app/backend/dist/scripts/seed.js
-            echo "✅ Seeding completed successfully"
-        else
-            echo "⚠️ Seed script not found - skipping seeding"
-        fi
+    # Regenerate Prisma client for Alpine (musl) if needed
+    if [ "$DOCKER_CONTEXT" = "true" ]; then
+        echo "🔧 Generating Prisma client for production..."
+        DATABASE_PROVIDER=${DATABASE_PROVIDER:-postgresql} /tmp/select-prisma-schema.sh generate
+    fi
+
+    # Determine migration status
+    STATUS=$(npx prisma migrate status --schema /app/backend/prisma/schema.prisma 2>&1 || echo "error")
+
+    if echo "$STATUS" | grep -q "Your database is up to date"; then
+        echo "✅ Database is up to date"
     else
-        echo "✅ Users exist - skipping seeding to protect existing data"
+        echo "🔄 Applying pending migrations..."
+        if [ "$NODE_ENV" = "production" ]; then
+            npx prisma migrate deploy --schema /app/backend/prisma/schema.prisma
+        else
+            npx prisma migrate dev --name init --schema /app/backend/prisma/schema.prisma --accept-data-loss
+        fi
+        echo "✅ Migrations applied"
     fi
 }
 
-# Function to initialize database
-initialize_database() {
-    # Wait for database
-    wait_for_postgres
-    
-    # Check if database is empty
-    TABLE_COUNT=$(is_database_empty)
-    
-    if [ "$TABLE_COUNT" -eq 0 ]; then
-        echo "🎯 First deployment detected - initializing database..."
-        
-        # Create backup if enabled and PostgreSQL
-        if [ "$DATABASE_PROVIDER" = "postgresql" ] && [ "$BACKUP_ENABLED" = "true" ]; then
-            create_backup
+#############################################
+# Seed initial data if needed
+#############################################
+seed_data() {
+    USER_COUNT=$(check_existing_users)
+    if [ "$USER_COUNT" -eq 0 ]; then
+        echo "🌱 Seeding initial data..."
+        if [ -f "/app/backend/dist/scripts/seed.js" ]; then
+            node /app/backend/dist/scripts/seed.js
+            echo "✅ Seeding completed"
+        else
+            echo "⚠️ Seed script not found, skipping"
         fi
-        
-        # Apply initial migrations
-        apply_migrations
-        
-        # Seed initial data
-        seed_data
-        
-        echo "✅ First deployment completed successfully"
     else
-        echo "🔄 Existing database detected - applying safe updates..."
-        
-        # Create backup before migration if enabled
+        echo "✅ Users exist, skipping seeding"
+    fi
+}
+
+#############################################
+# Initialize database
+#############################################
+initialize_database() {
+    wait_for_postgres
+    TABLE_COUNT=$(is_database_empty)
+
+    if [ "$TABLE_COUNT" -eq 0 ]; then
+        echo "🎯 First deployment detected..."
+        BACKUP_FILE=""
+        if [ "$DATABASE_PROVIDER" = "postgresql" ] && [ "$BACKUP_ENABLED" = "true" ]; then
+            BACKUP_FILE=$(create_backup)
+        fi
+        apply_migrations
+        seed_data
+        echo "✅ First deployment completed"
+    else
+        echo "🔄 Existing database detected..."
         BACKUP_FILE=""
         if [ "$AUTO_BACKUP_BEFORE_MIGRATION" = "true" ]; then
             BACKUP_FILE=$(create_backup)
         fi
-        
-        # Validate schema
-        echo "🔍 Validating database schema..."
-        if ! npx prisma validate --schema /app/backend/prisma/schema.prisma; then
-            echo "❌ Schema validation failed"
-            if [ -n "$BACKUP_FILE" ] && [ "$REQUIRE_MIGRATION_BACKUP" = "true" ]; then
-                echo "🔄 Restoring from backup due to validation failure..."
-                psql "$DATABASE_URL" < "$BACKUP_FILE"
-            fi
-            exit 1
-        fi
-        
-        # Apply migrations
         apply_migrations
-        
-        # Check if seeding is needed
         seed_data
-        
-        echo "✅ Database update completed successfully"
+        echo "✅ Database update completed"
     fi
-    
-    # Final health check
-    echo "🏥 Performing final health check..."
-    if [ "$DATABASE_PROVIDER" = "postgresql" ]; then
-        if ! psql "$DATABASE_URL" -c "SELECT 1;" > /dev/null 2>&1; then
-            echo "❌ Final health check failed"
-            exit 1
-        fi
-    fi
-    echo "✅ Final health check passed"
 }
 
-# Main execution flow
-main() {
-    echo "🚀 Starting Aether Identity initialization..."
-    
-    # Initialize database
-    initialize_database
-    
-    echo "🚀 Starting application services..."
-}
-
-# Function to start backend with retry
+#############################################
+# Start backend
+#############################################
 start_backend() {
-    echo "🔧 Starting backend API on port ${BACKEND_PORT:-8080}..."
+    echo "🔧 Starting backend on port ${BACKEND_PORT:-8080}..."
     cd /app/backend
-    local max_retries=3
-    local retry_count=0
-    
-    while [ $retry_count -lt $max_retries ]; do
-        if [ ! -f "dist/server.js" ]; then
-            echo "❌ ERROR: dist/server.js not found!"
-            exit 1
-        fi
-        
-        # Start backend in background
-        node dist/server.js &
-        BACKEND_PID=$!
-        
-        # Wait a moment and check if process is still running
-        sleep 3
-        if kill -0 "$BACKEND_PID" 2>/dev/null; then
-            echo "✅ Backend started successfully with PID: $BACKEND_PID"
-            return $BACKEND_PID
-        else
-            retry_count=$((retry_count + 1))
-            if [ $retry_count -lt $max_retries ]; then
-                echo "⚠️ Backend failed to start, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
-                sleep 5
-            else
-                echo "❌ Failed to start backend after $max_retries attempts"
-                exit 1
-            fi
-        fi
-    done
+    node dist/server.js &
+    BACKEND_PID=$!
+    sleep 3
+    if ! kill -0 "$BACKEND_PID" 2>/dev/null; then
+        echo "❌ Backend failed to start"
+        exit 1
+    fi
+    echo "✅ Backend running (PID $BACKEND_PID)"
 }
 
-# Function to start frontend with retry
+#############################################
+# Start frontend
+#############################################
 start_frontend() {
-    echo "🎨 Starting Next.js frontend on port ${FRONTEND_PORT:-3000}..."
+    echo "🎨 Starting frontend on port ${FRONTEND_PORT:-3000}..."
     cd /app/frontend
-    local max_retries=3
-    local retry_count=0
-    
-    while [ $retry_count -lt $max_retries ]; do
-        if [ ! -f "node_modules/.bin/next" ]; then
-            echo "❌ ERROR: Next.js binary not found!"
-            exit 1
-        fi
-        
-        # Start frontend in background
-        sh node_modules/.bin/next start -p ${FRONTEND_PORT:-3000} -H 0.0.0.0 &
-        FRONTEND_PID=$!
-        
-        # Wait a moment and check if process is still running
-        sleep 5
-        if kill -0 "$FRONTEND_PID" 2>/dev/null; then
-            echo "✅ Frontend started successfully with PID: $FRONTEND_PID"
-            return $FRONTEND_PID
-        else
-            retry_count=$((retry_count + 1))
-            if [ $retry_count -lt $max_retries ]; then
-                echo "⚠️ Frontend failed to start, retrying in 5 seconds... (attempt $retry_count/$max_retries)"
-                sleep 5
-            else
-                echo "❌ Failed to start frontend after $max_retries attempts"
-                exit 1
-            fi
-        fi
-    done
+    sh node_modules/.bin/next start -p "${FRONTEND_PORT:-3000}" -H 0.0.0.0 &
+    FRONTEND_PID=$!
+    sleep 5
+    if ! kill -0 "$FRONTEND_PID" 2>/dev/null; then
+        echo "❌ Frontend failed to start"
+        exit 1
+    fi
+    echo "✅ Frontend running (PID $FRONTEND_PID)"
 }
 
+#############################################
 # Cleanup function
+#############################################
 cleanup() {
     echo "🛑 Shutting down services..."
-    if [ -n "$BACKEND_PID" ]; then
-        kill "$BACKEND_PID" 2>/dev/null || true
-        echo "✅ Backend stopped"
-    fi
-    if [ -n "$FRONTEND_PID" ]; then
-        kill "$FRONTEND_PID" 2>/dev/null || true
-        echo "✅ Frontend stopped"
-    fi
+    if [ -n "$BACKEND_PID" ]; then kill "$BACKEND_PID" 2>/dev/null || true; fi
+    if [ -n "$FRONTEND_PID" ]; then kill "$FRONTEND_PID" 2>/dev/null || true; fi
     wait || true
     echo "✅ All services stopped"
 }
 
-# Trap signals for cleanup
 trap cleanup SIGTERM SIGINT
 
-# Execute main function
-main
-
-# Start both services
-BACKEND_PID=$(start_backend)
-FRONTEND_PID=$(start_frontend)
+#############################################
+# Main execution
+#############################################
+initialize_database
+start_backend
+start_frontend
 
 echo ""
 echo "📊 Services running:"
-echo "  ➜ Frontend:        http://localhost:${FRONTEND_PORT:-3000}"
-echo "  ➜ Backend API:     http://localhost:${BACKEND_PORT:-8080}"
-echo "  ➜ Health Check:    http://localhost:${BACKEND_PORT:-8080}/health"
-echo "  ➜ API Docs:        http://localhost:${BACKEND_PORT:-8080}/api/v1/docs"
+echo "  ➜ Frontend: http://localhost:${FRONTEND_PORT:-3000}"
+echo "  ➜ Backend:  http://localhost:${BACKEND_PORT:-8080}"
+echo "  ➜ Health:   http://localhost:${BACKEND_PORT:-8080}/health"
+echo "  ➜ API Docs: http://localhost:${BACKEND_PORT:-8080}/api/v1/docs"
 echo ""
 echo "Press Ctrl+C to stop all services"
 
-# Wait for all processes
 wait
