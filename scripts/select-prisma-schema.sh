@@ -31,11 +31,28 @@ log_error() {
 
 # Get database provider from environment
 DATABASE_PROVIDER=${DATABASE_PROVIDER:-sqlite}
-SCHEMA_DIR=${SCHEMA_DIR:-./api/prisma}
-TARGET_SCHEMA=${SCHEMA_DIR}/schema.prisma
+
+# Detect context (Docker vs Local)
+if [ -n "$DOCKER_CONTEXT" ]; then
+    SCHEMA_DIR=${PRISMA_SCHEMA_DIR:-/app/api/prisma}
+    TARGET_SCHEMA=${SCHEMA_DIR}/schema.prisma
+    CONTEXT="docker"
+    log_info "Docker context detected"
+elif [ -f "/app/backend/prisma/schema.postgresql.prisma" ]; then
+    SCHEMA_DIR=/app/backend/prisma
+    TARGET_SCHEMA=${SCHEMA_DIR}/schema.prisma
+    CONTEXT="docker"
+    log_info "Docker context detected (backend path)"
+else
+    SCHEMA_DIR=${SCHEMA_DIR:-./api/prisma}
+    TARGET_SCHEMA=${SCHEMA_DIR}/schema.prisma
+    CONTEXT="local"
+    log_info "Local context detected"
+fi
 
 log_info "Prisma Schema Selector"
 log_info "Database Provider: $DATABASE_PROVIDER"
+log_info "Context: $CONTEXT"
 log_info "Schema Directory: $SCHEMA_DIR"
 log_info "Target Schema: $TARGET_SCHEMA"
 
@@ -44,6 +61,8 @@ validate_schema() {
     local schema_file=$1
     if [ ! -f "$schema_file" ]; then
         log_error "Schema file not found: $schema_file"
+        log_info "Available files in $(dirname "$schema_file"):"
+        ls -la "$(dirname "$schema_file")" 2>/dev/null || echo "Directory not accessible"
         exit 1
     fi
     log_success "Schema file found: $schema_file"

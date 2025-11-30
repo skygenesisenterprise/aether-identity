@@ -26,6 +26,10 @@ COPY . .
 COPY scripts/select-prisma-schema.sh /tmp/select-prisma-schema.sh
 RUN chmod +x /tmp/select-prisma-schema.sh
 
+# Set Docker context environment variables for build stage
+ENV DOCKER_CONTEXT=true
+ENV PRISMA_SCHEMA_DIR=/app/api/prisma
+
 # Generate Prisma client with dynamic schema selection
 RUN DATABASE_PROVIDER=${DATABASE_PROVIDER:-sqlite} /tmp/select-prisma-schema.sh generate
 
@@ -91,6 +95,10 @@ RUN pnpm install --prod --ignore-scripts
 
 # Copy Prisma schema selector script to production
 COPY --from=builder /tmp/select-prisma-schema.sh /tmp/select-prisma-schema.sh
+
+# Set Docker context environment variables
+ENV DOCKER_CONTEXT=true
+ENV PRISMA_SCHEMA_DIR=/app/backend/prisma
 
 # Regenerate Prisma for linux-musl with dynamic provider
 RUN DATABASE_PROVIDER=${DATABASE_PROVIDER:-postgresql} /tmp/select-prisma-schema.sh generate
