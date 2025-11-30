@@ -22,8 +22,12 @@ ENV DATABASE_PROVIDER=${DATABASE_PROVIDER}
 
 COPY . .
 
-# Generate Prisma client first
-RUN npx prisma generate --schema api/prisma/schema.prisma
+# Copy Prisma schema selector script
+COPY scripts/select-prisma-schema.sh /tmp/select-prisma-schema.sh
+RUN chmod +x /tmp/select-prisma-schema.sh
+
+# Generate Prisma client with dynamic schema selection
+RUN DATABASE_PROVIDER=${DATABASE_PROVIDER:-sqlite} /tmp/select-prisma-schema.sh generate
 
 # Build backend
 RUN pnpm run build:api
@@ -85,8 +89,11 @@ RUN chmod +x /app/docker-entrypoint.sh
 WORKDIR /app/backend
 RUN pnpm install --prod --ignore-scripts
 
+# Copy Prisma schema selector script to production
+COPY --from=builder /tmp/select-prisma-schema.sh /tmp/select-prisma-schema.sh
+
 # Regenerate Prisma for linux-musl with dynamic provider
-RUN npx prisma generate --schema /app/backend/prisma/schema.prisma
+RUN DATABASE_PROVIDER=${DATABASE_PROVIDER:-postgresql} /tmp/select-prisma-schema.sh generate
 
 WORKDIR /app/frontend
 RUN pnpm install --prod --ignore-scripts

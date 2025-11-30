@@ -10,10 +10,16 @@
     "start": "next start -H 0.0.0.0",
     "start:api": "node api/dist/server.js",
     "lint": "eslint",
-    "db:generate": "prisma generate --schema api/prisma/schema.prisma",
-    "db:push": "prisma db push --schema api/prisma/schema.prisma",
-    "db:migrate": "prisma migrate dev --schema api/prisma/schema.prisma",
-    "db:studio": "prisma studio --schema api/prisma/schema.prisma"
+    "db:select": "./scripts/select-prisma-schema.sh",
+    "db:generate": "./scripts/select-prisma-schema.sh generate",
+    "db:validate": "./scripts/select-prisma-schema.sh validate",
+    "db:push": "./scripts/select-prisma-schema.sh generate && prisma db push --schema api/prisma/schema.prisma",
+    "db:migrate": "./scripts/select-prisma-schema.sh generate && prisma migrate dev --schema api/prisma/schema.prisma",
+    "db:migrate:deploy": "./scripts/select-prisma-schema.sh generate && prisma migrate deploy --schema api/prisma/schema.prisma",
+    "db:studio": "./scripts/select-prisma-schema.sh generate && prisma studio --schema api/prisma/schema.prisma",
+    "db:reset": "./scripts/select-prisma-schema.sh generate && prisma migrate reset --schema api/prisma/schema.prisma --force",
+    "db:seed": "node api/dist/scripts/seed.js",
+    "db:setup": "npm run db:generate && npm run db:migrate:deploy && npm run db:seed"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

@@ -94,9 +94,9 @@ create_backup() {
 apply_migrations() {
     echo "📦 Applying database migrations..."
     
-    # Generate Prisma client first
-    echo "🔧 Generating Prisma client..."
-    npx prisma generate --schema /app/backend/prisma/schema.prisma
+    # Generate Prisma client with dynamic schema selection
+    echo "🔧 Selecting and generating Prisma client..."
+    DATABASE_PROVIDER=${DATABASE_PROVIDER:-sqlite} /tmp/select-prisma-schema.sh generate
     
     # Check migration status
     echo "📊 Checking migration status..."
