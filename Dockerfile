@@ -13,6 +13,13 @@ RUN pnpm install --frozen-lockfile
 # 2. BUILDER (Debian) – build backend + frontend
 #############################################
 FROM base AS builder
+ARG NODE_ENV=production
+ARG DATABASE_PROVIDER=postgresql
+
+# Set build environment
+ENV NODE_ENV=${NODE_ENV}
+ENV DATABASE_PROVIDER=${DATABASE_PROVIDER}
+
 COPY . .
 
 # Generate Prisma client first
@@ -33,17 +40,24 @@ RUN test -d .next || (echo "Frontend build failed" && exit 1)
 #############################################
 FROM node:20-alpine AS production
 
-# Required system libs
-RUN apk add --no-cache sqlite curl openssl
+# Required system libs for both SQLite and PostgreSQL
+RUN apk add --no-cache \
+    sqlite \
+    curl \
+    openssl \
+    postgresql-client \
+    bash \
+    ncurses
 
 # Install pnpm
 RUN npm install -g pnpm && pnpm --version
 
 WORKDIR /app
 
-# Create dirs
-RUN mkdir -p /app/frontend /app/backend
-
+# Create dirs with proper permissions
+RUN mkdir -p /app/frontend /app/backend /app/backups /app/logs /app/data && \
+    chown -R node:node /app && \
+    chmod -R 755 /app
 
 #############################################
 # Copy build artifacts only (no node_modules)
@@ -58,6 +72,12 @@ COPY --from=builder /app/api/dist /app/backend/dist
 COPY --from=builder /app/api/prisma /app/backend/prisma
 COPY --from=builder /app/api/package.backend.json /app/backend/package.json
 
+# Copy scripts and configuration
+COPY --from=builder /app/docker-entrypoint.sh /app/docker-entrypoint.sh
+COPY --from=builder /app/.env.example /app/.env.example
+
+# Make scripts executable
+RUN chmod +x /app/docker-entrypoint.sh
 
 #############################################
 # Reinstall dependencies purposely in Alpine
@@ -65,32 +85,50 @@ COPY --from=builder /app/api/package.backend.json /app/backend/package.json
 WORKDIR /app/backend
 RUN pnpm install --prod --ignore-scripts
 
-# Regenerate Prisma for linux-musl
+# Regenerate Prisma for linux-musl with dynamic provider
 RUN npx prisma generate --schema /app/backend/prisma/schema.prisma
 
 WORKDIR /app/frontend
 RUN pnpm install --prod --ignore-scripts
 
-
 #############################################
-# DB directory with proper permissions
-RUN mkdir -p /app/backend/data && \
-    chown -R node:node /app/backend && \
-    chmod -R 755 /app/backend/data
-
+# Default Environment Variables
 #############################################
-# Entrypoint
-#############################################
-COPY docker-entrypoint.sh /app/docker-entrypoint.sh
-RUN chmod +x /app/docker-entrypoint.sh
-
 ENV NODE_ENV=production
-ENV DATABASE_URL="file:/app/backend/data/dev.db"
+ENV DATABASE_PROVIDER=postgresql
+ENV DATABASE_URL=""
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Default safety settings
+ENV BACKUP_ENABLED=true
+ENV AUTO_BACKUP_BEFORE_MIGRATION=true
+ENV DISABLE_DB_RESET=true
+ENV DISABLE_SEED_OVERRIDE=true
+ENV REQUIRE_MIGRATION_BACKUP=true
+
+# Default logging
+ENV LOG_LEVEL=warn
+ENV LOG_FILE=logs/api.log
+
+# Default ports
+ENV PORT=8080
+ENV BACKEND_PORT=8080
+ENV FRONTEND_PORT=3000
+
+# Default PostgreSQL settings
+ENV POSTGRES_HOST=postgres
+ENV POSTGRES_PORT=5432
+ENV POSTGRES_DB=aether_identity
+ENV POSTGRES_USER=aether_user
+
+# Expose ports
 EXPOSE 3000 8080
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8080/health || exit 1
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:${BACKEND_PORT:-8080}/health || exit 1
+
+# Set user
+USER node
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]

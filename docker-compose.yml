@@ -1,44 +1,210 @@
 version: '3.8'
 
 services:
-  # Backend API service
-  backend:
-    build: .
-    ports:
-      - "8080:8080"  # Backend API
+  # PostgreSQL Database Service
+  postgres:
+    image: postgres:15-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-aether}-postgres
     environment:
-      - NODE_ENV=production
-      - DATABASE_URL=file:/app/data/dev.db
-      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-      - JWT_EXPIRES_IN=24h
-      - API_CORS_ORIGINS=http://localhost:3000,http://localhost:8080
-      - PORT=8080
-      - NEXT_TELEMETRY_DISABLED=1
+      POSTGRES_DB: ${POSTGRES_DB:-aether_identity}
+      POSTGRES_USER: ${POSTGRES_USER:-aether_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
     volumes:
-      - ./data:/app/data
-      - ./logs:/app/logs
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  # Frontend service
-  frontend:
-    build: .
+      - postgres_data:/var/lib/postgresql/data
+      - ${BACKUP_DIR:-./backups}:/backups
+      - ${INIT_SCRIPTS_DIR:-./init-scripts}:/docker-entrypoint-initdb.d
     ports:
-      - "3000:3000"  # Frontend
-    environment:
-      - NODE_ENV=production
-      - BACKEND_URL=http://backend:8080
-      - API_BASE_URL=http://backend:8080
-      - NEXT_TELEMETRY_DISABLED=1
-    depends_on:
-      - backend
-    restart: unless-stopped
+      - "${POSTGRES_PORT:-5432}:5432"
+    restart: ${RESTART_POLICY:-unless-stopped}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aether_user} -d ${POSTGRES_DB:-aether_identity}"]
+      interval: ${POSTGRES_HEALTH_CHECK_INTERVAL:-10s}
+      timeout: ${POSTGRES_HEALTH_CHECK_TIMEOUT:-5s}
+      retries: ${POSTGRES_HEALTH_CHECK_RETRIES:-10}
+      start_period: ${POSTGRES_HEALTH_CHECK_START_PERIOD:-30s}
+    networks:
+      - ${COMPOSE_PROJECT_NAME:-aether}-network
+    profiles:
+      - postgres
+      - production
 
+  # Backend API Service
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=${NODE_ENV:-production}
+        - DATABASE_PROVIDER=${DATABASE_PROVIDER:-postgresql}
+    container_name: ${COMPOSE_PROJECT_NAME:-aether}-backend
+    environment:
+      # Core Configuration
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${BACKEND_PORT:-8080}
+      
+      # Database Configuration
+      - DATABASE_PROVIDER=${DATABASE_PROVIDER:-postgresql}
+      - DATABASE_URL=${DATABASE_URL}
+      - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - POSTGRES_DB=${POSTGRES_DB:-aether_identity}
+      - POSTGRES_USER=${POSTGRES_USER:-aether_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      
+      # Security Configuration
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-24h}
+      - API_CORS_ORIGINS=${API_CORS_ORIGINS}
+      
+      # Backup & Safety Configuration
+      - BACKUP_ENABLED=${BACKUP_ENABLED:-true}
+      - AUTO_BACKUP_BEFORE_MIGRATION=${AUTO_BACKUP_BEFORE_MIGRATION:-true}
+      - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-30}
+      - DISABLE_DB_RESET=${DISABLE_DB_RESET:-true}
+      - DISABLE_SEED_OVERRIDE=${DISABLE_SEED_OVERRIDE:-true}
+      - REQUIRE_MIGRATION_BACKUP=${REQUIRE_MIGRATION_BACKUP:-true}
+      
+      # Logging Configuration
+      - LOG_LEVEL=${LOG_LEVEL:-warn}
+      - LOG_FILE=${LOG_FILE:-logs/api.log}
+      
+      # Feature Flags
+      - API_DOCS_ENABLED=${API_DOCS_ENABLED:-false}
+      - NEXT_TELEMETRY_DISABLED=${NEXT_TELEMETRY_DISABLED:-1}
+    volumes:
+      - ${BACKUP_DIR:-./backups}:/app/backups
+      - ${LOGS_DIR:-./logs}:/app/logs
+      - ${DATA_DIR:-./data}:/app/data
+    ports:
+      - "${BACKEND_PORT:-8080}:${BACKEND_PORT:-8080}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: ${RESTART_POLICY:-unless-stopped}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${BACKEND_PORT:-8080}/health"]
+      interval: ${BACKEND_HEALTH_CHECK_INTERVAL:-30s}
+      timeout: ${BACKEND_HEALTH_CHECK_TIMEOUT:-10s}
+      retries: ${BACKEND_HEALTH_CHECK_RETRIES:-3}
+      start_period: ${BACKEND_HEALTH_CHECK_START_PERIOD:-60s}
+    networks:
+      - ${COMPOSE_PROJECT_NAME:-aether}-network
+    profiles:
+      - backend
+      - production
+
+  # Frontend Service
+  frontend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=${NODE_ENV:-production}
+    container_name: ${COMPOSE_PROJECT_NAME:-aether}-frontend
+    environment:
+      # Core Configuration
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${FRONTEND_PORT:-3000}
+      
+      # Backend Configuration
+      - BACKEND_URL=${BACKEND_URL:-http://backend:${BACKEND_PORT:-8080}}
+      - API_BASE_URL=${API_BASE_URL:-http://backend:${BACKEND_PORT:-8080}}
+      
+      # Feature Flags
+      - NEXT_TELEMETRY_DISABLED=${NEXT_TELEMETRY_DISABLED:-1}
+    ports:
+      - "${FRONTEND_PORT:-3000}:${FRONTEND_PORT:-3000}"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: ${RESTART_POLICY:-unless-stopped}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${FRONTEND_PORT:-3000}"]
+      interval: ${FRONTEND_HEALTH_CHECK_INTERVAL:-30s}
+      timeout: ${FRONTEND_HEALTH_CHECK_TIMEOUT:-10s}
+      retries: ${FRONTEND_HEALTH_CHECK_RETRIES:-3}
+      start_period: ${FRONTEND_HEALTH_CHECK_START_PERIOD:-30s}
+    networks:
+      - ${COMPOSE_PROJECT_NAME:-aether}-network
+    profiles:
+      - frontend
+      - production
+
+  # Development Services (only loaded in development)
+  postgres-dev:
+    extends: postgres
+    container_name: ${COMPOSE_PROJECT_NAME:-aether}-postgres-dev
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-aether_identity_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-aether_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_DEV_PORT:-5433}:5432"
+    profiles:
+      - development
+
+  backend-dev:
+    extends: backend
+    container_name: ${COMPOSE_PROJECT_NAME:-aether}-backend-dev
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=${DATABASE_URL_DEV:-postgresql://${POSTGRES_USER:-aether_user}:${POSTGRES_PASSWORD}@postgres-dev:5432/${POSTGRES_DB:-aether_identity_dev}}
+      - BACKUP_ENABLED=false
+      - DISABLE_DB_RESET=false
+      - DISABLE_SEED_OVERRIDE=false
+      - API_DOCS_ENABLED=true
+      - LOG_LEVEL=debug
+    volumes:
+      - ./api:/app/api
+      - ./api/src:/app/backend/src
+      - ./logs:/app/logs
+    ports:
+      - "${BACKEND_DEV_PORT:-8081}:8080"
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+    profiles:
+      - development
+
+  frontend-dev:
+    extends: frontend
+    container_name: ${COMPOSE_PROJECT_NAME:-aether}-frontend-dev
+    environment:
+      - NODE_ENV=development
+      - BACKEND_URL=http://backend-dev:${BACKEND_DEV_PORT:-8081}
+      - API_BASE_URL=http://backend-dev:${BACKEND_DEV_PORT:-8081}
+    volumes:
+      - ./app:/app/app
+      - ./public:/app/public
+      - ./.next:/app/.next
+    ports:
+      - "${FRONTEND_DEV_PORT:-3001}:3000"
+    depends_on:
+      backend-dev:
+        condition: service_healthy
+    profiles:
+      - development
+
+# Volumes Configuration
 volumes:
-  data:
-  logs:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: ${POSTGRES_VOLUME_TYPE:-none}
+      o: bind
+      device: ${POSTGRES_DATA_DIR:-./data/postgres}
+  postgres_dev_data:
+    driver: local
+    driver_opts:
+      type: ${POSTGRES_VOLUME_TYPE:-none}
+      o: bind
+      device: ${POSTGRES_DEV_DATA_DIR:-./data/postgres-dev}
+
+# Networks Configuration
+networks:
+  ${COMPOSE_PROJECT_NAME:-aether}-network:
+    driver: ${NETWORK_DRIVER:-bridge}
+    name: ${COMPOSE_PROJECT_NAME:-aether}-network
