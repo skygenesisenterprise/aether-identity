@@ -30,11 +30,14 @@ wait_for_postgres() {
 }
 
 #############################################
-# Apply migrations
+# Apply migrations (backend only)
 #############################################
 apply_migrations() {
     echo "📦 Applying Prisma migrations..."
-    npx prisma migrate deploy --schema /app/backend/prisma/schema.prisma
+    cd /app/backend
+    # Assure que les permissions sont correctes
+    chmod -R 755 node_modules
+    npx prisma migrate deploy --schema prisma/schema.prisma
     echo "✅ Migrations applied"
 }
 
@@ -42,10 +45,11 @@ apply_migrations() {
 # Seed initial data if needed
 #############################################
 seed_data() {
+    cd /app/backend
     USER_COUNT=$(psql "$DATABASE_URL" -t -c "SELECT COUNT(*) FROM \"users\";" 2>/dev/null | tr -d ' ' || echo "0")
-    if [ "$USER_COUNT" -eq 0 ] && [ -f "/app/backend/dist/scripts/seed.js" ]; then
+    if [ "$USER_COUNT" -eq 0 ] && [ -f "dist/scripts/seed.js" ]; then
         echo "🌱 Seeding initial data..."
-        node /app/backend/dist/scripts/seed.js
+        node dist/scripts/seed.js
         echo "✅ Seeding completed"
     else
         echo "✅ Users exist or seed script missing, skipping"
@@ -80,6 +84,7 @@ start_backend() {
 start_frontend() {
     echo "🎨 Starting frontend on port ${FRONTEND_PORT:-3000}..."
     cd /app/frontend
+    # On n'essaie plus d'écrire dans node_modules si Prisma n'est pas nécessaire
     sh node_modules/.bin/next start -p "${FRONTEND_PORT:-3000}" -H 0.0.0.0 &
     FRONTEND_PID=$!
     sleep 5
