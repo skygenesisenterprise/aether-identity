@@ -15,10 +15,14 @@ wait_for_postgres() {
         MAX_RETRIES=${POSTGRES_HEALTH_CHECK_RETRIES:-30}
         RETRY_COUNT=0
 
-        until pg_isready -h "${POSTGRES_HOST:-postgres}" -p "${POSTGRES_PORT:-5432}" -U "${POSTGRES_USER:-aether_user}" -d "${POSTGRES_DB:-aether_identity}" > /dev/null 2>&1; do
+        until pg_isready -h "${POSTGRES_HOST:-postgres}" -p "${POSTGRES_PORT:-5432}" \
+                          -U "${POSTGRES_USER:-aether_user}" -d "${POSTGRES_DB:-aether_identity}" > /dev/null 2>&1; do
             RETRY_COUNT=$((RETRY_COUNT + 1))
             echo "⏳ Attempt $RETRY_COUNT/$MAX_RETRIES: PostgreSQL not ready..."
-            [ "$RETRY_COUNT" -ge "$MAX_RETRIES" ] && { echo "❌ PostgreSQL connection failed"; exit 1; }
+            if [ "$RETRY_COUNT" -ge "$MAX_RETRIES" ]; then
+                echo "❌ PostgreSQL connection failed after $MAX_RETRIES attempts"
+                exit 1
+            fi
             sleep 2
         done
         echo "✅ PostgreSQL is ready!"
@@ -26,12 +30,14 @@ wait_for_postgres() {
 }
 
 #############################################
-# Apply migrations (backend only)
+# Apply Prisma migrations (backend only)
 #############################################
 apply_migrations() {
     echo "📦 Applying Prisma migrations..."
     cd /app/backend
-    npx prisma migrate deploy
+    # Assure-toi que Prisma Client est généré
+    npx prisma generate --schema prisma/schema.prisma
+    npx prisma migrate deploy --schema prisma/schema.prisma
     echo "✅ Migrations applied"
 }
 
@@ -73,7 +79,8 @@ start_backend() {
 start_frontend() {
     echo "🎨 Starting frontend on port ${FRONTEND_PORT:-3000}..."
     cd /app/frontend
-    sh node_modules/.bin/next start -p "${FRONTEND_PORT:-3000}" -H 0.0.0.0 &
+    # Utiliser NODE_ENV=production pour Next.js
+    NODE_ENV=production sh node_modules/.bin/next start -p "${FRONTEND_PORT:-3000}" -H 0.0.0.0 &
     FRONTEND_PID=$!
     sleep 5
     kill -0 "$FRONTEND_PID" 2>/dev/null || { echo "❌ Frontend failed to start"; exit 1; }
@@ -81,7 +88,7 @@ start_frontend() {
 }
 
 #############################################
-# Cleanup
+# Cleanup on exit
 #############################################
 cleanup() {
     echo "🛑 Shutting down services..."
@@ -102,6 +109,7 @@ initialize_database() {
     seed_data
 }
 
+# Run everything
 initialize_database
 start_backend
 start_frontend
@@ -115,4 +123,5 @@ echo "  ➜ API Docs: http://localhost:${BACKEND_PORT:-8080}/api/v1/docs"
 echo ""
 echo "Press Ctrl+C to stop all services"
 
+# Wait for background processes
 wait

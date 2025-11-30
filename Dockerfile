@@ -31,7 +31,7 @@ COPY . .
 COPY scripts/select-prisma-schema.sh /tmp/select-prisma-schema.sh
 RUN chmod +x /tmp/select-prisma-schema.sh
 
-# Generate Prisma client (backend only)
+# Generate Prisma Client for backend
 RUN DATABASE_PROVIDER=${DATABASE_PROVIDER:-sqlite} /tmp/select-prisma-schema.sh generate
 
 # Build backend
@@ -66,7 +66,7 @@ WORKDIR /app
 RUN mkdir -p /app/frontend /app/backend /app/backups /app/logs /app/data
 
 #############################################
-# Copy build artifacts only
+# Copy build artifacts
 #############################################
 # Frontend
 COPY --from=builder /app/.next /app/frontend/.next
@@ -77,7 +77,6 @@ COPY --from=builder /app/package.json /app/frontend/package.json
 COPY --from=builder /app/api/dist /app/backend/dist
 COPY --from=builder /app/api/prisma /app/backend/prisma
 COPY --from=builder /app/api/package.backend.json /app/backend/package.json
-COPY --from=builder /app/api/node_modules/.prisma /app/backend/node_modules/.prisma
 
 # Scripts and env
 COPY --from=builder /app/docker-entrypoint.sh /app/docker-entrypoint.sh
@@ -90,6 +89,8 @@ RUN chmod +x /app/docker-entrypoint.sh
 # Backend only (avec Prisma)
 WORKDIR /app/backend
 RUN pnpm install --prod
+# Regenerate Prisma Client to ensure .prisma/client exists
+RUN npx prisma generate --schema prisma/schema.prisma
 RUN chown -R node:node /app/backend
 
 # Frontend dependencies (prod only, no Prisma)
