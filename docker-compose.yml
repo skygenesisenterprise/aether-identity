@@ -46,7 +46,7 @@ services:
       NODE_ENV: ${NODE_ENV:-production}
       DATABASE_PROVIDER: ${DATABASE_PROVIDER:-postgresql}
       DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:password@postgres:5432/aether_identity}
-      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_HOST: postgres
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
       POSTGRES_DB: ${POSTGRES_DB:-aether_identity}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -68,13 +68,13 @@ services:
       - ${LOGS_DIR:-./logs}:/app/logs
       - ${DATA_DIR:-./data}:/app/data
     ports:
-      - "${BACKEND_PORT:-8080}:${BACKEND_PORT:-8080}"
+      - "${BACKEND_PORT:-8080}:8080"
     depends_on:
       postgres:
         condition: service_healthy
     restart: ${RESTART_POLICY:-unless-stopped}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${BACKEND_PORT:-8080}/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
       interval: ${BACKEND_HEALTH_CHECK_INTERVAL:-30s}
       timeout: ${BACKEND_HEALTH_CHECK_TIMEOUT:-10s}
       retries: ${BACKEND_HEALTH_CHECK_RETRIES:-3}
@@ -94,17 +94,17 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME:-aether}-frontend
     environment:
       NODE_ENV: ${NODE_ENV:-production}
-      BACKEND_URL: ${BACKEND_URL:-http://backend:8080}
-      API_BASE_URL: ${API_BASE_URL:-http://backend:8080}
+      BACKEND_URL: http://backend:8080
+      API_BASE_URL: http://backend:8080
       NEXT_TELEMETRY_DISABLED: ${NEXT_TELEMETRY_DISABLED:-1}
     ports:
-      - "${FRONTEND_PORT:-3000}:${FRONTEND_PORT:-3000}"
+      - "${FRONTEND_PORT:-3000}:3000"
     depends_on:
       backend:
         condition: service_healthy
     restart: ${RESTART_POLICY:-unless-stopped}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${FRONTEND_PORT:-3000}"]
+      test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
       interval: ${FRONTEND_HEALTH_CHECK_INTERVAL:-30s}
       timeout: ${FRONTEND_HEALTH_CHECK_TIMEOUT:-10s}
       retries: ${FRONTEND_HEALTH_CHECK_RETRIES:-3}
