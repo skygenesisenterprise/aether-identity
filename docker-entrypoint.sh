@@ -16,7 +16,7 @@ wait_for_postgres() {
         RETRY_COUNT=0
 
         until pg_isready -h "${POSTGRES_HOST:-postgres}" -p "${POSTGRES_PORT:-5432}" \
-                          -U "${POSTGRES_USER:-aether_user}" -d "${POSTGRES_DB:-aether_identity}" > /dev/null 2>&1; do
+                          -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-aether_identity}" > /dev/null 2>&1; do
             RETRY_COUNT=$((RETRY_COUNT + 1))
             echo "⏳ Attempt $RETRY_COUNT/$MAX_RETRIES: PostgreSQL not ready..."
             if [ "$RETRY_COUNT" -ge "$MAX_RETRIES" ]; then
