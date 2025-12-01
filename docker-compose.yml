@@ -3,7 +3,7 @@ version: '3.8'
 services:
 
   postgres:
-  image: postgres:16
+  image: postgres:16-alpine
   container_name: ${COMPOSE_PROJECT_NAME:-aether}-postgres
   environment:
     POSTGRES_DB: ${POSTGRES_DB:-aether_identity}
@@ -16,7 +16,7 @@ services:
     - ${INIT_SCRIPTS_DIR:-./init-scripts}:/docker-entrypoint-initdb.d
   ports:
     - "${POSTGRES_PORT:-5432}:5432"
-  restart: ${RESTART_POLICY:-no-restart}
+  restart: ${RESTART_POLICY:-unless-stopped}
   healthcheck:
     test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-aether_identity}"]
     interval: ${POSTGRES_HEALTH_CHECK_INTERVAL:-10s}
