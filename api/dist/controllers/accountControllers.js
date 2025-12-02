@@ -80,7 +80,7 @@ class AccountController {
                     sub: user.id,
                     email: user.email,
                     role: user.role,
-                    permissions: this.getUserPermissions(user.role)
+                    permissions: this.getRolePermissions(user.role)
                 }, config.jwt.secret, { expiresIn: config.jwt.expiresIn });
                 const refreshToken = jwt.sign({ sub: user.id, type: 'refresh' }, config.jwt.secret, { expiresIn: '7d' });
                 const idToken = jwt.sign({
@@ -191,7 +191,7 @@ class AccountController {
                     sub: user.id,
                     email: user.email,
                     role: user.role,
-                    permissions: this.getUserPermissions(user.role)
+                    permissions: this.getRolePermissions(user.role)
                 }, config.jwt.secret, { expiresIn: config.jwt.expiresIn });
                 const refreshToken = jwt.sign({ sub: user.id, type: 'refresh' }, config.jwt.secret, { expiresIn: '7d' });
                 const idToken = jwt.sign({
@@ -428,7 +428,148 @@ class AccountController {
                 });
             }
         };
-        // Placeholder methods for 2FA and other features
+        /**
+         * POST /api/v1/accounts/delete
+         */
+        this.deleteAccount = async (req, res) => {
+            if (this.handleValidationErrors(req, res))
+                return;
+            try {
+                const { password } = req.body;
+                const userId = req.user.id;
+                // Get user to verify password
+                const user = await database_1.prisma.user.findUnique({
+                    where: { id: userId }
+                });
+                if (!user) {
+                    res.status(404).json({
+                        error: 'User not found',
+                        code: 'USER_NOT_FOUND'
+                    });
+                    return;
+                }
+                // Verify password
+                const isPasswordValid = await bcryptjs_1.default.compare(password, user.password);
+                if (!isPasswordValid) {
+                    res.status(401).json({
+                        error: 'Invalid password',
+                        code: 'INVALID_PASSWORD'
+                    });
+                    return;
+                }
+                // Soft delete - mark as deleted
+                await database_1.prisma.user.update({
+                    where: { id: userId },
+                    data: {
+                        status: 'DELETED',
+                        email: `deleted_${Date.now()}_${user.email}` // Prevent email reuse
+                    }
+                });
+                res.status(200).json({
+                    success: true,
+                    message: 'Account deleted successfully'
+                });
+            }
+            catch (error) {
+                console.error('Delete account error:', error);
+                res.status(500).json({
+                    error: 'Internal server error',
+                    code: 'DELETE_ACCOUNT_ERROR'
+                });
+            }
+        };
+        /**
+         * GET /api/v1/accounts/sessions
+         */
+        this.getSessions = async (req, res) => {
+            try {
+                const userId = req.user.id;
+                const sessions = await database_1.prisma.session.findMany({
+                    where: { userId },
+                    orderBy: { createdAt: 'desc' },
+                    take: 20
+                });
+                res.status(200).json({
+                    success: true,
+                    data: sessions.map(session => ({
+                        id: session.id,
+                        createdAt: session.createdAt,
+                        expiresAt: session.expiresAt,
+                        isActive: session.expiresAt > new Date(),
+                        userAgent: session.userAgent,
+                        ipAddress: session.ipAddress
+                    }))
+                });
+            }
+            catch (error) {
+                console.error('Get sessions error:', error);
+                res.status(500).json({
+                    error: 'Internal server error',
+                    code: 'GET_SESSIONS_ERROR'
+                });
+            }
+        };
+        /**
+         * DELETE /api/v1/accounts/sessions/:sessionId
+         */
+        this.revokeSession = async (req, res) => {
+            try {
+                const { sessionId } = req.params;
+                const userId = req.user.id;
+                // Delete the specific session
+                const deleted = await database_1.prisma.session.deleteMany({
+                    where: {
+                        id: sessionId,
+                        userId: userId
+                    }
+                });
+                if (deleted.count === 0) {
+                    res.status(404).json({
+                        error: 'Session not found',
+                        code: 'SESSION_NOT_FOUND'
+                    });
+                    return;
+                }
+                res.status(200).json({
+                    success: true,
+                    message: 'Session revoked successfully'
+                });
+            }
+            catch (error) {
+                console.error('Revoke session error:', error);
+                res.status(500).json({
+                    error: 'Internal server error',
+                    code: 'REVOKE_SESSION_ERROR'
+                });
+            }
+        };
+        /**
+         * DELETE /api/v1/accounts/sessions
+         */
+        this.revokeAllSessions = async (req, res) => {
+            try {
+                const userId = req.user.id;
+                // Delete all sessions except current
+                await database_1.prisma.session.deleteMany({
+                    where: {
+                        userId: userId,
+                        // Note: We would need to track current session ID to exclude it
+                    }
+                });
+                res.status(200).json({
+                    success: true,
+                    message: 'All sessions revoked successfully'
+                });
+            }
+            catch (error) {
+                console.error('Revoke all sessions error:', error);
+                res.status(500).json({
+                    error: 'Internal server error',
+                    code: 'REVOKE_ALL_SESSIONS_ERROR'
+                });
+            }
+        };
+        // Placeholder methods for 2FA features
         this.enable2FA = async (req, res) => {
             res.status(501).json({
                 error: 'Feature not implemented yet',
@@ -442,30 +583,6 @@ class AccountController {
             });
         };
         this.verify2FA = async (req, res) => {
-            res.status(501).json({
-                error: 'Feature not implemented yet',
-                code: 'NOT_IMPLEMENTED'
-            });
-        };
-        this.deleteAccount = async (req, res) => {
-            res.status(501).json({
-                error: 'Feature not implemented yet',
-                code: 'NOT_IMPLEMENTED'
-            });
-        };
-        this.getSessions = async (req, res) => {
-            res.status(501).json({
-                error: 'Feature not implemented yet',
-                code: 'NOT_IMPLEMENTED'
-            });
-        };
-        this.revokeSession = async (req, res) => {
-            res.status(501).json({
-                error: 'Feature not implemented yet',
-                code: 'NOT_IMPLEMENTED'
-            });
-        };
-        this.revokeAllSessions = async (req, res) => {
             res.status(501).json({
                 error: 'Feature not implemented yet',
                 code: 'NOT_IMPLEMENTED'
@@ -619,6 +736,550 @@ class AccountController {
                 });
             }
         };
+        /**
+         * POST /api/v1/accounts/create-user (admin only)
+         */
+        this.createUser = async (req, res) => {
+            if (this.handleValidationErrors(req, res))
+                return;
+            try {
+                const { email, password, fullName, role = 'USER', status = 'ACTIVE', profile } = req.body;
+                // Check if user already exists
+                const existingUser = await database_1.prisma.user.findUnique({
+                    where: { email }
+                });
+                if (existingUser) {
+                    res.status(409).json({
+                        error: 'User already exists',
+                        code: 'USER_EXISTS'
+                    });
+                    return;
+                }
+                // Hash password
+                const hashedPassword = await bcryptjs_1.default.hash(password, 12);
+                // Parse full name
+                const nameParts = fullName.split(' ');
+                const firstName = nameParts[0];
+                const lastName = nameParts.slice(1).join(' ');
+                // Create user
+                const user = await database_1.prisma.user.create({
+                    data: {
+                        id: (0, uuid_1.v4)(),
+                        email,
+                        password: hashedPassword,
+                        role,
+                        status,
+                        profile: {
+                            create: {
+                                id: (0, uuid_1.v4)(),
+                                firstName,
+                                lastName: lastName || '',
+                                phone: profile?.phone || null,
+                                avatar: profile?.avatar || null,
+                                bio: profile?.bio || null
+                            }
+                        }
+                    },
+                    include: {
+                        profile: true
+                    }
+                });
+                // Create audit log
+                await database_1.prisma.auditLog.create({
+                    data: {
+                        id: (0, uuid_1.v4)(),
+                        userId: req.user.id,
+                        action: 'USER_CREATED',
+                        resourceType: 'USER',
+                        resourceId: user.id,
+                        details: {
+                            targetUserEmail: user.email,
+                            targetUserRole: user.role,
+                            targetUserStatus: user.status
+                        },
+                        ipAddress: req.ip,
+                        userAgent: req.get('User-Agent')
+                    }
+                });
+                res.status(201).json({
+                    success: true,
+                    data: {
+                        id: user.id,
+                        email: user.email,
+                        fullName: user.profile?.firstName && user.profile?.lastName
+                            ? `${user.profile.firstName} ${user.profile.lastName}`
+                            : user.email,
+                        avatar: user.profile?.avatar,
+                        role: user.role,
+                        status: user.status,
+                        createdAt: user.createdAt
+                    }
+                });
+            }
+            catch (error) {
+                console.error('Create user error:', error);
+                res.status(500).json({
+                    error: 'Internal server error',
+                    code: 'CREATE_USER_ERROR'
+                });
+            }
+        };
+        /**
+         * PUT /api/v1/accounts/:id (admin only)
+         */
+        this.updateUser = async (req, res) => {
+            if (this.handleValidationErrors(req, res))
+                return;
+            try {
+                const { id } = req.params;
+                const { email, fullName, role, status, profile } = req.body;
+                // Check if user exists
+                const existingUser = await database_1.prisma.user.findUnique({
+                    where: { id }
+                });
+                if (!existingUser) {
+                    res.status(404).json({
+                        error: 'User not found',
+                        code: 'USER_NOT_FOUND'
+                    });
+                    return;
+                }
+                // Check email uniqueness if changing email
+                if (email && email !== existingUser.email) {
+                    const emailExists = await database_1.prisma.user.findUnique({
+                        where: { email }
+                    });
+                    if (emailExists) {
+                        res.status(409).json({
+                            error: 'Email already exists',
+                            code: 'EMAIL_EXISTS'
+                        });
+                        return;
+                    }
+                }
+                // Parse full name if provided
+                let firstName, lastName;
+                if (fullName) {
+                    const nameParts = fullName.split(' ');
+                    firstName = nameParts[0];
+                    lastName = nameParts.slice(1).join(' ');
+                }
+                // Update user
+                const updatedUser = await database_1.prisma.user.update({
+                    where: { id },
+                    data: {
+                        ...(email && { email }),
+                        ...(role && { role }),
+                        ...(status && { status }),
+                        profile: {
+                            update: {
+                                ...(firstName && { firstName }),
+                                ...(lastName !== undefined && { lastName }),
+                                ...(profile?.phone !== undefined && { phone: profile.phone }),
+                                ...(profile?.avatar !== undefined && { avatar: profile.avatar }),
+                                ...(profile?.bio !== undefined && { bio: profile.bio })
+                            }
+                        }
+                    },
+                    include: {
+                        profile: true
+                    }
+                });
+                // Create audit log
+                await database_1.prisma.auditLog.create({
+                    data: {
+                        id: (0, uuid_1.v4)(),
+                        userId: req.user.id,
+                        action: 'USER_UPDATED',
+                        resourceType: 'USER',
+                        resourceId: updatedUser.id,
+                        details: {
+                            changes: {
+                                ...(email && { email: { from: existingUser.email, to: email } }),
+                                ...(role && { role: { from: existingUser.role, to: role } }),
+                                ...(status && { status: { from: existingUser.status, to: status } })
+                            }
+                        },
+                        ipAddress: req.ip,
+                        userAgent: req.get('User-Agent')
+                    }
+                });
+                res.status(200).json({
+                    success: true,
+                    data: {
+                        id: updatedUser.id,
+                        email: updatedUser.email,
+                        fullName: updatedUser.profile?.firstName && updatedUser.profile?.lastName
+                            ? `${updatedUser.profile.firstName} ${updatedUser.profile.lastName}`
+                            : updatedUser.email,
+                        avatar: updatedUser.profile?.avatar,
+                        role: updatedUser.role,
+                        status: updatedUser.status,
+                        updatedAt: updatedUser.updatedAt
+                    }
+                });
+            }
+            catch (error) {
+                console.error('Update user error:', error);
+                res.status(500).json({
+                    error: 'Internal server error',
+                    code: 'UPDATE_USER_ERROR'
+                });
+            }
+        };
+        /**
+         * DELETE /api/v1/accounts/:id (admin only)
+         */
+        this.deleteUser = async (req, res) => {
+            try {
+                const { id } = req.params;
+                // Check if user exists
+                const user = await database_1.prisma.user.findUnique({
+                    where: { id }
+                });
+                if (!user) {
+                    res.status(404).json({
+                        error: 'User not found',
+                        code: 'USER_NOT_FOUND'
+                    });
+                    return;
+                }
+                // Prevent self-deletion
+                if (id === req.user.id) {
+                    res.status(400).json({
+                        error: 'Cannot delete your own account',
+                        code: 'CANNOT_DELETE_SELF'
+                    });
+                    return;
+                }
+                // Soft delete
+                await database_1.prisma.user.update({
+                    where: { id },
+                    data: {
+                        status: 'DELETED',
+                        email: `deleted_${Date.now()}_${user.email}`
+                    }
+                });
+                // Create audit log
+                await database_1.prisma.auditLog.create({
+                    data: {
+                        id: (0, uuid_1.v4)(),
+                        userId: req.user.id,
+                        action: 'USER_DELETED',
+                        resourceType: 'USER',
+                        resourceId: user.id,
+                        details: {
+                            deletedUserEmail: user.email,
+                            deletedUserRole: user.role
+                        },
+                        ipAddress: req.ip,
+                        userAgent: req.get('User-Agent')
+                    }
+                });
+                res.status(200).json({
+                    success: true,
+                    message: 'User deleted successfully'
+                });
+            }
+            catch (error) {
+                console.error('Delete user error:', error);
+                res.status(500).json({
+                    error: 'Internal server error',
+                    code: 'DELETE_USER_ERROR'
+                });
+            }
+        };
+        /**
+         * GET /api/v1/accounts/:id/permissions (admin only)
+         */
+        this.getUserPermissionsEndpoint = async (req, res) => {
+            try {
+                const { id } = req.params;
+                const user = await database_1.prisma.user.findUnique({
+                    where: { id },
+                    include: {
+                        userRoles: {
+                            include: {
+                                role: {
+                                    include: {
+                                        rolePermissions: {
+                                            include: {
+                                                permission: true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                if (!user) {
+                    res.status(404).json({
+                        error: 'User not found',
+                        code: 'USER_NOT_FOUND'
+                    });
+                    return;
+                }
+                // Get all permissions from roles
+                const permissions = new Set();
+                user.userRoles.forEach(userRole => {
+                    if (userRole.isActive) {
+                        userRole.role.rolePermissions.forEach(rolePermission => {
+                            if (rolePermission.permission.isActive) {
+                                permissions.add(rolePermission.permission.name);
+                            }
+                        });
+                    }
+                });
+                // Add role-based permissions
+                const rolePermissions = this.getRolePermissions(user.role);
+                rolePermissions.forEach(permission => permissions.add(permission));
+                res.status(200).json({
+                    success: true,
+                    data: {
+                        userId: user.id,
+                        email: user.email,
+                        role: user.role,
+                        permissions: Array.from(permissions),
+                        roles: user.userRoles.map(ur => ({
+                            id: ur.role.id,
+                            name: ur.role.name,
+                            isActive: ur.isActive,
+                            assignedAt: ur.assignedAt,
+                            expiresAt: ur.expiresAt
+                        }))
+                    }
+                });
+            }
+            catch (error) {
+                console.error('Get user permissions error:', error);
+                res.status(500).json({
+                    error: 'Internal server error',
+                    code: 'GET_PERMISSIONS_ERROR'
+                });
+            }
+        };
+        /**
+         * PUT /api/v1/accounts/:id/permissions (admin only)
+         */
+        this.updateUserPermissions = async (req, res) => {
+            if (this.handleValidationErrors(req, res))
+                return;
+            try {
+                const { id } = req.params;
+                const { permissions } = req.body;
+                const user = await database_1.prisma.user.findUnique({
+                    where: { id }
+                });
+                if (!user) {
+                    res.status(404).json({
+                        error: 'User not found',
+                        code: 'USER_NOT_FOUND'
+                    });
+                    return;
+                }
+                // For now, we'll update the user's role based on permissions
+                // In a more complex system, you might want to create custom roles or direct permissions
+                let newRole = 'USER';
+                if (permissions.includes('admin:access')) {
+                    newRole = 'ADMIN';
+                }
+                else if (permissions.includes('accounts:write')) {
+                    newRole = 'MANAGER';
+                }
+                await database_1.prisma.user.update({
+                    where: { id },
+                    data: { role: newRole }
+                });
+                // Create audit log
+                await database_1.prisma.auditLog.create({
+                    data: {
+                        id: (0, uuid_1.v4)(),
+                        userId: req.user.id,
+                        action: 'USER_PERMISSIONS_UPDATED',
+                        resourceType: 'USER',
+                        resourceId: user.id,
+                        details: {
+                            oldRole: user.role,
+                            newRole,
+                            permissions
+                        },
+                        ipAddress: req.ip,
+                        userAgent: req.get('User-Agent')
+                    }
+                });
+                res.status(200).json({
+                    success: true,
+                    data: {
+                        userId: user.id,
+                        role: newRole,
+                        permissions: this.getRolePermissions(newRole)
+                    }
+                });
+            }
+            catch (error) {
+                console.error('Update user permissions error:', error);
+                res.status(500).json({
+                    error: 'Internal server error',
+                    code: 'UPDATE_PERMISSIONS_ERROR'
+                });
+            }
+        };
+        /**
+         * GET /api/v1/accounts/:id/audit-log (admin only)
+         */
+        this.getUserAuditLog = async (req, res) => {
+            try {
+                const { id } = req.params;
+                const { page = 1, limit = 50 } = req.query;
+                const [logs, total] = await Promise.all([
+                    database_1.prisma.auditLog.findMany({
+                        where: {
+                            OR: [
+                                { userId: id },
+                                { resourceId: id }
+                            ]
+                        },
+                        orderBy: { createdAt: 'desc' },
+                        skip: (Number(page) - 1) * Number(limit),
+                        take: Number(limit)
+                    }),
+                    database_1.prisma.auditLog.count({
+                        where: {
+                            OR: [
+                                { userId: id },
+                                { resourceId: id }
+                            ]
+                        }
+                    })
+                ]);
+                res.status(200).json({
+                    success: true,
+                    data: {
+                        logs: logs.map(log => ({
+                            id: log.id,
+                            action: log.action,
+                            resourceType: log.resourceType,
+                            resourceId: log.resourceId,
+                            details: log.details,
+                            ipAddress: log.ipAddress,
+                            userAgent: log.userAgent,
+                            createdAt: log.createdAt
+                        })),
+                        pagination: {
+                            page: Number(page),
+                            limit: Number(limit),
+                            total,
+                            pages: Math.ceil(total / Number(limit))
+                        }
+                    }
+                });
+            }
+            catch (error) {
+                console.error('Get user audit log error:', error);
+                res.status(500).json({
+                    error: 'Internal server error',
+                    code: 'GET_AUDIT_LOG_ERROR'
+                });
+            }
+        };
+        /**
+         * POST /api/v1/accounts/bulk-operations (admin only)
+         */
+        this.bulkOperations = async (req, res) => {
+            if (this.handleValidationErrors(req, res))
+                return;
+            try {
+                const { operation, userIds } = req.body;
+                // Validate users exist
+                const users = await database_1.prisma.user.findMany({
+                    where: { id: { in: userIds } }
+                });
+                if (users.length !== userIds.length) {
+                    res.status(400).json({
+                        error: 'Some users not found',
+                        code: 'USERS_NOT_FOUND'
+                    });
+                    return;
+                }
+                // Prevent self-operation
+                if (userIds.includes(req.user.id)) {
+                    res.status(400).json({
+                        error: 'Cannot perform bulk operations on your own account',
+                        code: 'CANNOT_OPERATE_ON_SELF'
+                    });
+                    return;
+                }
+                let updateData = {};
+                let action = '';
+                switch (operation) {
+                    case 'activate':
+                        updateData = { status: 'ACTIVE' };
+                        action = 'USERS_BULK_ACTIVATED';
+                        break;
+                    case 'deactivate':
+                        updateData = { status: 'INACTIVE' };
+                        action = 'USERS_BULK_DEACTIVATED';
+                        break;
+                    case 'suspend':
+                        updateData = { status: 'SUSPENDED' };
+                        action = 'USERS_BULK_SUSPENDED';
+                        break;
+                    case 'delete':
+                        updateData = {
+                            status: 'DELETED',
+                            email: {
+                                push: [`deleted_${Date.now()}_`]
+                            }
+                        };
+                        action = 'USERS_BULK_DELETED';
+                        break;
+                    default:
+                        res.status(400).json({
+                            error: 'Invalid operation',
+                            code: 'INVALID_OPERATION'
+                        });
+                        return;
+                }
+                // Perform bulk update
+                const result = await database_1.prisma.user.updateMany({
+                    where: { id: { in: userIds } },
+                    data: updateData
+                });
+                // Create audit log
+                await database_1.prisma.auditLog.create({
+                    data: {
+                        id: (0, uuid_1.v4)(),
+                        userId: req.user.id,
+                        action,
+                        resourceType: 'USER',
+                        resourceId: userIds.join(','), // Bulk operation
+                        details: {
+                            operation,
+                            userIds,
+                            affectedCount: result.count
+                        },
+                        ipAddress: req.ip,
+                        userAgent: req.get('User-Agent')
+                    }
+                });
+                res.status(200).json({
+                    success: true,
+                    data: {
+                        operation,
+                        affectedCount: result.count,
+                        message: `Successfully ${operation} ${result.count} users`
+                    }
+                });
+            }
+            catch (error) {
+                console.error('Bulk operations error:', error);
+                res.status(500).json({
+                    error: 'Internal server error',
+                    code: 'BULK_OPERATIONS_ERROR'
+                });
+            }
+        };
     }
     /**
      * Handle validation errors
@@ -641,7 +1302,7 @@ class AccountController {
     /**
      * Get user permissions based on role
      */
-    getUserPermissions(role) {
+    getRolePermissions(role) {
         switch (role) {
             case 'ADMIN':
                 return [

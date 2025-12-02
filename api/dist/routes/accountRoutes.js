@@ -138,4 +138,79 @@ router.put('/:id/status', [
     (0, permissionMiddleware_1.requirePermission)('accounts:write'),
     (0, express_validator_1.body)('status').isIn(['ACTIVE', 'INACTIVE', 'SUSPENDED']).withMessage('Invalid status'),
 ], accountController.updateAccountStatus);
+/**
+ * @route   POST /api/v1/accounts/create-user
+ * @desc    Create a new user (admin only)
+ * @access  Private (Admin)
+ */
+router.post('/create-user', [
+    authMiddlewares_1.authMiddleware,
+    (0, permissionMiddleware_1.requirePermission)('accounts:write'),
+    (0, express_validator_1.body)('email').isEmail().withMessage('Valid email is required'),
+    (0, express_validator_1.body)('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+    (0, express_validator_1.body)('fullName').notEmpty().withMessage('Full name is required'),
+    (0, express_validator_1.body)('role').optional().isIn(['USER', 'MANAGER', 'ADMIN']).withMessage('Invalid role'),
+    (0, express_validator_1.body)('status').optional().isIn(['ACTIVE', 'INACTIVE', 'SUSPENDED']).withMessage('Invalid status'),
+], accountController.createUser);
+/**
+ * @route   PUT /api/v1/accounts/:id
+ * @desc    Update user account (admin only)
+ * @access  Private (Admin)
+ */
+router.put('/:id', [
+    authMiddlewares_1.authMiddleware,
+    (0, permissionMiddleware_1.requirePermission)('accounts:write'),
+    (0, express_validator_1.body)('email').optional().isEmail().withMessage('Valid email is required'),
+    (0, express_validator_1.body)('fullName').optional().notEmpty().withMessage('Full name cannot be empty'),
+    (0, express_validator_1.body)('role').optional().isIn(['USER', 'MANAGER', 'ADMIN']).withMessage('Invalid role'),
+    (0, express_validator_1.body)('status').optional().isIn(['ACTIVE', 'INACTIVE', 'SUSPENDED']).withMessage('Invalid status'),
+], accountController.updateUser);
+/**
+ * @route   DELETE /api/v1/accounts/:id
+ * @desc    Delete user account (admin only)
+ * @access  Private (Admin)
+ */
+router.delete('/:id', [
+    authMiddlewares_1.authMiddleware,
+    (0, permissionMiddleware_1.requirePermission)('accounts:delete'),
+], accountController.deleteUser);
+/**
+ * @route   GET /api/v1/accounts/:id/permissions
+ * @desc    Get user permissions (admin only)
+ * @access  Private (Admin)
+ */
+router.get('/:id/permissions', [
+    authMiddlewares_1.authMiddleware,
+    (0, permissionMiddleware_1.requirePermission)('accounts:read'),
+], accountController.getUserPermissionsEndpoint);
+/**
+ * @route   PUT /api/v1/accounts/:id/permissions
+ * @desc    Update user permissions (admin only)
+ * @access  Private (Admin)
+ */
+router.put('/:id/permissions', [
+    authMiddlewares_1.authMiddleware,
+    (0, permissionMiddleware_1.requirePermission)('accounts:write'),
+    (0, express_validator_1.body)('permissions').isArray().withMessage('Permissions must be an array'),
+], accountController.updateUserPermissions);
+/**
+ * @route   GET /api/v1/accounts/:id/audit-log
+ * @desc    Get user audit log (admin only)
+ * @access  Private (Admin)
+ */
+router.get('/:id/audit-log', [
+    authMiddlewares_1.authMiddleware,
+    (0, permissionMiddleware_1.requirePermission)('accounts:read'),
+], accountController.getUserAuditLog);
+/**
+ * @route   POST /api/v1/accounts/bulk-operations
+ * @desc    Bulk operations on users (admin only)
+ * @access  Private (Admin)
+ */
+router.post('/bulk-operations', [
+    authMiddlewares_1.authMiddleware,
+    (0, permissionMiddleware_1.requirePermission)('accounts:write'),
+    (0, express_validator_1.body)('operation').isIn(['activate', 'deactivate', 'suspend', 'delete']).withMessage('Invalid operation'),
+    (0, express_validator_1.body)('userIds').isArray().withMessage('User IDs must be an array'),
+], accountController.bulkOperations);
 exports.default = router;

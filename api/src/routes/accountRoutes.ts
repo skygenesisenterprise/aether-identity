@@ -154,4 +154,86 @@ router.put('/:id/status', [
   body('status').isIn(['ACTIVE', 'INACTIVE', 'SUSPENDED']).withMessage('Invalid status'),
 ], accountController.updateAccountStatus);
 
+/**
+ * @route   POST /api/v1/accounts/create-user
+ * @desc    Create a new user (admin only)
+ * @access  Private (Admin)
+ */
+router.post('/create-user', [
+  authMiddleware,
+  requirePermission('accounts:write'),
+  body('email').isEmail().withMessage('Valid email is required'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('fullName').notEmpty().withMessage('Full name is required'),
+  body('role').optional().isIn(['USER', 'MANAGER', 'ADMIN']).withMessage('Invalid role'),
+  body('status').optional().isIn(['ACTIVE', 'INACTIVE', 'SUSPENDED']).withMessage('Invalid status'),
+], accountController.createUser);
+
+/**
+ * @route   PUT /api/v1/accounts/:id
+ * @desc    Update user account (admin only)
+ * @access  Private (Admin)
+ */
+router.put('/:id', [
+  authMiddleware,
+  requirePermission('accounts:write'),
+  body('email').optional().isEmail().withMessage('Valid email is required'),
+  body('fullName').optional().notEmpty().withMessage('Full name cannot be empty'),
+  body('role').optional().isIn(['USER', 'MANAGER', 'ADMIN']).withMessage('Invalid role'),
+  body('status').optional().isIn(['ACTIVE', 'INACTIVE', 'SUSPENDED']).withMessage('Invalid status'),
+], accountController.updateUser);
+
+/**
+ * @route   DELETE /api/v1/accounts/:id
+ * @desc    Delete user account (admin only)
+ * @access  Private (Admin)
+ */
+router.delete('/:id', [
+  authMiddleware,
+  requirePermission('accounts:delete'),
+], accountController.deleteUser);
+
+/**
+ * @route   GET /api/v1/accounts/:id/permissions
+ * @desc    Get user permissions (admin only)
+ * @access  Private (Admin)
+ */
+router.get('/:id/permissions', [
+  authMiddleware,
+  requirePermission('accounts:read'),
+], accountController.getUserPermissionsEndpoint);
+
+/**
+ * @route   PUT /api/v1/accounts/:id/permissions
+ * @desc    Update user permissions (admin only)
+ * @access  Private (Admin)
+ */
+router.put('/:id/permissions', [
+  authMiddleware,
+  requirePermission('accounts:write'),
+  body('permissions').isArray().withMessage('Permissions must be an array'),
+], accountController.updateUserPermissions);
+
+/**
+ * @route   GET /api/v1/accounts/:id/audit-log
+ * @desc    Get user audit log (admin only)
+ * @access  Private (Admin)
+ */
+router.get('/:id/audit-log', [
+  authMiddleware,
+  requirePermission('accounts:read'),
+], accountController.getUserAuditLog);
+
+/**
+ * @route   POST /api/v1/accounts/bulk-operations
+ * @desc    Bulk operations on users (admin only)
+ * @access  Private (Admin)
+ */
+router.post('/bulk-operations', [
+  authMiddleware,
+  requirePermission('accounts:write'),
+  body('operation').isIn(['activate', 'deactivate', 'suspend', 'delete']).withMessage('Invalid operation'),
+  body('userIds').isArray().withMessage('User IDs must be an array'),
+], accountController.bulkOperations);
+
 export default router;

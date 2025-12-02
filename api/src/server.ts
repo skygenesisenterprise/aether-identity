@@ -44,12 +44,14 @@ import qrcodeRoutes from './routes/qrcodeRoutes';
 import oidcRoutes from './routes/oidcRoutes';
 import webhookRoutes from './routes/webhookRoutes';
 import roleRoutes from './routes/roleRoutes';
+import loginPageRoutes from './routes/loginPageRoutes';
 
 // OIDC well-known endpoints
 app.use('/.well-known', oidcRoutes);
 
 // API v1 routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/auth', loginPageRoutes);
 app.use('/api/v1/auth/sso', ssoRoutes);
 app.use('/api/v1/mfa', mfaRoutes);
 app.use('/api/v1/totp', totpRoutes);

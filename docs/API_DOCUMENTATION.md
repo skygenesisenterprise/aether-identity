@@ -116,7 +116,7 @@ POST /api/v1/api-tokens
 ### Utilisation
 ```bash
 curl -H "Authorization: Bearer sk_7aec907b4dd613791ce9331f6c07838d67da96f3849d35b4888c2cea6e9ef4ac" \
-  https://identity.aether.com/api/v1/api/user
+  https://sso.skygenesisenterprise.net/api/v1/api/user
 ```
 
 ## Sécurité
