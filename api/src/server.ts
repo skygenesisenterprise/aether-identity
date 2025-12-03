@@ -85,12 +85,12 @@ const startServer = async (): Promise<void> => {
   try {
     await connectDatabase();
     
-    const server = app.listen(config.port, () => {
+    const server = app.listen(config.port, '0.0.0.0', () => {
       console.log(`🚀 API Server running on port ${config.port}`);
       console.log(`📊 Environment: ${config.nodeEnv}`);
       console.log(`🔗 Health check: http://localhost:${config.port}/health`);
       console.log(`📝 API Documentation: http://localhost:${config.port}/api/v1/docs`);
-    });
+    });    
 
     // Graceful shutdown
     const gracefulShutdown = async (signal: string) => {
