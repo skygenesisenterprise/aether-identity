@@ -46,7 +46,7 @@
     "next": "16.0.6",
     "next-auth": "^4.24.13",
     "nodemailer": "^7.0.11",
-    "prisma": "^5.22.0",
+    "prisma": "^7.1.0",
     "qrcode": "^1.5.4",
     "qrcode-terminal": "^0.12.0",
     "react": "^18.3.1",
