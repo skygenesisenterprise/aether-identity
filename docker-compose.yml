@@ -56,23 +56,24 @@ services:
       - aether-network
 
   frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: ${COMPOSE_PROJECT_NAME:-aether}-frontend
-    environment:
-      NODE_ENV: ${NODE_ENV:-production}
-      BACKEND_URL: http://backend:8080
-      API_BASE_URL: http://backend:8080/api/v1
-      NEXT_TELEMETRY_DISABLED: 1
-    ports:
-      - "${FRONTEND_PORT:-3000}:3000"
-    depends_on:
-      backend:
-        condition: service_healthy
-    restart: ${RESTART_POLICY:-unless-stopped}
-    networks:
-      - aether-network
+  build:
+    context: .
+    dockerfile: Dockerfile
+  container_name: ${COMPOSE_PROJECT_NAME:-aether}-frontend
+  environment:
+    NODE_ENV: ${NODE_ENV:-production}
+    BACKEND_URL: http://backend:8080
+    API_BASE_URL: http://backend:8080/api/v1
+    NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+    NEXT_TELEMETRY_DISABLED: 1
+  ports:
+    - "${FRONTEND_PORT:-3000}:3000"
+  depends_on:
+    backend:
+      condition: service_healthy
+  restart: ${RESTART_POLICY:-unless-stopped}
+  networks:
+    - aether-network
 
 volumes:
   postgres_data:
