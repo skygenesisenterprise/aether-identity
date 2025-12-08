@@ -20,9 +20,13 @@ class AuthController {
                 return;
             try {
                 const { email, password, sessionId } = req.body;
-                // Find user by email
-                const user = await database_1.prisma.user.findUnique({
-                    where: { email },
+                // Find user by email (case-insensitive for SQLite)
+                const user = await database_1.prisma.user.findFirst({
+                    where: {
+                        email: {
+                            equals: email.toLowerCase()
+                        }
+                    },
                     include: {
                         profile: true,
                         memberships: {
@@ -33,29 +37,41 @@ class AuthController {
                     }
                 });
                 if (!user) {
+                    console.log(`❌ Login failed: User not found`);
                     res.status(401).json({
                         error: 'Invalid credentials',
                         code: 'INVALID_CREDENTIALS'
                     });
                     return;
                 }
+                console.log(`✅ User found, Status: ${user.status}`);
                 // Check password
+                console.log(`🔍 Debug - Stored hash: "${user.password.substring(0, 20)}..."`);
                 const isPasswordValid = await bcryptjs_1.default.compare(password, user.password);
+                console.log(`🔍 Debug - Password comparison result: ${isPasswordValid}`);
                 if (!isPasswordValid) {
+                    console.log(`❌ Login failed: Invalid password`);
+                    // Test with a new hash to verify bcrypt works
+                    const testHash = await bcryptjs_1.default.hash(password, 12);
+                    const testComparison = await bcryptjs_1.default.compare(password, testHash);
+                    console.log(`🔍 Debug - New hash test: ${testComparison}`);
                     res.status(401).json({
                         error: 'Invalid credentials',
                         code: 'INVALID_CREDENTIALS'
                     });
                     return;
                 }
+                console.log(`✅ Password validated`);
                 // Check if user is active
                 if (user.status !== 'ACTIVE') {
+                    console.log(`❌ Login failed: Account not active, Status: ${user.status}`);
                     res.status(401).json({
                         error: 'Account is not active',
                         code: 'ACCOUNT_INACTIVE'
                     });
                     return;
                 }
+                console.log(`✅ User status validated: ${user.status}`);
                 // Check if MFA is required
                 if (user.mfaEnabled) {
                     if (!sessionId) {
@@ -214,7 +230,7 @@ class AuthController {
                 const { email, password, fullName } = req.body;
                 // Check if user already exists
                 const existingUser = await database_1.prisma.user.findUnique({
-                    where: { email }
+                    where: { email: email.toLowerCase() }
                 });
                 if (existingUser) {
                     res.status(409).json({
@@ -225,11 +241,15 @@ class AuthController {
                 }
                 // Hash password
                 const hashedPassword = await bcryptjs_1.default.hash(password, 12);
+                console.log(`🔍 Debug - Generated hash: "${hashedPassword.substring(0, 20)}..."`);
+                // Test hash immediately
+                const testComparison = await bcryptjs_1.default.compare(password, hashedPassword);
+                console.log(`🔍 Debug - Hash test during registration: ${testComparison}`);
                 // Create user
                 const user = await database_1.prisma.user.create({
                     data: {
                         id: (0, uuid_1.v4)(),
-                        email,
+                        email: email.toLowerCase(),
                         password: hashedPassword,
                         role: 'USER',
                         status: 'ACTIVE',
@@ -247,6 +267,7 @@ class AuthController {
                         memberships: true
                     }
                 });
+                console.log(`✅ User created successfully, ID: ${user.id}, Status: ${user.status}`);
                 // Generate tokens
                 const tokens = this.generateTokens(user);
                 res.status(201).json({

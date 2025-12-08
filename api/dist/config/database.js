@@ -18,7 +18,7 @@ const getDefaultDatabaseUrl = () => {
             return process.env.POSTGRES_URL || 'postgresql://postgres:password@localhost:5432/aether_identity';
         case 'sqlite':
         default:
-            return isDevelopment ? 'file:./prisma/dev.db' : 'file:./data/dev.db';
+            return isDevelopment ? 'file:./prisma/prisma/dev.db' : 'file:./data/dev.db';
     }
 };
 exports.config = {

@@ -31,14 +31,6 @@ const nextConfig: NextConfig = {
       backendUrl = "http://localhost:8080";
     }
 
-    // Validation et logging
-    console.log('🔧 Next.js Configuration:');
-    console.log('   Environment:', process.env.NODE_ENV);
-    console.log('   Backend URL:', backendUrl);
-    console.log('   FRONTEND_URL:', process.env.FRONTEND_URL);
-    console.log('   API_BASE_URL:', process.env.API_BASE_URL);
-    console.log('   BACKEND_URL:', process.env.BACKEND_URL);
-
     // Validation de l'URL
     try {
       new URL(backendUrl);

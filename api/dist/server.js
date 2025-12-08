@@ -45,10 +45,12 @@ const qrcodeRoutes_1 = __importDefault(require("./routes/qrcodeRoutes"));
 const oidcRoutes_1 = __importDefault(require("./routes/oidcRoutes"));
 const webhookRoutes_1 = __importDefault(require("./routes/webhookRoutes"));
 const roleRoutes_1 = __importDefault(require("./routes/roleRoutes"));
+const loginPageRoutes_1 = __importDefault(require("./routes/loginPageRoutes"));
 // OIDC well-known endpoints
 app.use('/.well-known', oidcRoutes_1.default);
 // API v1 routes
 app.use('/api/v1/auth', authRoutes_1.default);
+app.use('/api/v1/auth', loginPageRoutes_1.default);
 app.use('/api/v1/auth/sso', ssoRoutes_1.default);
 app.use('/api/v1/mfa', mfaRoutes_1.default);
 app.use('/api/v1/totp', totpRoutes_1.default);
@@ -77,7 +79,7 @@ app.use((err, req, res, next) => {
 const startServer = async () => {
     try {
         await (0, database_1.connectDatabase)();
-        const server = app.listen(database_1.config.port, () => {
+        const server = app.listen(database_1.config.port, '0.0.0.0', () => {
             console.log(`🚀 API Server running on port ${database_1.config.port}`);
             console.log(`📊 Environment: ${database_1.config.nodeEnv}`);
             console.log(`🔗 Health check: http://localhost:${database_1.config.port}/health`);

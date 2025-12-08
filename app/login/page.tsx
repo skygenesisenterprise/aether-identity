@@ -69,7 +69,7 @@ export default function UnifiedAuthForm() {
 
     try {
       // Utiliser l'API Aether Identity comme un vrai Identity Provider
-      const response = await fetch("http://localhost:8080/api/v1/auth/login", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -167,7 +167,7 @@ export default function UnifiedAuthForm() {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/api/v1/auth/register", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -228,18 +228,6 @@ export default function UnifiedAuthForm() {
       })
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const handleSocialLogin = (provider: string) => {
-    if (provider === 'keycloak') {
-      // Use NextAuth signIn for Keycloak SSO
-      window.location.href = '/api/auth/signin/keycloak'
-    } else {
-      toast({
-        title: "Connexion OAuth",
-        description: `Connexion avec ${provider} bientôt disponible`,
-      })
     }
   }
 
