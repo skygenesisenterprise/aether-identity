@@ -4,50 +4,42 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
 
-  // Required for Docker standalone output
+  // Output standalone pour Docker
   output: "standalone",
 
   images: {
-    domains: [],
+    domains: [
+      "localhost",
+      "127.0.0.1",
+      "sso.skygenesisenterprise.net",
+      "sso.skygenesisenterprise.com",
+    ],  
     unoptimized: false,
   },
 
   async rewrites() {
-    // Configuration robuste pour développement et production
     const isDevelopment = process.env.NODE_ENV === "development";
     const isProduction = process.env.NODE_ENV === "production";
-    
-    // Déterminer l'URL du backend selon l'environnement
-    let backendUrl: string;
-    
-    if (process.env.BACKEND_URL) {
-      // Priorité à la variable d'environnement explicite
-      backendUrl = process.env.BACKEND_URL;
-    } else if (isProduction) {
-      // En production, utiliser l'URL de l'API ou fallback
-      backendUrl = process.env.API_BASE_URL || "https://api.yourdomain.com";
-    } else {
-      // En développement, utiliser localhost
-      backendUrl = "http://localhost:8080";
-    }
 
-    // Validation de l'URL
+    // Détermination automatique du backend URL
+    let backendUrl: string = process.env.BACKEND_URL || (isProduction ? "http://backend:8080" : "http://localhost:8080");
+
+    // Validation
     try {
       new URL(backendUrl);
-    } catch (error) {
-      console.error('❌ Invalid backend URL:', backendUrl, error);
-      // Fallback sécurisé
-      backendUrl = isDevelopment ? "http://localhost:8080" : "https://api.yourdomain.com";
+    } catch (err) {
+      console.error("❌ Backend URL invalide :", backendUrl, err);
+      backendUrl = isDevelopment ? "http://localhost:8080" : "http://backend:8080";
     }
 
-    const rewrites = [
-      // Proxy API v1 routes (priorité haute)
+    return [
+      // Proxy API v1
       {
         source: "/api/v1/:path*",
         destination: `${backendUrl}/api/v1/:path*`,
       },
 
-      // Proxy health check
+      // Health check
       {
         source: "/health",
         destination: `${backendUrl}/health`,
@@ -59,28 +51,23 @@ const nextConfig: NextConfig = {
         destination: `${backendUrl}/.well-known/:path*`,
       },
 
-      // Proxy autres routes API (fallback)
+      // Proxy fallback pour toutes les autres routes API
       {
         source: "/api/:path*",
         destination: `${backendUrl}/:path*`,
       },
     ];
-
-    console.log('📝 Rewrites configured:', rewrites.length, 'rules');
-    return rewrites;
   },
 
   async headers() {
-    const isDevelopment = process.env.NODE_ENV === "development";
     const isProduction = process.env.NODE_ENV === "production";
-    
+
     const baseHeaders = [
       { key: "X-Content-Type-Options", value: "nosniff" },
       { key: "Referrer-Policy", value: "origin-when-cross-origin" },
       { key: "X-XSS-Protection", value: "1; mode=block" },
     ];
 
-    // Headers spécifiques à l'environnement
     if (isProduction) {
       baseHeaders.push(
         { key: "X-Frame-Options", value: "DENY" },
@@ -88,9 +75,7 @@ const nextConfig: NextConfig = {
         { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" }
       );
     } else {
-      baseHeaders.push(
-        { key: "X-Frame-Options", value: "SAMEORIGIN" }
-      );
+      baseHeaders.push({ key: "X-Frame-Options", value: "SAMEORIGIN" });
     }
 
     return [
