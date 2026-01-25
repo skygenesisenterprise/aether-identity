@@ -1,0 +1,117 @@
+{
+  "name": "aether-identity",
+  "version": "0.1.0",
+  "description": "An Enterprise OAuth2/OIDC support, multi-factor authentication, and secure account management for applications and services.",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "app",
+    "tools",
+    "options",
+    "package/node",
+    "package/github",
+    "package/vscode",
+    "snap",
+    "tests",
+    "messages",
+    "prisma",
+    "monitoring"
+  ],
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter app dev\" \"pnpm --filter server dev\"",
+    "dev:frontend": "pnpm --filter app dev",
+    "dev:backend": "pnpm --filter server dev",
+    "dev:cli": "pnpm --filter cli dev",
+    "build": "pnpm -r build",
+    "build:frontend": "pnpm --filter app build",
+    "build:backend": "pnpm --filter server build",
+    "build:cli": "pnpm --filter cli build",
+    "start": "concurrently \"pnpm --filter app start\" \"pnpm --filter server start\"",
+    "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint:fix",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "reset": "pnpm clean && pnpm install",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "db:seed": "prisma db seed",
+    "cli": "pnpm --filter cli cli",
+    "docker:build": "docker build -t aether-mailer .",
+    "docker:run": "docker-compose up -d",
+    "docker:stop": "docker-compose down",
+    "prepare": "husky install",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build && changeset publish",
+    "build:workspace": "tsc -b tsconfig.build.json",
+    "build:all": "tsc -b",
+    "clean:build": "pnpm -r exec rm -rf dist && rm -rf packages/*/dist",
+    "install:all": "pnpm install && pnpm -r install",
+    "update:all": "pnpm update && pnpm -r update",
+    "clean:deps": "pnpm -r exec rm -rf node_modules && rm -rf node_modules pnpm-lock.yaml"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.1",
+    "@prisma/client": "7.3.0",
+    "@types/node": "^25.0.9",
+    "concurrently": "^9.2.1",
+    "eslint": "^9",
+    "husky": "^9.0.11",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.1",
+    "prisma": "7.2.0",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skygenesisenterprise/aether-identity.git"
+  },
+  "keywords": [
+    "vault",
+    "password-manager",
+    "password-storage",
+    "password-security",
+    "password-management",
+    "password-generator",
+    "password-manager",
+    "password-storage",
+    "password-security",
+    "password-management",
+    "password-generator"
+  ],
+  "author": {
+    "name": "Sky Genesis Enterprise",
+    "email": "developer@skygenesisenterprise.com",
+    "url": "https://skygenesisenterprise.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/skygenesisenterprise/aether-identity/issues"
+  },
+  "homepage": "https://github.com/skygenesisenterprise/aether-identity#readme",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix --quiet",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "@capacitor/core": "^8.0.0",
+    "@loglayer/transport-pino": "^2.2.16",
+    "@prisma/client": "^7.3.0",
+    "@radix-ui/react-slot": "^1.2.4",
+    "class-variance-authority": "^0.7.1",
+    "loglayer": "^8.4.0",
+    "pino": "^10.3.0"
+  }
+}

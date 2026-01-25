@@ -1,13 +1,30 @@
-version: '3.5'
+version: "3.8"
 
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: docker-next
+    container_name: aether-vault-dev
     ports:
-      - '3000:3000'
+      - "3000:3000" # Frontend
+      - "8080:8080" # Backend API
     volumes:
-      - .:/app
-      - /app/node_modules
+      - ..:/app:cached
+      - pnpm-store:/pnpm/store
+      - node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PNPM_HOME=/pnpm
+      - PATH=/pnpm:$PATH
+    command: sleep infinity
+    networks:
+      - aether-network
+
+volumes:
+  pnpm-store:
+  node_modules:
+
+networks:
+  aether-network:
+    driver: bridge
