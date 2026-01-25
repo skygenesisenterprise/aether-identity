@@ -3,7 +3,7 @@ packages:
   - "tools"
   - "tests"
   - "options"
-  - "snap"
+  - "package/snap"
   - "prisma"
   - "package/node"
   - "package/github"
