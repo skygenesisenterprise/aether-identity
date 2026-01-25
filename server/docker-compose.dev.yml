@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # Service pour le serveur Aether Identity
+  aether-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: aether-server
+    ports:
+      - "8080:8080"
+    environment:
+      - JWT_SECRET=${JWT_SECRET:-votre-cle-secrete-ici}
+      - ACCESS_TOKEN_EXP=${ACCESS_TOKEN_EXP:-15}
+      - REFRESH_TOKEN_EXP=${REFRESH_TOKEN_EXP:-720}
+      - DATABASE_URL=${DATABASE_URL:-host=postgres user=postgres password=postgres dbname=aether_identity port=5432 sslmode=disable}
+      - PORT=${PORT:-8080}
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+    networks:
+      - aether-network
+    restart: unless-stopped
+
+  # Service PostgreSQL pour le développement
+  postgres:
+    image: postgres:16-alpine
+    container_name: aether-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: aether_identity
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - aether-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Service Adminer pour l'interface d'administration de la base de données
+  adminer:
+    image: adminer:latest
+    container_name: aether-adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
+    networks:
+      - aether-network
+
+# Réseau pour la communication entre les services
+networks:
+  aether-network:
+    driver: bridge
+
+# Volumes pour persister les données
+volumes:
+  postgres_data:
+    driver: local
