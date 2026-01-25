@@ -4,44 +4,50 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/skygenesisenterprise/aether-identity/server/src/model"
 )
 
 // JWTService gère la création et la validation des tokens JWT
 type JWTService struct {
-	SecretKey      string
-	AccessTokenExp int
+	SecretKey       string
+	AccessTokenExp  int
 	RefreshTokenExp int
 }
 
 // NewJWTService crée une nouvelle instance de JWTService
 func NewJWTService(secretKey string, accessTokenExp, refreshTokenExp int) *JWTService {
 	return &JWTService{
-		SecretKey:      secretKey,
-		AccessTokenExp: accessTokenExp,
+		SecretKey:       secretKey,
+		AccessTokenExp:  accessTokenExp,
 		RefreshTokenExp: refreshTokenExp,
 	}
 }
 
 // GenerateToken crée un token JWT
-func (s *JWTService) GenerateToken(userID uint, email string, role string) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userID": userID,
-		"email":  email,
-		"role":   role,
-		"exp":    time.Now().Add(time.Duration(s.AccessTokenExp) * time.Minute).Unix(),
-		"iat":    time.Now().Unix(),
-	})
+func (s *JWTService) GenerateToken(user *model.User) (string, error) {
+	claims := jwt.MapClaims{
+		"sub":          user.ID,
+		"email":        user.Email,
+		"account_type": user.AccountType,
+		"roles":        []string{user.Role},
+		"org_id":       user.OrgID,
+		"exp":          time.Now().Add(time.Duration(s.AccessTokenExp) * time.Minute).Unix(),
+		"iat":          time.Now().Unix(),
+	}
+	// inclure identifiant unique et sujet
+	claims["sub"] = user.ID
 
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(s.SecretKey))
 }
 
 // GenerateRefreshToken crée un refresh token JWT
 func (s *JWTService) GenerateRefreshToken(userID uint) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userID": userID,
-		"exp":    time.Now().Add(time.Duration(s.RefreshTokenExp) * time.Minute).Unix(),
-		"iat":    time.Now().Unix(),
-		"type":   "refresh",
+		"sub":  userID,
+		"exp":  time.Now().Add(time.Duration(s.RefreshTokenExp) * time.Minute).Unix(),
+		"iat":  time.Now().Unix(),
+		"type": "refresh",
 	})
 
 	return token.SignedString([]byte(s.SecretKey))

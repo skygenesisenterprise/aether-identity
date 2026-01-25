@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/skygenesisenterprise/aether-identity/server/src/config"
@@ -33,7 +34,7 @@ func Login(c *gin.Context) {
 	// Générer les tokens JWT
 	cfg := config.LoadConfig()
 	jwtService := services.NewJWTService(cfg.JWTSecret, cfg.AccessTokenExp, cfg.RefreshTokenExp)
-	accessToken, err := jwtService.GenerateToken(user.ID, user.Email, user.Role)
+	accessToken, err := jwtService.GenerateToken(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to generate access token",
@@ -41,7 +42,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	refreshToken, err := jwtService.GenerateRefreshToken(user.ID)
+	refreshTokenString, err := jwtService.GenerateRefreshToken(user.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to generate refresh token",
@@ -49,10 +50,43 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	// Stocker le refresh token en base
+	emailService := services.NewEmailService(services.DB)
+	_, err = emailService.CreateRefreshToken(user.ID, refreshTokenString)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to store refresh token",
+		})
+		return
+	}
+
+	// Set cookies HTTPOnly pour le token d’accès et le refresh
+	ExpiresAccess := time.Now().Add(time.Duration(cfg.AccessTokenExp) * time.Minute)
+	ExpiresRefresh := time.Now().Add(time.Duration(cfg.RefreshTokenExp) * time.Minute)
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "AETHER_ACCESS_TOKEN",
+		Value:    accessToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		Expires:  ExpiresAccess,
+	})
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "AETHER_REFRESH_TOKEN",
+		Value:    refreshTokenString,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		Expires:  ExpiresRefresh,
+	})
+
 	c.JSON(http.StatusOK, model.TokenResponse{
 		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		ExpiresIn:    15,
+		RefreshToken: refreshTokenString,
+		ExpiresIn:    cfg.AccessTokenExp,
 	})
 }
 
@@ -70,10 +104,10 @@ func Register(c *gin.Context) {
 	// Créer l'utilisateur
 	userService := services.NewUserService(services.DB)
 	user := &model.User{
-		Name:    registerData.Name,
-		Email:   registerData.Email,
+		Name:     registerData.Name,
+		Email:    registerData.Email,
 		Password: registerData.Password,
-		Role:    "user",
+		Role:     "user",
 	}
 
 	if err := userService.CreateUser(user); err != nil {
@@ -86,7 +120,7 @@ func Register(c *gin.Context) {
 	// Générer les tokens JWT
 	cfg := config.LoadConfig()
 	jwtService := services.NewJWTService(cfg.JWTSecret, cfg.AccessTokenExp, cfg.RefreshTokenExp)
-	accessToken, err := jwtService.GenerateToken(user.ID, user.Email, user.Role)
+	accessToken, err := jwtService.GenerateToken(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to generate access token",
@@ -94,7 +128,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	refreshToken, err := jwtService.GenerateRefreshToken(user.ID)
+	refreshTokenString, err := jwtService.GenerateRefreshToken(user.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to generate refresh token",
@@ -102,15 +136,66 @@ func Register(c *gin.Context) {
 		return
 	}
 
+	// Stocker le refresh token en base
+	emailService := services.NewEmailService(services.DB)
+	_, err = emailService.CreateRefreshToken(user.ID, refreshTokenString)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to store refresh token",
+		})
+		return
+	}
+
+	// Set cookies HTTPOnly pour le token d’accès et le refresh
+	ExpiresAccess := time.Now().Add(time.Duration(cfg.AccessTokenExp) * time.Minute)
+	ExpiresRefresh := time.Now().Add(time.Duration(cfg.RefreshTokenExp) * time.Minute)
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "AETHER_ACCESS_TOKEN",
+		Value:    accessToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		Expires:  ExpiresAccess,
+	})
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "AETHER_REFRESH_TOKEN",
+		Value:    refreshTokenString,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		Expires:  ExpiresRefresh,
+	})
+
 	c.JSON(http.StatusCreated, model.TokenResponse{
 		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		ExpiresIn:    15,
+		RefreshToken: refreshTokenString,
+		ExpiresIn:    cfg.AccessTokenExp,
 	})
 }
 
 // Logout gère la déconnexion
 func Logout(c *gin.Context) {
+	var request model.RefreshTokenRequest
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid request body",
+		})
+		return
+	}
+
+	// Révoquer le refresh token
+	emailService := services.NewEmailService(services.DB)
+	if err := emailService.RevokeRefreshToken(request.RefreshToken); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to revoke refresh token",
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Logged out successfully",
 	})
@@ -127,29 +212,19 @@ func RefreshToken(c *gin.Context) {
 		return
 	}
 
-	// Valider le refresh token
-	cfg := config.LoadConfig()
-	jwtService := services.NewJWTService(cfg.JWTSecret, cfg.AccessTokenExp, cfg.RefreshTokenExp)
-	claims, err := jwtService.ExtractClaims(refreshData.RefreshToken)
+	// Valider le refresh token en base
+	emailService := services.NewEmailService(services.DB)
+	refreshToken, err := emailService.ValidateRefreshToken(refreshData.RefreshToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "Invalid refresh token",
-		})
-		return
-	}
-
-	// Vérifier que c'est un refresh token
-	if tokenType, ok := claims["type"].(string); !ok || tokenType != "refresh" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "Invalid token type",
+			"error": "Invalid or expired refresh token",
 		})
 		return
 	}
 
 	// Récupérer l'utilisateur
-	userID := uint(claims["userID"].(float64))
 	userService := services.NewUserService(services.DB)
-	user, err := userService.GetUserByID(userID)
+	user, err := userService.GetUserByID(refreshToken.UserID)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "User not found",
@@ -158,7 +233,9 @@ func RefreshToken(c *gin.Context) {
 	}
 
 	// Générer un nouveau token d'accès
-	newAccessToken, err := jwtService.GenerateToken(user.ID, user.Email, user.Role)
+	cfg := config.LoadConfig()
+	jwtService := services.NewJWTService(cfg.JWTSecret, cfg.AccessTokenExp, cfg.RefreshTokenExp)
+	newAccessToken, err := jwtService.GenerateToken(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to generate new access token",
@@ -169,6 +246,6 @@ func RefreshToken(c *gin.Context) {
 	c.JSON(http.StatusOK, model.TokenResponse{
 		AccessToken:  newAccessToken,
 		RefreshToken: refreshData.RefreshToken,
-		ExpiresIn:    15,
+		ExpiresIn:    cfg.AccessTokenExp,
 	})
 }

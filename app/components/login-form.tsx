@@ -57,11 +57,11 @@ export function LoginForm() {
             <div className="space-y-2 text-sm">
               <p className="text-muted-foreground">
                 Vous n&apos;avez pas encore de compte ?{" "}
-                <a href="#" className="text-blue-600 hover:underline">
+                <a href="/register" className="text-blue-600 hover:underline">
                   Créez-en un !
                 </a>
               </p>
-              <a href="#" className="text-blue-600 hover:underline block">
+              <a href="/forgot" className="text-blue-600 hover:underline block">
                 Votre compte n&apos;est pas accessible ?
               </a>
             </div>
