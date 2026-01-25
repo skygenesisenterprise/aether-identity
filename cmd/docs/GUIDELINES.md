@@ -1,4 +1,4 @@
-# Guidelines d'Architecture - Aether Vault CMD
+# Guidelines d'Architecture - Aether Identity CMD
 
 ## 🎯 Principes Fondamentaux
 
@@ -356,4 +356,4 @@ sudo systemctl start vaultctl
 - [ ] Performance acceptable
 - [ ] Maintenabilité garantie
 
-Ces guidelines assurent que l'architecture reste cohérente, sécurisée et évolutive tout au long du développement d'Aether Vault CMD.
+Ces guidelines assurent que l'architecture reste cohérente, sécurisée et évolutive tout au long du développement d'Aether Identity CMD.

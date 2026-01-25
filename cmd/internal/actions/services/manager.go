@@ -5,9 +5,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/skygenesisenterprise/aether-vault/cmd/internal/context"
-	"github.com/skygenesisenterprise/aether-vault/cmd/internal/menu/types"
-	"github.com/skygenesisenterprise/aether-vault/cmd/internal/ui/theme"
+	"github.com/skygenesisenterprise/aether-identity/cmd/internal/context"
+	"github.com/skygenesisenterprise/aether-identity/cmd/internal/menu/types"
+	"github.com/skygenesisenterprise/aether-identity/cmd/internal/ui/theme"
 )
 
 // ListServicesAction liste tous les services système

@@ -11,7 +11,7 @@ func newVersionCommand() *cobra.Command {
 		Short: "Afficher la version de vaultctl",
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println("vaultctl v1.0.0")
-			fmt.Println("Aether Vault Console")
+			fmt.Println("Aether Identity Console")
 		},
 	}
 	return cmd

@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/skygenesisenterprise/aether-vault/cmd/internal/context"
-	"github.com/skygenesisenterprise/aether-vault/cmd/internal/ui/theme"
+	"github.com/skygenesisenterprise/aether-identity/cmd/internal/context"
+	"github.com/skygenesisenterprise/aether-identity/cmd/internal/ui/theme"
 )
 
 // ListInterfacesAction liste les interfaces réseau

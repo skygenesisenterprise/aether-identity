@@ -1,7 +1,7 @@
 package context
 
 import (
-	"github.com/skygenesisenterprise/aether-vault/cmd/internal/config"
+	"github.com/skygenesisenterprise/aether-identity/cmd/internal/config"
 )
 
 // Context représente l'état global de la session

@@ -1,19 +1,19 @@
 # 🖥️ Console Preview
 
-When you SSH into an Aether Vault server, you'll experience a professional OPNsense-style interface:
+When you SSH into an Aether Identity server, you'll experience a professional OPNsense-style interface:
 
 ```
 ------------------------------------------------
-|              Hello, this is AETHER VAULT     |           :::::::.
+|              Hello, this is AETHER IDENTITY   |           :::::::.
 |                                              |           :::::::::.
-|  Website:     https://aether-vault.io/       |        :::        :::
-|  Handbook:    https://docs.aether-vault.io/  |        :::        :::
-|  Forums:      https://forum.aether-vault.io/ |        :::        :::
-|  Code:        https://github.com/aether-vault|         `:::::::::
-|  Reddit:      https://reddit.com/r/aethervault|           `:::::::
+|  Website:     https://aether-identity.io/     |        :::        :::
+|  Handbook:    https://docs.aether-identity.io/|        :::        :::
+|  Forums:      https://forum.aether-identity.io/|        :::        :::
+|  Code:        https://github.com/aether-identity|         `:::::::::
+|  Reddit:      https://reddit.com/r/aetheridentity|           `:::::::
 ------------------------------------------------
 
-*** vault01.local: Aether Vault 1.0.0 (amd64) ***
+*** vault01.local: Aether Identity 1.0.0 (amd64) ***
 
  LAN (eth0)    -> v4/DHCP4: 192.168.1.100/24
 
@@ -57,7 +57,7 @@ Enter an option:
 ┌─ SERVICES SYSTÈME ────────────────────────────────────────────┐
 │                                                              │
 │  ✓ sshd                       active  OpenSSH Daemon          │
-│  ✓ vaultctl                    active  Aether Vault Console   │
+│  ✓ vaultctl                    active  Aether Identity Console   │
 │  ✓ networking                  active  Network Manager        │
 │  ✓ vault-core                  active  Vault Core Service     │
 │  ○ nginx                       inactive Web Server             │
@@ -175,14 +175,14 @@ Last login: Mon Jan  5 14:30:22 2026 from 192.168.1.21
 |  Handbook:    https://docs.aether-vault.io/  |        :::        :::
 |  Forums:      https://forum.aether-vault.io/ |        :::        :::
 |  Code:        https://github.com/aether-vault|         `:::::::::
-|  Reddit:      https://reddit.com/r/aethervault|           `:::::::
+|  Reddit:      https://reddit.com/r/aetheridentity|           `:::::::
 ------------------------------------------------
 
-*** vault01.local: Aether Vault 1.0.0 (amd64) ***
+*** vault01.local: Aether Identity 1.0.0 (amd64) ***
 [Previous menu selection: 9]
 
 Enter an option: 9
-┌─ VAULT CORE STATUS ───────────────────────────────────────────┐
+┌─ IDENTITY CORE STATUS ───────────────────────────────────────────┐
 │                                                              │
 │  Status:      ✓ Active and Initialized                        │
 │  Version:     1.12.3                                        │

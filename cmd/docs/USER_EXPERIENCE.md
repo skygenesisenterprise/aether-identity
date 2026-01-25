@@ -1,8 +1,8 @@
 # Console User Experience Guide
 
-## 🖥️ Aether Vault Console Experience
+## 🖥️ Aether Identity Console Experience
 
-This guide demonstrates the complete user experience when interacting with Aether Vault's enterprise console system.
+This guide demonstrates the complete user experience when interacting with Aether Identity's enterprise console system.
 
 ---
 
@@ -10,7 +10,7 @@ This guide demonstrates the complete user experience when interacting with Aethe
 
 ### First Connection
 
-When you first connect to an Aether Vault server via SSH, you're greeted with a professional OPNsense-style interface:
+When you first connect to an Aether Identity server via SSH, you're greeted with a professional OPNsense-style interface:
 
 ```
 ssh root@192.168.1.100
@@ -23,10 +23,10 @@ Last login: Mon Jan  5 14:30:22 2026 from 192.168.1.21
 |  Handbook:    https://docs.aether-vault.io/  |        :::        :::
 |  Forums:      https://forum.aether-vault.io/ |        :::        :::
 |  Code:        https://github.com/aether-vault|         `:::::::::
-|  Reddit:      https://reddit.com/r/aethervault|           `:::::::
+|  Reddit:      https://reddit.com/r/aetheridentity|           `:::::::
 ------------------------------------------------
 
-*** vault01.local: Aether Vault 1.0.0 (amd64) ***
+*** vault01.local: Aether Identity 1.0.0 (amd64) ***
 
  LAN (eth0)    -> v4/DHCP4: 192.168.1.100/24
 
@@ -77,7 +77,7 @@ Enter an option: 1
 ┌─ SERVICES SYSTÈME ────────────────────────────────────────────┐
 │                                                              │
 │  ✓ sshd                       active  OpenSSH Daemon          │
-│  ✓ vaultctl                    active  Aether Vault Console   │
+│  ✓ vaultctl                    active  Aether Identity Console   │
 │  ✓ networking                  active  Network Manager        │
 │  ✓ vault-core                  active  Vault Core Service     │
 │  ○ nginx                       inactive Web Server             │

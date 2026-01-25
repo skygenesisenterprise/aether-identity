@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/skygenesisenterprise/aether-vault/cmd/internal/system"
-	"github.com/skygenesisenterprise/aether-vault/cmd/internal/ui/theme"
+	"github.com/skygenesisenterprise/aether-identity/cmd/internal/system"
+	"github.com/skygenesisenterprise/aether-identity/cmd/internal/ui/theme"
 )
 
 // Display affiche le banner système complet
@@ -41,13 +41,13 @@ func DisplayWelcome() error {
 func displayOPNsenseBanner() {
 	fmt.Printf(`
 ------------------------------------------------
-|              Hello, this is AETHER VAULT     |           :::::::.
+|              Hello, this is AETHER IDENTITY   |           :::::::.
 |                                              |           :::::::::.
-|  Website:     https://aether-vault.io/       |        :::        :::
-|  Handbook:    https://docs.aether-vault.io/  |        :::        :::
-|  Forums:      https://forum.aether-vault.io/ |        :::        :::
-|  Code:        https://github.com/aether-vault|         ` + "`" + `:::::::::
-|  Reddit:      https://reddit.com/r/aethervault|           ` + "`" + `:::::::
+|  Website:     https://aether-identity.io/     |        :::        :::
+|  Handbook:    https://docs.aether-identity.io/|        :::        :::
+|  Forums:      https://forum.aether-identity.io/|        :::        :::
+|  Code:        https://github.com/aether-identity|         ` + "`" + `:::::::::
+|  Reddit:      https://reddit.com/r/aetheridentity|           ` + "`" + `:::::::
 ------------------------------------------------
 
 `)
@@ -57,7 +57,7 @@ func displaySystemInfo() {
 	sysInfo := system.GetInfo()
 	hostname := getHostname()
 
-	fmt.Printf(`*** %s: Aether Vault 1.0.0 (%s) ***
+	fmt.Printf(`*** %s: Aether Identity 1.0.0 (%s) ***
 
 `, hostname, runtime.GOARCH)
 }
@@ -84,7 +84,7 @@ func getHostname() string {
 	if hostname, err := exec.Command("hostname").Output(); err == nil {
 		return strings.TrimSpace(string(hostname))
 	}
-	return "AetherVault.local"
+	return "AetherIdentity.local"
 }
 
 func getNetworkInterfaces() []string {

@@ -4,9 +4,9 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](https://github.com/skygenesisenterprise/aether-vault/blob/main/LICENSE) [![Go](https://img.shields.io/badge/Go-1.25+-blue?style=for-the-badge&logo=go)](https://golang.org/) [![Cobra](https://img.shields.io/badge/Cobra-1.8+-lightgrey?style=for-the-badge&logo=go)](https://github.com/spf13/cobra) [![Systemd](https://img.shields.io/badge/Systemd-Integrated-green?style=for-the-badge&logo=linux)](https://systemd.io/) [![SSH](https://img.shields.io/badge/SSH-Supported-orange?style=for-the-badge&logo=openssh)](https://www.openssh.com/) [![Debian](https://img.shields.io/badge/Debian-Compatible-red?style=for-the-badge&logo=debian)](https://www.debian.org/)
 
-**🔥 Enterprise Console System - OPNsense-Style Interactive Management for Aether Vault**
+**🔥 Enterprise Console System - OPNsense-Style Interactive Management for Aether Identity**
 
-A sophisticated system console that provides **complete appliance-style management** for Aether Vault. Featuring **OPNsense-inspired interface**, **comprehensive system actions**, **SSH integration**, and **enterprise-ready architecture** with enhanced capabilities.
+A sophisticated system console that provides **complete appliance-style management** for Aether Identity. Featuring **OPNsense-inspired interface**, **comprehensive system actions**, **SSH integration**, and **enterprise-ready architecture** with enhanced capabilities.
 
 [🚀 Quick Start](#-quick-start) • [📋 What's New](#-whats-new) • [📊 Current Status](#-current-status) • [🛠️ Tech Stack](#️-tech-stack) • [🏗️ Architecture](#-architecture) • [🤝 Contributing](#-contributing)
 
@@ -16,9 +16,9 @@ A sophisticated system console that provides **complete appliance-style manageme
 
 ---
 
-## 🌟 What is Aether Vault CMD?
+## 🌟 What is Aether Identity CMD?
 
-**Aether Vault CMD** is a comprehensive system console that transforms server administration into an **enterprise appliance experience**. Inspired by industry-leading solutions like OPNsense and pfSense, it provides **complete system management** through an intuitive SSH interface with **modular action system**, **security-first design**, and **production-ready deployment**.
+**Aether Identity CMD** is a comprehensive system console that transforms server administration into an **enterprise appliance experience**. Inspired by industry-leading solutions like OPNsense and pfSense, it provides **complete system management** through an intuitive SSH interface with **modular action system**, **security-first design**, and **production-ready deployment**.
 
 ### 🎯 Our Vision
 
@@ -337,20 +337,20 @@ type Menu interface {
 
 ### 🎯 **SSH Login Experience**
 
-When you SSH into an Aether Vault server, you'll experience a professional OPNsense-style interface:
+When you SSH into an Aether Identity server, you'll experience a professional OPNsense-style interface:
 
 ```
 ------------------------------------------------
-|              Hello, this is AETHER VAULT     |           :::::::.
+|              Hello, this is AETHER IDENTITY   |           :::::::.
 |                                              |           :::::::::.
-|  Website:     https://aether-vault.io/       |        :::        :::
-|  Handbook:    https://docs.aether-vault.io/  |        :::        :::
-|  Forums:      https://forum.aether-vault.io/ |        :::        :::
-|  Code:        https://github.com/aether-vault|         `:::::::::
-|  Reddit:      https://reddit.com/r/aethervault|           `:::::::
+|  Website:     https://aether-identity.io/     |        :::        :::
+|  Handbook:    https://docs.aether-identity.io/|        :::        :::
+|  Forums:      https://forum.aether-identity.io/|        :::        :::
+|  Code:        https://github.com/aether-identity|         `:::::::::
+|  Reddit:      https://reddit.com/r/aetheridentity|           `:::::::
 ------------------------------------------------
 
-*** vault01.local: Aether Vault 1.0.0 (amd64) ***
+*** vault01.local: Aether Identity 1.0.0 (amd64) ***
 
  LAN (eth0)    -> v4/DHCP4: 192.168.1.100/24
 

@@ -3,9 +3,9 @@ package vaultctl
 import (
 	"fmt"
 
-	"github.com/skygenesisenterprise/aether-vault/cmd/internal/banner"
-	"github.com/skygenesisenterprise/aether-vault/cmd/internal/context"
-	"github.com/skygenesisenterprise/aether-vault/cmd/internal/menu"
+	"github.com/skygenesisenterprise/aether-identity/cmd/internal/banner"
+	"github.com/skygenesisenterprise/aether-identity/cmd/internal/context"
+	"github.com/skygenesisenterprise/aether-identity/cmd/internal/menu"
 )
 
 func runInteractiveMode(ctx *context.Context) error {

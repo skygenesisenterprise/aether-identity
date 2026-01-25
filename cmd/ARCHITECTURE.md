@@ -1,8 +1,8 @@
-# Aether Vault CMD Architecture
+# Aether Identity CMD Architecture
 
 ## 🎯 Mission
 
-Le dossier `cmd/` est le poste de pilotage d'Aether Vault - une console système interactive pour appliance Debian bootable.
+Le dossier `cmd/` est le poste de pilotage d'Aether Identity - une console système interactive pour appliance Debian bootable.
 
 ## 🏗️ Architecture Complète
 
@@ -245,4 +245,4 @@ type Authenticator interface {
 - `tests/e2e/` - Scénarios utilisateur complets
 - Machines virtuelles légères
 
-Cette architecture positionne `cmd/` comme le véritable poste de pilotage d'Aether Vault, offrant une expérience d'administration locale sécurisée et intuitive.
+Cette architecture positionne `cmd/` comme le véritable poste de pilotage d'Aether Identity, offrant une expérience d'administration locale sécurisée et intuitive.

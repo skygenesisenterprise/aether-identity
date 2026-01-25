@@ -1,7 +1,7 @@
 package vaultctl
 
 import (
-	"github.com/skygenesisenterprise/aether-vault/cmd/internal/context"
+	"github.com/skygenesisenterprise/aether-identity/cmd/internal/context"
 	"github.com/spf13/cobra"
 )
 
@@ -15,8 +15,8 @@ func Execute(ctx *context.Context) error {
 func NewRootCommand(ctx *context.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "vaultctl",
-		Short: "Aether Vault Console",
-		Long:  `Console système interactive pour Aether Vault`,
+		Short: "Aether Identity Console",
+		Long:  `Console système interactive pour Aether Identity`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runInteractiveMode(ctx)
 		},
