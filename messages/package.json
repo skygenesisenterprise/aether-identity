@@ -1,0 +1,50 @@
+{
+  "name": "@aether-identity/messages",
+  "version": "1.0.0",
+  "description": "Internationalization messages for Aether identity ecosystem",
+  "main": "generated/index.js",
+  "types": "generated/index.d.ts",
+  "scripts": {
+    "validate": "node tools/validate.js",
+    "generate": "node tools/generate.js",
+    "sync": "node tools/sync.js",
+    "build": "npm run validate && npm run generate",
+    "check:translations": "node tools/check-translations.js",
+    "generate:checksums": "node tools/generate-checksums.js",
+    "dev": "npm run build && npm run generate:checksums"
+  },
+  "keywords": [
+    "aether-vault",
+    "i18n",
+    "internationalization",
+    "messages",
+    "security",
+    "secrets-management"
+  ],
+  "author": "Sky Genesis Enterprise",
+  "license": "MIT",
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "chalk": "^4.1.2",
+    "fs-extra": "^11.1.1",
+    "glob": "^13.0.0",
+    "yaml": "^2.3.4"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.0.9",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skygenesisenterprise/aether-identity.git",
+    "directory": "messages"
+  },
+  "bugs": {
+    "url": "https://github.com/skygenesisenterprise/aether-identity/issues"
+  },
+  "homepage": "https://github.com/skygenesisenterprise/aether-identity/tree/main/messages"
+}

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Aether Mailer Frontend Development Script
+# Aether Identity Frontend Development Script
 # Démarrage direct avec contournement de la structure Next.js
 
-echo "🚀 Aether Mailer - Démarrage direct depuis app/..."
+echo "🚀 Aether Identity - Démarrage direct depuis app/..."
 
 # Variables d'environnement
 export NODE_ENV=${NODE_ENV:-development}

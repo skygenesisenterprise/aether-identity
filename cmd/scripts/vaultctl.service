@@ -1,0 +1,14 @@
+[Unit]
+Description=Aether Vault Console
+Documentation=https://docs.aether-vault.io/
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/vaultctl
+Restart=on-failure
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

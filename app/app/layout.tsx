@@ -4,8 +4,8 @@ import { AuthProvider } from "@/context/JwtAuthContext";
 import { DashboardLayout } from "@/components/DashboardLayout";
 
 export const metadata: Metadata = {
-  title: "Aether Vault",
-  description: "A modern, open-source secrets and TOTP vault built with Next.js",
+  title: "Aether Identity",
+  description: "An Enterprise OAuth2/OIDC support, multi-factor authentication, and secure account management for applications and services",
 };
 
 export default function RootLayout({

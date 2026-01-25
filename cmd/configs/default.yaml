@@ -1,0 +1,19 @@
+server:
+  host: localhost
+  port: 8080
+
+auth:
+  method: pam
+  timeout: 300
+  max_sessions: 5
+
+logging:
+  level: info
+  format: text
+  file: /var/log/vaultctl.log
+
+features:
+  read_only: false
+  network_mgmt: true
+  security_mgmt: true
+  backup_mgmt: true
