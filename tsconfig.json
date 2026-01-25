@@ -6,7 +6,8 @@
     { "path": "./options" },
     { "path": "./snap" },
     { "path": "./tests" },
-    { "path": "./prisma"}
+    { "path": "./prisma"},
+    { "path": "./infrastructure"}
   ],
   "compilerOptions": {
     "target": "ES2017",
