@@ -82,3 +82,15 @@ func (s *UserService) AuthenticateUser(email, password string) (*model.User, err
 
 	return user, nil
 }
+
+// UserToResponse convertit un modèle User en une réponse appropriée
+func (s *UserService) UserToResponse(user *model.User) map[string]interface{} {
+	return map[string]interface{}{
+		"id":        user.ID,
+		"email":     user.Email,
+		"name":      user.Name,
+		"created_at": user.CreatedAt,
+		"updated_at": user.UpdatedAt,
+		"role":      user.Role,
+	}
+}

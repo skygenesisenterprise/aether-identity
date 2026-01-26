@@ -83,7 +83,7 @@ func Login(c *gin.Context) {
 		Expires:  ExpiresRefresh,
 	})
 
-	c.JSON(http.StatusOK, model.TokenResponse{
+	c.JSON(http.StatusOK, model.JWTTokenResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshTokenString,
 		ExpiresIn:    cfg.AccessTokenExp,
@@ -169,7 +169,7 @@ func Register(c *gin.Context) {
 		Expires:  ExpiresRefresh,
 	})
 
-	c.JSON(http.StatusCreated, model.TokenResponse{
+	c.JSON(http.StatusCreated, model.JWTTokenResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshTokenString,
 		ExpiresIn:    cfg.AccessTokenExp,

@@ -63,10 +63,15 @@ A high-performance, secure identity management server built with Go, featuring J
 
 - ✅ **Authentication** - Login, register, logout, refresh token
 - ✅ **User Management** - CRUD operations for users
-- ✅ **OAuth2** - Userinfo, introspect, authorize endpoints
+- ✅ **OAuth2** - Userinfo, introspect, authorize, discovery endpoints
 - ✅ **Health Checks** - Database health and maintenance endpoints
 - ✅ **Organization** - Organization and membership management
 - ✅ **Roles** - Role and permission management
+- ✅ **Domain Management** - Domain registration and verification
+- ✅ **Email Service** - Email sending and verification
+- ✅ **Client Management** - OAuth2 client registration
+- ✅ **Discord Integration** - Discord OAuth2 integration
+- ✅ **Service Keys** - API key management with sk_ prefix for service authentication
 
 #### 🗄️ **Database Layer**
 
@@ -104,10 +109,15 @@ A high-performance, secure identity management server built with Go, featuring J
 
 - ✅ **Authentication** - Login, register, logout, refresh token
 - ✅ **User Management** - CRUD operations with proper authorization
-- ✅ **OAuth2** - Userinfo, introspect, authorize endpoints
+- ✅ **OAuth2** - Userinfo, introspect, authorize, discovery endpoints
 - ✅ **Health Checks** - Database health monitoring
 - ✅ **Organization** - Organization and membership management
 - ✅ **Roles** - Role and permission management
+- ✅ **Domain Management** - Domain registration and verification
+- ✅ **Email Service** - Email sending and verification
+- ✅ **Client Management** - OAuth2 client registration
+- ✅ **Discord Integration** - Discord OAuth2 integration
+- ✅ **Service Keys** - API key management with sk_ prefix for service authentication
 
 #### 🛠️ **Development Infrastructure**
 
@@ -255,6 +265,10 @@ PostgreSQL + GORM
 ├── 👤 User Models (Complete Implementation)
 ├── 🏢 Organization Models (Enterprise Features)
 ├── 🎭 Role Models (RBAC Implementation)
+├── 🔗 Membership Models (Organization Membership)
+├── 🌐 Domain Models (Domain Management)
+├── 🔐 Token Models (JWT and Refresh Tokens)
+├── 🔄 OAuth2 Models (OAuth2 Integration)
 └── 📈 Seed Scripts (Development Data)
 ```
 
@@ -267,35 +281,52 @@ aether-identity/server/
 │       └── main.go       # Server entry point
 ├── src/                    # Main source code
 │   ├── config/           # Configuration management
-│   │   └── config.go     # Server configuration
+│   │   ├── config.go     # Server configuration
+│   │   └── oauth_config.go # OAuth2 configuration
 │   ├── controllers/      # HTTP request handlers
 │   │   ├── auth.go       # Authentication endpoints
-│   │   ├── user.go       # User management endpoints
-│   │   ├── oauth.go      # OAuth2 endpoints
+│   │   ├── client_controller.go # Client management endpoints
+│   │   ├── database.go   # Database controller
+│   │   ├── discord.go    # Discord integration endpoints
+│   │   ├── discovery_controller.go # Discovery endpoints
+│   │   ├── domain_controller.go # Domain management endpoints
+│   │   ├── email.go      # Email service endpoints
+│   │   ├── health.go     # Health check endpoints
+│   │   ├── introspect.go # Token introspection endpoints
+│   │   ├── oauth_controller.go # OAuth2 endpoints
+│   │   ├── service_key_controller.go # Service key management endpoints
 │   │   ├── token.go      # Token management endpoints
-│   │   └── health.go     # Health check endpoints
+│   │   ├── user.go       # User management endpoints
+│   │   └── userinfo.go   # Userinfo endpoints
 │   ├── interfaces/       # Interface definitions
 │   │   ├── jwt_service.go # JWT service interface
 │   │   └── user_repository.go # User repository interface
 │   ├── middleware/       # HTTP middleware
+│   │   ├── admin_middleware.go # Admin role middleware
 │   │   ├── auth.go       # Authentication middleware
+│   │   ├── database.go   # Database connection middleware
+│   │   ├── oauth_middleware.go # OAuth2 middleware
 │   │   ├── rbac.go       # RBAC middleware
-│   │   ├── validation.go # Input validation middleware
-│   │   └── database.go   # Database connection middleware
+│   │   └── validation.go # Input validation middleware
 │   ├── model/            # Data models
 │   │   ├── auth.go       # Authentication models
-│   │   ├── user.go       # User models
+│   │   ├── database.go   # Database models
+│   │   ├── domain.go     # Domain models
+│   │   ├── membership.go # Membership models
+│   │   ├── oauth.go      # OAuth2 models
 │   │   ├── organization.go # Organization models
 │   │   ├── role.go       # Role models
-│   │   └── token.go      # Token models
+│   │   ├── token.go      # Token models
+│   │   └── user.go       # User models
 │   ├── routes/           # API route definitions
 │   │   └── routes.go     # Route configuration
-│   ├── services/         # Business logic
-│   │   ├── auth.go       # Authentication service
-│   │   ├── user.go       # User service
-│   │   ├── jwt.go        # JWT service implementation
-│   │   └── database.go   # Database service
-│   └── tests/            # Unit and integration tests
+│   └── services/         # Business logic
+│       ├── database.go   # Database service
+│       ├── domain_service.go # Domain service
+│       ├── email.go      # Email service
+│       ├── jwt.go        # JWT service implementation
+│       ├── oauth.go      # OAuth2 service
+│       └── user.go       # User service
 ├── main.go               # Main entry point
 ├── go.mod                # Go modules file
 ├── go.sum                # Go modules checksum

@@ -13,8 +13,8 @@ type RegisterRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
-// TokenResponse représente la réponse avec les tokens JWT
-type TokenResponse struct {
+// JWTTokenResponse représente la réponse avec les tokens JWT
+type JWTTokenResponse struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
 	ExpiresIn    int    `json:"expiresIn"`
