@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 
 services:
   # Service pour le serveur Aether Identity
@@ -55,9 +55,11 @@ services:
       - aether-network
 
 # Réseau pour la communication entre les services
+# Déclaré comme externe pour permettre à d'autres docker-compose d'y accéder
 networks:
   aether-network:
     driver: bridge
+    name: aether-network
 
 # Volumes pour persister les données
 volumes:
