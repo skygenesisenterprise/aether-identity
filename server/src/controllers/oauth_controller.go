@@ -63,8 +63,17 @@ func AuthorizationHandler(c *gin.Context) {
 	// Vérifier si l'utilisateur est connecté
 	userID, isAuthenticated := c.Get("user_id")
 	if !isAuthenticated {
-		// Pour l'instant, rediriger vers la page de login avec un paramètre pour indiquer OAuth
-		c.Redirect(http.StatusFound, "/login?oauth=true")
+		// Rediriger vers la page de login Next.js avec les paramètres OAuth
+		params := c.Request.URL.Query()
+		params.Set("oauth", "true")
+		params.Set("client_id", authReq.ClientID)
+		params.Set("redirect_uri", authReq.RedirectURI)
+		params.Set("response_type", authReq.ResponseType)
+		params.Set("scope", authReq.Scope)
+		params.Set("state", authReq.State)
+		
+		loginURL := "/login?" + params.Encode()
+		c.Redirect(http.StatusFound, loginURL)
 		return
 	}
 	

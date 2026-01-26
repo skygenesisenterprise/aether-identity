@@ -268,3 +268,66 @@ func GetServiceKeyUsage(ctx *gin.Context) {
 		"message": "Service key usage retrieved successfully",
 	})
 }
+
+// ValidateServiceKey validates a service key
+func ValidateServiceKey(ctx *gin.Context) {
+	var req struct {
+		Key string `json:"key" binding:"required"`
+	}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "Invalid request body",
+			"message": "Key is required",
+		})
+		return
+	}
+
+	serviceKeyService := services.NewServiceKeyService(services.DB)
+	isValid, err := serviceKeyService.ValidateServiceKey(req.Key)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"error":   "Invalid service key",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if !isValid {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"error":   "Invalid service key",
+			"message": "Service key is invalid or expired",
+		})
+		return
+	}
+
+	// If we get here, the key is valid
+	// Optionally, we can return the service key details (without the actual key for security)
+	serviceKey, err := serviceKeyService.GetServiceKeyByKey(req.Key)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   "Failed to retrieve service key details",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	// Return a sanitized response without the actual key
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data": gin.H{
+			"service_key_id": serviceKey.ID,
+			"name":           serviceKey.Name,
+			"description":    serviceKey.Description,
+			"is_active":      serviceKey.IsActive,
+			"expires_at":     serviceKey.ExpiresAt,
+			"created_at":     serviceKey.CreatedAt,
+			"updated_at":     serviceKey.UpdatedAt,
+		},
+		"message": "Service key is valid",
+	})
+}

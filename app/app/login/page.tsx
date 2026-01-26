@@ -2,15 +2,39 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Search, ChevronLeft } from "lucide-react"
 import Link from "next/link"
+import { useAuth } from "@/context/AuthContext"
 
 export default function LoginPage() {
   const [step, setStep] = useState<"email" | "password">("email")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [error, setError] = useState("")
+  
+  const { isLoading, login } = useAuth()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  
+  // Récupérer les paramètres OAuth depuis l'URL
+  const isOAuth = searchParams.get("oauth") === "true"
+  const clientId = searchParams.get("client_id")
+  const redirectUri = searchParams.get("redirect_uri")
+  const responseType = searchParams.get("response_type")
+  const scope = searchParams.get("scope")
+  const state = searchParams.get("state")
+  
+  // Préparer les paramètres OAuth pour la redirection
+  const oauthParams = {
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    response_type: responseType,
+    scope: scope,
+    state: state,
+  }
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -23,9 +47,15 @@ export default function LoginPage() {
     }
   }
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Login attempt with:", email, password)
+    setError("")
+    
+    try {
+      await login(email, password, oauthParams)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue")
+    }
   }
 
   const handleBack = () => {
@@ -129,6 +159,13 @@ export default function LoginPage() {
 
               {/* Form */}
               <form onSubmit={handlePasswordSubmit}>
+                {/* Error message */}
+                {error && (
+                  <div className="mb-4 p-3 bg-[#ffebee] border border-[#ffcdd2] rounded text-[13px] text-[#c62828]">
+                    {error}
+                  </div>
+                )}
+
                 {/* Password input */}
                 <div className="mb-4">
                   <input
@@ -161,9 +198,10 @@ export default function LoginPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-1.5 text-[15px] text-white bg-[#0067b8] hover:bg-[#005a9e] border border-transparent focus:outline-none focus:border-[#8a8886]"
+                    disabled={isLoading}
+                    className="px-6 py-1.5 text-[15px] text-white bg-[#0067b8] hover:bg-[#005a9e] border border-transparent focus:outline-none focus:border-[#8a8886] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Se connecter
+                    {isLoading ? "Connexion en cours..." : "Se connecter"}
                   </button>
                 </div>
               </form>

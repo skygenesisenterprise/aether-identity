@@ -142,6 +142,9 @@ importers:
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
+      config:
+        specifier: link:@prisma/client/config
+        version: link:@prisma/client/config
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.3

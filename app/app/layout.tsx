@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
-import { AuthProvider } from "@/context/JwtAuthContext";
+import { AuthProvider } from "@/context/AuthContext";
 import { DashboardLayout } from "@/components/DashboardLayout";
 
 export const metadata: Metadata = {

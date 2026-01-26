@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // URL configuration moved to prisma.config.ts
 }
 
 // Identity schema: users, accounts, sessions, roles/permissions, API keys and tokens
@@ -27,8 +27,18 @@ model User {
   sessions       Session[]
   userRoles      UserRole[]
   apiKeys        ApiKey[]
-  passwordResets PasswordResetToken[]?    // optional for convenience
-  emailVerifs    EmailVerificationToken[]? // optional for convenience
+  passwordResets PasswordResetToken[]    // optional for convenience
+  emailVerifs    EmailVerificationToken[] // optional for convenience
+  oauthAuthorizationCodes OAuthAuthorizationCode[]
+  oauthAccessTokens OAuthAccessToken[]
+  oauthRefreshTokens OAuthRefreshToken[]
+  oauthConsents OAuthConsent[]
+  createdServiceKeys ServiceKey[] @relation(name: "createdByUser")
+  updatedServiceKeys ServiceKey[] @relation(name: "updatedByUser")
+  serviceKeyUsages ServiceKeyUsage[]
+  userDomains UserDomain[]
+  memberships Membership[]
+  databaseBackups DatabaseBackup[]
 }
 
 model Profile {
@@ -136,4 +146,202 @@ model EmailVerificationToken {
   expiresAt DateTime
   used      Boolean  @default(false)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// OAuth2/OpenID Connect models
+
+model OAuthClient {
+  id          String    @id @default(uuid())
+  clientId    String    @unique
+  clientSecret String
+  name        String
+  redirectUris String[]
+  grantTypes   String[]
+  scopes       String[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  authorizationCodes OAuthAuthorizationCode[]
+  accessTokens OAuthAccessToken[]
+  refreshTokens OAuthRefreshToken[]
+  consents OAuthConsent[]
+}
+
+model OAuthAuthorizationCode {
+  id          String    @id @default(uuid())
+  code        String    @unique
+  clientId    String
+  userId      String
+  redirectUri String
+  scopes      String[]
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+
+  client OAuthClient @relation(fields: [clientId], references: [clientId], onDelete: Cascade)
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model OAuthAccessToken {
+  id          String    @id @default(uuid())
+  token       String    @unique
+  clientId    String
+  userId      String
+  scopes      String[]
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+
+  client OAuthClient @relation(fields: [clientId], references: [clientId], onDelete: Cascade)
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model OAuthRefreshToken {
+  id          String    @id @default(uuid())
+  token       String    @unique
+  clientId    String
+  userId      String
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+
+  client OAuthClient @relation(fields: [clientId], references: [clientId], onDelete: Cascade)
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model OAuthConsent {
+  id          String    @id @default(uuid())
+  userId      String
+  clientId    String
+  scopes      String[]
+  createdAt   DateTime  @default(now())
+
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client OAuthClient @relation(fields: [clientId], references: [clientId], onDelete: Cascade)
+}
+
+// Service Key models
+
+model ServiceKey {
+  id          String    @id @default(uuid())
+  key         String    @unique
+  name        String
+  description String?
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime?
+  createdBy   String
+  updatedBy   String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  createdByUser User @relation(fields: [createdBy], references: [id], onDelete: Cascade, name: "createdByUser")
+  updatedByUser User @relation(fields: [updatedBy], references: [id], onDelete: Cascade, name: "updatedByUser")
+  usages ServiceKeyUsage[]
+}
+
+model ServiceKeyUsage {
+  id            String    @id @default(uuid())
+  serviceKeyId  String
+  endpoint      String
+  method        String
+  ipAddress     String?
+  statusCode    Int
+  userAgent     String?
+  createdAt     DateTime  @default(now())
+
+  serviceKey ServiceKey @relation(fields: [serviceKeyId], references: [id], onDelete: Cascade)
+}
+
+// Organization and Domain models
+
+model Organization {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  domain      String    @unique
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  domains      Domain[]
+  memberships  Membership[]
+}
+
+model Domain {
+  id              String    @id @default(uuid())
+  name            String
+  organizationId  String
+  isVerified      Boolean   @default(false)
+  verificationToken String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  users          UserDomain[]
+}
+
+model UserDomain {
+  userId      String
+  domainId    String
+  isAdmin     Boolean   @default(false)
+  joinedAt    DateTime  @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  domain Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
+
+  @@id([userId, domainId])
+}
+
+model Membership {
+  id              String    @id @default(uuid())
+  userId          String
+  organizationId  String
+  role            String
+  status          String    @default("active")
+  joinedAt        DateTime  @default(now())
+  leftAt          DateTime?
+
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+// Database management models
+
+model DatabaseBackup {
+  id            String    @id @default(uuid())
+  fileName      String
+  filePath      String
+  fileSize      Int
+  backupType    String
+  status        String    @default("pending")
+  errorMessage  String?
+  createdBy     String
+  createdAt     DateTime  @default(now())
+  completedAt   DateTime?
+
+  createdByUser User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+}
+
+model DatabaseConnectionLog {
+  id            String    @id @default(uuid())
+  databaseName  String
+  userName      String
+  ipAddress     String
+  userAgent     String?
+  action        String
+  query         String?
+  executionTime Int
+  success       Boolean   @default(true)
+  errorMessage  String?
+  createdAt     DateTime  @default(now())
+}
+
+model DatabaseHealthCheck {
+  id              String    @id @default(uuid())
+  databaseName    String
+  status          String
+  responseTime    Int
+  connectionCount Int
+  activeQueries   Int
+  totalQueries    Int
+  errorRate       Float
+  uptime          Int
+  lastChecked     DateTime  @default(now())
 }

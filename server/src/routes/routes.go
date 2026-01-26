@@ -90,6 +90,18 @@ func SetupRoutes(router *gin.Engine) {
 		}
 	}
 
+	// Routes OAuth2/OpenID Connect (accessibles directement)
+	oauthRoutes := router.Group("/oauth")
+	oauthRoutes.Use(middleware.DatabaseMiddleware())
+	{
+		oauthRoutes.GET("/authorize", controllers.AuthorizationHandler)
+		oauthRoutes.POST("/token", controllers.TokenHandler)
+		oauthRoutes.GET("/userinfo", controllers.UserInfoHandler)
+		oauthRoutes.POST("/revoke", controllers.RevokeHandler)
+		oauthRoutes.GET("/.well-known/openid-configuration", controllers.DiscoveryHandler)
+		oauthRoutes.GET("/jwks", controllers.JWKSHandler)
+	}
+
 	// Routes de gestion des clés de service (protégées par JWT)
 	serviceKeyRoutes := router.Group("/api/v1/service-keys")
 	serviceKeyRoutes.Use(middleware.AuthMiddleware())
@@ -101,4 +113,7 @@ func SetupRoutes(router *gin.Engine) {
 		serviceKeyRoutes.DELETE(":id", controllers.DeleteServiceKey)
 		serviceKeyRoutes.GET(":id/usage", controllers.GetServiceKeyUsage)
 	}
+
+	// Route pour valider une clé de service (sans authentification JWT)
+	serviceKeyRoutes.POST("/validate", controllers.ValidateServiceKey)
 }
