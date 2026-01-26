@@ -18,7 +18,7 @@ DOCKER_COMPOSE := docker compose
 MODE ?= dev
 
 # Fichiers Docker Compose en fonction du mode
-DOCKER_COMPOSE_FILE := docker-compose.$(MODE).yml
+DOCKER_COMPOSE_FILE := infra/docker-compose.$(MODE).yml
 
 # Nom du conteneur
 CONTAINER_NAME := aether-identity-frontend-$(MODE)
@@ -62,7 +62,7 @@ help: ## Afficher l'aide pour les commandes disponibles
 	@echo "${CYAN}─────────────────────────────────────────────────────────────${RESET}"
 	@echo ""
 	@echo "  ${YELLOW}make ports${RESET}                 ${GREEN}# Vérifier les ports utilisés${RESET}"
-	@echo "  ${YELLOW}make kill-ports${RESET}            ${GREEN}# Forcer la libération des ports 3000/8080${RESET}"
+	@echo "  ${YELLOW}make kill-ports${RESET}            ${GREEN}# Forcer la libération du port 3000${RESET}"
 	@echo ""
 	@echo "${CYAN}─────────────────────────────────────────────────────────────${RESET}"
 	@echo "${CYAN}💻 ACCÈS AU CONTENAIR${RESET}"
@@ -117,7 +117,6 @@ up: ## Lancer le conteneur en mode $(MODE)
 	@echo "${GREEN}✅ Conteneur démarré: $(CONTAINER_NAME)${RESET}"
 	@echo "${GREEN}🌐 Accès à l'application:${RESET}"
 	@echo "   - http://localhost:3000 (Next.js direct)"
-	@echo "   - http://localhost:8080 (via Nginx avec MIME types corrects)"
 	@echo ""
 	@echo "${GREEN}📝 Pour suivre les logs: make logs-follow${RESET}"
 

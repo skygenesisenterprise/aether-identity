@@ -6,18 +6,18 @@ import (
 	"github.com/skygenesisenterprise/aether-identity/server/src/middleware"
 )
 
-func SetupRoutes(router *gin.Engine) {
+func SetupRoutes(router *gin.Engine, systemKey string) {
 	// API versioning
 	apiV1 := router.Group("/api/v1")
 	{
-		// Routes de santé - sans middleware de base de données
+		// Health routes - without database middleware
 		apiV1.GET("/health", controllers.HealthCheck)
 
-		// Routes qui nécessitent une base de données
+		// Routes that require database
 		dbRoutes := apiV1.Group("")
 		dbRoutes.Use(middleware.DatabaseMiddleware())
 		{
-			// Routes d'authentification
+			// Authentication routes
 			authRoutes := dbRoutes.Group("/auth")
 			{
 				authRoutes.POST("/login", controllers.Login)
@@ -116,4 +116,12 @@ func SetupRoutes(router *gin.Engine) {
 
 	// Route pour valider une clé de service (sans authentification JWT)
 	serviceKeyRoutes.POST("/validate", controllers.ValidateServiceKey)
+
+	// Routes protégées par la clé système (pour les requêtes de l'application)
+	appRoutes := router.Group("/api/v1/app")
+	appRoutes.Use(middleware.AppAuth(systemKey))
+	{
+		appRoutes.GET("/health", controllers.HealthCheck)
+		appRoutes.GET("/userinfo", middleware.AuthMiddleware(), controllers.UserInfo)
+	}
 }

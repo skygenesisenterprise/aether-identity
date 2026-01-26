@@ -12,6 +12,7 @@ type Config struct {
 	RefreshTokenExp int
 	DatabaseURL    string
 	Port           string
+	SystemKey      string // Clé système pour les requêtes internes de l'application
 }
 
 // LoadConfig charge la configuration depuis les variables d'environnement
@@ -22,6 +23,7 @@ func LoadConfig() *Config {
 		RefreshTokenExp: getEnvAsInt("REFRESH_TOKEN_EXP", 720),
 		DatabaseURL:    getEnv("DATABASE_URL", "host=localhost user=postgres password=postgres dbname=aether_identity port=5432 sslmode=disable"),
 		Port:           getEnv("PORT", "8080"),
+		SystemKey:      getEnv("SYSTEM_KEY", "sk_system_default_key_change_in_production"),
 	}
 }
 

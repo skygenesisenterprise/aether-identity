@@ -8,7 +8,7 @@ FROM golang:1.25.5-alpine AS builder
 WORKDIR /app
 
 # Copier le fichier go.mod et go.sum
-COPY go.mod go.sum ./
+COPY go.mod go.sum ../
 
 # Télécharger les dépendances
 RUN go mod download

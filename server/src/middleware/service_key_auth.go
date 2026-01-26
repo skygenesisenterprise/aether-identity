@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/skygenesisenterprise/aether-identity/server/src/model"
 	"github.com/skygenesisenterprise/aether-identity/server/src/services"
 	"github.com/gin-gonic/gin"
 )
@@ -11,11 +12,15 @@ import (
 // ServiceKeyAuthMiddleware is a middleware that validates service keys
 type ServiceKeyAuthMiddleware struct {
 	ServiceKeyService *services.ServiceKeyService
+	systemKey         string
 }
 
 // NewServiceKeyAuthMiddleware creates a new ServiceKeyAuthMiddleware
-func NewServiceKeyAuthMiddleware(serviceKeyService *services.ServiceKeyService) *ServiceKeyAuthMiddleware {
-	return &ServiceKeyAuthMiddleware{ServiceKeyService: serviceKeyService}
+func NewServiceKeyAuthMiddleware(serviceKeyService *services.ServiceKeyService, systemKey string) *ServiceKeyAuthMiddleware {
+	return &ServiceKeyAuthMiddleware{
+		ServiceKeyService: serviceKeyService,
+		systemKey:         systemKey,
+	}
 }
 
 // Authenticate validates the service key from the request
@@ -45,6 +50,21 @@ func (m *ServiceKeyAuthMiddleware) Authenticate(c *gin.Context) {
 			"error":   "Invalid authorization format",
 			"message": "Service key must be in format 'Bearer sk_...' or 'sk_...'",
 		})
+		return
+	}
+
+	// First check if this is the system key
+	if serviceKey == m.systemKey {
+		// Create a system key object to attach to the context
+		systemKeyDetails := &model.ServiceKey{
+			Key:         m.systemKey,
+			Name:        "System Key (Application)",
+			Description: "System key used by the application for internal requests",
+			IsActive:    true,
+		}
+		c.Set("service_key", systemKeyDetails)
+		c.Set("is_system_key", true)
+		c.Next()
 		return
 	}
 
@@ -87,6 +107,6 @@ func (m *ServiceKeyAuthMiddleware) Authenticate(c *gin.Context) {
 }
 
 // ServiceKeyAuth is a convenience function to create the middleware
-func ServiceKeyAuth(serviceKeyService *services.ServiceKeyService) gin.HandlerFunc {
-	return NewServiceKeyAuthMiddleware(serviceKeyService).Authenticate
+func ServiceKeyAuth(serviceKeyService *services.ServiceKeyService, systemKey string) gin.HandlerFunc {
+	return NewServiceKeyAuthMiddleware(serviceKeyService, systemKey).Authenticate
 }

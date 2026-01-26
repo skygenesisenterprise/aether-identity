@@ -110,7 +110,7 @@ func main() {
 
 	// Configurer les routes
 	fmt.Printf("\033[1;34m[info] Setting up API routes...\033[0m\n")
-	routes.SetupRoutes(router)
+	routes.SetupRoutes(router, cfg.SystemKey)
 	time.Sleep(200 * time.Millisecond)
 
 	fmt.Printf("\n")

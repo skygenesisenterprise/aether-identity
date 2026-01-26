@@ -26,6 +26,7 @@ A high-performance, secure identity management server built with Go, featuring J
 - **⚡ High Performance** - Go backend with GORM and PostgreSQL integration
 - **📊 Comprehensive API** - RESTful endpoints for user management and identity operations
 - **🏗️ Modular Architecture** - Clean separation of concerns with controllers, services, and repositories
+- **🔑 System Key Authentication** - Dedicated `sk_` key system for application-to-server communication
 
 ### 🎯 Our Vision
 
@@ -35,6 +36,7 @@ A high-performance, secure identity management server built with Go, featuring J
 - **📊 RESTful API** - Well-documented, versioned API endpoints
 - **🗄️ Database Integration** - GORM ORM with PostgreSQL for data persistence
 - **🛠️ Developer-Friendly** - Comprehensive Makefile, hot reload, and testing support
+- **🔑 System Key Management** - Secure internal communication between application and server
 
 ---
 
@@ -58,6 +60,7 @@ A high-performance, secure identity management server built with Go, featuring J
 - ✅ **Rate Limiting** - Protection against brute force attacks
 - ✅ **CORS Configuration** - Secure cross-origin resource sharing
 - ✅ **Security Headers** - HTTP security headers for all responses
+- ✅ **System Key Authentication** - Dedicated `sk_` key for application-to-server communication
 
 #### 📊 **API Endpoints**
 
@@ -71,7 +74,8 @@ A high-performance, secure identity management server built with Go, featuring J
 - ✅ **Email Service** - Email sending and verification
 - ✅ **Client Management** - OAuth2 client registration
 - ✅ **Discord Integration** - Discord OAuth2 integration
-- ✅ **Service Keys** - API key management with sk_ prefix for service authentication
+- ✅ **Service Keys** - API key management with `sk_` prefix for service authentication
+- ✅ **System Key Routes** - Dedicated endpoints for application-to-server communication
 
 #### 🗄️ **Database Layer**
 
@@ -85,7 +89,7 @@ A high-performance, secure identity management server built with Go, featuring J
 
 ## 📊 Current Status
 
-> **✅ Production-Ready**: Complete authentication system with enterprise security features.
+> **✅ Production-Ready**: Complete authentication system with enterprise security features and system key authentication.
 
 ### ✅ **Currently Implemented**
 
@@ -96,6 +100,7 @@ A high-performance, secure identity management server built with Go, featuring J
 - ✅ **Database Layer** - GORM with PostgreSQL and complete identity models
 - ✅ **Security Middleware** - RBAC, validation, rate limiting, CORS
 - ✅ **API Endpoints** - Complete RESTful API for identity management
+- ✅ **System Key Authentication** - Dedicated `sk_` key system for application communication
 
 #### 🔐 **Security Implementation**
 
@@ -104,6 +109,7 @@ A high-performance, secure identity management server built with Go, featuring J
 - ✅ **Input Validation** - Comprehensive request validation
 - ✅ **Rate Limiting** - Protection against brute force attacks
 - ✅ **Security Headers** - HTTP security headers
+- ✅ **System Key Middleware** - `AppAuthMiddleware` for application-to-server authentication
 
 #### 📊 **API Features**
 
@@ -117,7 +123,8 @@ A high-performance, secure identity management server built with Go, featuring J
 - ✅ **Email Service** - Email sending and verification
 - ✅ **Client Management** - OAuth2 client registration
 - ✅ **Discord Integration** - Discord OAuth2 integration
-- ✅ **Service Keys** - API key management with sk_ prefix for service authentication
+- ✅ **Service Keys** - API key management with `sk_` prefix
+- ✅ **System Key Routes** - Protected endpoints for application communication
 
 #### 🛠️ **Development Infrastructure**
 
@@ -126,6 +133,7 @@ A high-performance, secure identity management server built with Go, featuring J
 - ✅ **Makefile** - Comprehensive build and development commands
 - ✅ **Testing Suite** - Unit and integration tests
 - ✅ **Structured Logging** - Zerolog-based logging
+- ✅ **System Key Generation** - Script for secure key generation
 
 ### 🔄 **In Development**
 
@@ -141,6 +149,89 @@ A high-performance, secure identity management server built with Go, featuring J
 - **Single Sign-On** - SAML and OAuth2 federation
 - **Identity Federation** - Social login integration
 - **Advanced Analytics** - Usage metrics and reporting
+
+---
+
+## 🔑 System Key Authentication
+
+### 🎯 **Overview**
+
+The **System Key** is a special authentication key designed for secure communication between the application web (`app/app/`) and the Aether Identity Server. This key follows the format `sk_<15_random_characters>` and is considered a "system" key that should only be used by the application itself.
+
+### 🔐 **Key Features**
+
+- **Dedicated Authentication** - Separate from regular service keys
+- **Application-Only** - Reserved for application-to-server communication
+- **15-Character Randomness** - Secure random generation for production
+- **Environment-Specific** - Different keys for dev, staging, and production
+- **No Database Storage** - System key is configured via environment variables
+
+### 📋 **System Key Format**
+
+```
+sk_<15_characters>
+```
+
+Where:
+- `sk_` is the fixed prefix
+- `<15_characters>` are 15 alphanumeric characters generated randomly
+
+### 🔧 **Configuration**
+
+1. **Generate a System Key**
+
+   ```bash
+   ./scripts/generate_system_key.sh
+   ```
+
+2. **Add to Environment Variables**
+
+   ```bash
+   # In .env file
+   SYSTEM_KEY=sk_your_random_key_here
+   ```
+
+3. **Use in Application**
+
+   ```javascript
+   // In Next.js application
+   const response = await fetch('http://localhost:8080/api/v1/app/health', {
+     headers: {
+       'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SYSTEM_KEY}`
+     }
+   });
+   ```
+
+### 🛡️ **Security Best Practices**
+
+- **Never commit** the system key to version control
+- **Rotate regularly** (every 3-6 months in production)
+- **Use different keys** for different environments
+- **Limit access** to the key to authorized team members only
+- **Monitor usage** of system key endpoints
+
+### 📚 **System Key Middleware**
+
+The server provides two middleware components for system key authentication:
+
+1. **`AppAuthMiddleware`** - Specifically for application routes
+   - Validates the system key
+   - Attaches `is_app_request` flag to context
+   - Used for dedicated application endpoints
+
+2. **`ServiceKeyAuthMiddleware`** - For general service key authentication
+   - Checks for system key first
+   - Falls back to database lookup for regular service keys
+   - Attaches `is_system_key` flag when system key is used
+
+### 🌐 **Protected Routes**
+
+System key-protected endpoints are available at:
+
+```
+GET    /api/v1/app/health          - Health check for application
+GET    /api/v1/app/userinfo        - User info with system key auth
+```
 
 ---
 
@@ -180,6 +271,10 @@ A high-performance, secure identity management server built with Go, featuring J
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
+   # Generate a system key:
+   cd ..
+   ./scripts/generate_system_key.sh
+   cd server
    ```
 
 5. **Database initialization**
@@ -208,7 +303,7 @@ Once running, you can access:
 - **API Server**: [http://localhost:8080](http://localhost:8080)
 - **Health Check**: [http://localhost:8080/health](http://localhost:8080/health)
 - **Database Health**: [http://localhost:8080/health/database](http://localhost:8080/health/database)
-- **Swagger Docs**: [http://localhost:8080/docs](http://localhost:8080/docs) (if enabled)
+- **System Key Health**: [http://localhost:8080/api/v1/app/health](http://localhost:8080/api/v1/app/health) (with system key auth)
 
 ### 🎯 **Make Commands**
 
@@ -249,7 +344,7 @@ make help                # Show all available commands
 Go 1.21+ + Gin Framework
 ├── 🗄️ GORM + PostgreSQL (Database Layer)
 ├── 🔐 JWT Authentication (Complete Implementation)
-├── 🛡️ Middleware (Security, CORS, Logging, RBAC)
+├── 🛡️ Middleware (Security, CORS, Logging, RBAC, System Key Auth)
 ├── 🌐 HTTP Router (Gin Router)
 ├── 📦 JSON Serialization (Native Go)
 └── 📊 Structured Logging (Zerolog)
@@ -269,6 +364,7 @@ PostgreSQL + GORM
 ├── 🌐 Domain Models (Domain Management)
 ├── 🔐 Token Models (JWT and Refresh Tokens)
 ├── 🔄 OAuth2 Models (OAuth2 Integration)
+├── 🔑 Service Key Models (sk_ prefix for API keys)
 └── 📈 Seed Scripts (Development Data)
 ```
 
@@ -281,7 +377,7 @@ aether-identity/server/
 │       └── main.go       # Server entry point
 ├── src/                    # Main source code
 │   ├── config/           # Configuration management
-│   │   ├── config.go     # Server configuration
+│   │   ├── config.go     # Server configuration (includes SystemKey)
 │   │   └── oauth_config.go # OAuth2 configuration
 │   ├── controllers/      # HTTP request handlers
 │   │   ├── auth.go       # Authentication endpoints
@@ -303,6 +399,7 @@ aether-identity/server/
 │   │   └── user_repository.go # User repository interface
 │   ├── middleware/       # HTTP middleware
 │   │   ├── admin_middleware.go # Admin role middleware
+│   │   ├── app_auth.go  # System key authentication middleware
 │   │   ├── auth.go       # Authentication middleware
 │   │   ├── database.go   # Database connection middleware
 │   │   ├── oauth_middleware.go # OAuth2 middleware
@@ -316,16 +413,18 @@ aether-identity/server/
 │   │   ├── oauth.go      # OAuth2 models
 │   │   ├── organization.go # Organization models
 │   │   ├── role.go       # Role models
+│   │   ├── service_key.go # Service key models (sk_ prefix)
 │   │   ├── token.go      # Token models
 │   │   └── user.go       # User models
 │   ├── routes/           # API route definitions
-│   │   └── routes.go     # Route configuration
+│   │   └── routes.go     # Route configuration (includes system key routes)
 │   └── services/         # Business logic
 │       ├── database.go   # Database service
 │       ├── domain_service.go # Domain service
 │       ├── email.go      # Email service
 │       ├── jwt.go        # JWT service implementation
 │       ├── oauth.go      # OAuth2 service
+│       ├── service_key.go # Service key service
 │       └── user.go       # User service
 ├── main.go               # Main entry point
 ├── go.mod                # Go modules file
@@ -375,418 +474,18 @@ Error responses:
 }
 ```
 
-### 🔑 **Authentication Endpoints**
+### 🔑 **System Key Authentication**
 
-#### Register a new user
-
-```bash
-POST /api/v1/auth/register
-```
-
-**Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "securePassword123",
-  "name": "John Doe"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "user": {
-      "id": "user-123",
-      "email": "user@example.com",
-      "name": "John Doe"
-    },
-    "tokens": {
-      "access_token": "eyJhbGci...",
-      "refresh_token": "eyJhbGci..."
-    }
-  },
-  "message": "User registered successfully"
-}
-```
-
-#### Login
+For system key-protected endpoints, use the system key in the Authorization header:
 
 ```bash
-POST /api/v1/auth/login
+Authorization: Bearer sk_your_system_key_here
 ```
 
-**Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "securePassword123"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "tokens": {
-      "access_token": "eyJhbGci...",
-      "refresh_token": "eyJhbGci..."
-    }
-  },
-  "message": "Login successful"
-}
-```
-
-#### Refresh Token
+Or without the Bearer prefix:
 
 ```bash
-POST /api/v1/auth/refresh
-```
-
-**Request Body:**
-```json
-{
-  "refresh_token": "eyJhbGci..."
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "access_token": "eyJhbGci..."
-  },
-  "message": "Token refreshed successfully"
-}
-```
-
-#### Logout
-
-```bash
-POST /api/v1/auth/logout
-```
-
-**Headers:**
-```bash
-Authorization: Bearer <access_token>
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Logged out successfully"
-}
-```
-
-### 👤 **User Management Endpoints**
-
-#### Get current user
-
-```bash
-GET /api/v1/users/me
-```
-
-**Headers:**
-```bash
-Authorization: Bearer <access_token>
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "user-123",
-    "email": "user@example.com",
-    "name": "John Doe",
-    "created_at": "2024-01-15T10:30:00Z",
-    "updated_at": "2024-01-15T10:30:00Z",
-    "role": "user"
-  },
-  "message": "User retrieved successfully"
-}
-```
-
-#### Update user profile
-
-```bash
-PUT /api/v1/users/me
-```
-
-**Headers:**
-```bash
-Authorization: Bearer <access_token>
-```
-
-**Request Body:**
-```json
-{
-  "name": "John Doe Updated",
-  "email": "newemail@example.com"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "user-123",
-    "email": "newemail@example.com",
-    "name": "John Doe Updated",
-    "updated_at": "2024-01-16T14:20:00Z"
-  },
-  "message": "User updated successfully"
-}
-```
-
-#### Change password
-
-```bash
-POST /api/v1/users/change-password
-```
-
-**Headers:**
-```bash
-Authorization: Bearer <access_token>
-```
-
-**Request Body:**
-```json
-{
-  "current_password": "oldPassword123",
-  "new_password": "newSecurePassword456"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Password changed successfully"
-}
-```
-
-### 🔄 **OAuth2 Endpoints**
-
-#### Userinfo
-
-```bash
-GET /api/v1/oauth/userinfo
-```
-
-**Headers:**
-```bash
-Authorization: Bearer <access_token>
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "sub": "user-123",
-    "email": "user@example.com",
-    "name": "John Doe",
-    "role": "user"
-  },
-  "message": "Userinfo retrieved successfully"
-}
-```
-
-#### Introspect Token
-
-```bash
-POST /api/v1/oauth/introspect
-```
-
-**Request Body:**
-```json
-{
-  "token": "eyJhbGci..."
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "active": true,
-    "sub": "user-123",
-    "exp": 1735689600,
-    "iat": 1735686000,
-    "role": "user"
-  },
-  "message": "Token is active"
-}
-```
-
-### 🏢 **Organization Endpoints**
-
-#### Create organization
-
-```bash
-POST /api/v1/organizations
-```
-
-**Headers:**
-```bash
-Authorization: Bearer <access_token>
-```
-
-**Request Body:**
-```json
-{
-  "name": "Acme Corp",
-  "description": "Enterprise software company"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "org-456",
-    "name": "Acme Corp",
-    "description": "Enterprise software company",
-    "created_at": "2024-01-17T09:15:00Z"
-  },
-  "message": "Organization created successfully"
-}
-```
-
-#### Get organization members
-
-```bash
-GET /api/v1/organizations/{org_id}/members
-```
-
-**Headers:**
-```bash
-Authorization: Bearer <access_token>
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "user_id": "user-123",
-      "email": "user@example.com",
-      "name": "John Doe",
-      "role": "admin"
-    },
-    {
-      "user_id": "user-789",
-      "email": "member@example.com",
-      "name": "Jane Smith",
-      "role": "member"
-    }
-  ],
-  "message": "Members retrieved successfully"
-}
-```
-
-### 🛡️ **Health Check Endpoints**
-
-#### Server Health
-
-```bash
-GET /api/v1/health
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "status": "healthy",
-    "timestamp": "2024-01-18T11:25:00Z"
-  },
-  "message": "Server is healthy"
-}
-```
-
-#### Database Health
-
-```bash
-GET /api/v1/health/database
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "status": "healthy",
-    "database": "PostgreSQL",
-    "version": "14.5",
-    "timestamp": "2024-01-18T11:25:00Z"
-  },
-  "message": "Database connection is healthy"
-}
-```
-
-### 📚 **API Usage Examples**
-
-#### Using cURL
-
-```bash
-# Login
-curl -X POST http://localhost:8080/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"securePassword123"}'
-
-# Get user info (with auth)
-curl -X GET http://localhost:8080/api/v1/users/me \
-  -H "Authorization: Bearer eyJhbGci..."
-```
-
-#### Using JavaScript (Fetch API)
-
-```javascript
-// Login
-const login = async (email, password) => {
-  const response = await fetch('http://localhost:8080/api/v1/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-  });
-  return await response.json();
-};
-
-// Get user info
-const getUser = async (token) => {
-  const response = await fetch('http://localhost:8080/api/v1/users/me', {
-    headers: { 'Authorization': `Bearer ${token}` }
-  });
-  return await response.json();
-};
-```
-
-#### Using Python (Requests)
-
-```python
-import requests
-
-# Login
-response = requests.post(
-  'http://localhost:8080/api/v1/auth/login',
-  json={'email': 'user@example.com', 'password': 'securePassword123'}
-)
-tokens = response.json()['data']
-
-# Get user info
-headers = {'Authorization': f'Bearer {tokens["access_token"]}'}
-response = requests.get('http://localhost:8080/api/v1/users/me', headers=headers)
-user = response.json()['data']
+Authorization: sk_your_system_key_here
 ```
 
 ---
@@ -805,7 +504,7 @@ The server follows a clean, modular architecture with clear separation of concer
                                 ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                     Middleware Layer                        │
-│  (Auth, RBAC, Validation, Database, Logging)              │
+│  (Auth, RBAC, Validation, Database, Logging, System Key)   │
 └─────────────────────────────────────────────────────────────┘
                                 │
                                 ▼
@@ -929,6 +628,7 @@ The authentication system is fully implemented with JWT tokens and OAuth2 suppor
 - **Session Management** - HTTP-only cookies for secure token handling
 - **Email Verification** - Complete email verification workflow
 - **Password Reset** - Secure password recovery mechanism
+- **System Key Authentication** - Dedicated `sk_` key for application-to-server communication
 
 ### 🔄 **Authentication Flow**
 
@@ -949,6 +649,12 @@ The authentication system is fully implemented with JWT tokens and OAuth2 suppor
 1. Background token refresh → Automatic renewal
 2. Invalid tokens → Redirect to login
 3. Session expiration → Clean logout
+
+// System Key Authentication
+1. Application includes system key in Authorization header
+2. Server validates system key
+3. Request processed with system key privileges
+4. Response returned to application
 ```
 
 ### 🛡️ **Security Features**
@@ -960,6 +666,7 @@ The authentication system is fully implemented with JWT tokens and OAuth2 suppor
 - **Security Headers** - HTTP security headers for all responses
 - **CSRF Protection** - Cross-site request forgery prevention
 - **XSS Protection** - Cross-site scripting prevention
+- **System Key Isolation** - System key is separate from regular service keys
 
 ---
 
@@ -996,12 +703,29 @@ When reporting bugs, please include:
 | **Testing Suite**         | 🔄 In Progress | Go Testing Framework      | Unit and integration tests       |
 | **API Documentation**     | 📋 Planned     | Swagger/OpenAPI          | Comprehensive API docs          |
 | **Performance Optimization** | 📋 Planned | Caching + Optimization  | Query and caching optimization  |
+| **System Key Authentication** | ✅ Working | System Key Middleware | Application-to-server auth |
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](https://github.com/skygenesisenterprise/aether-identity/blob/main/LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+```
+MIT License
+
+Copyright (c) 2025 Sky Genesis Enterprise
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+```
 
 ---
 

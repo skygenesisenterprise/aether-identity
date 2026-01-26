@@ -48,7 +48,7 @@ type ServiceKeyGenerator struct {
 func NewServiceKeyGenerator() *ServiceKeyGenerator {
 	return &ServiceKeyGenerator{
 		Prefix: "sk_",
-		Length: 32,
+		Length: 15,
 	}
 }
 

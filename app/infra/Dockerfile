@@ -50,7 +50,7 @@ ENV HOSTNAME=0.0.0.0
 ENV CHOKIDAR_USEPOLLING=true
 
 # Copy package files and install dependencies
-COPY package.json ./
+COPY package.json pnpm-lock.yaml ./
 
 # Copy built files from builder stage
 COPY --from=builder /app/.next/standalone ./
