@@ -16,6 +16,8 @@ type User struct {
 	OrgID         uint   `json:"org_id"`
 	DiscordID     string `gorm:"size:100" json:"discord_id"`
 	DiscordLinked bool   `gorm:"default:false" json:"discord_linked"`
+	TOTPSecret    string `gorm:"size:255" json:"-"`
+	TOTPEnabled   bool   `gorm:"default:false" json:"totp_enabled"`
 }
 
 // TableName spécifie le nom de la table pour le modèle User

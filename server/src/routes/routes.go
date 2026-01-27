@@ -35,6 +35,17 @@ func SetupRoutes(router *gin.Engine, systemKey string) {
 				// Password reset
 				authRoutes.POST("/request-password-reset", controllers.RequestPasswordReset)
 				authRoutes.POST("/confirm-password-reset", controllers.ConfirmPasswordReset)
+
+				// TOTP routes
+				totpRoutes := authRoutes.Group("/totp")
+				totpRoutes.Use(middleware.AuthMiddleware())
+				{
+					totpRoutes.GET("/setup", controllers.GenerateTOTPSecret)
+					totpRoutes.POST("/verify", controllers.VerifyTOTPCode)
+					totpRoutes.POST("/disable", controllers.DisableTOTP)
+					totpRoutes.GET("/status", controllers.GetTOTPStatus)
+				}
+				authRoutes.POST("/totp/login", controllers.VerifyTOTPLogin)
 			}
 
 			// Routes OAuth2/OpenID Connect
