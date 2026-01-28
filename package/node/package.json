@@ -1,0 +1,39 @@
+{
+  "name": "@aether-identity/node",
+  "version": "1.0.0",
+  "description": "Official Node.js SDK for Aether Identity",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest"
+  },
+  "keywords": [
+    "aether",
+    "identity",
+    "authentication",
+    "oauth2",
+    "sdk"
+  ],
+  "author": "Sky Genesis Enterprise",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
