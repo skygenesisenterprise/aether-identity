@@ -1,4 +1,4 @@
-name: Aether Vault Node Release
+name: Aether Identity Node Release
 
 on:
   push:
@@ -93,7 +93,7 @@ jobs:
         working-directory: package/node
         run: |
           # Ajouter le scope temporairement pour GitHub Packages
-          jq '.name = "@skygenesisenterprise/aether-vault"' package.json > package.tmp.json
+          jq '.name = "@skygenesisenterprise/aether-identity"' package.json > package.tmp.json
           mv package.tmp.json package.json
 
       - name: Configure GitHub Packages authentication
@@ -124,7 +124,7 @@ jobs:
 
           ## 📦 Package Information
           - **Package Name npmjs**: \`aether-vault\`
-          - **Package Name GitHub**: \`@skygenesisenterprise/aether-vault\`
+          - **Package Name GitHub**: \`@skygenesisenterprise/aether-identity\`
           - **Version**: v$VERSION
           - **Registry**: npm and GitHub Packages
 
@@ -137,14 +137,14 @@ jobs:
 
           ### From GitHub Packages
           \`\`\`bash
-          npm install @skygenesisenterprise/aether-vault
+          npm install @skygenesisenterprise/aether-identity
           \`\`\`
 
           ## 📖 Quick Start
           \`\`\`typescript
-          import { AetherVaultClient } from 'aether-vault';
+          import { CreateIdentityClient } from 'aether-identity';
 
-          const client = new AetherVaultClient({
+          const client = new CreateIdentityClient({
             endpoint: 'https://your-vault-endpoint',
             token: 'your-token'
           });
@@ -165,7 +165,7 @@ jobs:
           - [Examples](https://github.com/skygenesisenterprise/aether-vault/tree/main/package/node/examples)
 
           ## 🐛 Bug Reports & Feature Requests
-          Please report issues on [GitHub Issues](https://github.com/skygenesisenterprise/aether-vault/issues).
+          Please report issues on [GitHub Issues](https://github.com/skygenesisenterprise/aether-identity/issues).
 
           ---
           **Note**: Automated release.
@@ -181,7 +181,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          name: Aether Vault Node.js SDK ${{ github.ref }}
+          name: Aether Identity Node.js SDK ${{ github.ref }}
           body: ${{ steps.release_notes.outputs.release_notes }}
           draft: false
           prerelease: false
