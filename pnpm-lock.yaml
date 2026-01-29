@@ -53,7 +53,7 @@ importers:
         version: 3.8.1
       prisma:
         specifier: 7.3.0
-        version: 7.3.0(@types/react@19.2.10)(react-dom@19.2.4)(react@19.2.4)(typescript@5.9.3)
+        version: 7.3.0(@types/react@19.2.10)(react-dom@19.2.3)(react@19.2.4)(typescript@5.9.3)
       typescript:
         specifier: ^5
         version: 5.9.3
@@ -69,6 +69,12 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.1.0
         version: 1.2.4(@types/react@19.2.10)(react@19.2.4)
+      aether-identity:
+        specifier: ^1.0.2
+        version: 1.0.2
+      aether-vault:
+        specifier: ^1.0.12
+        version: 1.0.12
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.1
@@ -206,7 +212,7 @@ importers:
         version: 0.6.0(@typescript-eslint/eslint-plugin@6.21.0)(@typescript-eslint/parser@6.21.0)(eslint-plugin-deprecation@2.0.0)(eslint-plugin-only-warn@1.1.0)(eslint-plugin-prefer-arrow@1.2.3)(eslint-plugin-tsdoc@0.2.17)(eslint@8.57.1)(typescript@5.9.3)
       prisma:
         specifier: ^7.3.0
-        version: 7.3.0(@types/react@19.2.10)(react-dom@19.2.4)(react@19.2.4)(typescript@5.9.3)
+        version: 7.3.0(@types/react@19.2.10)(react-dom@19.2.3)(react@19.2.4)(typescript@5.9.3)
       rimraf:
         specifier: ^6.1.2
         version: 6.1.2
@@ -1814,18 +1820,6 @@ packages:
       react: 19.2.4
       react-dom: 19.2.3(react@19.2.4)
 
-  /@prisma/studio-core@0.13.1(@types/react@19.2.10)(react-dom@19.2.4)(react@19.2.4):
-    resolution: {integrity: sha512-agdqaPEePRHcQ7CexEfkX1RvSH9uWDb6pXrZnhCRykhDFAV0/0P3d07WtfiY8hZWb7oRU4v+NkT4cGFHkQJIPg==}
-    peerDependencies:
-      '@types/react': ^18.0.0 || ^19.0.0
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-    dependencies:
-      '@types/react': 19.2.10
-      react: 19.2.4
-      react-dom: 19.2.4(react@19.2.4)
-    dev: true
-
   /@radix-ui/react-compose-refs@1.1.2(@types/react@19.2.10)(react@19.2.4):
     resolution: {integrity: sha512-z4eqJvfiNnFMHIIvXP3CY57y2WJs5g2v3X0zm9mEJkrkNv4rDxu+sg9Jh8EkXyeqBkB7SOcboo9dMVqhyrACIg==}
     peerDependencies:
@@ -2982,6 +2976,21 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
     dev: true
+
+  /aether-identity@1.0.2:
+    resolution: {integrity: sha512-ixKzNecHN+URzJkXjf5dq4NHHEkL3o8LBcXI1uGOZHgU8c22x67sF9lpekBgkEr4YNyHyiJqEg3JScOCkIs6Qw==}
+    engines: {node: '>=18.0.0'}
+    dependencies:
+      node-fetch: 3.3.2
+    dev: false
+
+  /aether-vault@1.0.12:
+    resolution: {integrity: sha512-wx5JI0Od4l0EUGlYHeqqTSI7+eWaujOfr4EokUKhh2UOtEukqebcGO0QVwdJ+ANJ85+2DJ9bpmxW5O13oQfHhA==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+    dependencies:
+      jose: 6.1.3
+    dev: false
 
   /ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
@@ -5118,6 +5127,10 @@ packages:
     resolution: {integrity: sha512-8wb9Yw966OSxApiCt0K3yNJL8pnNeIv+OEq2YMidz4FKP6nonSRoOXc80iXY4JaN2FC11B9qsNmDsm+ZOfMROA==}
     dev: true
 
+  /jose@6.1.3:
+    resolution: {integrity: sha512-0TpaTfihd4QMNwrz/ob2Bp7X04yuxJkjRGi4aKmOqwhov54i6u79oCv7T+C7lo70MKH6BesI3vscD1yb/yzKXQ==}
+    dev: false
+
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
@@ -6114,34 +6127,6 @@ packages:
       - react
       - react-dom
 
-  /prisma@7.3.0(@types/react@19.2.10)(react-dom@19.2.4)(react@19.2.4)(typescript@5.9.3):
-    resolution: {integrity: sha512-ApYSOLHfMN8WftJA+vL6XwAPOh/aZ0BgUyyKPwUFgjARmG6EBI9LzDPf6SWULQMSAxydV9qn5gLj037nPNlg2w==}
-    engines: {node: ^20.19 || ^22.12 || >=24.0}
-    hasBin: true
-    requiresBuild: true
-    peerDependencies:
-      better-sqlite3: '>=9.0.0'
-      typescript: '>=5.4.0'
-    peerDependenciesMeta:
-      better-sqlite3:
-        optional: true
-      typescript:
-        optional: true
-    dependencies:
-      '@prisma/config': 7.3.0
-      '@prisma/dev': 0.20.0(typescript@5.9.3)
-      '@prisma/engines': 7.3.0
-      '@prisma/studio-core': 0.13.1(@types/react@19.2.10)(react-dom@19.2.4)(react@19.2.4)
-      mysql2: 3.15.3
-      postgres: 3.4.7
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - '@types/react'
-      - magicast
-      - react
-      - react-dom
-    dev: true
-
   /process-warning@5.0.0:
     resolution: {integrity: sha512-a39t9ApHNx2L4+HBnQKqxxHNs1r7KF+Intd8Q/g1bUh6q0WIp9voPXJ/x0j+ZL45KF1pJd9+q2jLIRMfvEshkA==}
     dev: false
@@ -6204,15 +6189,6 @@ packages:
     dependencies:
       react: 19.2.4
       scheduler: 0.27.0
-
-  /react-dom@19.2.4(react@19.2.4):
-    resolution: {integrity: sha512-AXJdLo8kgMbimY95O2aKQqsz2iWi9jMgKJhRBAxECE4IFxfcazB2LmzloIoibJI3C12IlY20+KFaLv+71bUJeQ==}
-    peerDependencies:
-      react: ^19.2.4
-    dependencies:
-      react: 19.2.4
-      scheduler: 0.27.0
-    dev: true
 
   /react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}

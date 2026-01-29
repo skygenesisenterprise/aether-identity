@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Search, ChevronLeft } from "lucide-react"
 import Link from "next/link"
+import { CreateIdentityClient } from "aether-identity"
 import { useAuth } from "@/context/AuthContext"
 
 export default function LoginPage() {
