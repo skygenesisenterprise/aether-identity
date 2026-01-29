@@ -1,0 +1,95 @@
+version: '3.9'
+
+services:
+  # Service pour l'application frontend Aether Identity
+  aether-app:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.dev
+    container_name: aether-identity-app-dev
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+      CHOKIDAR_USEPOLLING: "true"
+      NEXT_PUBLIC_API_URL: "http://aether-server:8080"
+    user: root
+    volumes:
+      - ../../app:/app
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - aether-network
+
+  # Service pour le serveur Aether Identity
+  aether-server:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.dev
+    container_name: aether-identity-server-dev
+    ports:
+      - "8081:8080"
+    environment:
+      - JWT_SECRET=${JWT_SECRET:-votre-cle-secrete-ici}
+      - ACCESS_TOKEN_EXP=${ACCESS_TOKEN_EXP:-15}
+      - REFRESH_TOKEN_EXP=${REFRESH_TOKEN_EXP:-720}
+      - DATABASE_URL=${DATABASE_URL:-host=postgres user=postgres password=postgres dbname=aether_identity port=5432 sslmode=disable}
+      - PORT=${PORT:-8080}
+    depends_on:
+      - postgres
+    volumes:
+      - ../../server:/server
+    networks:
+      - aether-network
+    restart: unless-stopped
+
+  # Service PostgreSQL pour le développement
+  postgres:
+    image: postgres:16-alpine
+    container_name: aether-postgres-dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: aether_identity
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - aether-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Service Adminer pour l'interface d'administration de la base de données
+  adminer:
+    image: adminer:latest
+    container_name: aether-adminer-dev
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
+    networks:
+      - aether-network
+
+# Réseau pour la communication entre les services
+networks:
+  aether-network:
+    driver: bridge
+    name: aether-network-dev
+
+# Volumes pour persister les données
+volumes:
+  postgres_data:
+    driver: local
