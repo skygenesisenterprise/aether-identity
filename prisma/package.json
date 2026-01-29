@@ -30,6 +30,8 @@
   },
   "dependencies": {
     "@prisma/client": "^7.3.0",
+    "aether-identity": "^1.0.2",
+    "aether-vault": "^1.0.12",
     "argon2": "^0.44.0",
     "bcryptjs": "^3.0.3",
     "config": "link:@prisma/client/config",

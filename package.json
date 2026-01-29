@@ -1,6 +1,6 @@
 {
   "name": "aether-identity",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "An Enterprise OAuth2/OIDC support, multi-factor authentication, and secure account management for applications and services.",
   "private": true,
   "type": "module",
@@ -9,13 +9,12 @@
     "tools",
     "options",
     "package/node",
-    "package/github",
     "package/vscode",
-    "snap",
+    "package/extension",
+    "package/snap",
     "tests",
     "messages",
-    "prisma",
-    "monitoring"
+    "prisma"
   ],
   "scripts": {
     "dev": "concurrently \"pnpm --filter app dev\" \"pnpm --filter server dev\"",

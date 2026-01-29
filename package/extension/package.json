@@ -1,0 +1,115 @@
+{
+  "name": "@aether-identity/extension",
+  "displayName": "Aether Identity",
+  "description": "Enterprise OAuth2/OIDC authentication and secure account management for web browsers",
+  "version": "1.0.0",
+  "author": "Sky Genesis Enterprise <developer@skygenesisenterprise.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/skygenesisenterprise/aether-identity#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skygenesisenterprise/aether-identity.git"
+  },
+  "bugs": {
+    "url": "https://github.com/skygenesisenterprise/aether-identity/issues"
+  },
+  "keywords": [
+    "aether",
+    "identity",
+    "authentication",
+    "oauth2",
+    "oidc",
+    "security",
+    "enterprise",
+    "mfa",
+    "sso",
+    "browser-extension",
+    "web-extension"
+  ],
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "dist/popup.html",
+    "default_title": "Aether Identity",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "background": {
+    "service_worker": "dist/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "dist/content.js"
+      ]
+    }
+  ],
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "webRequest",
+    "webRequestBlocking"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "dist/*",
+        "icons/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "scripts": {
+    "build": "webpack --mode=production",
+    "build:watch": "webpack --mode=development --watch",
+    "dev": "concurrently \"pnpm build:watch\" \"web-ext run --target=chromium\"",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "clean": "rm -rf dist icons/*.png",
+    "package": "pnpm build && web-ext build",
+    "package:firefox": "pnpm build && web-ext build --target=firefox-desktop",
+    "sign": "web-ext sign --api-key=$WEB_EXT_API_KEY --api-secret=$WEB_EXT_API_SECRET",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.268",
+    "@types/node": "^25.1.0",
+    "@types/react": "^18.2.79",
+    "@types/react-dom": "^18.2.25",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "copy-webpack-plugin": "^12.0.2",
+    "eslint": "^9.0.0",
+    "jest": "^29.7.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.3",
+    "web-ext": "^8.2.0",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "aether-identity": "^1.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}

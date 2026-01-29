@@ -1,0 +1,123 @@
+{
+  "name": "@aether-identity/vscode",
+  "displayName": "Aether Identity for VS Code",
+  "description": "Enterprise OAuth2/OIDC authentication and secure account management within Visual Studio Code",
+  "version": "1.0.0",
+  "publisher": "skygenesisenterprise",
+  "author": "Sky Genesis Enterprise <developer@skygenesisenterprise.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/skygenesisenterprise/aether-identity#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skygenesisenterprise/aether-identity.git"
+  },
+  "bugs": {
+    "url": "https://github.com/skygenesisenterprise/aether-identity/issues"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Authentication",
+    "Other",
+    "Snippets"
+  ],
+  "keywords": [
+    "aether",
+    "identity",
+    "authentication",
+    "oauth2",
+    "oidc",
+    "security",
+    "enterprise",
+    "mfa",
+    "sso"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aether.signIn",
+        "title": "Sign In with Aether",
+        "category": "Aether Identity"
+      },
+      {
+        "command": "aether.signOut",
+        "title": "Sign Out",
+        "category": "Aether Identity"
+      },
+      {
+        "command": "aether.refreshToken",
+        "title": "Refresh Token",
+        "category": "Aether Identity"
+      },
+      {
+        "command": "aether.getStatus",
+        "title": "Get Authentication Status",
+        "category": "Aether Identity"
+      }
+    ],
+    "statusBarItems": [
+      {
+        "id": "aether.status",
+        "name": "Aether Status",
+        "command": "aether.getStatus",
+        "alignment": "right"
+      }
+    ],
+    "configuration": {
+      "title": "Aether Identity",
+      "properties": {
+        "aether.serverUrl": {
+          "type": "string",
+          "default": "",
+          "description": "Aether Identity server URL"
+        },
+        "aether.clientId": {
+          "type": "string",
+          "default": "",
+          "description": "OAuth2 client ID"
+        },
+        "aether.redirectUri": {
+          "type": "string",
+          "default": "http://localhost:3000/callback",
+          "description": "OAuth2 redirect URI"
+        },
+        "aether.autoRefresh": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically refresh tokens"
+        },
+        "aether.refreshThreshold": {
+          "type": "number",
+          "default": 300,
+          "description": "Time in seconds before token expiry to refresh"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "run:in-vscode": "vscode-test-web --extensionDevelopmentPath=. $PWD"
+  },
+  "devDependencies": {
+    "@types/node": "^25.1.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vscode/test-web": "^0.0.52",
+    "eslint": "^9.0.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "aether-identity": "^1.0.2"
+  }
+}
