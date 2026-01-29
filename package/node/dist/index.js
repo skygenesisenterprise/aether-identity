@@ -19,8 +19,18 @@ class IdentityClient {
     transport;
     sessionManager;
     constructor(config) {
+        let nodeFetchPromise = null;
         const fetcher = config.fetcher ||
-            (typeof fetch !== "undefined" ? fetch : require("node-fetch").default);
+            (typeof fetch !== "undefined"
+                ? fetch
+                : (async (url, init) => {
+                    if (!nodeFetchPromise) {
+                        nodeFetchPromise = import("node-fetch");
+                    }
+                    const { default: nodeFetch } = await nodeFetchPromise;
+                    const response = await nodeFetch(url, init);
+                    return response;
+                }));
         this.transport = new TransportImpl({
             baseUrl: config.baseUrl,
             fetcher,

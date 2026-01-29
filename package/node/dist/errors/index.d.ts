@@ -26,5 +26,5 @@ export declare class NetworkError extends IdentityError {
 export declare class ServerError extends IdentityError {
     constructor(message?: string, requestId?: string);
 }
-export declare function createErrorFromResponse(statusCode: number, data: any): IdentityError;
+export declare function createErrorFromResponse(statusCode: number, data: unknown): IdentityError;
 //# sourceMappingURL=index.d.ts.map

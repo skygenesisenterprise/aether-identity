@@ -18,7 +18,11 @@ class AuthModule {
   }
 
   async login(input: AuthInput): Promise<void> {
-    const payload: any = {
+    const payload: {
+      email: string;
+      password: string;
+      totpCode?: string;
+    } = {
       email: input.email,
       password: input.password,
     };

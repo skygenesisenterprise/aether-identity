@@ -77,55 +77,61 @@ export class ServerError extends IdentityError {
 
 export function createErrorFromResponse(
   statusCode: number,
-  data: any,
+  data: unknown,
 ): IdentityError {
-  const requestId = data?.requestId || data?.error?.requestId;
+  const dataObj = data as Record<string, unknown> | null | undefined;
+  const requestId =
+    (dataObj?.requestId as string | undefined) ||
+    ((dataObj?.error as Record<string, unknown>)?.requestId as string | undefined);
 
   if (statusCode === 401) {
     return new AuthenticationError(
-      data?.message || "Authentication failed",
+      (dataObj?.message as string | undefined) || "Authentication failed",
       requestId,
     );
   }
 
   if (statusCode === 403) {
     return new AuthorizationError(
-      data?.message || "Authorization failed",
+      (dataObj?.message as string | undefined) || "Authorization failed",
       requestId,
     );
   }
 
-  if (statusCode === 401 && data?.code === "SESSION_EXPIRED") {
+  if (statusCode === 401 && dataObj?.code === "SESSION_EXPIRED") {
     return new SessionExpiredError(
-      data?.message || "Session expired",
+      (dataObj?.message as string | undefined) || "Session expired",
       requestId,
     );
   }
 
   if (
-    data?.code === "TOTP_REQUIRED" ||
-    (statusCode === 401 && data?.requiresTOTP)
+    dataObj?.code === "TOTP_REQUIRED" ||
+    (statusCode === 401 && dataObj?.requiresTOTP)
   ) {
     return new TOTPRequiredError(
-      data?.message || "TOTP verification required",
+      (dataObj?.message as string | undefined) || "TOTP verification required",
       requestId,
     );
   }
 
-  if (data?.code === "DEVICE_NOT_AVAILABLE") {
+  if (dataObj?.code === "DEVICE_NOT_AVAILABLE") {
     return new DeviceNotAvailableError(
-      data?.message || "Device not available",
+      (dataObj?.message as string | undefined) || "Device not available",
       requestId,
     );
   }
 
   if (statusCode >= 500) {
-    return new ServerError(data?.message || "Server error occurred", requestId);
+    return new ServerError(
+      (dataObj?.message as string | undefined) || "Server error occurred",
+      requestId,
+    );
   }
 
   return new IdentityError(
-    data?.message || "An error occurred",
-    data?.code || "INVALID_INPUT",
+    (dataObj?.message as string | undefined) || "An error occurred",
+    (dataObj?.code as ErrorCode | undefined) || "INVALID_INPUT",
     requestId,
   );
 }

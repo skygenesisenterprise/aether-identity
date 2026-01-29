@@ -23,8 +23,8 @@ class MemoryStorage implements SessionStorage {
 }
 
 function getStorage(): SessionStorage {
-  if (typeof localStorage !== "undefined") {
-    return localStorage;
+  if (typeof globalThis !== "undefined" && "localStorage" in globalThis) {
+    return (globalThis as unknown as { localStorage: SessionStorage }).localStorage;
   }
   return new MemoryStorage();
 }

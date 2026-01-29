@@ -11,8 +11,8 @@ class MemoryStorage {
     }
 }
 function getStorage() {
-    if (typeof localStorage !== "undefined") {
-        return localStorage;
+    if (typeof globalThis !== "undefined" && "localStorage" in globalThis) {
+        return globalThis.localStorage;
     }
     return new MemoryStorage();
 }

@@ -22,7 +22,7 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function isRetryableError(error: any): boolean {
+function isRetryableError(error: unknown): boolean {
   if (error instanceof NetworkError) return true;
   if (error instanceof ServerError) return true;
   return false;
@@ -50,7 +50,7 @@ class Transport {
       const response = await this.config.fetcher(url, options);
 
       if (!response.ok) {
-        let data: any;
+        let data: unknown;
         try {
           data = await response.json();
         } catch {
@@ -104,7 +104,7 @@ class Transport {
 
   async post<T>(
     endpoint: string,
-    data?: any,
+    data?: unknown,
     accessToken?: string,
   ): Promise<T> {
     const headers: Record<string, string> = {
@@ -123,7 +123,7 @@ class Transport {
     });
   }
 
-  async put<T>(endpoint: string, data?: any, accessToken?: string): Promise<T> {
+  async put<T>(endpoint: string, data?: unknown, accessToken?: string): Promise<T> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       "X-Client-ID": this.config.clientId,

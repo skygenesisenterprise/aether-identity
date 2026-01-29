@@ -54,26 +54,28 @@ export class ServerError extends IdentityError {
     }
 }
 export function createErrorFromResponse(statusCode, data) {
-    const requestId = data?.requestId || data?.error?.requestId;
+    const dataObj = data;
+    const requestId = dataObj?.requestId ||
+        dataObj?.error?.requestId;
     if (statusCode === 401) {
-        return new AuthenticationError(data?.message || "Authentication failed", requestId);
+        return new AuthenticationError(dataObj?.message || "Authentication failed", requestId);
     }
     if (statusCode === 403) {
-        return new AuthorizationError(data?.message || "Authorization failed", requestId);
+        return new AuthorizationError(dataObj?.message || "Authorization failed", requestId);
     }
-    if (statusCode === 401 && data?.code === "SESSION_EXPIRED") {
-        return new SessionExpiredError(data?.message || "Session expired", requestId);
+    if (statusCode === 401 && dataObj?.code === "SESSION_EXPIRED") {
+        return new SessionExpiredError(dataObj?.message || "Session expired", requestId);
     }
-    if (data?.code === "TOTP_REQUIRED" ||
-        (statusCode === 401 && data?.requiresTOTP)) {
-        return new TOTPRequiredError(data?.message || "TOTP verification required", requestId);
+    if (dataObj?.code === "TOTP_REQUIRED" ||
+        (statusCode === 401 && dataObj?.requiresTOTP)) {
+        return new TOTPRequiredError(dataObj?.message || "TOTP verification required", requestId);
     }
-    if (data?.code === "DEVICE_NOT_AVAILABLE") {
-        return new DeviceNotAvailableError(data?.message || "Device not available", requestId);
+    if (dataObj?.code === "DEVICE_NOT_AVAILABLE") {
+        return new DeviceNotAvailableError(dataObj?.message || "Device not available", requestId);
     }
     if (statusCode >= 500) {
-        return new ServerError(data?.message || "Server error occurred", requestId);
+        return new ServerError(dataObj?.message || "Server error occurred", requestId);
     }
-    return new IdentityError(data?.message || "An error occurred", data?.code || "INVALID_INPUT", requestId);
+    return new IdentityError(dataObj?.message || "An error occurred", dataObj?.code || "INVALID_INPUT", requestId);
 }
 //# sourceMappingURL=index.js.map
