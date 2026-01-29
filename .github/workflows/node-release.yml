@@ -62,11 +62,22 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Prepare npm publish
+        working-directory: package/node
+        run: |
+          # Modifier le nom du package pour npm
+          jq '.name = "aether-identity"' package.json > package.tmp.json
+          mv package.tmp.json package.json
+
       - name: Publish to npm
         working-directory: package/node
         run: pnpm publish --access public --no-git-checks --registry https://registry.npmjs.org/
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Revert package.json
+        working-directory: package/node
+        run: git checkout package.json
 
   publish-gpr:
     needs: build
@@ -92,7 +103,7 @@ jobs:
       - name: Prepare GitHub Packages publish
         working-directory: package/node
         run: |
-          # Ajouter le scope temporairement pour GitHub Packages
+          # Modifier le nom du package pour GitHub Packages
           jq '.name = "@skygenesisenterprise/aether-identity"' package.json > package.tmp.json
           mv package.tmp.json package.json
 
@@ -120,10 +131,10 @@ jobs:
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
           cat > release_notes.md << EOF
-          # Aether Vault Node.js SDK v$VERSION
+          # Aether Identity Node.js SDK v$VERSION
 
           ## 📦 Package Information
-          - **Package Name npmjs**: \`aether-vault\`
+          - **Package Name npmjs**: \`aether-identity\`
           - **Package Name GitHub**: \`@skygenesisenterprise/aether-identity\`
           - **Version**: v$VERSION
           - **Registry**: npm and GitHub Packages
@@ -132,7 +143,7 @@ jobs:
 
           ### From npm
           \`\`\`bash
-          npm install aether-vault
+          npm install aether-identity
           \`\`\`
 
           ### From GitHub Packages
@@ -145,24 +156,23 @@ jobs:
           import { CreateIdentityClient } from 'aether-identity';
 
           const client = new CreateIdentityClient({
-            endpoint: 'https://your-vault-endpoint',
+            endpoint: 'https://your-identity-endpoint',
             token: 'your-token'
           });
           \`\`\`
 
           ## 🔧 Features
-          - ✅ Secure secrets management
-          - ✅ TOTP support
+          - ✅ OAuth2/OIDC support
+          - ✅ Multi-factor authentication
           - ✅ Identity and access management
-          - ✅ Policy management
-          - ✅ Audit logging
+          - ✅ Secure account management
           - ✅ TypeScript support
           - ✅ Node.js 18+ compatible
 
           ## 📚 Documentation
-          - [README](https://github.com/skygenesisenterprise/aether-vault/blob/main/package/node/README.md)
-          - [API Documentation](https://github.com/skygenesisenterprise/aether-vault/tree/main/package/node/docs)
-          - [Examples](https://github.com/skygenesisenterprise/aether-vault/tree/main/package/node/examples)
+          - [README](https://github.com/skygenesisenterprise/aether-identity/blob/main/package/node/README.md)
+          - [API Documentation](https://github.com/skygenesisenterprise/aether-identity/tree/main/package/node/docs)
+          - [Examples](https://github.com/skygenesisenterprise/aether-identity/tree/main/package/node/examples)
 
           ## 🐛 Bug Reports & Feature Requests
           Please report issues on [GitHub Issues](https://github.com/skygenesisenterprise/aether-identity/issues).
