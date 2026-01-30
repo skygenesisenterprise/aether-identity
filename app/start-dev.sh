@@ -7,7 +7,7 @@ echo "🚀 Aether Identity - Démarrage direct depuis app/..."
 
 # Variables d'environnement
 export NODE_ENV=${NODE_ENV:-development}
-export PORT=${PORT:-3000}
+export PORT=${PORT:-3001}
 export NEXT_TELEMETRY_DISABLED=1
 
 echo "📍 Configuration:"

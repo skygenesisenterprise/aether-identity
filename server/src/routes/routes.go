@@ -4,9 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/skygenesisenterprise/aether-identity/server/src/controllers"
 	"github.com/skygenesisenterprise/aether-identity/server/src/middleware"
+	"github.com/skygenesisenterprise/aether-identity/server/src/services"
 )
 
-func SetupRoutes(router *gin.Engine, systemKey string) {
+func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *services.ServiceKeyService) {
+	// Middleware CORS adaptatif global
+	router.Use(middleware.AdaptiveCORSMiddleware())
+
 	// API versioning
 	apiV1 := router.Group("/api/v1")
 	{
@@ -17,8 +21,9 @@ func SetupRoutes(router *gin.Engine, systemKey string) {
 		dbRoutes := apiV1.Group("")
 		dbRoutes.Use(middleware.DatabaseMiddleware())
 		{
-			// Authentication routes
+			// Authentication routes - protégées par Service Key
 			authRoutes := dbRoutes.Group("/auth")
+			authRoutes.Use(middleware.ServiceKeyAuth(serviceKeyService, systemKey))
 			{
 				authRoutes.POST("/login", controllers.Login)
 				authRoutes.POST("/register", controllers.Register)
@@ -90,10 +95,22 @@ func SetupRoutes(router *gin.Engine, systemKey string) {
 			userRoutes := dbRoutes.Group("/users")
 			userRoutes.Use(middleware.AuthMiddleware())
 			{
+				userRoutes.GET("/me", controllers.GetCurrentUser)
 				userRoutes.GET(":id", controllers.GetUser)
 				userRoutes.PUT(":id", controllers.UpdateUser)
 				userRoutes.DELETE(":id", controllers.DeleteUser)
 			}
+
+			// Routes admin pour la gestion des utilisateurs
+			adminUserRoutes := dbRoutes.Group("/admin/users")
+			adminUserRoutes.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
+			{
+				adminUserRoutes.GET("", controllers.ListUsers)
+				adminUserRoutes.POST("", controllers.CreateUserAdmin)
+			}
+
+			// Route publique pour vérifier la disponibilité d'un email
+			dbRoutes.GET("/check-email", controllers.CheckEmailAvailability)
 
 			// RBAC et info util
 			dbRoutes.GET("/userinfo", middleware.AuthMiddleware(), controllers.UserInfo)

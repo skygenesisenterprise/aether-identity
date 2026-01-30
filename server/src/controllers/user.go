@@ -3,8 +3,10 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/skygenesisenterprise/aether-identity/server/src/model"
 	"github.com/skygenesisenterprise/aether-identity/server/src/services"
 )
 
@@ -107,5 +109,55 @@ func DeleteUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "User deleted successfully",
+	})
+}
+
+// ListUsers récupère la liste paginée des utilisateurs avec filtres
+func ListUsers(c *gin.Context) {
+	// Récupérer les paramètres de pagination
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
+
+	// Récupérer les filtres
+	filter := services.ListUsersFilter{
+		Role:      c.Query("role"),
+		Search:    c.Query("search"),
+		SortBy:    c.Query("sort_by"),
+		SortOrder: c.Query("sort_order"),
+	}
+
+	// Filtre par statut actif/inactif
+	isActiveParam := c.Query("is_active")
+	if isActiveParam != "" {
+		isActive := strings.ToLower(isActiveParam) == "true"
+		filter.IsActive = &isActive
+	}
+
+	// Récupérer les utilisateurs
+	userService := services.NewUserService(services.DB)
+	result, err := userService.ListUsers(page, limit, filter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   "Failed to list users",
+		})
+		return
+	}
+
+	// Convertir les utilisateurs en réponses
+	var userResponses []*model.UserResponse
+	for _, user := range result.Users {
+		userResponses = append(userResponses, user.ToResponse())
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data": gin.H{
+			"users":       userResponses,
+			"total":       result.Total,
+			"page":        result.Page,
+			"limit":       result.Limit,
+			"total_pages": result.TotalPages,
+		},
 	})
 }

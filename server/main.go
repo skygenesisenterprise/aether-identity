@@ -29,8 +29,8 @@ func displayBanner() {
 	fmt.Printf("\n")
 	fmt.Printf("\033[1;33m    ╔══════════════════════════════════════════════════════════════╗\n")
 	fmt.Printf("\033[1;33m    ║                    AETHER IDENTITY SERVER                    ║\n")
-	fmt.Printf("\033[1;33m    ║              Enterprise Identity Management                ║\n")
-	fmt.Printf("\033[1;33m    ║                   Version 1.0.0-alpha                      ║\n")
+	fmt.Printf("\033[1;33m    ║              Enterprise Identity Management                  ║\n")
+	fmt.Printf("\033[1;33m    ║                   Version 1.0.0-alpha                        ║\n")
 	fmt.Printf("\033[1;33m    ╚══════════════════════════════════════════════════════════════╝\n")
 	fmt.Printf("\033[0;37m")
 	fmt.Printf("\n")
@@ -108,9 +108,17 @@ func main() {
 		time.Sleep(200 * time.Millisecond)
 	}
 
+	// Initialiser le ServiceKeyService
+	var serviceKeyService *services.ServiceKeyService
+	if dbInitialized {
+		fmt.Printf("\033[1;34m[info] Initializing service key service...\033[0m\n")
+		serviceKeyService = services.NewServiceKeyService(services.DB)
+		time.Sleep(100 * time.Millisecond)
+	}
+
 	// Configurer les routes
 	fmt.Printf("\033[1;34m[info] Setting up API routes...\033[0m\n")
-	routes.SetupRoutes(router, cfg.SystemKey)
+	routes.SetupRoutes(router, cfg.SystemKey, serviceKeyService)
 	time.Sleep(200 * time.Millisecond)
 
 	fmt.Printf("\n")
