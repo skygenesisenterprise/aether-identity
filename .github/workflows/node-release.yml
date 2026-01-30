@@ -61,7 +61,6 @@ jobs:
       - name: Prepare npm publish
         working-directory: package/node
         run: |
-          # Modifier le nom du package pour npm
           jq '.name = "aether-identity"' package.json > package.tmp.json
           mv package.tmp.json package.json
 
@@ -97,7 +96,6 @@ jobs:
       - name: Prepare GitHub Packages publish
         working-directory: package/node
         run: |
-          # Modifier le nom du package pour GitHub Packages
           jq '.name = "@skygenesisenterprise/aether-identity"' package.json > package.tmp.json
           mv package.tmp.json package.json
 
@@ -123,58 +121,8 @@ jobs:
       - name: Generate Release Notes
         id: release_notes
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          cat > release_notes.md << EOF
-          # Aether Identity Node.js SDK v$VERSION
-
-          ## 📦 Package Information
-          - **Package Name npmjs**: \`aether-identity\`
-          - **Package Name GitHub**: \`@skygenesisenterprise/aether-identity\`
-          - **Version**: v$VERSION
-          - **Registry**: npm and GitHub Packages
-
-          ## 🚀 Installation
-
-          ### From npm
-          \`\`\`bash
-          npm install aether-identity
-          \`\`\`
-
-          ### From GitHub Packages
-          \`\`\`bash
-          npm install @skygenesisenterprise/aether-identity
-          \`\`\`
-
-          ## 📖 Quick Start
-          \`\`\`typescript
-          import { CreateIdentityClient } from 'aether-identity';
-
-          const client = new CreateIdentityClient({
-            endpoint: 'https://your-identity-endpoint',
-            token: 'your-token'
-          });
-          \`\`\`
-
-          ## 🔧 Features
-          - ✅ OAuth2/OIDC support
-          - ✅ Multi-factor authentication
-          - ✅ Identity and access management
-          - ✅ Secure account management
-          - ✅ TypeScript support
-          - ✅ Node.js 18+ compatible
-
-          ## 📚 Documentation
-          - [README](https://github.com/skygenesisenterprise/aether-identity/blob/main/package/node/README.md)
-          - [API Documentation](https://github.com/skygenesisenterprise/aether-identity/tree/main/package/node/docs)
-          - [Examples](https://github.com/skygenesisenterprise/aether-identity/tree/main/package/node/examples)
-
-          ## 🐛 Bug Reports & Feature Requests
-          Please report issues on [GitHub Issues](https://github.com/skygenesisenterprise/aether-identity/issues).
-
-          ---
-          **Note**: Automated release.
-          EOF
-
+          VERSION=${GITHUB_REF_NAME}
+          printf '%s\n' "# Aether Identity Node.js SDK $VERSION" "" "## Package Information" "- Package Name npmjs: aether-identity" "- Package Name GitHub: @skygenesisenterprise/aether-identity" "- Version: $VERSION" "- Registry: npm and GitHub Packages" "" "## Installation" "" "### From npm" "\`\`\`bash" "npm install aether-identity" "\`\`\`" "" "### From GitHub Packages" "\`\`\`bash" "npm install @skygenesisenterprise/aether-identity" "\`\`\`" "" "## Quick Start" "\`\`\`typescript" "import { CreateIdentityClient } from 'aether-identity';" "" "const client = new CreateIdentityClient({" "  endpoint: 'https://your-identity-endpoint'," "  token: 'your-token'" "});" "\`\`\`" "" "## Features" "- OAuth2/OIDC support" "- Multi-factor authentication" "- Identity and access management" "- Secure account management" "- TypeScript support" "- Node.js 18+ compatible" "" "## Documentation" "- README: https://github.com/skygenesisenterprise/aether-identity/blob/main/package/node/README.md" "- API Documentation: https://github.com/skygenesisenterprise/aether-identity/tree/main/package/node/docs" "- Examples: https://github.com/skygenesisenterprise/aether-identity/tree/main/package/node/examples" "" "## Bug Reports & Feature Requests" "Please report issues on GitHub Issues: https://github.com/skygenesisenterprise/aether-identity/issues" "" "---" "Note: Automated release." > release_notes.md
           echo "release_notes<<EOF" >> $GITHUB_OUTPUT
           cat release_notes.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -184,8 +132,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          name: Aether Identity Node.js SDK ${{ github.ref }}
+          tag_name: ${{ github.ref_name }}
+          name: Aether Identity Node.js SDK ${{ github.ref_name }}
           body: ${{ steps.release_notes.outputs.release_notes }}
           draft: false
           prerelease: false
