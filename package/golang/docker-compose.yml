@@ -1,0 +1,107 @@
+version: "3.8"
+
+services:
+  # Go SDK Development Environment
+  golang-sdk-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: aether-identity-golang-sdk-dev
+    volumes:
+      # Mount source code for live development
+      - .:/sdk
+      # Cache Go modules
+      - go-mod-cache:/go/pkg/mod
+    environment:
+      # Go Configuration
+      - GO111MODULE=on
+      - CGO_ENABLED=0
+      - GOOS=linux
+      - GOARCH=amd64
+
+      # SDK Configuration (for testing)
+      - IDENTITY_ENDPOINT=${IDENTITY_ENDPOINT:-http://localhost:8080}
+      - IDENTITY_CLIENT_ID=${IDENTITY_CLIENT_ID:-test-client}
+      - IDENTITY_ACCESS_TOKEN=${IDENTITY_ACCESS_TOKEN:-}
+
+      # Test Configuration
+      - SDK_TEST_TIMEOUT=30s
+      - SDK_TEST_VERBOSE=true
+    working_dir: /sdk
+    command: ["make", "dev"]
+    networks:
+      - aether-identity-network
+    restart: unless-stopped
+
+  # Go SDK Testing Environment
+  golang-sdk-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    container_name: aether-identity-golang-sdk-test
+    volumes:
+      - .:/sdk
+      - go-mod-cache:/go/pkg/mod
+    environment:
+      - GO111MODULE=on
+      - CGO_ENABLED=0
+      - IDENTITY_ENDPOINT=${IDENTITY_ENDPOINT:-http://aether-server:8080}
+      - IDENTITY_CLIENT_ID=${IDENTITY_CLIENT_ID:-test-client}
+    working_dir: /sdk
+    command: ["make", "test"]
+    networks:
+      - aether-identity-network
+    profiles:
+      - test
+
+  # Go SDK Build Environment
+  golang-sdk-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    container_name: aether-identity-golang-sdk-build
+    volumes:
+      - .:/sdk
+      - go-mod-cache:/go/pkg/mod
+      - build-output:/sdk/dist
+    environment:
+      - GO111MODULE=on
+      - CGO_ENABLED=0
+    working_dir: /sdk
+    command: ["make", "build"]
+    networks:
+      - aether-identity-network
+    profiles:
+      - build
+
+  # Go SDK Lint Environment
+  golang-sdk-lint:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: aether-identity-golang-sdk-lint
+    volumes:
+      - .:/sdk
+      - go-mod-cache:/go/pkg/mod
+    working_dir: /sdk
+    command: ["make", "lint"]
+    networks:
+      - aether-identity-network
+    profiles:
+      - lint
+
+networks:
+  aether-identity-network:
+    driver: bridge
+    name: aether-identity-network
+    external: false
+
+volumes:
+  go-mod-cache:
+    driver: local
+  build-output:
+    driver: local

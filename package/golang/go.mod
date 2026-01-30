@@ -1,3 +1,3 @@
-module github.com/skygenesisenterprise/aether-identity/package/golang
+module github.com/skygenesisenterprise/aether-identity
 
-go 1.25.5
+go 1.21
