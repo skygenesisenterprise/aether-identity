@@ -112,6 +112,17 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 			// Route publique pour vérifier la disponibilité d'un email
 			dbRoutes.GET("/check-email", controllers.CheckEmailAvailability)
 
+			// Routes pour la gestion des clés de service par les utilisateurs
+			userKeysRoutes := dbRoutes.Group("/keys")
+			userKeysRoutes.Use(middleware.AuthMiddleware())
+			{
+				userKeysRoutes.POST("/generate", controllers.GenerateUserKey)
+				userKeysRoutes.GET("", controllers.ListUserKeys)
+				userKeysRoutes.GET("/:id", controllers.GetUserKeyInfo)
+				userKeysRoutes.POST("/:id/revoke", controllers.RevokeUserKey)
+				userKeysRoutes.DELETE("/:id", controllers.DeleteUserKey)
+			}
+
 			// RBAC et info util
 			dbRoutes.GET("/userinfo", middleware.AuthMiddleware(), controllers.UserInfo)
 			dbRoutes.POST("/introspect", controllers.Introspect)

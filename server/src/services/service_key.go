@@ -162,3 +162,29 @@ func (s *ServiceKeyService) LogServiceKeyUsage(serviceKeyID uint, endpoint, meth
 
 	return nil
 }
+
+// ListServiceKeysByUser lists all service keys created by a specific user with pagination
+func (s *ServiceKeyService) ListServiceKeysByUser(userID uint, page, limit int) ([]model.ServiceKey, int64, error) {
+	var serviceKeys []model.ServiceKey
+	var count int64
+
+	// Count total keys for this user
+	result := s.DB.Model(&model.ServiceKey{}).Where("created_by = ?", userID).Count(&count)
+	if result.Error != nil {
+		return nil, 0, result.Error
+	}
+
+	offset := (page - 1) * limit
+
+	// Get keys for this user with pagination
+	result = s.DB.Where("created_by = ?", userID).
+		Order("created_at DESC").
+		Limit(limit).
+		Offset(offset).
+		Find(&serviceKeys)
+	if result.Error != nil {
+		return nil, 0, result.Error
+	}
+
+	return serviceKeys, count, nil
+}
