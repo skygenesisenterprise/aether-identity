@@ -5,20 +5,21 @@ services:
       dockerfile: infra/Dockerfile.dev
     container_name: aether-identity-frontend-dev
     ports:
-      - "3001:3000"
+      - "3001:3001"
     environment:
       NODE_ENV: development
-      PORT: 3000
+      PORT: 3001
       HOSTNAME: 0.0.0.0
       CHOKIDAR_USEPOLLING: "true"
     user: root
+    working_dir: /app
     volumes:
-      - ../:/app
+      - ..:/app:cached
       - /app/node_modules
       - /app/.next
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -8,13 +8,13 @@ FROM golang:1.25.5-alpine AS builder
 WORKDIR /app
 
 # Copier le fichier go.mod et go.sum
-COPY go.mod go.sum ../
+COPY server/go.mod server/go.sum ./
 
 # Télécharger les dépendances
 RUN go mod download
 
 # Copier le code source
-COPY . .
+COPY server/ .
 
 # Construire l'application
 RUN go build -o aether-server main.go

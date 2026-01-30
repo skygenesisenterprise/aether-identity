@@ -3,7 +3,10 @@ const nextConfig = {
   // Next.js gère déjà les MIME types correctement
   devIndicators: {
     buildActivity: true,
-    buildActivityPosition: 'bottom-right',
+    buildActivityPosition: "bottom-right",
+  },
+  turbopack: {
+    root: process.cwd(),
   },
 };
 
