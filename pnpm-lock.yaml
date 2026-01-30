@@ -70,8 +70,8 @@ importers:
         specifier: ^1.1.0
         version: 1.2.4(@types/react@19.2.10)(react@19.2.4)
       aether-identity:
-        specifier: ^1.0.2
-        version: 1.0.2
+        specifier: ^1.0.4
+        version: 1.0.4
       aether-vault:
         specifier: ^1.0.12
         version: 1.0.12
@@ -3166,6 +3166,13 @@ packages:
 
   /aether-identity@1.0.2:
     resolution: {integrity: sha512-ixKzNecHN+URzJkXjf5dq4NHHEkL3o8LBcXI1uGOZHgU8c22x67sF9lpekBgkEr4YNyHyiJqEg3JScOCkIs6Qw==}
+    engines: {node: '>=18.0.0'}
+    dependencies:
+      node-fetch: 3.3.2
+    dev: false
+
+  /aether-identity@1.0.4:
+    resolution: {integrity: sha512-OFAoeyTFMGd6mP3z88s/k0vnX1Ng2+e/aPB2LpAz4Th76TyqCuFjYybGkHzYfmsRxXHIEmAAGZUUWZ3btPewrg==}
     engines: {node: '>=18.0.0'}
     dependencies:
       node-fetch: 3.3.2
