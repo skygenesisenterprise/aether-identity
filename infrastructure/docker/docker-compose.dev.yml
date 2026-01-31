@@ -1,21 +1,23 @@
 services:
   # Traefik Reverse Proxy - Seul service avec port exposé publiquement
   traefik:
-    image: traefik:v3.1
+    build:
+      context: ../traefik
+      dockerfile: Dockerfile
     container_name: aether-traefik-dev
-    environment: 
-    - DOCKER_API_VERSION=1.44
     ports:
-      - "3001:3001" # Seul port exposé publiquement
-      - "8082:8080" # Dashboard Traefik (optionnel, pour debug)
+      - "3001:3001"
+      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command:
       - "--api.dashboard=true"
       - "--providers.docker=true"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=aether-network-dev"
       - "--entrypoints.web.address=:3001"
-      - "--log.level=INFO"
+      - "--log.level=DEBUG"
       - "--accesslog=true"
     labels:
       - "traefik.enable=true"
@@ -23,50 +25,25 @@ services:
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=web"
     networks:
-      - aether-network
+      - aether-network-dev
     restart: unless-stopped
 
   # Service pour l'application frontend Aether Identity (Next.js)
+  # Étend la configuration de app/infra/docker-compose.dev.yml
   aether-app:
-    build:
-      context: ../../app
-      dockerfile: infra/Dockerfile.dev
-    container_name: aether-identity-app-dev
-    # Pas de ports exposés publiquement - uniquement via Traefik
-    expose:
-      - "3001"
-    environment:
-      NODE_ENV: development
-      PORT: 3001
-      HOSTNAME: 0.0.0.0
-      CHOKIDAR_USEPOLLING: "true"
-      NEXT_PUBLIC_API_URL: "http://localhost:3001/api"
-    user: root
-    volumes:
-      - ../../app:/app
-      - app_node_modules:/app/node_modules
-      - app_next:/app/.next
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.aether-app.rule=Host(`localhost`) || Host(`aether.local`)"
-      - "traefik.http.routers.aether-app.entrypoints=web"
-      - "traefik.http.services.aether-app.loadbalancer.server.port=3000"
-      - "traefik.http.routers.aether-app.priority=10"
+    extends:
+      file: ../../app/infra/docker-compose.dev.yml
+      service: app-dev
+    # Suppression du port exposé pour éviter le conflit avec Traefik
+    ports: []
     networks:
-      - aether-network
+      - aether-network-dev
 
   # Service pour le serveur Aether Identity (Go)
   aether-server:
     build:
       context: ../..
-      dockerfile: server/infra/Dockerfile.dev # ⚠️ Utilise le Dockerfile Go, pas celui de Next.js
+      dockerfile: server/infra/Dockerfile.dev
     container_name: aether-identity-server-dev
     # Pas de ports exposés publiquement - uniquement via Traefik
     expose:
@@ -101,7 +78,7 @@ services:
       - "traefik.http.services.aether-server.loadbalancer.server.port=8080"
       - "traefik.http.routers.aether-server.priority=20"
     networks:
-      - aether-network
+      - aether-network-dev
 
   # Service PostgreSQL pour le développement
   postgres:
@@ -117,7 +94,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - aether-network
+      - aether-network-dev
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -126,32 +103,9 @@ services:
       start_period: 5s
     restart: unless-stopped
 
-  # Service Adminer pour l'interface d'administration de la base de données
-  adminer:
-    image: adminer:latest
-    container_name: aether-adminer-dev
-    # Pas de ports exposés publiquement - uniquement via Traefik
-    expose:
-      - "8080"
-    environment:
-      ADMINER_DEFAULT_SERVER: postgres
-      ADMINER_DEFAULT_DB: aether_identity
-      ADMINER_DEFAULT_USER: postgres
-    depends_on:
-      - postgres
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.adminer.rule=Host(`localhost`) || Host(`aether.local`); PathPrefix(`/admin`)"
-      - "traefik.http.routers.adminer.entrypoints=web"
-      - "traefik.http.services.adminer.loadbalancer.server.port=8080"
-      - "traefik.http.routers.adminer.priority=30"
-    networks:
-      - aether-network
-    restart: unless-stopped
-
 # Réseau pour la communication entre les services
 networks:
-  aether-network:
+  aether-network-dev:
     driver: bridge
     name: aether-network-dev
 

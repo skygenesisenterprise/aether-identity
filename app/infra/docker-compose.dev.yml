@@ -1,30 +1,55 @@
+version: "3.9"
+
 services:
   app-dev:
     build:
       context: ..
       dockerfile: infra/Dockerfile.dev
     container_name: aether-identity-frontend-dev
-    ports:
-      - "3001:3001"
+
+    # Le port est uniquement visible dans le réseau Docker
+    expose:
+      - "3001"
+
     environment:
       NODE_ENV: development
       PORT: 3001
       HOSTNAME: 0.0.0.0
       CHOKIDAR_USEPOLLING: "true"
-    user: root
+
     working_dir: /app
+    user: root
+
     volumes:
       - ..:/app:cached
-      - /app/node_modules
-      - /app/.next
+      - app_node_modules:/app/node_modules
+      - app_next:/app/.next
+
     restart: unless-stopped
+
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001"]
-      interval: 30s
-      timeout: 10s
+      interval: 20s
+      timeout: 5s
       retries: 3
-      start_period: 40s
+      start_period: 30s
+
+    # 🔑 Indexation par Traefik (l’infra décide de l’exposition)
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.aether-app.rule=Host(`localhost`) || Host(`aether.local`)"
+      - "traefik.http.routers.aether-app.entrypoints=web"
+      - "traefik.http.services.aether-app.loadbalancer.server.port=3001"
+      - "traefik.http.routers.aether-app.priority=1"
+
+    networks:
+      - aether-network-dev
 
 networks:
   aether-network-dev:
+    name: aether-network-dev
     driver: bridge
+
+volumes:
+  app_node_modules:
+  app_next:

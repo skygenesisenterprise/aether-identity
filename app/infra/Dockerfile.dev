@@ -1,46 +1,27 @@
-# Dockerfile.dev - Development stage WITHOUT Nginx
+# Dockerfile.dev — Next.js Development (no Nginx)
 
 FROM node:20-alpine
 
-# Install system dependencies
+# System dependencies (minimal)
 RUN apk add --no-cache \
     libc6-compat \
-    git \
     bash \
-    curl \
-    wget
+    curl
 
-# Install pnpm globally via npm
+# Install pnpm
 RUN npm install -g pnpm@10.28.1
 
-# Setup pnpm global directory
-ENV PNPM_HOME=/root/.local/share/pnpm
-ENV PATH=$PNPM_HOME:$PATH
-RUN mkdir -p $PNPM_HOME
-
-# Install Next.js globally
-RUN pnpm add -g next
-
-# Set working directory
+# App directory
 WORKDIR /app
 
-# Copy package files
-COPY package.json ./
-
-# Install dependencies
-RUN pnpm install --force
-
-# Copy app source
-COPY . .
-
-# Expose port
-EXPOSE 3001
-
-# Environment variables
+# Environment
 ENV NODE_ENV=development
 ENV PORT=3001
 ENV HOSTNAME=0.0.0.0
 ENV CHOKIDAR_USEPOLLING=true
 
-# Start Next.js in development mode
+# Expose internal port (for Traefik)
+EXPOSE 3001
+
+# Dependencies will be installed at runtime (volume-mounted)
 CMD ["pnpm", "dev"]

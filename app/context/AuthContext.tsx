@@ -15,7 +15,11 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string, oauthParams?: OAuthParams) => Promise<void>;
+  login: (
+    email: string,
+    password: string,
+    oauthParams?: OAuthParams,
+  ) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
@@ -41,30 +45,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const checkAuth = async () => {
-    try {
-      const response = await fetch("/api/v1/auth/userinfo", {
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser({
-          id: userData.sub,
-          email: userData.email,
-          name: userData.name,
-          role: userData.roles?.[0] || "user",
-        });
-      } else {
-        setUser(null);
-      }
-    } catch (error) {
-      setUser(null);
-    } finally {
-      setIsLoading(false);
-    }
+    setIsLoading(false);
   };
 
-  const login = async (email: string, password: string, oauthParams?: OAuthParams) => {
+  const login = async (
+    email: string,
+    password: string,
+    oauthParams?: OAuthParams,
+  ) => {
     setIsLoading(true);
     try {
       const response = await fetch("/api/v1/auth/login", {
@@ -92,7 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const redirectUrl = getRedirectUrl(
         !!oauthParams,
         oauthParams || {},
-        user?.role
+        user?.role,
       );
 
       router.push(redirectUrl);
