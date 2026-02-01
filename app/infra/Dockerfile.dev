@@ -22,7 +22,7 @@ COPY pnpm-lock.yaml ./
 
 # Install dependencies during build
 # This ensures node_modules is populated in the image
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # Copy the rest of the application
 COPY . .

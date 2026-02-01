@@ -72,9 +72,6 @@ importers:
       aether-identity:
         specifier: ^1.0.4
         version: 1.0.4
-      aether-vault:
-        specifier: ^1.0.12
-        version: 1.0.12
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.1

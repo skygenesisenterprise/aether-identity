@@ -117,12 +117,12 @@ export default function LoginPage() {
                 <div className="mb-6 space-y-2">
                   <p className="text-[13px] text-[#1b1b1b]">
                     Vous n&apos;avez pas encore de compte ?{" "}
-                    <a href="#" className="text-[#0067b8] hover:underline focus:underline">
+                    <a href="/register" className="text-[#0067b8] hover:underline focus:underline">
                       Créez-en un !
                     </a>
                   </p>
                   <p>
-                    <a href="#" className="text-[13px] text-[#0067b8] hover:underline focus:underline">
+                    <a href="/forgot" className="text-[13px] text-[#0067b8] hover:underline focus:underline">
                       Votre compte n&apos;est pas accessible ?
                     </a>
                   </p>
@@ -182,7 +182,7 @@ export default function LoginPage() {
                 {/* Links */}
                 <div className="mb-6">
                   <p>
-                    <a href="#" className="text-[13px] text-[#0067b8] hover:underline focus:underline">
+                    <a href="/forgot" className="text-[13px] text-[#0067b8] hover:underline focus:underline">
                       Mot de passe oublié ?
                     </a>
                   </p>
