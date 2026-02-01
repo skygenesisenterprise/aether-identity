@@ -1,29 +1,28 @@
 # Dockerfile.dev pour Aether Identity Server
-# Utilisé pour le développement avec hot-reload
+# Utilise pour le developpement avec hot-reload
+# Contexte: repertoire server/ (racine du projet server)
 
-# Utiliser l'image officielle Go
 FROM golang:1.25.5-alpine AS builder
 
-# Définir le répertoire de travail
 WORKDIR /app
 
-# Copier le fichier go.mod et go.sum
-COPY server/go.mod server/go.sum ./
+# Copier les fichiers go depuis le contexte local
+COPY go.mod go.sum ./
 
-# Télécharger les dépendances
+# Telecharger les dependances
 RUN go mod download
 
 # Copier le code source
-COPY server/ .
+COPY . .
 
 # Construire l'application
 RUN go build -o aether-server main.go
 
-# Image finale légère
+# Image finale legere
 FROM alpine:latest
 
-# Installer les dépendances nécessaires
-RUN apk add --no-cache ca-certificates
+# Installer les dependances necessaires
+RUN apk add --no-cache ca-certificates wget
 
 # Copier l'application construite
 COPY --from=builder /app/aether-server /aether-server
@@ -31,5 +30,5 @@ COPY --from=builder /app/aether-server /aether-server
 # Exposer le port
 EXPOSE 8080
 
-# Commande par défaut
+# Commande par defaut
 CMD ["/aether-server"]

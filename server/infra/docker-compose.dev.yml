@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 services:
   # Service pour le serveur Aether Identity
@@ -7,23 +7,56 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     container_name: aether-server
-    ports:
-      - "8080:8080"
+    # Port interne uniquement (pas de publication publique)
+    expose:
+      - "8080"
     environment:
       - JWT_SECRET=${JWT_SECRET:-votre-cle-secrete-ici}
       - ACCESS_TOKEN_EXP=${ACCESS_TOKEN_EXP:-15}
       - REFRESH_TOKEN_EXP=${REFRESH_TOKEN_EXP:-720}
       - DATABASE_URL=${DATABASE_URL:-host=postgres user=postgres password=postgres dbname=aether_identity port=5432 sslmode=disable}
       - PORT=${PORT:-8080}
-    depends_on:
-      - postgres
     volumes:
       - .:/app
+    restart: unless-stopped
+    healthcheck:
+      test:
+        ["CMD", "wget", "--spider", "-q", "http://localhost:8080/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    # Network defini par l'orchestrateur ou en mode standalone
+    # networks:
+    #   - aether-network
+    profiles:
+      - "" # Par defaut disponible
+
+  # Service aether-server avec port public expose (pour developpement standalone)
+  aether-server-public:
+    extends:
+      service: aether-server
+    ports:
+      - "8080:8080"
+    profiles:
+      - standalone-public
+    depends_on:
+      - postgres
+
+  # Service Adminer pour l'interface d'administration de la base de donnees
+  adminer:
+    image: adminer:latest
+    container_name: aether-adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
     networks:
       - aether-network
-    restart: unless-stopped
+    profiles:
+      - standalone # Ne demarre qu'avec --profile standalone
 
-  # Service PostgreSQL pour le développement
+  # Service PostgreSQL pour le developpement standalone
   postgres:
     image: postgres:16-alpine
     container_name: aether-postgres
@@ -42,26 +75,16 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    profiles:
+      - standalone # Ne demarre qu'avec --profile standalone
 
-  # Service Adminer pour l'interface d'administration de la base de données
-  adminer:
-    image: adminer:latest
-    container_name: aether-adminer
-    ports:
-      - "8081:8080"
-    depends_on:
-      - postgres
-    networks:
-      - aether-network
-
-# Réseau pour la communication entre les services
-# Déclaré comme externe pour permettre à d'autres docker-compose d'y accéder
+# Reseau pour la communication entre les services en mode standalone
 networks:
   aether-network:
     driver: bridge
     name: aether-network
 
-# Volumes pour persister les données
+# Volumes pour persister les donnees
 volumes:
   postgres_data:
     driver: local

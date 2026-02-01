@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  # Service Database - Prisma Migrations et gestion du schema
+  database:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.dev
+    container_name: aether-database
+    environment:
+      # La DATABASE_URL sera surchargee par l'orchestrateur
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/aether_identity?schema=public}
+    volumes:
+      - ..:/app
+    command: >
+      sh -c "npx prisma migrate deploy && npx prisma generate"
+    restart: "no"
+    # Le network et depends_on seront definis par l'orchestrateur
+
+  # Service Prisma Studio pour l'interface graphique de gestion
+  prisma-studio:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.dev
+    container_name: aether-prisma-studio
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/aether_identity?schema=public}
+    ports:
+      - "5555:5555"
+    volumes:
+      - ..:/app
+    command: >
+      sh -c "npx prisma generate && npx prisma studio --hostname 0.0.0.0 --port 5555"
+    restart: unless-stopped
+    profiles:
+      - studio # Ne demarre qu'avec --profile studio

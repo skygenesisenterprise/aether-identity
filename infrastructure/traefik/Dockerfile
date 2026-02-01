@@ -1,9 +1,9 @@
-FROM traefik:v3.2
+FROM alpine:latest
 
-# Créer un entrypoint personnalisé qui force la version API
-RUN echo '#!/bin/sh' > /custom-entrypoint.sh && \
-    echo 'export DOCKER_API_VERSION=1.44' >> /custom-entrypoint.sh && \
-    echo 'exec /entrypoint.sh "$@"' >> /custom-entrypoint.sh && \
-    chmod +x /custom-entrypoint.sh
+# Installer socat pour proxifier le socket Docker
+RUN apk add --no-cache socat
 
-ENTRYPOINT ["/custom-entrypoint.sh"]
+# Script pour démarrer socat
+CMD ["socat", "-d", "-d", \
+     "UNIX-LISTEN:/var/run/docker-proxy.sock,fork,reuseaddr,unlink-early,mode=777", \
+     "UNIX-CONNECT:/var/run/docker.sock"]
