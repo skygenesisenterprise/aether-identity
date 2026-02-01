@@ -1,0 +1,56 @@
+api:
+  dashboard: false
+
+entryPoints:
+  web:
+    address: ":80"
+
+providers:
+  file:
+    filename: /traefik.yml
+    watch: true
+
+log:
+  level: INFO
+
+accessLog:
+  format: common
+
+http:
+  routers:
+    # Route pour le frontend Next.js - toutes les requêtes sauf /api
+    aether-frontend:
+      rule: "Host(`localhost`) || Host(`aether.local`)"
+      entryPoints:
+        - web
+      service: aether-frontend
+      priority: 10
+
+    # Route pour le backend Go - uniquement les chemins /api
+    aether-backend:
+      rule: "(Host(`localhost`) || Host(`aether.local`)) && PathPrefix(`/api`)"
+      entryPoints:
+        - web
+      service: aether-backend
+      priority: 20
+
+  services:
+    # Service frontend Next.js
+    aether-frontend:
+      loadBalancer:
+        servers:
+          - url: "http://aether-app:3001"
+        healthCheck:
+          path: "/login"
+          interval: "10s"
+          timeout: "5s"
+
+    # Service backend Go
+    aether-backend:
+      loadBalancer:
+        servers:
+          - url: "http://aether-server:8080"
+        healthCheck:
+          path: "/api/v1/health"
+          interval: "10s"
+          timeout: "5s"
