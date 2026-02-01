@@ -1,7 +1,7 @@
 {
-  "name": "@aether-vault/prisma",
+  "name": "@aether-identity/prisma",
   "version": "1.0.0",
-  "description": "Prisma database package for Aether Vault",
+  "description": "Prisma database package for Aether Identity",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
