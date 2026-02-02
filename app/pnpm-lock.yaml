@@ -18,8 +18,8 @@ importers:
         specifier: ^1.1.0
         version: 1.2.4(@types/react@19.2.10)(react@19.2.4)
       aether-identity:
-        specifier: ^1.0.8
-        version: 1.0.8
+        specifier: ^1.0.9
+        version: 1.0.9
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.1
@@ -869,8 +869,8 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  aether-identity@1.0.8:
-    resolution: {integrity: sha512-qmbAiRhJXCGUlDx1e+fKKEiJ9X9gQKSqIaurWN9Q/+on1cKTbNY35nhBFAuY8/YcyTVmMGocob12xqFdksfrww==}
+  aether-identity@1.0.9:
+    resolution: {integrity: sha512-Qg+9Bqlph96I8Qo8g/r9r9li1CRjIVCvlmjnT7Qtv8SCduRBiJaGRuVA+O0XF30/WIZfjEyZHVBaoUZoVpFARQ==}
     engines: {node: '>=18.0.0'}
 
   ajv@6.12.6:
@@ -3127,7 +3127,7 @@ snapshots:
 
   acorn@8.15.0: {}
 
-  aether-identity@1.0.8: {}
+  aether-identity@1.0.9: {}
 
   ajv@6.12.6:
     dependencies:
