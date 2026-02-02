@@ -2,11 +2,11 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-// import { CreateIdentityClient } from "aether-identity";
+import { CreateIdentityClient, IdentityClient } from "aether-identity";
 
 export default function RegisterPage() {
   const [step, setStep] = useState<"email" | "password" | "confirm">("email");
@@ -19,6 +19,16 @@ export default function RegisterPage() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
+  const identityRef = useRef<IdentityClient | null>(null);
+
+  if (!identityRef.current) {
+    identityRef.current = CreateIdentityClient({
+      baseUrl:
+        process.env.NEXT_PUBLIC_IDENTITY_API_URL || "http://localhost:3000",
+      clientId: process.env.NEXT_PUBLIC_CLIENT_ID || "",
+      systemKey: process.env.NEXT_PUBLIC_IDENTITY_SYSTEM_KEY,
+    });
+  }
 
   // Récupérer les paramètres OAuth depuis l'URL
   const isOAuth = searchParams.get("oauth") === "true";
@@ -74,34 +84,15 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/v1/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-        credentials: "include",
+      const identity = identityRef.current;
+      if (!identity) {
+        throw new Error("Identity client not initialized");
+      }
+
+      await identity.auth.register({
+        email,
+        password,
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Échec de l'inscription");
-      }
-
-      // Redirection vers la page de connexion après inscription réussie
-      const queryParams = new URLSearchParams();
-      if (isOAuth) {
-        queryParams.set("oauth", "true");
-        if (clientId) queryParams.set("client_id", clientId);
-        if (redirectUri) queryParams.set("redirect_uri", redirectUri);
-        if (responseType) queryParams.set("response_type", responseType);
-        if (scope) queryParams.set("scope", scope);
-        if (state) queryParams.set("state", state);
-      }
 
       router.push("/register/confirmed");
     } catch (err) {

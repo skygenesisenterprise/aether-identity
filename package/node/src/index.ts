@@ -18,6 +18,8 @@ import type {
   TOTPVerifyInput,
   TOTPStatusResponse,
   TOTPLoginInput,
+  RegisterInput,
+  RegisterResponse,
 } from "./types";
 import type { Transport } from "./core/transport";
 import type { SessionManager } from "./core/session";
@@ -141,6 +143,8 @@ export type {
   TOTPVerifyInput,
   TOTPStatusResponse,
   TOTPLoginInput,
+  RegisterInput,
+  RegisterResponse,
   FetchLike,
   OAuthParams,
 };

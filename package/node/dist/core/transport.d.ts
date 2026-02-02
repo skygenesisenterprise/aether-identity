@@ -12,7 +12,7 @@ declare class Transport {
     constructor(config: TransportConfig);
     private request;
     get<T>(endpoint: string, accessToken?: string): Promise<T>;
-    post<T>(endpoint: string, data?: unknown, accessToken?: string): Promise<T>;
+    post<T>(endpoint: string, data?: unknown, accessToken?: string, useSystemKeyAsAuth?: boolean): Promise<T>;
     put<T>(endpoint: string, data?: unknown, accessToken?: string): Promise<T>;
     delete<T>(endpoint: string, accessToken?: string): Promise<T>;
 }

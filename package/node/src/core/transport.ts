@@ -111,6 +111,7 @@ class Transport {
     endpoint: string,
     data?: unknown,
     accessToken?: string,
+    useSystemKeyAsAuth?: boolean,
   ): Promise<T> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -119,6 +120,8 @@ class Transport {
 
     if (accessToken) {
       headers["Authorization"] = `Bearer ${accessToken}`;
+    } else if (useSystemKeyAsAuth && this.config.systemKey) {
+      headers["Authorization"] = `Bearer ${this.config.systemKey}`;
     }
 
     return this.request<T>(endpoint, {

@@ -34,6 +34,16 @@ export interface AuthInput {
     password: string;
     _totpCode?: string;
 }
+export interface RegisterInput {
+    email: string;
+    password: string;
+    name?: string;
+}
+export interface RegisterResponse {
+    success: boolean;
+    message: string;
+    userId?: string;
+}
 export interface StrengthenInput {
     type: "totp" | "email" | "sms";
     value?: string;

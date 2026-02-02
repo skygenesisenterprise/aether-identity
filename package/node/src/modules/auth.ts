@@ -1,6 +1,12 @@
 import type { Transport } from "../core/transport";
 import type { SessionManager } from "../core/session";
-import type { AuthInput, StrengthenInput, TokenResponse } from "../types";
+import type {
+  AuthInput,
+  StrengthenInput,
+  TokenResponse,
+  RegisterInput,
+  RegisterResponse,
+} from "../types";
 import { SessionExpiredError } from "../errors";
 
 interface OAuthParams {
@@ -47,6 +53,28 @@ class AuthModule {
     );
 
     this.session.setTokens(response);
+  }
+
+  async register(input: RegisterInput): Promise<RegisterResponse> {
+    const payload: {
+      email: string;
+      password: string;
+      name?: string;
+    } = {
+      email: input.email,
+      password: input.password,
+    };
+
+    if (input.name) {
+      payload.name = input.name;
+    }
+
+    return this.transport.post<RegisterResponse>(
+      "/api/v1/auth/register",
+      payload,
+      undefined,
+      true,
+    );
   }
 
   private buildLoginEndpoint(oauthParams?: OAuthParams): string {

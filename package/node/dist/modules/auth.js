@@ -18,6 +18,16 @@ class AuthModule {
         const response = await this.transport.post(endpoint, payload);
         this.session.setTokens(response);
     }
+    async register(input) {
+        const payload = {
+            email: input.email,
+            password: input.password,
+        };
+        if (input.name) {
+            payload.name = input.name;
+        }
+        return this.transport.post("/api/v1/auth/register", payload, undefined, true);
+    }
     buildLoginEndpoint(oauthParams) {
         if (!oauthParams || Object.keys(oauthParams).length === 0) {
             return "/api/v1/auth/login";

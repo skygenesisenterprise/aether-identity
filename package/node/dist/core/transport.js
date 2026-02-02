@@ -68,13 +68,16 @@ class Transport {
             headers,
         });
     }
-    async post(endpoint, data, accessToken) {
+    async post(endpoint, data, accessToken, useSystemKeyAsAuth) {
         const headers = {
             "Content-Type": "application/json",
             "X-Client-ID": this.config.clientId,
         };
         if (accessToken) {
             headers["Authorization"] = `Bearer ${accessToken}`;
+        }
+        else if (useSystemKeyAsAuth && this.config.systemKey) {
+            headers["Authorization"] = `Bearer ${this.config.systemKey}`;
         }
         return this.request(endpoint, {
             method: "POST",
