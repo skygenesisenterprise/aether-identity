@@ -51,22 +51,7 @@ class IdentityClient {
   private sessionManager: SessionManager;
 
   constructor(config: IdentityClientConfig) {
-    let nodeFetchPromise: Promise<typeof import("node-fetch")> | null = null;
-    const fetcher: FetchLike =
-      config.fetcher ||
-      (typeof fetch !== "undefined"
-        ? fetch
-        : ((async (url: string | URL | Request, init?: RequestInit) => {
-            if (!nodeFetchPromise) {
-              nodeFetchPromise = import("node-fetch");
-            }
-            const { default: nodeFetch } = await nodeFetchPromise;
-            const response = await nodeFetch(
-              url as string | URL,
-              init as Parameters<typeof nodeFetch>[1],
-            );
-            return response as unknown as ReturnType<FetchLike>;
-          }) as FetchLike));
+    const fetcher: FetchLike = config.fetcher || fetch;
 
     this.transport = new TransportImpl({
       baseUrl: config.baseUrl,
