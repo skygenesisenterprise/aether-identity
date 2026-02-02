@@ -1,85 +1,104 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Search, ChevronLeft } from "lucide-react"
-import Link from "next/link"
-import { CreateIdentityClient } from "aether-identity"
-import { useAuth } from "@/context/AuthContext"
+import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Search, ChevronLeft } from "lucide-react";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+// import { CreateIdentityClient } from "aether-identity";
 
 export default function LoginPage() {
-  const [step, setStep] = useState<"email" | "password">("email")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [isTransitioning, setIsTransitioning] = useState(false)
-  const [error, setError] = useState("")
-  
-  const { isLoading, login } = useAuth()
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  
-  // Récupérer les paramètres OAuth depuis l'URL
-  const isOAuth = searchParams.get("oauth") === "true"
-  const clientId = searchParams.get("client_id")
-  const redirectUri = searchParams.get("redirect_uri")
-  const responseType = searchParams.get("response_type")
-  const scope = searchParams.get("scope")
-  const state = searchParams.get("state")
-  
-  // Préparer les paramètres OAuth pour la redirection
+  const [step, setStep] = useState<"email" | "password">("email");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [error, setError] = useState("");
+
+  const { isLoading, login } = useAuth();
+  const searchParams = useSearchParams();
+
+  const clientId = searchParams.get("client_id");
+  const redirectUri = searchParams.get("redirect_uri");
+  const responseType = searchParams.get("response_type");
+  const scope = searchParams.get("scope");
+  const state = searchParams.get("state");
+
   const oauthParams = {
-    client_id: clientId,
-    redirect_uri: redirectUri,
-    response_type: responseType,
-    scope: scope,
-    state: state,
-  }
+    client_id: clientId ?? undefined,
+    redirect_uri: redirectUri ?? undefined,
+    response_type: responseType ?? undefined,
+    scope: scope ?? undefined,
+    state: state ?? undefined,
+  };
 
   const handleEmailSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (email) {
-      setIsTransitioning(true)
+      setIsTransitioning(true);
       setTimeout(() => {
-        setStep("password")
-        setIsTransitioning(false)
-      }, 300)
+        setStep("password");
+        setIsTransitioning(false);
+      }, 300);
     }
-  }
+  };
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    
+    e.preventDefault();
+    setError("");
+
     try {
-      await login(email, password, oauthParams)
+      await login(email, password, oauthParams);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue")
+      setError(err instanceof Error ? err.message : "Une erreur est survenue");
     }
-  }
+  };
 
   const handleBack = () => {
     if (step === "password") {
-      setIsTransitioning(true)
+      setIsTransitioning(true);
       setTimeout(() => {
-        setStep("email")
-        setPassword("")
-        setIsTransitioning(false)
-      }, 300)
+        setStep("email");
+        setPassword("");
+        setIsTransitioning(false);
+      }, 300);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen relative bg-[#e8eef4] flex items-center justify-center p-4">
       {/* Background pattern - subtle hexagon shapes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
-        <svg className="absolute top-20 right-40 w-96 h-96" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="100,10 172,50 172,130 100,170 28,130 28,50" fill="none" stroke="#0067b8" strokeWidth="0.5" />
-          <polygon points="100,30 152,60 152,120 100,150 48,120 48,60" fill="none" stroke="#0067b8" strokeWidth="0.5" />
+        <svg
+          className="absolute top-20 right-40 w-96 h-96"
+          viewBox="0 0 200 200"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <polygon
+            points="100,10 172,50 172,130 100,170 28,130 28,50"
+            fill="none"
+            stroke="#0067b8"
+            strokeWidth="0.5"
+          />
+          <polygon
+            points="100,30 152,60 152,120 100,150 48,120 48,60"
+            fill="none"
+            stroke="#0067b8"
+            strokeWidth="0.5"
+          />
         </svg>
-        <svg className="absolute top-60 left-20 w-64 h-64" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="100,10 172,50 172,130 100,170 28,130 28,50" fill="none" stroke="#50bfdc" strokeWidth="0.5" />
+        <svg
+          className="absolute top-60 left-20 w-64 h-64"
+          viewBox="0 0 200 200"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <polygon
+            points="100,10 172,50 172,130 100,170 28,130 28,50"
+            fill="none"
+            stroke="#50bfdc"
+            strokeWidth="0.5"
+          />
         </svg>
       </div>
 
@@ -88,17 +107,23 @@ export default function LoginPage() {
         {/* Login card */}
         <div
           className={`bg-white rounded-sm shadow-lg p-11 mb-4 transition-all duration-300 ${
-            isTransitioning ? "opacity-0 translate-x-[-20px]" : "opacity-100 translate-x-0"
+            isTransitioning
+              ? "opacity-0 translate-x-[-20px]"
+              : "opacity-100 translate-x-0"
           }`}
         >
           <div className="mb-6">
-            <span className="text-[15px] font-semibold text-[#5e5e5e]">Sky Genesis Enterprise</span>
+            <span className="text-[15px] font-semibold text-[#5e5e5e]">
+              Sky Genesis Enterprise
+            </span>
           </div>
 
           {step === "email" ? (
             <>
               {/* Title */}
-              <h1 className="text-2xl font-semibold mb-4 text-[#1b1b1b]">Se connecter</h1>
+              <h1 className="text-2xl font-semibold mb-4 text-[#1b1b1b]">
+                Se connecter
+              </h1>
 
               {/* Form */}
               <form onSubmit={handleEmailSubmit}>
@@ -108,7 +133,7 @@ export default function LoginPage() {
                     type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="E-mail, téléphone ou identifiant Skype"
+                    placeholder="E-mail, téléphone ou identifiant d'entreprise"
                     className="w-full px-3 py-2 border border-[#8a8886] bg-white text-[15px] text-[#1b1b1b] placeholder:text-[#605e5c] focus:outline-none focus:border-[#0067b8] focus:border-2 hover:border-[#323130] transition-colors"
                   />
                 </div>
@@ -117,12 +142,18 @@ export default function LoginPage() {
                 <div className="mb-6 space-y-2">
                   <p className="text-[13px] text-[#1b1b1b]">
                     Vous n&apos;avez pas encore de compte ?{" "}
-                    <a href="/register" className="text-[#0067b8] hover:underline focus:underline">
+                    <a
+                      href="/register"
+                      className="text-[#0067b8] hover:underline focus:underline"
+                    >
                       Créez-en un !
                     </a>
                   </p>
                   <p>
-                    <a href="/forgot" className="text-[13px] text-[#0067b8] hover:underline focus:underline">
+                    <a
+                      href="/forgot"
+                      className="text-[13px] text-[#0067b8] hover:underline focus:underline"
+                    >
                       Votre compte n&apos;est pas accessible ?
                     </a>
                   </p>
@@ -156,7 +187,9 @@ export default function LoginPage() {
                 {email}
               </button>
 
-              <h1 className="text-2xl font-semibold mb-4 text-[#1b1b1b]">Entrer le mot de passe</h1>
+              <h1 className="text-2xl font-semibold mb-4 text-[#1b1b1b]">
+                Entrer le mot de passe
+              </h1>
 
               {/* Form */}
               <form onSubmit={handlePasswordSubmit}>
@@ -182,7 +215,10 @@ export default function LoginPage() {
                 {/* Links */}
                 <div className="mb-6">
                   <p>
-                    <a href="/forgot" className="text-[13px] text-[#0067b8] hover:underline focus:underline">
+                    <a
+                      href="/forgot"
+                      className="text-[13px] text-[#0067b8] hover:underline focus:underline"
+                    >
                       Mot de passe oublié ?
                     </a>
                   </p>
@@ -213,7 +249,9 @@ export default function LoginPage() {
         {step === "email" && (
           <div
             className={`bg-white rounded-sm shadow-lg transition-all duration-300 ${
-              isTransitioning ? "opacity-0 translate-x-[-20px]" : "opacity-100 translate-x-0"
+              isTransitioning
+                ? "opacity-0 translate-x-[-20px]"
+                : "opacity-100 translate-x-0"
             }`}
           >
             <Link
@@ -241,5 +279,5 @@ export default function LoginPage() {
         </a>
       </footer>
     </div>
-  )
+  );
 }
