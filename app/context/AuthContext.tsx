@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getRedirectUrl, NAVIGATION_CONFIG } from "@/config/navigation";
+import { CreateIdentityClient, IdentityClient, OAuthParams } from "aether-identity";
 
 type User = {
   id: string;
@@ -24,27 +25,55 @@ interface AuthContextType {
   checkAuth: () => Promise<void>;
 }
 
-interface OAuthParams {
-  client_id?: string;
-  redirect_uri?: string;
-  response_type?: string;
-  scope?: string;
-  state?: string;
-}
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+let identityClient: IdentityClient | null = null;
+
+function getIdentityClient(): IdentityClient {
+  if (!identityClient) {
+    identityClient = CreateIdentityClient({
+      baseUrl:
+        process.env.NEXT_PUBLIC_IDENTITY_API_URL || "http://localhost:3000",
+      clientId: process.env.NEXT_PUBLIC_CLIENT_ID || "",
+    });
+  }
+  return identityClient;
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const identityRef = useRef<IdentityClient | null>(null);
 
-  // Vérifier l'authentification au montage
   useEffect(() => {
+    identityRef.current = getIdentityClient();
     checkAuth();
   }, []);
 
   const checkAuth = async () => {
+    const identity = identityRef.current;
+    if (!identity) {
+      setIsLoading(false);
+      return;
+    }
+
+    const isAuth = identity.session.isAuthenticated();
+    if (isAuth) {
+      try {
+        const session = await identity.session.current();
+        if (session.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email,
+            name: session.user.name,
+            role: session.user.role,
+          });
+        }
+      } catch {
+        setUser(null);
+      }
+    }
     setIsLoading(false);
   };
 
@@ -55,28 +84,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   ) => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/v1/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-        credentials: "include",
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Échec de la connexion");
+      const identity = identityRef.current;
+      if (!identity) {
+        throw new Error("Identity client not initialized");
       }
 
-      // Recharger l'utilisateur après authentification
+      await identity.auth.login({ email, password }, oauthParams);
+
       await checkAuth();
 
-      // Déterminer la redirection
       const redirectUrl = getRedirectUrl(
         !!oauthParams,
         oauthParams || {},
@@ -94,10 +110,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch("/api/v1/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
+      const identity = identityRef.current;
+      if (identity) {
+        await identity.auth.logout();
+      }
       setUser(null);
       router.push(NAVIGATION_CONFIG.LOGIN_PAGE);
     } catch (error) {

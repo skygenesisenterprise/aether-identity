@@ -2,12 +2,19 @@
 
 import type React from "react";
 
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useRef } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Search, ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
-// import { CreateIdentityClient } from "aether-identity";
+import { CreateIdentityClient, IdentityClient } from "aether-identity";
+
+interface OAuthParams {
+  client_id?: string;
+  redirect_uri?: string;
+  response_type?: string;
+  scope?: string;
+  state?: string;
+}
 
 export default function LoginPage() {
   const [step, setStep] = useState<"email" | "password">("email");
@@ -15,8 +22,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { isLoading, login } = useAuth();
+  const router = useRouter();
+  const identityRef = useRef<IdentityClient | null>(null);
+
+  if (!identityRef.current) {
+    identityRef.current = CreateIdentityClient({
+      baseUrl:
+        process.env.NEXT_PUBLIC_IDENTITY_API_URL || "http://localhost:3000",
+      clientId: process.env.NEXT_PUBLIC_CLIENT_ID || "",
+    });
+  }
+
   const searchParams = useSearchParams();
 
   const clientId = searchParams.get("client_id");
@@ -47,11 +65,28 @@ export default function LoginPage() {
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
 
     try {
-      await login(email, password, oauthParams);
+      const identity = identityRef.current;
+      if (!identity) {
+        throw new Error("Identity client not initialized");
+      }
+
+      await identity.auth.login({ email, password }, oauthParams);
+
+      // Redirect after successful login
+      if (oauthParams.client_id && oauthParams.redirect_uri) {
+        const params = new URLSearchParams();
+        if (oauthParams.state) params.set("state", oauthParams.state);
+        router.push(`${oauthParams.redirect_uri}?${params.toString()}`);
+      } else {
+        router.push("/");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue");
+    } finally {
+      setIsLoading(false);
     }
   };
 
