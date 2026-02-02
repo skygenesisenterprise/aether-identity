@@ -1,9 +1,33 @@
 export type FetchLike = typeof fetch;
+export interface TOTPConfig {
+    issuer?: string;
+    digits?: number;
+    period?: number;
+}
+export interface TOTPSetupResponse {
+    secret: string;
+    qrCode: string;
+    url: string;
+}
+export interface TOTPVerifyInput {
+    code: string;
+    secret: string;
+}
+export interface TOTPStatusResponse {
+    enabled: boolean;
+}
+export interface TOTPLoginInput {
+    email: string;
+    password: string;
+    totpCode: string;
+}
 export interface IdentityClientConfig {
     baseUrl: string;
     clientId: string;
     accessToken?: string;
     fetcher?: FetchLike;
+    systemKey?: string;
+    totp?: TOTPConfig;
 }
 export interface AuthInput {
     email: string;

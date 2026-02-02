@@ -3,7 +3,11 @@
 import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getRedirectUrl, NAVIGATION_CONFIG } from "@/config/navigation";
-import { CreateIdentityClient, IdentityClient, OAuthParams } from "aether-identity";
+import {
+  CreateIdentityClient,
+  IdentityClient,
+  OAuthParams,
+} from "aether-identity";
 
 type User = {
   id: string;
@@ -35,6 +39,12 @@ function getIdentityClient(): IdentityClient {
       baseUrl:
         process.env.NEXT_PUBLIC_IDENTITY_API_URL || "http://localhost:3000",
       clientId: process.env.NEXT_PUBLIC_CLIENT_ID || "",
+      systemKey: process.env.NEXT_PUBLIC_IDENTITY_SYSTEM_KEY,
+      totp: {
+        issuer: "Sky Genesis Enterprise",
+        digits: 6,
+        period: 30,
+      },
     });
   }
   return identityClient;

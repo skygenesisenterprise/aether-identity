@@ -1,19 +1,18 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-
-interface TotpSetupResponse {
-  secret: string;
-  otpauthUrl: string;
-  backupCodes: string[];
-}
+import {
+  CreateIdentityClient,
+  IdentityClient,
+  TOTPSetupResponse,
+} from "aether-identity";
 
 export default function TotpRegisterPage() {
-  const [totpSetup, setTotpSetup] = useState<TotpSetupResponse | null>(null);
+  const [totpSetup, setTotpSetup] = useState<TOTPSetupResponse | null>(null);
   const [totpCode, setTotpCode] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -21,6 +20,21 @@ export default function TotpRegisterPage() {
   const [verified, setVerified] = useState(false);
 
   const router = useRouter();
+  const identityRef = useRef<IdentityClient | null>(null);
+
+  if (!identityRef.current) {
+    identityRef.current = CreateIdentityClient({
+      baseUrl:
+        process.env.NEXT_PUBLIC_IDENTITY_API_URL || "http://localhost:3000",
+      clientId: process.env.NEXT_PUBLIC_CLIENT_ID || "",
+      systemKey: process.env.NEXT_PUBLIC_IDENTITY_SYSTEM_KEY,
+      totp: {
+        issuer: "Sky Genesis Enterprise",
+        digits: 6,
+        period: 30,
+      },
+    });
+  }
 
   useEffect(() => {
     initTotpSetup();
@@ -28,17 +42,13 @@ export default function TotpRegisterPage() {
 
   const initTotpSetup = async () => {
     try {
-      const response = await fetch("/api/v1/auth/totp/setup", {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to initialize TOTP setup");
+      const identity = identityRef.current;
+      if (!identity) {
+        throw new Error("Identity client not initialized");
       }
 
-      const data = await response.json();
-      setTotpSetup(data);
+      const setup = await identity.totp.setup();
+      setTotpSetup(setup);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to setup TOTP");
     } finally {
@@ -52,18 +62,19 @@ export default function TotpRegisterPage() {
     setIsVerifying(true);
 
     try {
-      const response = await fetch("/api/v1/auth/totp/verify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code: totpCode }),
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Invalid TOTP code");
+      const identity = identityRef.current;
+      if (!identity) {
+        throw new Error("Identity client not initialized");
       }
+
+      if (!totpSetup) {
+        throw new Error("TOTP setup not initialized");
+      }
+
+      await identity.totp.verify({
+        code: totpCode,
+        secret: totpSetup.secret,
+      });
 
       setVerified(true);
       setTimeout(() => {
@@ -227,7 +238,7 @@ export default function TotpRegisterPage() {
             <>
               <div className="flex justify-center mb-6 p-4 bg-white border border-[#edebe9] rounded">
                 <QRCodeSVG
-                  value={totpSetup.otpauthUrl}
+                  value={totpSetup.url}
                   size={200}
                   level="H"
                   includeMargin={true}
@@ -235,17 +246,11 @@ export default function TotpRegisterPage() {
               </div>
 
               <div className="mb-6 p-4 bg-[#f3f2f1] rounded text-[13px] text-[#605e5c]">
-                <p className="font-medium mb-2 text-[#1b1b1b]">
-                  Codes de sauvegarde :
-                </p>
-                <div className="grid grid-cols-2 gap-2 font-mono">
-                  {totpSetup.backupCodes.slice(0, 4).map((code, index) => (
-                    <span key={index}>{code}</span>
-                  ))}
-                </div>
-                <p className="mt-2 text-xs">
-                  Conservez ces codes dans un lieu sûr. Vous pouvez les utiliser
-                  pour accéder à votre compte si vous perdez votre appareil.
+                <p className="font-medium mb-2 text-[#1b1b1b]">Clé secrète :</p>
+                <p className="font-mono break-all mb-4">{totpSetup.secret}</p>
+                <p className="text-xs">
+                  Si vous ne pouvez pas scanner le code QR, entrez cette clé
+                  manuellement dans votre application d&apos;authentification.
                 </p>
               </div>
 

@@ -14,15 +14,19 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 	// API versioning
 	apiV1 := router.Group("/api/v1")
 	{
-		// Health routes - without database middleware
+		// Health routes - without database middleware and authentication
+		// These routes are public and accessible without any authentication
 		apiV1.GET("/health", controllers.HealthCheck)
+		apiV1.HEAD("/health", controllers.HealthCheck)
 
-		// Routes that require database
-		dbRoutes := apiV1.Group("")
-		dbRoutes.Use(middleware.DatabaseMiddleware())
+		// Protected routes - require system key authentication
+		// All other /api/v1/* routes must be accompanied by the system key
+		protectedV1 := apiV1.Group("")
+		protectedV1.Use(middleware.AppAuth(systemKey))
+		protectedV1.Use(middleware.DatabaseMiddleware())
 		{
 			// Authentication routes - protégées par Service Key
-			authRoutes := dbRoutes.Group("/auth")
+			authRoutes := protectedV1.Group("/auth")
 			authRoutes.Use(middleware.ServiceKeyAuth(serviceKeyService, systemKey))
 			{
 				authRoutes.POST("/login", controllers.Login)
@@ -54,7 +58,7 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 			}
 
 			// Routes OAuth2/OpenID Connect
-			oauthRoutes := dbRoutes.Group("/oauth2")
+			oauthRoutes := protectedV1.Group("/oauth2")
 			{
 				oauthRoutes.POST("/token", controllers.TokenHandler)
 				oauthRoutes.GET("/userinfo", controllers.UserInfoHandler)
@@ -64,7 +68,7 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 			}
 
 			// Routes de gestion des clients OAuth (protégées par admin)
-			clientRoutes := dbRoutes.Group("/clients")
+			clientRoutes := protectedV1.Group("/clients")
 			clientRoutes.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
 			{
 				clientRoutes.POST("", controllers.CreateClient)
@@ -76,7 +80,7 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 			}
 
 			// Routes de gestion des domaines (protégées par admin)
-			domainRoutes := dbRoutes.Group("/domains")
+			domainRoutes := protectedV1.Group("/domains")
 			domainRoutes.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
 			{
 				domainRoutes.POST("", controllers.CreateDomain)
@@ -92,7 +96,7 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 			}
 
 			// Routes utilisateur (protégées par JWT)
-			userRoutes := dbRoutes.Group("/users")
+			userRoutes := protectedV1.Group("/users")
 			userRoutes.Use(middleware.AuthMiddleware())
 			{
 				userRoutes.GET("/me", controllers.GetCurrentUser)
@@ -102,18 +106,18 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 			}
 
 			// Routes admin pour la gestion des utilisateurs
-			adminUserRoutes := dbRoutes.Group("/admin/users")
+			adminUserRoutes := protectedV1.Group("/admin/users")
 			adminUserRoutes.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
 			{
 				adminUserRoutes.GET("", controllers.ListUsers)
 				adminUserRoutes.POST("", controllers.CreateUserAdmin)
 			}
 
-			// Route publique pour vérifier la disponibilité d'un email
-			dbRoutes.GET("/check-email", controllers.CheckEmailAvailability)
+			// Route pour vérifier la disponibilité d'un email
+			protectedV1.GET("/check-email", controllers.CheckEmailAvailability)
 
 			// Routes pour la gestion des clés de service par les utilisateurs
-			userKeysRoutes := dbRoutes.Group("/keys")
+			userKeysRoutes := protectedV1.Group("/keys")
 			userKeysRoutes.Use(middleware.AuthMiddleware())
 			{
 				userKeysRoutes.POST("/generate", controllers.GenerateUserKey)
@@ -124,12 +128,28 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 			}
 
 			// RBAC et info util
-			dbRoutes.GET("/userinfo", middleware.AuthMiddleware(), controllers.UserInfo)
-			dbRoutes.POST("/introspect", controllers.Introspect)
+			protectedV1.GET("/userinfo", middleware.AuthMiddleware(), controllers.UserInfo)
+			protectedV1.POST("/introspect", controllers.Introspect)
+
+			// Routes de gestion des clés de service (protégées par JWT)
+			serviceKeyRoutes := protectedV1.Group("/service-keys")
+			serviceKeyRoutes.Use(middleware.AuthMiddleware())
+			{
+				serviceKeyRoutes.POST("", controllers.CreateServiceKey)
+				serviceKeyRoutes.GET("", controllers.ListServiceKeys)
+				serviceKeyRoutes.GET(":id", controllers.GetServiceKey)
+				serviceKeyRoutes.PUT(":id", controllers.UpdateServiceKey)
+				serviceKeyRoutes.DELETE(":id", controllers.DeleteServiceKey)
+				serviceKeyRoutes.GET(":id/usage", controllers.GetServiceKeyUsage)
+			}
+
+			// Route pour valider une clé de service (sans authentification JWT)
+			serviceKeyRoutes.POST("/validate", controllers.ValidateServiceKey)
 		}
 	}
 
-	// Routes OAuth2/OpenID Connect (accessibles directement)
+	// Routes OAuth2/OpenID Connect (accessibles directement sous /oauth)
+	// Note: Les routes équivalentes sous /api/v1/oauth2 sont maintenant protégées par le system key
 	oauthRoutes := router.Group("/oauth")
 	oauthRoutes.Use(middleware.DatabaseMiddleware())
 	{
@@ -141,22 +161,8 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 		oauthRoutes.GET("/jwks", controllers.JWKSHandler)
 	}
 
-	// Routes de gestion des clés de service (protégées par JWT)
-	serviceKeyRoutes := router.Group("/api/v1/service-keys")
-	serviceKeyRoutes.Use(middleware.AuthMiddleware())
-	{
-		serviceKeyRoutes.POST("", controllers.CreateServiceKey)
-		serviceKeyRoutes.GET("", controllers.ListServiceKeys)
-		serviceKeyRoutes.GET(":id", controllers.GetServiceKey)
-		serviceKeyRoutes.PUT(":id", controllers.UpdateServiceKey)
-		serviceKeyRoutes.DELETE(":id", controllers.DeleteServiceKey)
-		serviceKeyRoutes.GET(":id/usage", controllers.GetServiceKeyUsage)
-	}
-
-	// Route pour valider une clé de service (sans authentification JWT)
-	serviceKeyRoutes.POST("/validate", controllers.ValidateServiceKey)
-
 	// Routes protégées par la clé système (pour les requêtes de l'application)
+	// Ces routes sont spécifiques à l'application interne
 	appRoutes := router.Group("/api/v1/app")
 	appRoutes.Use(middleware.AppAuth(systemKey))
 	{

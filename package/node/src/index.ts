@@ -13,6 +13,11 @@ import type {
   DeviceStatusResponse,
   MachineEnrollmentResponse,
   MachineTokenResponse,
+  TOTPConfig,
+  TOTPSetupResponse,
+  TOTPVerifyInput,
+  TOTPStatusResponse,
+  TOTPLoginInput,
 } from "./types";
 import type { Transport } from "./core/transport";
 import type { SessionManager } from "./core/session";
@@ -37,6 +42,7 @@ import { TokenModule } from "./modules/token";
 import { EIDModule } from "./modules/eid";
 import { MachineModule } from "./modules/machine";
 import { DeviceModule } from "./modules/device";
+import { TOTPModule } from "./modules/totp";
 
 class IdentityClient {
   public readonly auth: AuthModule;
@@ -46,6 +52,7 @@ class IdentityClient {
   public readonly eid: EIDModule;
   public readonly machine: MachineModule;
   public readonly device: DeviceModule;
+  public readonly totp: TOTPModule;
 
   private transport: Transport;
   private sessionManager: SessionManager;
@@ -57,6 +64,7 @@ class IdentityClient {
       baseUrl: config.baseUrl,
       fetcher,
       clientId: config.clientId,
+      systemKey: config.systemKey,
     });
 
     this.sessionManager = new SessionManagerImpl();
@@ -99,6 +107,12 @@ class IdentityClient {
       transport: this.transport,
       session: this.sessionManager,
     });
+
+    this.totp = new TOTPModule({
+      transport: this.transport,
+      session: this.sessionManager,
+      config: config.totp,
+    });
   }
 }
 
@@ -122,6 +136,11 @@ export type {
   DeviceStatusResponse,
   MachineEnrollmentResponse,
   MachineTokenResponse,
+  TOTPConfig,
+  TOTPSetupResponse,
+  TOTPVerifyInput,
+  TOTPStatusResponse,
+  TOTPLoginInput,
   FetchLike,
   OAuthParams,
 };

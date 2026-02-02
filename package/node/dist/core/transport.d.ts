@@ -3,6 +3,7 @@ interface TransportConfig {
     baseUrl: string;
     fetcher: FetchLike;
     clientId: string;
+    systemKey?: string;
     maxRetries?: number;
     retryDelay?: number;
 }

@@ -14,6 +14,7 @@ interface TransportConfig {
   baseUrl: string;
   fetcher: FetchLike;
   clientId: string;
+  systemKey?: string;
   maxRetries?: number;
   retryDelay?: number;
 }
@@ -96,6 +97,10 @@ class Transport {
       headers["Authorization"] = `Bearer ${accessToken}`;
     }
 
+    if (this.config.systemKey) {
+      headers["X-System-Key"] = this.config.systemKey;
+    }
+
     return this.request<T>(endpoint, {
       method: "GET",
       headers,
@@ -123,7 +128,11 @@ class Transport {
     });
   }
 
-  async put<T>(endpoint: string, data?: unknown, accessToken?: string): Promise<T> {
+  async put<T>(
+    endpoint: string,
+    data?: unknown,
+    accessToken?: string,
+  ): Promise<T> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       "X-Client-ID": this.config.clientId,
@@ -148,6 +157,10 @@ class Transport {
 
     if (accessToken) {
       headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    if (this.config.systemKey) {
+      headers["X-System-Key"] = this.config.systemKey;
     }
 
     return this.request<T>(endpoint, {

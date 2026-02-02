@@ -31,7 +31,7 @@ func (s *TOTPService) GenerateTOTPSecret(userID uint) (string, string, error) {
 		return "", "", fmt.Errorf("failed to generate TOTP secret: %w", err)
 	}
 	secretString := base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(secret)
-	issuer := "Aether Identity"
+	issuer := "Sky Genesis Enterprise"
 	accountName := fmt.Sprintf("%d", userID)
 	url := fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s&digits=%d&period=%d",
 		issuer, accountName, secretString, issuer, 6, 30)

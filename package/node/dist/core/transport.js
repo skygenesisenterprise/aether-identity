@@ -60,6 +60,9 @@ class Transport {
         if (accessToken) {
             headers["Authorization"] = `Bearer ${accessToken}`;
         }
+        if (this.config.systemKey) {
+            headers["X-System-Key"] = this.config.systemKey;
+        }
         return this.request(endpoint, {
             method: "GET",
             headers,
@@ -100,6 +103,9 @@ class Transport {
         };
         if (accessToken) {
             headers["Authorization"] = `Bearer ${accessToken}`;
+        }
+        if (this.config.systemKey) {
+            headers["X-System-Key"] = this.config.systemKey;
         }
         return this.request(endpoint, {
             method: "DELETE",

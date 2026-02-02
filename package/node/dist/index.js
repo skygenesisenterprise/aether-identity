@@ -8,6 +8,7 @@ import { TokenModule } from "./modules/token";
 import { EIDModule } from "./modules/eid";
 import { MachineModule } from "./modules/machine";
 import { DeviceModule } from "./modules/device";
+import { TOTPModule } from "./modules/totp";
 class IdentityClient {
     auth;
     session;
@@ -16,6 +17,7 @@ class IdentityClient {
     eid;
     machine;
     device;
+    totp;
     transport;
     sessionManager;
     constructor(config) {
@@ -24,6 +26,7 @@ class IdentityClient {
             baseUrl: config.baseUrl,
             fetcher,
             clientId: config.clientId,
+            systemKey: config.systemKey,
         });
         this.sessionManager = new SessionManagerImpl();
         if (config.accessToken) {
@@ -56,6 +59,11 @@ class IdentityClient {
         this.device = new DeviceModule({
             transport: this.transport,
             session: this.sessionManager,
+        });
+        this.totp = new TOTPModule({
+            transport: this.transport,
+            session: this.sessionManager,
+            config: config.totp,
         });
     }
 }
