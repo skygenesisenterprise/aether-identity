@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { CreateIdentityClient } from "aether-identity"
+// import { CreateIdentityClient } from "aether-identity";
 
 export default function RegisterPage() {
   const [step, setStep] = useState<"email" | "password" | "confirm">("email");
@@ -103,8 +103,7 @@ export default function RegisterPage() {
         if (state) queryParams.set("state", state);
       }
 
-      const redirectUrl = `/login${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
-      router.push(redirectUrl);
+      router.push("/register/confirmed");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue");
     } finally {

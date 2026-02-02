@@ -2,7 +2,7 @@
 
 import { CheckCircle } from "lucide-react";
 
-export default function ConnectedPage() {
+export default function Confirmed() {
   return (
     <div className="min-h-screen relative bg-[#e8eef4] flex items-center justify-center p-4">
       {/* Background pattern - subtle hexagon shapes */}
@@ -41,7 +41,7 @@ export default function ConnectedPage() {
 
       {/* Main card container */}
       <div className="relative z-10 w-full max-w-md">
-        {/* Connected card */}
+        {/* Confirmed card */}
         <div className="bg-white rounded-sm shadow-lg p-11 mb-4">
           <div className="mb-6">
             <span className="text-[15px] font-semibold text-[#5e5e5e]">
@@ -58,14 +58,14 @@ export default function ConnectedPage() {
 
           {/* Title */}
           <h1 className="text-2xl font-semibold mb-4 text-[#1b1b1b] text-center">
-            Successfully Connected
+            Successfully Registered
           </h1>
 
           {/* Message */}
           <div className="text-center space-y-4">
             <p className="text-[15px] text-[#1b1b1b]">
-              You have been successfully authenticated and connected to your
-              account.
+              Your account has been successfully created and you have been
+              authenticated.
             </p>
             <p className="text-[13px] text-[#605e5c]">
               You can now close this window and return to your application. Your
