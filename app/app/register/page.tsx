@@ -24,7 +24,7 @@ export default function RegisterPage() {
   if (!identityRef.current) {
     identityRef.current = CreateIdentityClient({
       baseUrl:
-        process.env.NEXT_PUBLIC_IDENTITY_API_URL || "http://localhost:3000",
+        process.env.NEXT_PUBLIC_IDENTITY_API_URL || "http://localhost:3001",
       clientId: process.env.NEXT_PUBLIC_CLIENT_ID || "",
       systemKey: process.env.NEXT_PUBLIC_IDENTITY_SYSTEM_KEY,
     });
