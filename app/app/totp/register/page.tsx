@@ -18,6 +18,7 @@ export default function TotpRegisterPage() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState("");
   const [verified, setVerified] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   const router = useRouter();
   const identityRef = useRef<IdentityClient | null>(null);
@@ -49,8 +50,17 @@ export default function TotpRegisterPage() {
 
       const setup = await identity.totp.setup();
       setTotpSetup(setup);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to setup TOTP");
+    } catch {
+      // Generate demo TOTP data for preview mode with valid base32 secret
+      // Base32 only allows A-Z and 2-7
+      const demoSecret = "JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP";
+      const demoUrl = `otpauth://totp/Sky%20Genesis%20Enterprise:user@demo.local?secret=${demoSecret}&issuer=Sky%20Genesis%20Enterprise&algorithm=SHA1&digits=6&period=30`;
+      setTotpSetup({
+        secret: demoSecret,
+        qrCode: "",
+        url: demoUrl,
+      });
+      setIsDemoMode(true);
     } finally {
       setIsLoading(false);
     }
@@ -59,6 +69,14 @@ export default function TotpRegisterPage() {
   const handleTotpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (isDemoMode) {
+      setError(
+        "La vérification n'est pas disponible en mode aperçu. Veuillez vous connecter pour activer l'authentification à deux facteurs.",
+      );
+      return;
+    }
+
     setIsVerifying(true);
 
     try {
@@ -211,10 +229,10 @@ export default function TotpRegisterPage() {
       </div>
 
       <div className="relative z-10 w-full max-w-md">
-        <div className="bg-white rounded-sm shadow-lg p-11 mb-4">
+        <div className="bg-white rounded-sm shadow-lg p-6 mb-4">
           <button
             onClick={handleBack}
-            className="flex items-center gap-1 mb-6 text-[13px] text-[#0067b8] hover:underline"
+            className="flex items-center gap-1 mb-3 text-[13px] text-[#0067b8] hover:underline"
           >
             <ChevronLeft className="w-4 h-4" />
             Retour
@@ -223,31 +241,39 @@ export default function TotpRegisterPage() {
           <h1 className="text-2xl font-semibold mb-2 text-[#1b1b1b]">
             Configurer l&apos;authentification à deux facteurs
           </h1>
-          <p className="text-[15px] text-[#605e5c] mb-6">
+          <p className="text-[15px] text-[#605e5c] mb-4">
             Scannez ce code QR avec votre application d&apos;authentification
             (Google Authenticator, Microsoft Authenticator, etc.)
           </p>
 
-          {error && (
-            <div className="mb-4 p-3 bg-[#ffebee] border border-[#ffcdd2] rounded text-[13px] text-[#c62828]">
+          {isDemoMode && (
+            <div className="mb-3 p-2 bg-[#fff3e0] border border-[#ffe0b2] rounded text-[13px] text-[#e65100]">
+              <strong>Mode Aperçu :</strong> Aucune connexion détectée. Ce QR
+              code est une démonstration. Connectez-vous pour configurer
+              réellement l&apos;authentification à deux facteurs.
+            </div>
+          )}
+
+          {error && !isDemoMode && (
+            <div className="mb-3 p-2 bg-[#ffebee] border border-[#ffcdd2] rounded text-[13px] text-[#c62828]">
               {error}
             </div>
           )}
 
           {totpSetup && (
             <>
-              <div className="flex justify-center mb-6 p-4 bg-white border border-[#edebe9] rounded">
+              <div className="flex justify-center mb-4 p-2 bg-white border border-[#edebe9] rounded">
                 <QRCodeSVG
                   value={totpSetup.url}
-                  size={200}
+                  size={180}
                   level="H"
                   includeMargin={true}
                 />
               </div>
 
-              <div className="mb-6 p-4 bg-[#f3f2f1] rounded text-[13px] text-[#605e5c]">
-                <p className="font-medium mb-2 text-[#1b1b1b]">Clé secrète :</p>
-                <p className="font-mono break-all mb-4">{totpSetup.secret}</p>
+              <div className="mb-4 p-3 bg-[#f3f2f1] rounded text-[13px] text-[#605e5c]">
+                <p className="font-medium mb-1 text-[#1b1b1b]">Clé secrète :</p>
+                <p className="font-mono break-all mb-2">{totpSetup.secret}</p>
                 <p className="text-xs">
                   Si vous ne pouvez pas scanner le code QR, entrez cette clé
                   manuellement dans votre application d&apos;authentification.
@@ -255,7 +281,7 @@ export default function TotpRegisterPage() {
               </div>
 
               <form onSubmit={handleTotpSubmit}>
-                <div className="mb-4">
+                <div className="mb-3">
                   <input
                     type="text"
                     value={totpCode}
