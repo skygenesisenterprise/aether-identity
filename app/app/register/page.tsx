@@ -6,11 +6,22 @@ import { useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { CreateIdentityClient, IdentityClient } from "aether-identity";
 
 export default function RegisterPage() {
   const [step, setStep] = useState<"email" | "password" | "confirm">("email");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [domain, setDomain] = useState("aethermail.fr");
+  const [availableDomains] = useState<string[]>([
+    "aethermail.fr",
+    "aethermail.me",
+    "aethermail.be",
+    "aethermail.de",
+    "aethermail.ch",
+    "aethermail.eu",
+  ]);
+  const [isDomainOpen, setIsDomainOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -18,7 +29,6 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
-  const searchParams = useSearchParams();
   const identityRef = useRef<IdentityClient | null>(null);
 
   if (!identityRef.current) {
@@ -30,26 +40,61 @@ export default function RegisterPage() {
     });
   }
 
-  // Récupérer les paramètres OAuth depuis l'URL
-  const isOAuth = searchParams.get("oauth") === "true";
-  const clientId = searchParams.get("client_id");
-  const redirectUri = searchParams.get("redirect_uri");
-  const responseType = searchParams.get("response_type");
-  const scope = searchParams.get("scope");
-  const state = searchParams.get("state");
+  // Dropdown animations
+  const dropdownVariants = {
+    open: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        when: "beforeChildren",
+        staggerChildren: 0.07,
+        delayChildren: 0.05,
+      },
+    },
+    closed: {
+      opacity: 0,
+      scale: 0.95,
+      transition: {
+        when: "afterChildren",
+      },
+    },
+  };
 
-  // Préparer les paramètres OAuth pour la redirection
-  const oauthParams = {
-    client_id: clientId,
-    redirect_uri: redirectUri,
-    response_type: responseType,
-    scope: scope,
-    state: state,
+  const optionVariants = {
+    open: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        y: {
+          type: "spring" as const,
+          stiffness: 500,
+          damping: 35,
+        },
+      },
+    },
+    closed: {
+      opacity: 0,
+      y: 10,
+    },
+  };
+
+  const handleDomainClick = (selectedDomain: string) => {
+    setDomain(selectedDomain);
+    setIsDomainOpen(false);
+  };
+
+  const handleDomainToggle = () => {
+    setIsDomainOpen(!isDomainOpen);
+  };
+
+  const getFullEmail = () => {
+    if (!username.trim()) return " ";
+    return `${username.trim()}@${domain}`;
   };
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (username.trim()) {
       setIsTransitioning(true);
       setTimeout(() => {
         setStep("password");
@@ -90,7 +135,7 @@ export default function RegisterPage() {
       }
 
       await identity.auth.register({
-        email,
+        email: `${username.trim()}@${domain}`,
         password,
       });
 
@@ -181,16 +226,77 @@ export default function RegisterPage() {
 
               {/* Form */}
               <form onSubmit={handleEmailSubmit}>
-                {/* Email input */}
+                {/* Email input with username and domain selector */}
                 <div className="mb-4">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Adresse e-mail"
-                    required
-                    className="w-full px-3 py-2 border border-[#8a8886] bg-white text-[15px] text-[#1b1b1b] placeholder:text-[#605e5c] focus:outline-none focus:border-[#0067b8] focus:border-2 hover:border-[#323130] transition-colors"
-                  />
+                  {/* Username and Domain on same line */}
+                  <div className="flex items-stretch w-full">
+                    {/* Username input */}
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="nomutilisateur"
+                      required
+                      className="flex-1 min-w-0 px-3 py-2 border border-r-0 border-[#8a8886] bg-white text-[15px] text-[#1b1b1b] placeholder:text-[#605e5c] focus:outline-none focus:border-[#0067b8] focus:border-2 focus:border-r-2 focus:z-10 hover:border-[#323130] transition-colors"
+                    />
+                    {/* Domain selector */}
+                    <div className="relative shrink-0">
+                      <motion.button
+                        type="button"
+                        onClick={handleDomainToggle}
+                        className="h-full px-3 py-2 border border-[#8a8886] bg-white text-[15px] text-[#1b1b1b] hover:border-[#323130] transition-colors flex items-center justify-between min-w-[140px] max-w-[180px]"
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                      >
+                        <span className="flex items-center gap-1 overflow-hidden">
+                          <span className="text-[#605e5c] shrink-0">@</span>
+                          <span className="truncate">{domain}</span>
+                        </span>
+                        <svg
+                          className={`w-4 h-4 shrink-0 ml-1 transition-transform duration-200 ${isDomainOpen ? "rotate-180" : ""}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </motion.button>
+                      <AnimatePresence>
+                        {isDomainOpen && (
+                          <motion.div
+                            initial="closed"
+                            animate="open"
+                            exit="closed"
+                            className="absolute right-0 z-10 w-56 mt-1 bg-white border border-[#8a8886] rounded-sm shadow-lg max-h-60 overflow-auto"
+                            variants={dropdownVariants}
+                          >
+                            {availableDomains.map((domainOption) => (
+                              <motion.button
+                                key={domainOption}
+                                onClick={() => handleDomainClick(domainOption)}
+                                className="w-full px-4 py-2 text-left text-[15px] text-[#1b1b1b] hover:bg-[#f8f8f8] transition-colors"
+                                variants={optionVariants}
+                              >
+                                {domainOption}
+                              </motion.button>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+
+                  {/* Email preview */}
+                  <div className="mt-2 text-[13px] text-[#605e5c] text-center">
+                    {username.trim()
+                      ? `Votre adresse : ${username.trim()}@${domain}`
+                      : "Entrez votre nom d'utilisateur"}
+                  </div>
                 </div>
 
                 {/* Links */}
@@ -233,7 +339,7 @@ export default function RegisterPage() {
                 className="flex items-center gap-1 mb-6 text-[13px] text-[#0067b8] hover:underline"
               >
                 <ChevronLeft className="w-4 h-4" />
-                {email}
+                {getFullEmail()}
               </button>
 
               <h1 className="text-2xl font-semibold mb-4 text-[#1b1b1b]">
@@ -296,7 +402,7 @@ export default function RegisterPage() {
                 className="flex items-center gap-1 mb-6 text-[13px] text-[#0067b8] hover:underline"
               >
                 <ChevronLeft className="w-4 h-4" />
-                {email}
+                {getFullEmail()}
               </button>
 
               <h1 className="text-2xl font-semibold mb-4 text-[#1b1b1b]">
