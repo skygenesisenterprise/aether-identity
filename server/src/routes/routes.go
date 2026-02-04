@@ -11,6 +11,9 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 	// Middleware CORS adaptatif global
 	router.Use(middleware.AdaptiveCORSMiddleware())
 
+	// Créer le contrôleur d'authentification externe
+	externalAuthController := controllers.NewExternalAuthController()
+
 	// API versioning
 	apiV1 := router.Group("/api/v1")
 	{
@@ -36,6 +39,11 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 				authRoutes.POST("/token", controllers.Token)
 				authRoutes.GET("/authorize", controllers.AuthorizationHandler)
 				authRoutes.GET("/discord/callback", controllers.DiscordCallback)
+
+				// Routes OAuth externes (Social Login)
+				authRoutes.GET("/external/providers", externalAuthController.GetEnabledProviders)
+				authRoutes.GET("/external/:provider", externalAuthController.InitiateOAuth)
+				authRoutes.GET("/external/:provider/callback", externalAuthController.HandleOAuthCallback)
 
 				// Email verification
 				authRoutes.POST("/send-verification", controllers.SendEmailVerification)
@@ -103,6 +111,10 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 				userRoutes.GET(":id", controllers.GetUser)
 				userRoutes.PUT(":id", controllers.UpdateUser)
 				userRoutes.DELETE(":id", controllers.DeleteUser)
+
+				// Routes pour les comptes externes liés
+				userRoutes.GET("/me/external-accounts", externalAuthController.GetLinkedAccounts)
+				userRoutes.DELETE("/me/external-accounts/:provider", externalAuthController.UnlinkAccount)
 			}
 
 			// Routes admin pour la gestion des utilisateurs
@@ -111,6 +123,14 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 			{
 				adminUserRoutes.GET("", controllers.ListUsers)
 				adminUserRoutes.POST("", controllers.CreateUserAdmin)
+			}
+
+			// Routes admin pour la gestion OAuth
+			adminOAuthRoutes := protectedV1.Group("/admin/oauth")
+			adminOAuthRoutes.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
+			{
+				adminOAuthRoutes.GET("/external-accounts/migration-status", externalAuthController.GetMigrationStatus)
+				adminOAuthRoutes.POST("/external-accounts/migrate", externalAuthController.MigrateExternalAccounts)
 			}
 
 			// Route pour vérifier la disponibilité d'un email
