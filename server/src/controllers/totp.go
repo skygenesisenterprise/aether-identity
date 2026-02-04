@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -66,7 +67,7 @@ func VerifyTOTPCode(c *gin.Context) {
 	}
 
 	totpService := services.NewTOTPService(services.DB)
-	
+
 	// Vérifier le code TOTP
 	valid, err := totpService.VerifyTOTPCode(verifyRequest.Code, verifyRequest.Secret)
 	if err != nil {
@@ -75,7 +76,7 @@ func VerifyTOTPCode(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	if !valid {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "Invalid TOTP code",
@@ -84,7 +85,7 @@ func VerifyTOTPCode(c *gin.Context) {
 	}
 
 	// Si le code est valide, activer le 2FA pour l'utilisateur
-	if err := totpService.EnableTOTP(userID, verifyRequest.Secret); err != nil {
+	if err := totpService.EnableTOTP(fmt.Sprintf("%d", userID), verifyRequest.Secret); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to enable TOTP",
 		})
@@ -107,7 +108,7 @@ func DisableTOTP(c *gin.Context) {
 	}
 
 	totpService := services.NewTOTPService(services.DB)
-	if err := totpService.DisableTOTP(userID); err != nil {
+	if err := totpService.DisableTOTP(fmt.Sprintf("%d", userID)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to disable TOTP",
 		})
@@ -208,7 +209,7 @@ func GetTOTPStatus(c *gin.Context) {
 	}
 
 	totpService := services.NewTOTPService(services.DB)
-	enabled, err := totpService.GetTOTPStatus(userID)
+	enabled, err := totpService.GetTOTPStatus(fmt.Sprintf("%d", userID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to retrieve TOTP status",

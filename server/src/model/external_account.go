@@ -135,6 +135,7 @@ type OAuthState struct {
 	RedirectURI  *string   `gorm:"size:500;column:redirect_uri" json:"redirectUri,omitempty"`
 	CodeVerifier *string   `gorm:"size:255;column:code_verifier" json:"codeVerifier,omitempty"`
 	UserID       *string   `gorm:"type:uuid;column:user_id;index" json:"userId,omitempty"`
+	Action       *string   `gorm:"size:50;column:action" json:"action,omitempty"`
 	ExpiresAt    time.Time `gorm:"column:expires_at" json:"expiresAt"`
 	CreatedAt    time.Time `gorm:"column:created_at" json:"createdAt"`
 }

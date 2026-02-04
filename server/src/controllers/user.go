@@ -22,7 +22,7 @@ func GetUser(c *gin.Context) {
 
 	// Récupérer l'utilisateur depuis la base de données
 	userService := services.NewUserService(services.DB)
-	user, err := userService.GetUserByID(uint(userID))
+	user, err := userService.GetUserByID(strconv.FormatUint(userID, 10))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "User not found",
@@ -58,7 +58,7 @@ func UpdateUser(c *gin.Context) {
 
 	// Récupérer l'utilisateur existant
 	userService := services.NewUserService(services.DB)
-	user, err := userService.GetUserByID(uint(userID))
+	user, err := userService.GetUserByID(strconv.FormatUint(userID, 10))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "User not found",
@@ -67,22 +67,29 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	// Mettre à jour les champs
-	if updateData.Name != "" {
-		user.Name = updateData.Name
+	name := updateData.Name
+	email := updateData.Email
+	if name != "" {
+		user.Name = &name
 	}
-	if updateData.Email != "" {
-		user.Email = updateData.Email
+	if email != "" {
+		user.Email = &email
 	}
 	if updateData.Password != "" {
-		user.Password = updateData.Password
-	}
-
-	// Sauvegarder les modifications
-	if err := userService.UpdateUser(user); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to update user",
-		})
-		return
+		password := updateData.Password
+		if err := userService.UpdateUser(user, &password); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to update user",
+			})
+			return
+		}
+	} else {
+		if err := userService.UpdateUser(user, nil); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to update user",
+			})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, user.ToResponse())
@@ -100,7 +107,7 @@ func DeleteUser(c *gin.Context) {
 
 	// Supprimer l'utilisateur
 	userService := services.NewUserService(services.DB)
-	if err := userService.DeleteUser(uint(userID)); err != nil {
+	if err := userService.DeleteUser(strconv.FormatUint(userID, 10)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to delete user",
 		})
@@ -120,7 +127,6 @@ func ListUsers(c *gin.Context) {
 
 	// Récupérer les filtres
 	filter := services.ListUsersFilter{
-		Role:      c.Query("role"),
 		Search:    c.Query("search"),
 		SortBy:    c.Query("sort_by"),
 		SortOrder: c.Query("sort_order"),

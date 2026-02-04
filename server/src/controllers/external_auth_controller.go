@@ -1,14 +1,24 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/skygenesisenterprise/aether-identity/server/src/config"
 	"github.com/skygenesisenterprise/aether-identity/server/src/model"
 	"github.com/skygenesisenterprise/aether-identity/server/src/services"
 )
+
+func uintFromStringPtr(s *string) uint {
+	if s == nil {
+		return 0
+	}
+	val, _ := strconv.ParseUint(*s, 10, 32)
+	return uint(val)
+}
 
 // ExternalAuthController gère les endpoints OAuth externes
 type ExternalAuthController struct {
@@ -118,11 +128,18 @@ func (ctrl *ExternalAuthController) HandleOAuthCallback(c *gin.Context) {
 	}
 
 	// Traiter selon l'action
-	switch oauthState.Action {
+	if oauthState.Action == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid action"})
+		return
+	}
+
+	switch *oauthState.Action {
 	case "login":
 		ctrl.handleLoginOAuth(c, provider, userInfo, tokenResult)
 	case "link":
-		ctrl.handleLinkOAuth(c, provider, oauthState.UserID, userInfo, tokenResult)
+		userIDVal := uintFromStringPtr(oauthState.UserID)
+		userID := &userIDVal
+		ctrl.handleLinkOAuth(c, provider, userID, userInfo, tokenResult)
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid action"})
 	}
@@ -194,7 +211,7 @@ func (ctrl *ExternalAuthController) handleLinkOAuth(c *gin.Context, provider str
 	}
 
 	// Lier le compte
-	err := ctrl.externalAuthService.LinkExternalAccount(*userID, provider, userInfo, tokenResult)
+	err := ctrl.externalAuthService.LinkExternalAccount(fmt.Sprintf("%d", *userID), provider, userInfo, tokenResult)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to link account", "details": err.Error()})
 		return
@@ -235,7 +252,7 @@ func (ctrl *ExternalAuthController) UnlinkAccount(c *gin.Context) {
 
 	provider := c.Param("provider")
 
-	err := ctrl.externalAuthService.UnlinkExternalAccount(userID.(uint), provider)
+	err := ctrl.externalAuthService.UnlinkExternalAccount(fmt.Sprintf("%d", userID.(uint)), provider)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

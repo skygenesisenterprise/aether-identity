@@ -67,10 +67,12 @@ func (s *ExternalAuthService) GenerateOAuthURL(provider, action string, userID *
 	}
 
 	// Sauvegarder le state en base
+	actionStr := action
 	oauthState := &model.OAuthState{
 		State:     state,
 		Provider:  provider,
 		UserID:    userIDStr,
+		Action:    &actionStr,
 		ExpiresAt: time.Now().Add(10 * time.Minute),
 	}
 

@@ -31,7 +31,7 @@ func SendEmailVerification(c *gin.Context) {
 
 	// Créer le token de vérification
 	emailService := services.NewEmailService(services.DB)
-	verification, err := emailService.CreateEmailVerification(user.ID)
+	verification, err := emailService.CreateEmailVerification(user.ID, request.Email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to create verification token",
@@ -40,7 +40,7 @@ func SendEmailVerification(c *gin.Context) {
 	}
 
 	// Envoyer l'email
-	if err := emailService.SendEmailVerificationEmail(user.Email, verification.Token); err != nil {
+	if err := emailService.SendEmailVerificationEmail(*user.Email, verification.Token); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to send verification email",
 		})

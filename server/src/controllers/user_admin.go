@@ -88,15 +88,15 @@ func CreateUserAdmin(c *gin.Context) {
 	}
 
 	// Créer l'utilisateur
+	name := req.Name
+	email := req.Email
 	user := &model.User{
-		Name:     req.Name,
-		Email:    req.Email,
-		Password: req.Password,
-		Role:     role,
+		Name:     &name,
+		Email:    &email,
 		IsActive: req.IsActive,
 	}
 
-	if err := userService.CreateUser(user); err != nil {
+	if err := userService.CreateUser(user, req.Password); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"error":   "Failed to create user: " + err.Error(),
