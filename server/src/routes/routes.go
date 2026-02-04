@@ -3,16 +3,21 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/skygenesisenterprise/aether-identity/server/src/controllers"
+	"github.com/skygenesisenterprise/aether-identity/server/src/interfaces"
 	"github.com/skygenesisenterprise/aether-identity/server/src/middleware"
 	"github.com/skygenesisenterprise/aether-identity/server/src/services"
 )
 
-func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *services.ServiceKeyService) {
+// SetupRoutes configure toutes les routes de l'application
+func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *services.ServiceKeyService, dbService interfaces.IDatabaseService) {
 	// Middleware CORS adaptatif global
 	router.Use(middleware.AdaptiveCORSMiddleware())
 
 	// Créer le contrôleur d'authentification externe
 	externalAuthController := controllers.NewExternalAuthController()
+
+	// Créer le contrôleur de base de données
+	databaseController := controllers.NewDatabaseController(dbService)
 
 	// API versioning
 	apiV1 := router.Group("/api/v1")
@@ -26,8 +31,20 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 		// All other /api/v1/* routes must be accompanied by the system key
 		protectedV1 := apiV1.Group("")
 		protectedV1.Use(middleware.AppAuth(systemKey))
-		protectedV1.Use(middleware.DatabaseMiddleware())
+		protectedV1.Use(middleware.DatabaseMiddleware(dbService))
 		{
+			// Database management routes (admin only)
+			databaseRoutes := protectedV1.Group("/database")
+			databaseRoutes.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
+			{
+				databaseRoutes.GET("/status", databaseController.GetStatus)
+				databaseRoutes.GET("/stats", databaseController.GetStats)
+				databaseRoutes.GET("/tables", databaseController.GetTables)
+				databaseRoutes.GET("/tables/:tableName/schema", databaseController.GetTableSchema)
+				databaseRoutes.POST("/migrate", databaseController.Migrate)
+				databaseRoutes.POST("/maintenance", databaseController.Maintenance)
+			}
+
 			// Authentication routes - protégées par Service Key
 			authRoutes := protectedV1.Group("/auth")
 			authRoutes.Use(middleware.ServiceKeyAuth(serviceKeyService, systemKey))
@@ -171,7 +188,7 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 	// Routes OAuth2/OpenID Connect (accessibles directement sous /oauth)
 	// Note: Les routes équivalentes sous /api/v1/oauth2 sont maintenant protégées par le system key
 	oauthRoutes := router.Group("/oauth")
-	oauthRoutes.Use(middleware.DatabaseMiddleware())
+	oauthRoutes.Use(middleware.DatabaseMiddleware(dbService))
 	{
 		oauthRoutes.GET("/authorize", controllers.AuthorizationHandler)
 		oauthRoutes.POST("/token", controllers.TokenHandler)

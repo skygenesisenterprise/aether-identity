@@ -2,64 +2,119 @@ package model
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // OAuthClient représente un client OAuth2/OpenID Connect
 type OAuthClient struct {
-	ID             uint      `json:"id" gorm:"primaryKey"`
-	ClientID       string    `json:"clientId" gorm:"unique;not null"`
-	ClientSecret   string    `json:"clientSecret" gorm:"not null"`
-	Name           string    `json:"name" gorm:"not null"`
-	RedirectURIs   []string  `json:"redirectUris" gorm:"type:text[]"`
-	GrantTypes     []string  `json:"grantTypes" gorm:"type:text[]"`
-	Scopes         []string  `json:"scopes" gorm:"type:text[]"`
-	PostLoginPath  string    `json:"postLoginPath" gorm:"default:/"`    // Chemin après login
-	PostLogoutPath string    `json:"postLogoutPath" gorm:"default:/"`   // Chemin après logout
-	AllowedOrigins []string  `json:"allowedOrigins" gorm:"type:text[]"` // CORS origins autorisées
-	CreatedAt      time.Time `json:"createdAt" gorm:"autoCreateTime"`
-	UpdatedAt      time.Time `json:"updatedAt" gorm:"autoUpdateTime"`
+	ID             string    `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	ClientID       string    `gorm:"size:255;uniqueIndex;not null;column:client_id" json:"clientId"`
+	ClientSecret   string    `gorm:"size:255;not null;column:client_secret" json:"clientSecret"`
+	Name           string    `gorm:"size:255;not null" json:"name"`
+	Description    *string   `gorm:"type:text" json:"description,omitempty"`
+	RedirectURIs   []string  `gorm:"type:text[];column:redirect_uris" json:"redirectUris"`
+	GrantTypes     []string  `gorm:"type:text[];column:grant_types" json:"grantTypes"`
+	Scopes         []string  `gorm:"type:text[]" json:"scopes"`
+	PostLoginPath  string    `gorm:"size:255;default:/;column:post_login_path" json:"postLoginPath"`
+	PostLogoutPath string    `gorm:"size:255;default:/;column:post_logout_path" json:"postLogoutPath"`
+	AllowedOrigins []string  `gorm:"type:text[];column:allowed_origins" json:"allowedOrigins"`
+	IsActive       bool      `gorm:"default:true;column:is_active" json:"isActive"`
+	CreatedAt      time.Time `gorm:"column:created_at" json:"createdAt"`
+	UpdatedAt      time.Time `gorm:"column:updated_at" json:"updatedAt"`
+
+	AuthorizationCodes []OAuthAuthorizationCode
+	AccessTokens       []OAuthAccessToken
+	RefreshTokens      []OAuthRefreshToken
+	Consents           []OAuthConsent
+}
+
+func (OAuthClient) TableName() string {
+	return "oauth_clients"
 }
 
 // OAuthAuthorizationCode représente un code d'autorisation OAuth2
 type OAuthAuthorizationCode struct {
-	ID          uint      `json:"id" gorm:"primaryKey"`
-	Code        string    `json:"code" gorm:"unique;not null"`
-	ClientID    string    `json:"clientId" gorm:"not null"`
-	UserID      uint      `json:"userId" gorm:"not null"`
-	RedirectURI string    `json:"redirectUri" gorm:"not null"`
-	Scopes      []string  `json:"scopes" gorm:"type:text[]"`
-	ExpiresAt   time.Time `json:"expiresAt" gorm:"not null"`
-	CreatedAt   time.Time `json:"createdAt" gorm:"autoCreateTime"`
+	ID            string     `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	Code          string     `gorm:"size:255;uniqueIndex;not null" json:"code"`
+	ClientID      string     `gorm:"size:255;not null;column:client_id;index" json:"clientId"`
+	UserID        string     `gorm:"type:uuid;not null;column:user_id;index" json:"userId"`
+	RedirectURI   string     `gorm:"size:500;not null;column:redirect_uri" json:"redirectUri"`
+	Scopes        []string   `gorm:"type:text[]" json:"scopes"`
+	CodeChallenge *string    `gorm:"size:255;column:code_challenge" json:"codeChallenge,omitempty"`
+	CodeMethod    *string    `gorm:"size:20;column:code_method" json:"codeMethod,omitempty"`
+	ExpiresAt     time.Time  `gorm:"column:expires_at" json:"expiresAt"`
+	Used          bool       `gorm:"default:false" json:"used"`
+	UsedAt        *time.Time `gorm:"column:used_at" json:"usedAt,omitempty"`
+	CreatedAt     time.Time  `gorm:"column:created_at" json:"createdAt"`
+
+	Client OAuthClient `gorm:"foreignKey:ClientID"`
+	User   User        `gorm:"foreignKey:UserID"`
+}
+
+func (OAuthAuthorizationCode) TableName() string {
+	return "oauth_authorization_codes"
 }
 
 // OAuthAccessToken représente un token d'accès OAuth2
 type OAuthAccessToken struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	Token     string    `json:"token" gorm:"unique;not null"`
-	ClientID  string    `json:"clientId" gorm:"not null"`
-	UserID    uint      `json:"userId" gorm:"not null"`
-	Scopes    []string  `json:"scopes" gorm:"type:text[]"`
-	ExpiresAt time.Time `json:"expiresAt" gorm:"not null"`
-	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
+	ID        string         `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	Token     string         `gorm:"size:500;uniqueIndex;not null" json:"token"`
+	ClientID  string         `gorm:"size:255;not null;column:client_id;index" json:"clientId"`
+	UserID    string         `gorm:"type:uuid;not null;column:user_id;index" json:"userId"`
+	Scopes    []string       `gorm:"type:text[]" json:"scopes"`
+	ExpiresAt time.Time      `gorm:"column:expires_at" json:"expiresAt"`
+	Revoked   bool           `gorm:"default:false" json:"revoked"`
+	RevokedAt *time.Time     `gorm:"column:revoked_at" json:"revokedAt,omitempty"`
+	CreatedAt time.Time      `gorm:"column:created_at" json:"createdAt"`
+	DeletedAt gorm.DeletedAt `gorm:"index;column:deleted_at" json:"-"`
+
+	Client OAuthClient `gorm:"foreignKey:ClientID"`
+	User   User        `gorm:"foreignKey:UserID"`
+}
+
+func (OAuthAccessToken) TableName() string {
+	return "oauth_access_tokens"
 }
 
 // OAuthRefreshToken représente un token de rafraîchissement OAuth2
 type OAuthRefreshToken struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	Token     string    `json:"token" gorm:"unique;not null"`
-	ClientID  string    `json:"clientId" gorm:"not null"`
-	UserID    uint      `json:"userId" gorm:"not null"`
-	ExpiresAt time.Time `json:"expiresAt" gorm:"not null"`
-	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
+	ID        string         `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	Token     string         `gorm:"size:500;uniqueIndex;not null" json:"token"`
+	ClientID  string         `gorm:"size:255;not null;column:client_id;index" json:"clientId"`
+	UserID    string         `gorm:"type:uuid;not null;column:user_id;index" json:"userId"`
+	Scopes    []string       `gorm:"type:text[]" json:"scopes"`
+	ExpiresAt time.Time      `gorm:"column:expires_at" json:"expiresAt"`
+	Revoked   bool           `gorm:"default:false" json:"revoked"`
+	RevokedAt *time.Time     `gorm:"column:revoked_at" json:"revokedAt,omitempty"`
+	CreatedAt time.Time      `gorm:"column:created_at" json:"createdAt"`
+	DeletedAt gorm.DeletedAt `gorm:"index;column:deleted_at" json:"-"`
+
+	Client OAuthClient `gorm:"foreignKey:ClientID"`
+	User   User        `gorm:"foreignKey:UserID"`
+}
+
+func (OAuthRefreshToken) TableName() string {
+	return "oauth_refresh_tokens"
 }
 
 // OAuthConsent représente le consentement de l'utilisateur
 type OAuthConsent struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	UserID    uint      `json:"userId" gorm:"not null"`
-	ClientID  string    `json:"clientId" gorm:"not null"`
-	Scopes    []string  `json:"scopes" gorm:"type:text[]"`
-	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
+	ID        string     `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	UserID    string     `gorm:"type:uuid;not null;column:user_id;index" json:"userId"`
+	ClientID  string     `gorm:"size:255;not null;column:client_id;index" json:"clientId"`
+	Scopes    []string   `gorm:"type:text[]" json:"scopes"`
+	GrantedAt time.Time  `gorm:"column:granted_at" json:"grantedAt"`
+	ExpiresAt *time.Time `gorm:"column:expires_at" json:"expiresAt,omitempty"`
+	CreatedAt time.Time  `gorm:"column:created_at" json:"createdAt"`
+	UpdatedAt time.Time  `gorm:"column:updated_at" json:"updatedAt"`
+
+	User   User        `gorm:"foreignKey:UserID"`
+	Client OAuthClient `gorm:"foreignKey:ClientID"`
+}
+
+func (OAuthConsent) TableName() string {
+	return "oauth_consents"
 }
 
 // AuthorizationRequest représente une requête d'autorisation OAuth2
@@ -99,10 +154,10 @@ type TokenResponse struct {
 // UserInfoResponse représente une réponse d'information utilisateur OpenID Connect
 type UserInfoResponse struct {
 	Sub           string   `json:"sub"`
-	Name          string   `json:"name,omitempty"`
-	Email         string   `json:"email,omitempty"`
+	Name          *string  `json:"name,omitempty"`
+	Email         *string  `json:"email,omitempty"`
 	EmailVerified bool     `json:"email_verified,omitempty"`
-	GivenName     string   `json:"given_name,omitempty"`
-	FamilyName    string   `json:"family_name,omitempty"`
+	GivenName     *string  `json:"given_name,omitempty"`
+	FamilyName    *string  `json:"family_name,omitempty"`
 	Roles         []string `json:"roles,omitempty"`
 }

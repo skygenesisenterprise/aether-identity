@@ -11,27 +11,26 @@ import (
 
 // CreateDomainRequest représente une requête de création de domaine
 type CreateDomainRequest struct {
-	Name        string  `json:"name" binding:"required"`
-	DisplayName string  `json:"displayName" binding:"required"`
-	IsInternal  bool    `json:"isInternal"`
-	OwnerID     *uint   `json:"ownerId,omitempty"`
-	OwnerType   string  `json:"ownerType"`
-	Notes       string  `json:"notes,omitempty"`
+	Name        string `json:"name" binding:"required"`
+	DisplayName string `json:"displayName" binding:"required"`
+	IsInternal  bool   `json:"isInternal"`
+	OwnerID     *uint  `json:"ownerId,omitempty"`
+	OwnerType   string `json:"ownerType"`
+	Notes       string `json:"notes,omitempty"`
 }
 
 // DomainResponse représente une réponse de domaine
 type DomainResponse struct {
-	ID          uint    `json:"id"`
-	Name        string  `json:"name"`
-	DisplayName string  `json:"displayName"`
-	IsInternal  bool    `json:"isInternal"`
-	IsActive    bool    `json:"isActive"`
-	OwnerID     *uint   `json:"ownerId,omitempty"`
-	OwnerType   string  `json:"ownerType"`
-	CreatedAt   string  `json:"createdAt"`
-	UpdatedAt   string  `json:"updatedAt"`
-	UserCount   int     `json:"userCount"`
-	IsVerified  bool    `json:"isVerified"`
+	ID             string `json:"id"`
+	Name           string `json:"name"`
+	DisplayName    string `json:"displayName"`
+	IsInternal     bool   `json:"isInternal"`
+	IsActive       bool   `json:"isActive"`
+	OrganizationID string `json:"organizationId,omitempty"`
+	CreatedAt      string `json:"createdAt"`
+	UpdatedAt      string `json:"updatedAt"`
+	UserCount      int    `json:"userCount"`
+	IsVerified     bool   `json:"isVerified"`
 }
 
 // CreateDomain crée un nouveau domaine
@@ -48,14 +47,15 @@ func CreateDomain(c *gin.Context) {
 	domainService := services.NewDomainService(services.DB)
 
 	// Créer le domaine
+	displayName := req.DisplayName
+	notes := req.Notes
 	domain := &model.Domain{
-		Name:        req.Name,
-		DisplayName: req.DisplayName,
-		IsInternal:  req.IsInternal,
-		IsActive:    true,
-		OwnerID:     req.OwnerID,
-		OwnerType:   req.OwnerType,
-		Notes:       req.Notes,
+		Name:           req.Name,
+		DisplayName:    &displayName,
+		IsInternal:     req.IsInternal,
+		IsActive:       true,
+		OrganizationID: fmt.Sprintf("%d", *req.OwnerID),
+		Notes:          &notes,
 	}
 
 	if err := domainService.CreateDomain(domain); err != nil {
@@ -69,17 +69,16 @@ func CreateDomain(c *gin.Context) {
 	userCount, _ := domainService.GetDomainUserCount(domain.ID)
 
 	response := DomainResponse{
-		ID:          domain.ID,
-		Name:        domain.Name,
-		DisplayName: domain.DisplayName,
-		IsInternal:  domain.IsInternal,
-		IsActive:    domain.IsActive,
-		OwnerID:     domain.OwnerID,
-		OwnerType:   domain.OwnerType,
-		CreatedAt:   domain.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt:   domain.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UserCount:   userCount,
-		IsVerified:  false, // Nouveau domaine non vérifié
+		ID:             domain.ID,
+		Name:           domain.Name,
+		DisplayName:    *domain.DisplayName,
+		IsInternal:     domain.IsInternal,
+		IsActive:       domain.IsActive,
+		OrganizationID: domain.OrganizationID,
+		CreatedAt:      domain.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt:      domain.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UserCount:      userCount,
+		IsVerified:     false, // Nouveau domaine non vérifié
 	}
 
 	c.JSON(http.StatusCreated, response)
@@ -91,10 +90,7 @@ func GetDomain(c *gin.Context) {
 
 	domainService := services.NewDomainService(services.DB)
 
-	id := 0
-	fmt.Sscanf(domainID, "%d", &id)
-
-	domain, err := domainService.GetDomainByID(uint(id))
+	domain, err := domainService.GetDomainByID(domainID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Domain not found",
@@ -102,20 +98,19 @@ func GetDomain(c *gin.Context) {
 		return
 	}
 
-	userCount, _ := domainService.GetDomainUserCount(uint(id))
+	userCount, _ := domainService.GetDomainUserCount(domainID)
 
 	response := DomainResponse{
-		ID:          domain.ID,
-		Name:        domain.Name,
-		DisplayName: domain.DisplayName,
-		IsInternal:  domain.IsInternal,
-		IsActive:    domain.IsActive,
-		OwnerID:     domain.OwnerID,
-		OwnerType:   domain.OwnerType,
-		CreatedAt:   domain.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt:   domain.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UserCount:   userCount,
-		IsVerified:  domain.VerifiedAt != nil,
+		ID:             domain.ID,
+		Name:           domain.Name,
+		DisplayName:    *domain.DisplayName,
+		IsInternal:     domain.IsInternal,
+		IsActive:       domain.IsActive,
+		OrganizationID: domain.OrganizationID,
+		CreatedAt:      domain.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt:      domain.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UserCount:      userCount,
+		IsVerified:     domain.VerifiedAt != nil,
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -138,17 +133,16 @@ func ListDomains(c *gin.Context) {
 		userCount, _ := domainService.GetDomainUserCount(domain.ID)
 
 		responses = append(responses, DomainResponse{
-			ID:          domain.ID,
-			Name:        domain.Name,
-			DisplayName: domain.DisplayName,
-			IsInternal:  domain.IsInternal,
-			IsActive:    domain.IsActive,
-			OwnerID:     domain.OwnerID,
-			OwnerType:   domain.OwnerType,
-			CreatedAt:   domain.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-			UpdatedAt:   domain.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
-			UserCount:   userCount,
-			IsVerified:  domain.VerifiedAt != nil,
+			ID:             domain.ID,
+			Name:           domain.Name,
+			DisplayName:    *domain.DisplayName,
+			IsInternal:     domain.IsInternal,
+			IsActive:       domain.IsActive,
+			OrganizationID: domain.OrganizationID,
+			CreatedAt:      domain.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			UpdatedAt:      domain.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			UserCount:      userCount,
+			IsVerified:     domain.VerifiedAt != nil,
 		})
 	}
 
@@ -173,7 +167,7 @@ func UpdateDomain(c *gin.Context) {
 	fmt.Sscanf(domainID, "%d", &id)
 
 	// Récupérer le domaine existant
-	domain, err := domainService.GetDomainByID(uint(id))
+	domain, err := domainService.GetDomainByID(domainID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Domain not found",
@@ -182,11 +176,9 @@ func UpdateDomain(c *gin.Context) {
 	}
 
 	// Mettre à jour les champs
-	domain.DisplayName = req.DisplayName
+	domain.DisplayName = &req.DisplayName
 	domain.IsActive = true // Toujours actif sauf si explicitement désactivé
-	domain.OwnerID = req.OwnerID
-	domain.OwnerType = req.OwnerType
-	domain.Notes = req.Notes
+	domain.Notes = &req.Notes
 
 	if err := domainService.UpdateDomain(domain); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -195,20 +187,19 @@ func UpdateDomain(c *gin.Context) {
 		return
 	}
 
-	userCount, _ := domainService.GetDomainUserCount(uint(id))
+	userCount, _ := domainService.GetDomainUserCount(domainID)
 
 	response := DomainResponse{
-		ID:          domain.ID,
-		Name:        domain.Name,
-		DisplayName: domain.DisplayName,
-		IsInternal:  domain.IsInternal,
-		IsActive:    domain.IsActive,
-		OwnerID:     domain.OwnerID,
-		OwnerType:   domain.OwnerType,
-		CreatedAt:   domain.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt:   domain.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UserCount:   userCount,
-		IsVerified:  domain.VerifiedAt != nil,
+		ID:             domain.ID,
+		Name:           domain.Name,
+		DisplayName:    *domain.DisplayName,
+		IsInternal:     domain.IsInternal,
+		IsActive:       domain.IsActive,
+		OrganizationID: domain.OrganizationID,
+		CreatedAt:      domain.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt:      domain.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UserCount:      userCount,
+		IsVerified:     domain.VerifiedAt != nil,
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -224,7 +215,7 @@ func DeleteDomain(c *gin.Context) {
 	fmt.Sscanf(domainID, "%d", &id)
 
 	// Vérifier si le domaine est interne (ne peut pas être supprimé)
-	domain, err := domainService.GetDomainByID(uint(id))
+	domain, err := domainService.GetDomainByID(domainID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Domain not found",
@@ -239,7 +230,7 @@ func DeleteDomain(c *gin.Context) {
 		return
 	}
 
-	if err := domainService.DeleteDomain(uint(id)); err != nil {
+	if err := domainService.DeleteDomain(domainID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to delete domain",
 		})
@@ -269,7 +260,7 @@ func VerifyDomain(c *gin.Context) {
 	id := 0
 	fmt.Sscanf(domainID, "%d", &id)
 
-	if err := domainService.VerifyDomain(uint(id), req.Method, req.Value); err != nil {
+	if err := domainService.VerifyDomain(domainID, req.Method, req.Value); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to verify domain",
 		})
@@ -291,7 +282,7 @@ func GetDomainUsers(c *gin.Context) {
 	id := 0
 	fmt.Sscanf(domainID, "%d", &id)
 
-	users, err := domainService.GetUsersByDomain(uint(id))
+	users, err := domainService.GetUsersByDomain(domainID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to get domain users",
@@ -328,7 +319,7 @@ func AddUserToDomain(c *gin.Context) {
 	domainIDInt := 0
 	fmt.Sscanf(domainID, "%d", &domainIDInt)
 
-	if err := domainService.AddUserToDomain(uint(domainIDInt), req.UserID, req.IsAdmin, req.IsOwner); err != nil {
+	if err := domainService.AddUserToDomain(domainID, fmt.Sprintf("%d", req.UserID), req.IsAdmin, req.IsOwner); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to add user to domain",
 		})
@@ -352,7 +343,7 @@ func RemoveUserFromDomain(c *gin.Context) {
 	userIDInt := 0
 	fmt.Sscanf(userID, "%d", &userIDInt)
 
-	if err := domainService.RemoveUserFromDomain(uint(domainIDInt), uint(userIDInt)); err != nil {
+	if err := domainService.RemoveUserFromDomain(domainID, userID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to remove user from domain",
 		})
@@ -371,7 +362,7 @@ func GetDomainDetails(c *gin.Context) {
 	id := 0
 	fmt.Sscanf(domainID, "%d", &id)
 
-	domainDetails, err := domainService.GetDomainWithDetails(uint(id))
+	domainDetails, err := domainService.GetDomainWithDetails(domainID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Domain not found",

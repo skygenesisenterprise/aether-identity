@@ -31,20 +31,21 @@ func (s *EmailService) GenerateToken() (string, error) {
 }
 
 // CreateEmailVerification crée un token de vérification d'email
-func (s *EmailService) CreateEmailVerification(userID uint) (*model.EmailVerification, error) {
+func (s *EmailService) CreateEmailVerification(userID string, email string) (*model.EmailVerificationToken, error) {
 	// Supprimer les anciens tokens non utilisés
-	s.DB.Where("user_id = ? AND is_used = false", userID).Delete(&model.EmailVerification{})
+	s.DB.Where("user_id = ? AND used = false", userID).Delete(&model.EmailVerificationToken{})
 
 	token, err := s.GenerateToken()
 	if err != nil {
 		return nil, err
 	}
 
-	verification := &model.EmailVerification{
+	verification := &model.EmailVerificationToken{
 		UserID:    userID,
+		Email:     email,
 		Token:     token,
-		ExpiresAt: time.Now().Add(24 * time.Hour), // 24 heures
-		IsUsed:    false,
+		ExpiresAt: time.Now().Add(24 * time.Hour),
+		Used:      false,
 	}
 
 	if err := s.DB.Create(verification).Error; err != nil {
@@ -56,8 +57,8 @@ func (s *EmailService) CreateEmailVerification(userID uint) (*model.EmailVerific
 
 // VerifyEmail vérifie un email avec un token
 func (s *EmailService) VerifyEmail(token string) (*model.User, error) {
-	var verification model.EmailVerification
-	if err := s.DB.Where("token = ? AND is_used = false AND expires_at > ?", token, time.Now()).First(&verification).Error; err != nil {
+	var verification model.EmailVerificationToken
+	if err := s.DB.Where("token = ? AND used = false AND expires_at > ?", token, time.Now()).First(&verification).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("invalid or expired token")
 		}
@@ -65,18 +66,20 @@ func (s *EmailService) VerifyEmail(token string) (*model.User, error) {
 	}
 
 	// Marquer le token comme utilisé
-	verification.IsUsed = true
+	now := time.Now()
+	verification.Used = true
+	verification.UsedAt = &now
 	if err := s.DB.Save(&verification).Error; err != nil {
 		return nil, err
 	}
 
 	// Activer le compte utilisateur
 	var user model.User
-	if err := s.DB.First(&user, verification.UserID).Error; err != nil {
+	if err := s.DB.First(&user, "id = ?", verification.UserID).Error; err != nil {
 		return nil, err
 	}
 
-	user.IsActive = true
+	user.EmailVerified = true
 	if err := s.DB.Save(&user).Error; err != nil {
 		return nil, err
 	}
@@ -85,7 +88,7 @@ func (s *EmailService) VerifyEmail(token string) (*model.User, error) {
 }
 
 // CreatePasswordReset crée un token de réinitialisation de mot de passe
-func (s *EmailService) CreatePasswordReset(email string) (*model.PasswordReset, error) {
+func (s *EmailService) CreatePasswordReset(email string) (*model.PasswordResetToken, error) {
 	// Récupérer l'utilisateur
 	var user model.User
 	if err := s.DB.Where("email = ?", email).First(&user).Error; err != nil {
@@ -96,18 +99,18 @@ func (s *EmailService) CreatePasswordReset(email string) (*model.PasswordReset, 
 	}
 
 	// Supprimer les anciens tokens non utilisés
-	s.DB.Where("user_id = ? AND is_used = false", user.ID).Delete(&model.PasswordReset{})
+	s.DB.Where("user_id = ? AND used = false", user.ID).Delete(&model.PasswordResetToken{})
 
 	token, err := s.GenerateToken()
 	if err != nil {
 		return nil, err
 	}
 
-	reset := &model.PasswordReset{
+	reset := &model.PasswordResetToken{
 		UserID:    user.ID,
 		Token:     token,
-		ExpiresAt: time.Now().Add(1 * time.Hour), // 1 heure
-		IsUsed:    false,
+		ExpiresAt: time.Now().Add(1 * time.Hour),
+		Used:      false,
 	}
 
 	if err := s.DB.Create(reset).Error; err != nil {
@@ -119,8 +122,8 @@ func (s *EmailService) CreatePasswordReset(email string) (*model.PasswordReset, 
 
 // ResetPassword réinitialise le mot de passe avec un token
 func (s *EmailService) ResetPassword(token, newPassword string) error {
-	var reset model.PasswordReset
-	if err := s.DB.Where("token = ? AND is_used = false AND expires_at > ?", token, time.Now()).First(&reset).Error; err != nil {
+	var reset model.PasswordResetToken
+	if err := s.DB.Where("token = ? AND used = false AND expires_at > ?", token, time.Now()).First(&reset).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("invalid or expired token")
 		}
@@ -128,7 +131,9 @@ func (s *EmailService) ResetPassword(token, newPassword string) error {
 	}
 
 	// Marquer le token comme utilisé
-	reset.IsUsed = true
+	now := time.Now()
+	reset.Used = true
+	reset.UsedAt = &now
 	if err := s.DB.Save(&reset).Error; err != nil {
 		return err
 	}
@@ -140,55 +145,7 @@ func (s *EmailService) ResetPassword(token, newPassword string) error {
 		return err
 	}
 
-	user.Password = newPassword
-	return userService.UpdateUser(user)
-}
-
-// CreateRefreshToken crée un refresh token en base
-func (s *EmailService) CreateRefreshToken(userID uint, token string) (*model.RefreshToken, error) {
-	// Supprimer les anciens tokens révoqués ou expirés
-	s.DB.Where("user_id = ? AND (is_revoked = true OR expires_at < ?)", userID, time.Now()).Delete(&model.RefreshToken{})
-
-	refreshToken := &model.RefreshToken{
-		UserID:    userID,
-		Token:     token,
-		ExpiresAt: time.Now().Add(7 * 24 * time.Hour), // 7 jours
-		IsRevoked: false,
-	}
-
-	if err := s.DB.Create(refreshToken).Error; err != nil {
-		return nil, err
-	}
-
-	return refreshToken, nil
-}
-
-// ValidateRefreshToken valide un refresh token
-func (s *EmailService) ValidateRefreshToken(token string) (*model.RefreshToken, error) {
-	var refreshToken model.RefreshToken
-	if err := s.DB.Where("token = ? AND is_revoked = false AND expires_at > ?", token, time.Now()).First(&refreshToken).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("invalid or expired refresh token")
-		}
-		return nil, err
-	}
-
-	// Mettre à jour la date de dernière utilisation
-	now := time.Now()
-	refreshToken.LastUsedAt = &now
-	s.DB.Save(&refreshToken)
-
-	return &refreshToken, nil
-}
-
-// RevokeRefreshToken révoque un refresh token
-func (s *EmailService) RevokeRefreshToken(token string) error {
-	return s.DB.Model(&model.RefreshToken{}).Where("token = ?", token).Update("is_revoked", true).Error
-}
-
-// RevokeAllUserRefreshTokens révoque tous les refresh tokens d'un utilisateur
-func (s *EmailService) RevokeAllUserRefreshTokens(userID uint) error {
-	return s.DB.Model(&model.RefreshToken{}).Where("user_id = ?", userID).Update("is_revoked", true).Error
+	return userService.UpdateUser(user, &newPassword)
 }
 
 // SendEmailVerificationEmail envoie un email de vérification (simulation)
@@ -215,4 +172,48 @@ func (s *EmailService) SendPasswordResetEmail(email, token string) error {
 	fmt.Printf("====================\n")
 
 	return nil
+}
+
+// CreateRefreshToken creates a refresh token for a user
+func (s *EmailService) CreateRefreshToken(userID string, token string) (*model.OAuthRefreshToken, error) {
+	refreshToken := &model.OAuthRefreshToken{
+		Token:     token,
+		UserID:    userID,
+		ClientID:  "default", // Default client for direct authentication
+		ExpiresAt: time.Now().Add(24 * time.Hour),
+		Revoked:   false,
+	}
+
+	if err := s.DB.Create(refreshToken).Error; err != nil {
+		return nil, err
+	}
+
+	return refreshToken, nil
+}
+
+// ValidateRefreshToken validates a refresh token
+func (s *EmailService) ValidateRefreshToken(token string) (*model.OAuthRefreshToken, error) {
+	var refreshToken model.OAuthRefreshToken
+	if err := s.DB.Where("token = ? AND revoked = false AND expires_at > ?", token, time.Now()).First(&refreshToken).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("invalid or expired token")
+		}
+		return nil, err
+	}
+
+	return &refreshToken, nil
+}
+
+// RevokeRefreshToken marks a refresh token as revoked
+func (s *EmailService) RevokeRefreshToken(token string) error {
+	var refreshToken model.OAuthRefreshToken
+	if err := s.DB.Where("token = ?", token).First(&refreshToken).Error; err != nil {
+		return err
+	}
+
+	now := time.Now()
+	refreshToken.Revoked = true
+	refreshToken.RevokedAt = &now
+
+	return s.DB.Save(&refreshToken).Error
 }

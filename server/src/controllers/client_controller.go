@@ -11,22 +11,21 @@ import (
 // CreateClientRequest représente une requête de création de client
 
 type CreateClientRequest struct {
-	Name        string   `json:"name" binding:"required"`
+	Name         string   `json:"name" binding:"required"`
 	RedirectURIs []string `json:"redirectUris" binding:"required"`
-	Scopes      []string `json:"scopes" binding:"required"`
-	GrantTypes  []string `json:"grantTypes" binding:"required"`
+	Scopes       []string `json:"scopes" binding:"required"`
+	GrantTypes   []string `json:"grantTypes" binding:"required"`
 }
 
 // ClientResponse représente une réponse de client
-
 type ClientResponse struct {
-	ID          uint     `json:"id"`
-	ClientID    string   `json:"clientId"`
+	ID           string   `json:"id"`
+	ClientID     string   `json:"clientId"`
 	ClientSecret string   `json:"clientSecret"`
-	Name        string   `json:"name"`
+	Name         string   `json:"name"`
 	RedirectURIs []string `json:"redirectUris"`
-	Scopes      []string `json:"scopes"`
-	GrantTypes  []string `json:"grantTypes"`
+	Scopes       []string `json:"scopes"`
+	GrantTypes   []string `json:"grantTypes"`
 }
 
 // CreateClient crée un nouveau client OAuth
@@ -65,12 +64,12 @@ func CreateClient(c *gin.Context) {
 	))
 
 	client := &model.OAuthClient{
-		ClientID:    clientID,
+		ClientID:     clientID,
 		ClientSecret: clientSecret,
-		Name:        req.Name,
+		Name:         req.Name,
 		RedirectURIs: req.RedirectURIs,
-		Scopes:      req.Scopes,
-		GrantTypes:  req.GrantTypes,
+		Scopes:       req.Scopes,
+		GrantTypes:   req.GrantTypes,
 	}
 
 	if err := oauthService.CreateClient(client); err != nil {
@@ -82,13 +81,13 @@ func CreateClient(c *gin.Context) {
 
 	// Retourner la réponse
 	response := ClientResponse{
-		ID:          client.ID,
-		ClientID:    client.ClientID,
+		ID:           client.ID,
+		ClientID:     client.ClientID,
 		ClientSecret: client.ClientSecret,
-		Name:        client.Name,
+		Name:         client.Name,
 		RedirectURIs: client.RedirectURIs,
-		Scopes:      client.Scopes,
-		GrantTypes:  client.GrantTypes,
+		Scopes:       client.Scopes,
+		GrantTypes:   client.GrantTypes,
 	}
 
 	c.JSON(http.StatusCreated, response)
@@ -113,13 +112,13 @@ func GetClient(c *gin.Context) {
 	}
 
 	response := ClientResponse{
-		ID:          client.ID,
-		ClientID:    client.ClientID,
+		ID:           client.ID,
+		ClientID:     client.ClientID,
 		ClientSecret: "*****", // Masquer le secret pour la sécurité
-		Name:        client.Name,
+		Name:         client.Name,
 		RedirectURIs: client.RedirectURIs,
-		Scopes:      client.Scopes,
-		GrantTypes:  client.GrantTypes,
+		Scopes:       client.Scopes,
+		GrantTypes:   client.GrantTypes,
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -139,13 +138,13 @@ func ListClients(c *gin.Context) {
 	var responses []ClientResponse
 	for _, client := range clients {
 		responses = append(responses, ClientResponse{
-			ID:          client.ID,
-			ClientID:    client.ClientID,
+			ID:           client.ID,
+			ClientID:     client.ClientID,
 			ClientSecret: "*****", // Masquer le secret pour la sécurité
-			Name:        client.Name,
+			Name:         client.Name,
 			RedirectURIs: client.RedirectURIs,
-			Scopes:      client.Scopes,
-			GrantTypes:  client.GrantTypes,
+			Scopes:       client.Scopes,
+			GrantTypes:   client.GrantTypes,
 		})
 	}
 
@@ -193,13 +192,13 @@ func UpdateClient(c *gin.Context) {
 	}
 
 	response := ClientResponse{
-		ID:          client.ID,
-		ClientID:    client.ClientID,
+		ID:           client.ID,
+		ClientID:     client.ClientID,
 		ClientSecret: "*****", // Masquer le secret pour la sécurité
-		Name:        client.Name,
+		Name:         client.Name,
 		RedirectURIs: client.RedirectURIs,
-		Scopes:      client.Scopes,
-		GrantTypes:  client.GrantTypes,
+		Scopes:       client.Scopes,
+		GrantTypes:   client.GrantTypes,
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -243,13 +242,13 @@ func RotateClientSecret(c *gin.Context) {
 	}
 
 	response := ClientResponse{
-		ID:          client.ID,
-		ClientID:    client.ClientID,
+		ID:           client.ID,
+		ClientID:     client.ClientID,
 		ClientSecret: newSecret,
-		Name:        client.Name,
+		Name:         client.Name,
 		RedirectURIs: client.RedirectURIs,
-		Scopes:      client.Scopes,
-		GrantTypes:  client.GrantTypes,
+		Scopes:       client.Scopes,
+		GrantTypes:   client.GrantTypes,
 	}
 
 	c.JSON(http.StatusOK, response)

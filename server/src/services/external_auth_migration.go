@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/skygenesisenterprise/aether-identity/server/src/model"
 )
@@ -32,14 +31,12 @@ func (s *ExternalAuthService) MigrateDiscordAccounts() error {
 
 		// Créer le compte externe
 		externalAccount := &model.ExternalAccount{
-			UserID:         user.ID,
-			Provider:       "discord",
-			ProviderUserID: user.DiscordID,
-			Email:          "", // Non disponible dans l'ancien système
-			Name:           user.Name,
-			IsPrimary:      false,
-			CreatedAt:      time.Now(),
-			UpdatedAt:      time.Now(),
+			UserID:            user.ID,
+			Provider:          "discord",
+			ProviderAccountID: *user.DiscordID,
+			Email:             nil, // Non disponible dans l'ancien système
+			DisplayName:       user.Name,
+			IsPrimary:         false,
 		}
 
 		if err := s.DB.Create(externalAccount).Error; err != nil {

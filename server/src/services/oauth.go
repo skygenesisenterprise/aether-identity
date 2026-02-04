@@ -18,7 +18,7 @@ import (
 
 // OAuthService gère les opérations OAuth2/OpenID Connect
 type OAuthService struct {
-	DB      *gorm.DB
+	DB         *gorm.DB
 	JWTService *JWTService
 }
 
@@ -72,7 +72,7 @@ func (s *OAuthService) ValidateClient(clientID, clientSecret string) (*model.OAu
 }
 
 // CreateAuthorizationCode crée un code d'autorisation
-func (s *OAuthService) CreateAuthorizationCode(code, clientID string, userID uint, redirectURI string, scopes []string) (*model.OAuthAuthorizationCode, error) {
+func (s *OAuthService) CreateAuthorizationCode(code, clientID string, userID string, redirectURI string, scopes []string) (*model.OAuthAuthorizationCode, error) {
 	authCode := &model.OAuthAuthorizationCode{
 		Code:        code,
 		ClientID:    clientID,
@@ -104,13 +104,13 @@ func (s *OAuthService) DeleteAuthorizationCode(code string) error {
 }
 
 // CreateAccessToken crée un token d'accès
-func (s *OAuthService) CreateAccessToken(token, clientID string, userID uint, scopes []string) (*model.OAuthAccessToken, error) {
+func (s *OAuthService) CreateAccessToken(token, clientID string, userID string, scopes []string) (*model.OAuthAccessToken, error) {
 	accessToken := &model.OAuthAccessToken{
-		Token:       token,
-		ClientID:    clientID,
-		UserID:      userID,
-		Scopes:      scopes,
-		ExpiresAt:   time.Now().Add(time.Duration(config.LoadConfig().AccessTokenExp) * time.Minute),
+		Token:     token,
+		ClientID:  clientID,
+		UserID:    userID,
+		Scopes:    scopes,
+		ExpiresAt: time.Now().Add(time.Duration(config.LoadConfig().AccessTokenExp) * time.Minute),
 	}
 	err := s.DB.Create(accessToken).Error
 	if err != nil {
@@ -135,12 +135,12 @@ func (s *OAuthService) RevokeAccessToken(token string) error {
 }
 
 // CreateRefreshToken crée un token de rafraîchissement
-func (s *OAuthService) CreateRefreshToken(token, clientID string, userID uint) (*model.OAuthRefreshToken, error) {
+func (s *OAuthService) CreateRefreshToken(token, clientID string, userID string) (*model.OAuthRefreshToken, error) {
 	refreshToken := &model.OAuthRefreshToken{
-		Token:       token,
-		ClientID:    clientID,
-		UserID:      userID,
-		ExpiresAt:   time.Now().Add(time.Duration(config.LoadConfig().RefreshTokenExp) * time.Minute),
+		Token:     token,
+		ClientID:  clientID,
+		UserID:    userID,
+		ExpiresAt: time.Now().Add(time.Duration(config.LoadConfig().RefreshTokenExp) * time.Minute),
 	}
 	err := s.DB.Create(refreshToken).Error
 	if err != nil {
@@ -165,7 +165,7 @@ func (s *OAuthService) RevokeRefreshToken(token string) error {
 }
 
 // CreateConsent crée un consentement utilisateur
-func (s *OAuthService) CreateConsent(userID uint, clientID string, scopes []string) (*model.OAuthConsent, error) {
+func (s *OAuthService) CreateConsent(userID string, clientID string, scopes []string) (*model.OAuthConsent, error) {
 	consent := &model.OAuthConsent{
 		UserID:   userID,
 		ClientID: clientID,
@@ -179,7 +179,7 @@ func (s *OAuthService) CreateConsent(userID uint, clientID string, scopes []stri
 }
 
 // GetConsentByUserAndClient récupère un consentement par utilisateur et client
-func (s *OAuthService) GetConsentByUserAndClient(userID uint, clientID string) (*model.OAuthConsent, error) {
+func (s *OAuthService) GetConsentByUserAndClient(userID string, clientID string) (*model.OAuthConsent, error) {
 	var consent model.OAuthConsent
 	err := s.DB.Where("user_id = ? AND client_id = ?", userID, clientID).First(&consent).Error
 	if err != nil {
@@ -199,7 +199,7 @@ func ParseScopes(scopeString string) []string {
 // ValidateScopes valide les scopes demandés contre les scopes autorisés
 func (s *OAuthService) ValidateScopes(requestedScopes, allowedScopes []string) ([]string, error) {
 	var validScopes []string
-	
+
 	for _, requestedScope := range requestedScopes {
 		for _, allowedScope := range allowedScopes {
 			if requestedScope == allowedScope {
@@ -208,32 +208,31 @@ func (s *OAuthService) ValidateScopes(requestedScopes, allowedScopes []string) (
 			}
 		}
 	}
-	
+
 	if len(validScopes) == 0 {
 		return nil, errors.New("invalid scope")
 	}
-	
+
 	return validScopes, nil
 }
 
 // GenerateIDToken génère un ID token OpenID Connect
 func (s *OAuthService) GenerateIDToken(user *model.User, client *model.OAuthClient, scopes []string, nonce string) (string, error) {
 	claims := jwt.MapClaims{
-		"sub":          user.ID,
-		"email":        user.Email,
-		"account_type": user.AccountType,
-		"roles":        []string{user.Role},
-		"org_id":       user.OrgID,
-		"aud":          client.ClientID,
-		"iss":          "https://aether-identity.example.com",
-		"exp":          time.Now().Add(time.Duration(config.LoadConfig().AccessTokenExp) * time.Minute).Unix(),
-		"iat":          time.Now().Unix(),
+		"sub":            user.ID,
+		"email":          user.Email,
+		"name":           user.Name,
+		"email_verified": user.EmailVerified,
+		"aud":            client.ClientID,
+		"iss":            "https://aether-identity.example.com",
+		"exp":            time.Now().Add(time.Duration(config.LoadConfig().AccessTokenExp) * time.Minute).Unix(),
+		"iat":            time.Now().Unix(),
 	}
-	
+
 	if nonce != "" {
 		claims["nonce"] = nonce
 	}
-	
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(s.JWTService.SecretKey))
 }
@@ -241,24 +240,23 @@ func (s *OAuthService) GenerateIDToken(user *model.User, client *model.OAuthClie
 // GenerateAccessToken génère un token d'accès OAuth2
 func (s *OAuthService) GenerateAccessToken(user *model.User, client *model.OAuthClient, scopes []string) (string, error) {
 	claims := jwt.MapClaims{
-		"sub":          user.ID,
-		"email":        user.Email,
-		"account_type": user.AccountType,
-		"roles":        []string{user.Role},
-		"org_id":       user.OrgID,
-		"client_id":    client.ClientID,
-		"scopes":       strings.Join(scopes, " "),
-		"exp":          time.Now().Add(time.Duration(config.LoadConfig().AccessTokenExp) * time.Minute).Unix(),
-		"iat":          time.Now().Unix(),
-		"token_type":   "access_token",
+		"sub":            user.ID,
+		"email":          user.Email,
+		"name":           user.Name,
+		"email_verified": user.EmailVerified,
+		"client_id":      client.ClientID,
+		"scopes":         strings.Join(scopes, " "),
+		"exp":            time.Now().Add(time.Duration(config.LoadConfig().AccessTokenExp) * time.Minute).Unix(),
+		"iat":            time.Now().Unix(),
+		"token_type":     "access_token",
 	}
-	
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(s.JWTService.SecretKey))
 }
 
 // GenerateRefreshToken génère un token de rafraîchissement OAuth2
-func (s *OAuthService) GenerateRefreshToken(userID uint, clientID string) (string, error) {
+func (s *OAuthService) GenerateRefreshToken(userID string, clientID string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub":       userID,
 		"client_id": clientID,
@@ -266,7 +264,7 @@ func (s *OAuthService) GenerateRefreshToken(userID uint, clientID string) (strin
 		"iat":       time.Now().Unix(),
 		"type":      "refresh_token",
 	})
-	
+
 	return token.SignedString([]byte(s.JWTService.SecretKey))
 }
 

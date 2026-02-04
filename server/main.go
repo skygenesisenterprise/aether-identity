@@ -13,6 +13,7 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/skygenesisenterprise/aether-identity/server/src/config"
+	"github.com/skygenesisenterprise/aether-identity/server/src/interfaces"
 	"github.com/skygenesisenterprise/aether-identity/server/src/routes"
 	"github.com/skygenesisenterprise/aether-identity/server/src/services"
 )
@@ -79,27 +80,39 @@ func main() {
 
 	// Initialiser la base de données (optionnel)
 	fmt.Printf("\033[1;34m[info] Initializing database connection...\033[0m\n")
-	dbInitialized := true
-	if err := services.InitDB(cfg.DatabaseURL); err != nil {
-		fmt.Printf("\033[1;33m[warn] Failed to initialize database: %v\033[0m\n", err)
-		fmt.Printf("\033[1;33m[warn] Running in database-less mode\033[0m\n")
-		dbInitialized = false
-	}
-	defer func() {
-		if dbInitialized {
-			if err := services.CloseDB(); err != nil {
-				fmt.Printf("\033[1;33m[warn] Error closing database: %v\033[0m\n", err)
-			} else {
-				fmt.Printf("\033[1;34m[info] Database connection closed\033[0m\n")
-			}
+	var dbService interfaces.IDatabaseService
+	var dbInitialized bool
+
+	if cfg.DatabaseURL != "" {
+		service, err := services.NewDatabaseService(cfg.DatabaseURL)
+		if err != nil {
+			fmt.Printf("\033[1;33m[warn] Failed to initialize database: %v\033[0m\n", err)
+			fmt.Printf("\033[1;33m[warn] Running in database-less mode\033[0m\n")
+		} else {
+			dbService = service
+			dbInitialized = true
+
+			// Fermeture propre à la fin
+			defer func() {
+				if err := dbService.Close(); err != nil {
+					fmt.Printf("\033[1;33m[warn] Error closing database: %v\033[0m\n", err)
+				} else {
+					fmt.Printf("\033[1;34m[info] Database connection closed\033[0m\n")
+				}
+			}()
+
+			fmt.Printf("\033[1;32m[success] Database connected successfully\033[0m\n")
 		}
-	}()
+	} else {
+		fmt.Printf("\033[1;33m[warn] No database URL configured, running in database-less mode\033[0m\n")
+	}
+
 	time.Sleep(300 * time.Millisecond)
 
 	// Initialiser les domaines par défaut (si la base de données est disponible)
-	if dbInitialized {
+	if dbInitialized && dbService != nil {
 		fmt.Printf("\033[1;34m[info] Initializing default domains...\033[0m\n")
-		domainService := services.NewDomainService(services.DB)
+		domainService := services.NewDomainService(dbService.GetDB())
 		if err := domainService.InitializeDefaultDomains(); err != nil {
 			fmt.Printf("\033[1;33m[warn] Failed to initialize default domains: %v\033[0m\n", err)
 		} else {
@@ -110,15 +123,15 @@ func main() {
 
 	// Initialiser le ServiceKeyService
 	var serviceKeyService *services.ServiceKeyService
-	if dbInitialized {
+	if dbInitialized && dbService != nil {
 		fmt.Printf("\033[1;34m[info] Initializing service key service...\033[0m\n")
-		serviceKeyService = services.NewServiceKeyService(services.DB)
+		serviceKeyService = services.NewServiceKeyService(dbService.GetDB())
 		time.Sleep(100 * time.Millisecond)
 	}
 
 	// Configurer les routes
 	fmt.Printf("\033[1;34m[info] Setting up API routes...\033[0m\n")
-	routes.SetupRoutes(router, cfg.SystemKey, serviceKeyService)
+	routes.SetupRoutes(router, cfg.SystemKey, serviceKeyService, dbService)
 	time.Sleep(200 * time.Millisecond)
 
 	fmt.Printf("\n")

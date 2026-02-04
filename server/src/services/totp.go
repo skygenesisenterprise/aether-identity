@@ -54,40 +54,41 @@ func (s *TOTPService) VerifyTOTPCode(code, secret string) (bool, error) {
 }
 
 // EnableTOTP enables TOTP for a user
-func (s *TOTPService) EnableTOTP(userID uint, secret string) error {
+func (s *TOTPService) EnableTOTP(userID string, secret string) error {
 	user, err := s.userService.GetUserByID(userID)
 	if err != nil {
 		return fmt.Errorf("failed to retrieve user: %w", err)
 	}
-	user.TOTPSecret = secret
-	user.TOTPEnabled = true
-	if err := s.userService.UpdateUser(user); err != nil {
+	user.TotpSecret = &secret
+	user.TotpEnabled = true
+	if err := s.userService.UpdateUser(user, nil); err != nil {
 		return fmt.Errorf("failed to enable TOTP: %w", err)
 	}
 	return nil
 }
 
 // DisableTOTP disables TOTP for a user
-func (s *TOTPService) DisableTOTP(userID uint) error {
+func (s *TOTPService) DisableTOTP(userID string) error {
 	user, err := s.userService.GetUserByID(userID)
 	if err != nil {
 		return fmt.Errorf("failed to retrieve user: %w", err)
 	}
-	user.TOTPSecret = ""
-	user.TOTPEnabled = false
-	if err := s.userService.UpdateUser(user); err != nil {
+	emptySecret := ""
+	user.TotpSecret = &emptySecret
+	user.TotpEnabled = false
+	if err := s.userService.UpdateUser(user, nil); err != nil {
 		return fmt.Errorf("failed to disable TOTP: %w", err)
 	}
 	return nil
 }
 
 // GetTOTPStatus returns the TOTP enabled status for a user
-func (s *TOTPService) GetTOTPStatus(userID uint) (bool, error) {
+func (s *TOTPService) GetTOTPStatus(userID string) (bool, error) {
 	user, err := s.userService.GetUserByID(userID)
 	if err != nil {
 		return false, fmt.Errorf("failed to retrieve user: %w", err)
 	}
-	return user.TOTPEnabled, nil
+	return user.TotpEnabled, nil
 }
 
 // VerifyTOTPLogin verifies a TOTP during login
@@ -98,11 +99,11 @@ func (s *TOTPService) VerifyTOTPLogin(email, password, totpCode string) (*model.
 		return nil, fmt.Errorf("invalid email or password: %w", err)
 	}
 	// Ensure TOTP is enabled
-	if !user.TOTPEnabled {
+	if !user.TotpEnabled {
 		return nil, fmt.Errorf("TOTP not enabled for this user")
 	}
 	// Validate the TOTP code
-	if !totp.Validate(totpCode, user.TOTPSecret) {
+	if user.TotpSecret == nil || !totp.Validate(totpCode, *user.TotpSecret) {
 		return nil, fmt.Errorf("invalid TOTP code")
 	}
 	return user, nil

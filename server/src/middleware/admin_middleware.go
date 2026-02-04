@@ -22,7 +22,7 @@ func AdminMiddleware() gin.HandlerFunc {
 
 		// Récupérer l'utilisateur
 		userService := services.NewUserService(services.DB)
-		user, err := userService.GetUserByID(uint(userID.(uint)))
+		user, err := userService.GetUserByID(userID.(string))
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": "Unauthorized",
@@ -32,7 +32,14 @@ func AdminMiddleware() gin.HandlerFunc {
 		}
 
 		// Vérifier si l'utilisateur est un administrateur
-		if user.Role != "admin" {
+		isAdmin := false
+		for _, userRole := range user.UserRoles {
+			if userRole.Role.Name == "admin" {
+				isAdmin = true
+				break
+			}
+		}
+		if !isAdmin {
 			c.JSON(http.StatusForbidden, gin.H{
 				"error": "Forbidden",
 			})

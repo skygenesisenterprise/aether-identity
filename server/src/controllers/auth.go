@@ -278,15 +278,15 @@ func Register(c *gin.Context) {
 	}
 
 	// Créer l'utilisateur
+	name := registerData.Name
+	email := registerData.Email
 	user := &model.User{
-		Name:     registerData.Name,
-		Email:    registerData.Email,
-		Password: registerData.Password,
-		Role:     "user",
+		Name:     &name,
+		Email:    &email,
 		IsActive: true,
 	}
 
-	if err := userService.CreateUser(user); err != nil {
+	if err := userService.CreateUser(user, registerData.Password); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"error":   "Failed to create user: " + err.Error(),

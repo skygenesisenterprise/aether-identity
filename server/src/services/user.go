@@ -19,19 +19,22 @@ func NewUserService(db *gorm.DB) *UserService {
 }
 
 // CreateUser crée un nouvel utilisateur avec validation
-func (s *UserService) CreateUser(user *model.User) error {
+func (s *UserService) CreateUser(user *model.User, password string) error {
 	// Vérifier si l'email existe déjà
-	existingUser, _ := s.GetUserByEmail(user.Email)
-	if existingUser != nil {
-		return errors.New("email already exists")
+	if user.Email != nil {
+		existingUser, _ := s.GetUserByEmail(*user.Email)
+		if existingUser != nil {
+			return errors.New("email already exists")
+		}
 	}
 
 	// Hacher le mot de passe
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
-	user.Password = string(hashedPassword)
+	hashStr := string(hashedPassword)
+	user.PasswordHash = &hashStr
 
 	// Sauvegarder dans la base de données
 	return s.DB.Create(user).Error
@@ -45,9 +48,9 @@ func (s *UserService) CheckEmailExists(email string) bool {
 }
 
 // GetUserByID récupère un utilisateur par son ID
-func (s *UserService) GetUserByID(id uint) (*model.User, error) {
+func (s *UserService) GetUserByID(id string) (*model.User, error) {
 	var user model.User
-	if err := s.DB.First(&user, id).Error; err != nil {
+	if err := s.DB.First(&user, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -63,22 +66,23 @@ func (s *UserService) GetUserByEmail(email string) (*model.User, error) {
 }
 
 // UpdateUser met à jour un utilisateur
-func (s *UserService) UpdateUser(user *model.User) error {
+func (s *UserService) UpdateUser(user *model.User, newPassword *string) error {
 	// Si le mot de passe est fourni, le hacher
-	if user.Password != "" {
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if newPassword != nil && *newPassword != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*newPassword), bcrypt.DefaultCost)
 		if err != nil {
 			return err
 		}
-		user.Password = string(hashedPassword)
+		hashStr := string(hashedPassword)
+		user.PasswordHash = &hashStr
 	}
 
 	return s.DB.Save(user).Error
 }
 
 // DeleteUser supprime un utilisateur
-func (s *UserService) DeleteUser(id uint) error {
-	return s.DB.Delete(&model.User{}, id).Error
+func (s *UserService) DeleteUser(id string) error {
+	return s.DB.Delete(&model.User{}, "id = ?", id).Error
 }
 
 // AuthenticateUser authentifie un utilisateur
@@ -89,7 +93,11 @@ func (s *UserService) AuthenticateUser(email, password string) (*model.User, err
 	}
 
 	// Vérifier le mot de passe
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+	if user.PasswordHash == nil {
+		return nil, errors.New("no password set")
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(*user.PasswordHash), []byte(password)); err != nil {
 		return nil, errors.New("invalid password")
 	}
 
@@ -99,18 +107,18 @@ func (s *UserService) AuthenticateUser(email, password string) (*model.User, err
 // UserToResponse convertit un modèle User en une réponse appropriée
 func (s *UserService) UserToResponse(user *model.User) map[string]interface{} {
 	return map[string]interface{}{
-		"id":         user.ID,
-		"email":      user.Email,
-		"name":       user.Name,
-		"created_at": user.CreatedAt,
-		"updated_at": user.UpdatedAt,
-		"role":       user.Role,
+		"id":             user.ID,
+		"email":          user.Email,
+		"name":           user.Name,
+		"created_at":     user.CreatedAt,
+		"updated_at":     user.UpdatedAt,
+		"email_verified": user.EmailVerified,
+		"is_active":      user.IsActive,
 	}
 }
 
 // ListUsersFilter représente les filtres pour la liste des utilisateurs
 type ListUsersFilter struct {
-	Role      string
 	IsActive  *bool
 	Search    string
 	SortBy    string
@@ -141,9 +149,6 @@ func (s *UserService) ListUsers(page, limit int, filter ListUsersFilter) (*ListU
 	query := s.DB.Model(&model.User{})
 
 	// Appliquer les filtres
-	if filter.Role != "" {
-		query = query.Where("role = ?", filter.Role)
-	}
 	if filter.IsActive != nil {
 		query = query.Where("is_active = ?", *filter.IsActive)
 	}

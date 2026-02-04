@@ -11,8 +11,8 @@ import (
 // Si le TOTP est activé, il redirige vers la page de login TOTP
 func TOTPMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userID := c.GetUint("userId")
-		if userID == 0 {
+		userID, exists := c.Get("userId")
+		if !exists {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": "Unauthorized",
 			})
@@ -20,7 +20,7 @@ func TOTPMiddleware() gin.HandlerFunc {
 		}
 
 		totpService := services.NewTOTPService(services.DB)
-		_, err := totpService.GetTOTPStatus(userID)
+		_, err := totpService.GetTOTPStatus(userID.(string))
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": "Failed to check TOTP status",
@@ -40,8 +40,8 @@ func TOTPMiddleware() gin.HandlerFunc {
 // Si le TOTP n'est pas activé, il retourne une erreur
 func TOTPRequiredMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userID := c.GetUint("userId")
-		if userID == 0 {
+		userID, exists := c.Get("userId")
+		if !exists {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": "Unauthorized",
 			})
@@ -49,7 +49,7 @@ func TOTPRequiredMiddleware() gin.HandlerFunc {
 		}
 
 		totpService := services.NewTOTPService(services.DB)
-		enabled, err := totpService.GetTOTPStatus(userID)
+		enabled, err := totpService.GetTOTPStatus(userID.(string))
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": "Failed to check TOTP status",
@@ -72,9 +72,9 @@ func TOTPRequiredMiddleware() gin.HandlerFunc {
 func TOTPLoginMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var loginRequest struct {
-			Email     string `json:"email"`
-			Password  string `json:"password"`
-			TOTPCode  string `json:"totpCode"`
+			Email    string `json:"email"`
+			Password string `json:"password"`
+			TOTPCode string `json:"totpCode"`
 		}
 		if err := c.ShouldBindJSON(&loginRequest); err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -101,8 +101,8 @@ func TOTPLoginMiddleware() gin.HandlerFunc {
 // TOTPVerificationMiddleware vérifie un code TOTP pour activer le 2FA
 func TOTPVerificationMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userID := c.GetUint("userId")
-		if userID == 0 {
+		_, exists := c.Get("userId")
+		if !exists {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": "Unauthorized",
 			})

@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -71,8 +72,11 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		// Convertir en string
+		userIDStr := fmt.Sprintf("%.0f", userID)
+
 		// Stocker l'ID de l'utilisateur dans le contexte
-		c.Set("userId", uint(userID))
+		c.Set("userId", userIDStr)
 
 		c.Next()
 	}

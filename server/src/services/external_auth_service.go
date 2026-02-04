@@ -59,12 +59,18 @@ func (s *ExternalAuthService) GenerateOAuthURL(provider, action string, userID *
 		return "", "", err
 	}
 
+	// Convert userID from *uint to *string
+	var userIDStr *string
+	if userID != nil {
+		idStr := fmt.Sprintf("%d", *userID)
+		userIDStr = &idStr
+	}
+
 	// Sauvegarder le state en base
 	oauthState := &model.OAuthState{
 		State:     state,
 		Provider:  provider,
-		UserID:    userID,
-		Action:    action,
+		UserID:    userIDStr,
 		ExpiresAt: time.Now().Add(10 * time.Minute),
 	}
 
@@ -433,20 +439,19 @@ func (s *ExternalAuthService) FindOrCreateUser(provider string, userInfo *model.
 
 	// Créer un nouvel utilisateur
 	newUser := &model.User{
-		Name:        userInfo.Name,
-		Email:       userInfo.Email,
-		AccountType: provider,
-		Role:        "user",
-		IsActive:    true,
-		Password:    "", // Pas de mot de passe pour OAuth
+		Name:     &userInfo.Name,
+		Email:    &userInfo.Email,
+		IsActive: true,
 	}
 
-	if newUser.Email == "" {
-		newUser.Email = fmt.Sprintf("%s_%s@oauth.local", provider, userInfo.ID)
+	if newUser.Email == nil {
+		email := fmt.Sprintf("%s_%s@oauth.local", provider, userInfo.ID)
+		newUser.Email = &email
 	}
 
-	if newUser.Name == "" {
-		newUser.Name = userInfo.Username
+	if newUser.Name == nil {
+		name := userInfo.Username
+		newUser.Name = &name
 	}
 
 	if err := s.DB.Create(newUser).Error; err != nil {
@@ -462,7 +467,7 @@ func (s *ExternalAuthService) FindOrCreateUser(provider string, userInfo *model.
 }
 
 // LinkExternalAccount lie un compte externe à un utilisateur existant
-func (s *ExternalAuthService) LinkExternalAccount(userID uint, provider string, userInfo *model.ProviderUserInfo, tokenData *TokenExchangeResult) error {
+func (s *ExternalAuthService) LinkExternalAccount(userID string, provider string, userInfo *model.ProviderUserInfo, tokenData *TokenExchangeResult) error {
 	// Vérifier si le compte n'est pas déjà lié
 	var existing model.ExternalAccount
 	err := s.DB.Where("user_id = ? AND provider = ?", userID, provider).First(&existing).Error
@@ -490,15 +495,15 @@ func (s *ExternalAuthService) LinkExternalAccount(userID uint, provider string, 
 
 	// Créer le compte externe
 	externalAccount := &model.ExternalAccount{
-		UserID:         userID,
-		Provider:       provider,
-		ProviderUserID: userInfo.ID,
-		Email:          userInfo.Email,
-		Name:           userInfo.Name,
-		AvatarURL:      userInfo.Avatar,
-		AccessToken:    accessToken,
-		RefreshToken:   refreshToken,
-		TokenExpiresAt: &expiresAt,
+		UserID:            fmt.Sprint(userID),
+		Provider:          provider,
+		ProviderAccountID: userInfo.ID,
+		Email:             &userInfo.Email,
+		DisplayName:       &userInfo.Name,
+		AvatarURL:         &userInfo.Avatar,
+		AccessToken:       &accessToken,
+		RefreshToken:      &refreshToken,
+		ExpiresAt:         &expiresAt,
 	}
 
 	if err := s.DB.Create(externalAccount).Error; err != nil {
@@ -509,7 +514,7 @@ func (s *ExternalAuthService) LinkExternalAccount(userID uint, provider string, 
 }
 
 // UnlinkExternalAccount supprime le lien avec un compte externe
-func (s *ExternalAuthService) UnlinkExternalAccount(userID uint, provider string) error {
+func (s *ExternalAuthService) UnlinkExternalAccount(userID string, provider string) error {
 	// Vérifier que l'utilisateur a d'autres moyens d'authentification
 	var externalAccounts []model.ExternalAccount
 	if err := s.DB.Where("user_id = ?", userID).Find(&externalAccounts).Error; err != nil {
@@ -522,7 +527,7 @@ func (s *ExternalAuthService) UnlinkExternalAccount(userID uint, provider string
 	}
 
 	// S'il n'y a qu'un seul compte externe et pas de mot de passe, refuser
-	if len(externalAccounts) == 1 && externalAccounts[0].Provider == provider && user.Password == "" {
+	if len(externalAccounts) == 1 && externalAccounts[0].Provider == provider && user.PasswordHash == nil {
 		return errors.New("cannot unlink: no other authentication method available")
 	}
 
@@ -624,13 +629,13 @@ func (s *ExternalAuthService) decrypt(ciphertext string) string {
 }
 
 // RefreshAccessToken rafraîchit le token d'accès si possible
-func (s *ExternalAuthService) RefreshAccessToken(userID uint, provider string) (string, error) {
+func (s *ExternalAuthService) RefreshAccessToken(userID string, provider string) (string, error) {
 	var account model.ExternalAccount
 	if err := s.DB.Where("user_id = ? AND provider = ?", userID, provider).First(&account).Error; err != nil {
 		return "", err
 	}
 
-	refreshToken := s.decrypt(account.RefreshToken)
+	refreshToken := s.decrypt(*account.RefreshToken)
 	if refreshToken == "" {
 		return "", errors.New("no refresh token available")
 	}
@@ -670,13 +675,18 @@ func (s *ExternalAuthService) RefreshAccessToken(userID uint, provider string) (
 		return "", err
 	}
 
-	// Mettre à jour les tokens
-	account.AccessToken = s.encrypt(result.AccessToken)
+	accessToken := s.encrypt(result.AccessToken)
 	if result.RefreshToken != "" {
-		account.RefreshToken = s.encrypt(result.RefreshToken)
+		refreshToken = s.encrypt(result.RefreshToken)
 	}
 	expiresAt := time.Now().Add(time.Duration(result.ExpiresIn) * time.Second)
-	account.TokenExpiresAt = &expiresAt
+
+	// Mettre à jour les tokens
+	account.AccessToken = &accessToken
+	if refreshToken != "" {
+		account.RefreshToken = &refreshToken
+	}
+	account.ExpiresAt = &expiresAt
 
 	s.DB.Save(&account)
 

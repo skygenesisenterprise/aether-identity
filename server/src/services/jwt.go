@@ -26,23 +26,20 @@ func NewJWTService(secretKey string, accessTokenExp, refreshTokenExp int) *JWTSe
 // GenerateToken crée un token JWT
 func (s *JWTService) GenerateToken(user *model.User) (string, error) {
 	claims := jwt.MapClaims{
-		"sub":          user.ID,
-		"email":        user.Email,
-		"account_type": user.AccountType,
-		"roles":        []string{user.Role},
-		"org_id":       user.OrgID,
-		"exp":          time.Now().Add(time.Duration(s.AccessTokenExp) * time.Minute).Unix(),
-		"iat":          time.Now().Unix(),
+		"sub":            user.ID,
+		"email":          user.Email,
+		"name":           user.Name,
+		"email_verified": user.EmailVerified,
+		"exp":            time.Now().Add(time.Duration(s.AccessTokenExp) * time.Minute).Unix(),
+		"iat":            time.Now().Unix(),
 	}
-	// inclure identifiant unique et sujet
-	claims["sub"] = user.ID
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(s.SecretKey))
 }
 
 // GenerateRefreshToken crée un refresh token JWT
-func (s *JWTService) GenerateRefreshToken(userID uint) (string, error) {
+func (s *JWTService) GenerateRefreshToken(userID string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub":  userID,
 		"exp":  time.Now().Add(time.Duration(s.RefreshTokenExp) * time.Minute).Unix(),

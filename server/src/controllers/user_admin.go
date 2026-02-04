@@ -156,7 +156,7 @@ func GetCurrentUser(c *gin.Context) {
 	}
 
 	userService := services.NewUserService(services.DB)
-	user, err := userService.GetUserByID(userID.(uint))
+	user, err := userService.GetUserByID(userID.(string))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"success": false,
