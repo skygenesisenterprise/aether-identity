@@ -147,8 +147,8 @@ func (p *EventParser) parseMembershipEvent(event *Event, payload []byte) (*Event
 		event.Sender = p.convertUser(ghEvent.Sender)
 	}
 
-	if ghEvent.Organization != nil {
-		event.Organization = p.convertOrganization(ghEvent.Organization)
+	if ghEvent.Org != nil {
+		event.Organization = p.convertOrganization(ghEvent.Org)
 	}
 
 	// Store membership details
@@ -176,8 +176,8 @@ func (p *EventParser) parseRepositoryEvent(event *Event, payload []byte) (*Event
 		event.Sender = p.convertUser(ghEvent.Sender)
 	}
 
-	if ghEvent.Organization != nil {
-		event.Organization = p.convertOrganization(ghEvent.Organization)
+	if ghEvent.Org != nil {
+		event.Organization = p.convertOrganization(ghEvent.Org)
 	}
 
 	var rawPayload map[string]interface{}
@@ -248,8 +248,8 @@ func (p *EventParser) parseTeamEvent(event *Event, payload []byte) (*Event, erro
 		event.Sender = p.convertUser(ghEvent.Sender)
 	}
 
-	if ghEvent.Organization != nil {
-		event.Organization = p.convertOrganization(ghEvent.Organization)
+	if ghEvent.Org != nil {
+		event.Organization = p.convertOrganization(ghEvent.Org)
 	}
 
 	var rawPayload map[string]interface{}
@@ -272,8 +272,8 @@ func (p *EventParser) parseTeamAddEvent(event *Event, payload []byte) (*Event, e
 		event.Sender = p.convertUser(ghEvent.Sender)
 	}
 
-	if ghEvent.Organization != nil {
-		event.Organization = p.convertOrganization(ghEvent.Organization)
+	if ghEvent.Org != nil {
+		event.Organization = p.convertOrganization(ghEvent.Org)
 	}
 
 	var rawPayload map[string]interface{}

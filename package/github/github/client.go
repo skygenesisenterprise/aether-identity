@@ -214,13 +214,13 @@ func (c *Client) GetUser(ctx context.Context, userID int64) (*github.User, error
 }
 
 // GetTeam retrieves a team by ID
-func (c *Client) GetTeam(ctx context.Context, installationID int64, org string, teamID int64) (*github.Team, error) {
+func (c *Client) GetTeam(ctx context.Context, installationID int64, orgID int64, teamID int64) (*github.Team, error) {
 	client, err := c.GetInstallationClient(ctx, installationID)
 	if err != nil {
 		return nil, err
 	}
 
-	team, resp, err := client.Teams.GetTeamByID(ctx, org, teamID)
+	team, resp, err := client.Teams.GetTeamByID(ctx, orgID, teamID)
 	if err != nil {
 		if resp != nil && resp.StatusCode == http.StatusNotFound {
 			return nil, errors.ErrTeamNotFound
@@ -232,7 +232,7 @@ func (c *Client) GetTeam(ctx context.Context, installationID int64, org string, 
 }
 
 // ListTeamMembers lists members of a team
-func (c *Client) ListTeamMembers(ctx context.Context, installationID int64, org string, teamID int64) ([]*github.User, error) {
+func (c *Client) ListTeamMembers(ctx context.Context, installationID int64, orgID int64, teamID int64) ([]*github.User, error) {
 	client, err := c.GetInstallationClient(ctx, installationID)
 	if err != nil {
 		return nil, err
@@ -242,7 +242,7 @@ func (c *Client) ListTeamMembers(ctx context.Context, installationID int64, org 
 	opts := &github.TeamListTeamMembersOptions{ListOptions: github.ListOptions{PerPage: 100}}
 
 	for {
-		members, resp, err := client.Teams.ListTeamMembersByID(ctx, org, teamID, opts)
+		members, resp, err := client.Teams.ListTeamMembersByID(ctx, orgID, teamID, opts)
 		if err != nil {
 			return nil, errors.Wrap(err, "GITHUB", "API_ERROR", "failed to list team members")
 		}

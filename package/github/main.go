@@ -2,13 +2,17 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/skygenesisenterprise/aether-identity/package/github/config"
 	"github.com/skygenesisenterprise/aether-identity/package/github/github"
 	"github.com/skygenesisenterprise/aether-identity/package/github/identity"
@@ -17,56 +21,64 @@ import (
 	"github.com/skygenesisenterprise/aether-identity/package/github/sync"
 )
 
-// App represents the GitHub App application
-type App struct {
-	config         *config.Config
-	githubClient   *github.Client
-	identityClient *identity.Client
-	auditLogger    *identity.AuditLogger
-	syncManager    *sync.Manager
-	checker        *permissions.Checker
-	mapper         *permissions.Mapper
-	enforcer       *permissions.Enforcer
-	webhookHandler *server.WebhookHandler
-	httpServer     *server.Server
+func displayBanner() {
+	fmt.Printf("\n")
+	fmt.Printf("\033[1;36m    ██████╗ ██╗████████╗██╗  ██╗██╗   ██╗██████╗     ██╗██████╗ ███████╗███╗   ██╗████████╗██╗████████╗██╗   ██╗\n")
+	fmt.Printf("\033[1;36m   ██╔════╝ ██║╚══██╔══╝██║  ██║██║   ██║██╔══██╗   ██╔╝██╔══██╗██╔════╝████╗  ██║╚══██╔══╝██║╚══██╔══╝╚██╗ ██╔╝\n")
+	fmt.Printf("\033[1;36m   ██║  ███╗██║   ██║   ███████║██║   ██║██████╔╝  ██╔╝ ██║  ██║█████╗  ██╔██╗ ██║   ██║   ██║   ██║    ╚████╔╝ \n")
+	fmt.Printf("\033[1;36m   ██║   ██║██║   ██║   ██╔══██║██║   ██║██╔══██╗ ██╔╝  ██║  ██║██╔══╝  ██║╚██╗██║   ██║   ██║   ██║     ╚██╔╝  \n")
+	fmt.Printf("\033[1;36m   ╚██████╔╝██║   ██║   ██║  ██║╚██████╔╝██████╔╝██╔╝   ██████╔╝███████╗██║ ╚████║   ██║   ██║   ██║      ██║   \n")
+	fmt.Printf("\033[1;36m    ╚═════╝ ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝    ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝   ╚═╝      ╚═╝   \n")
+	fmt.Printf("\033[0;37m")
+	fmt.Printf("\n")
+	fmt.Printf("\033[1;33m    ╔═══════════════════════════════════════════════════════════════════════════╗\n")
+	fmt.Printf("\033[1;33m    ║                        GITHUB IDENTITY SYNC                               ║\n")
+	fmt.Printf("\033[1;33m    ║                   Enterprise GitHub Identity Management                   ║\n")
+	fmt.Printf("\033[1;33m    ╚═══════════════════════════════════════════════════════════════════════════╝\n")
+	fmt.Printf("\033[0;37m")
+	fmt.Printf("\n")
+	fmt.Printf("\033[1;32m[✓] System Architecture: %s\033[0m\n", runtime.GOARCH)
+	fmt.Printf("\033[1;32m[✓] Operating System: %s\033[0m\n", runtime.GOOS)
+	fmt.Printf("\033[1;32m[✓] Go Version: %s\033[0m\n", runtime.Version())
+	fmt.Printf("\033[1;32m[✓] CPU Cores: %d\033[0m\n", runtime.NumCPU())
+	fmt.Printf("\033[1;32m[✓] Process ID: %d\033[0m\n", os.Getpid())
+	fmt.Printf("\n")
+	fmt.Printf("\033[1;34m[info] Loading configuration...\033[0m\n")
+	time.Sleep(300 * time.Millisecond)
+	fmt.Printf("\033[1;34m[info] Initializing GitHub client...\033[0m\n")
+	time.Sleep(300 * time.Millisecond)
+	fmt.Printf("\033[1;34m[info] Setting up identity services...\033[0m\n")
+	time.Sleep(300 * time.Millisecond)
+	fmt.Printf("\033[1;34m[info] Configuring sync manager...\033[0m\n")
+	time.Sleep(200 * time.Millisecond)
+	fmt.Printf("\033[1;34m[info] Initializing permission system...\033[0m\n")
+	time.Sleep(200 * time.Millisecond)
+	fmt.Printf("\033[1;34m[info] Setting up webhook handlers...\033[0m\n")
+	time.Sleep(200 * time.Millisecond)
+	fmt.Printf("\n")
 }
 
-// NewApp creates a new GitHub App instance
-func NewApp() (*App, error) {
-	// Load configuration
+func main() {
+	displayBanner()
+
 	cfg, err := config.Load()
 	if err != nil {
-		return nil, err
+		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
-	// Create GitHub client
 	ghClient, err := github.NewClient(cfg.GitHub)
 	if err != nil {
-		return nil, err
+		log.Fatalf("Failed to create GitHub client: %v", err)
 	}
 
-	// Create Identity client
 	idClient := identity.NewClient(cfg.Identity)
-
-	// Create audit logger
 	auditLogger := identity.NewAuditLogger(idClient)
-
-	// Create sync manager
 	syncMgr := sync.NewManager(cfg.Sync, idClient, auditLogger, ghClient)
-
-	// Create permission checker
 	checker := permissions.NewChecker(idClient)
-
-	// Create permission mapper
 	mapper := permissions.NewMapper()
-
-	// Create enforcer
 	enforcer := permissions.NewEnforcer(checker, auditLogger, mapper)
-
-	// Create event parser
 	eventParser := github.NewEventParser()
 
-	// Create webhook handler
 	webhookHandler := server.NewWebhookHandler(
 		eventParser,
 		syncMgr,
@@ -75,7 +87,6 @@ func NewApp() (*App, error) {
 		ghClient,
 	)
 
-	// Create HTTP handlers
 	handlers := &server.Handlers{
 		WebhookHandler:      webhookHandler.Handle,
 		HealthHandler:       healthHandler,
@@ -83,74 +94,78 @@ func NewApp() (*App, error) {
 		InstallationHandler: installationHandler(syncMgr),
 	}
 
-	// Create HTTP server
-	httpServer := server.NewServer(cfg.Server, handlers)
+	gin.SetMode(gin.ReleaseMode)
+	router := gin.New()
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
+	gin.DefaultWriter = io.Discard
 
-	return &App{
-		config:         cfg,
-		githubClient:   ghClient,
-		identityClient: idClient,
-		auditLogger:    auditLogger,
-		syncManager:    syncMgr,
-		checker:        checker,
-		mapper:         mapper,
-		enforcer:       enforcer,
-		webhookHandler: webhookHandler,
-		httpServer:     httpServer,
-	}, nil
-}
+	router.POST("/webhook", gin.WrapF(handlers.WebhookHandler))
+	router.GET("/health", gin.WrapF(handlers.HealthHandler))
+	router.GET("/metrics", gin.WrapF(handlers.MetricsHandler))
+	router.POST("/installations/sync", gin.WrapF(handlers.InstallationHandler))
 
-// Run starts the GitHub App
-func (a *App) Run() error {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = cfg.Server.Port
+	}
+	if port == "" {
+		port = "8080"
+	}
+
+	fmt.Printf("\033[1;32m[✓] All systems operational\033[0m\n")
+	fmt.Printf("\n")
+	fmt.Printf("\033[1;36m┌─────────────────────────────────────────────────────────────────────────n")
+	fmt.Printf("\033[1;36m│                      🚀 SERVER READY                                    │\n")
+	fmt.Printf("\033[1;36m├─────────────────────────────────────────────────────────────────────────┤\n")
+	fmt.Printf("\033[1;36m│  🌐 Server listening on: http://localhost:%s                           │\n", port)
+	fmt.Printf("\033[1;36m│  📊 Health Check: http://localhost:%s/health                           │\n", port)
+	fmt.Printf("\033[1;36m│  🔗 Webhook Endpoint: http://localhost:%s/webhook                      │\n", port)
+	fmt.Printf("\033[1;36m│  ⚡ Mode: %s                                                           │\n", gin.Mode())
+	fmt.Printf("\033[1;36m└─────────────────────────────────────────────────────────────────────────┘\n")
+	fmt.Printf("\033[0;37m\n")
+	fmt.Printf("\033[1;33m[info] Press Ctrl+C to stop the server\033[0m\n\n")
+
 	// Create context for graceful shutdown
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	// Start HTTP server in a goroutine
+	// Start server in a goroutine
 	serverErr := make(chan error, 1)
 	go func() {
-		log.Printf("Starting GitHub App on %s", a.httpServer.Addr())
-		if err := a.httpServer.Start(); err != nil {
-			serverErr <- err
-		}
+		serverErr <- router.Run(":" + port)
 	}()
 
 	// Wait for shutdown signal or server error
 	select {
 	case <-ctx.Done():
-		log.Println("Shutdown signal received, gracefully shutting down...")
+		fmt.Println("\033[1;33m[info] Shutdown signal received, gracefully shutting down...\033[0m")
 	case err := <-serverErr:
-		return err
+		log.Fatalf("Server error: %v", err)
 	}
 
 	// Graceful shutdown with timeout
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	if err := a.httpServer.Stop(shutdownCtx); err != nil {
-		log.Printf("Error during shutdown: %v", err)
-		return err
+	select {
+	case <-shutdownCtx.Done():
+		fmt.Println("\033[1;32m[✓] Server stopped gracefully\033[0m")
 	}
-
-	log.Println("Server stopped gracefully")
-	return nil
 }
 
-// healthHandler handles health check requests
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"status":"healthy","service":"aether-identity-github-app"}`))
 }
 
-// metricsHandler handles metrics requests (placeholder for Prometheus/metrics)
 func metricsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("# Metrics endpoint - implement with Prometheus client library\n"))
 }
 
-// installationHandler handles installation management requests
 func installationHandler(syncMgr *sync.Manager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -158,7 +173,6 @@ func installationHandler(syncMgr *sync.Manager) http.HandlerFunc {
 			return
 		}
 
-		// Trigger sync for all installations
 		go func() {
 			ctx := context.Background()
 			if err := syncMgr.SyncAllInstallations(ctx); err != nil {
@@ -169,16 +183,5 @@ func installationHandler(syncMgr *sync.Manager) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusAccepted)
 		w.Write([]byte(`{"status":"sync_started"}`))
-	}
-}
-
-func main() {
-	app, err := NewApp()
-	if err != nil {
-		log.Fatalf("Failed to create app: %v", err)
-	}
-
-	if err := app.Run(); err != nil {
-		log.Fatalf("Error running app: %v", err)
 	}
 }

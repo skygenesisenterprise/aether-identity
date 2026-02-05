@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: aether-identity-github-app
+    container_name: identity-github-app
     ports:
       - "3000:3000"
     environment:
@@ -56,8 +56,8 @@ services:
       start_period: 5s
       retries: 3
     networks:
-      - aether-identity-network
+      - identity-network
 
 networks:
-  aether-identity-network:
+  identity-network:
     driver: bridge

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/skygenesisenterprise/aether-identity/package/github/config"
 )
