@@ -67,9 +67,9 @@ services:
 
 # Reseau pour la communication entre les services en mode standalone
 networks:
-  identity-network:
+  identity-network-dev:
     driver: bridge
-    name: identity-network
+    name: identity-network-dev
 
 # Volumes pour persister les donnees
 volumes:
