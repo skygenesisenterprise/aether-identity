@@ -74,4 +74,6 @@ export { CreateIdentityClient, IdentityClient };
 export { IdentityError, AuthenticationError, AuthorizationError, SessionExpiredError, TOTPRequiredError, DeviceNotAvailableError, NetworkError, ServerError, };
 export * from "./core/transport";
 export * from "./core/session";
+// Server SDK exports
+export { CreateIdentityServer, IdentityServer } from "./server";
 //# sourceMappingURL=index.js.map

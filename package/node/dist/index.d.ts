@@ -27,4 +27,7 @@ export type { IdentityClientConfig, AuthInput, StrengthenInput, UserProfile, Use
 export { IdentityError, AuthenticationError, AuthorizationError, SessionExpiredError, TOTPRequiredError, DeviceNotAvailableError, NetworkError, ServerError, };
 export * from "./core/transport";
 export * from "./core/session";
+export { CreateIdentityServer, IdentityServer } from "./server";
+export type { IdentityServerInstance, IdentityServerConfig, IdentityServerHooks, ServerLoginCredentials, GenerateTokenInput, ServerTokenResponse, TokenValidationResult, UserContext, ContextType, ExpressMiddleware, MiddlewareOptions, UnauthorizedInfo, HookContext, LoginHookContext, LogoutHookContext, TokenRefreshHookContext, MFARequiredHookContext, RoleCheckHookContext, } from "./server";
+export type { TokenCacheConfig, RateLimitConfig } from "./server/types";
 //# sourceMappingURL=index.d.ts.map

@@ -162,3 +162,27 @@ export {
 
 export * from "./core/transport";
 export * from "./core/session";
+
+// Server SDK exports
+export { CreateIdentityServer, IdentityServer } from "./server";
+export type {
+  IdentityServerInstance,
+  IdentityServerConfig,
+  IdentityServerHooks,
+  ServerLoginCredentials,
+  GenerateTokenInput,
+  ServerTokenResponse,
+  TokenValidationResult,
+  UserContext,
+  ContextType,
+  ExpressMiddleware,
+  MiddlewareOptions,
+  UnauthorizedInfo,
+  HookContext,
+  LoginHookContext,
+  LogoutHookContext,
+  TokenRefreshHookContext,
+  MFARequiredHookContext,
+  RoleCheckHookContext,
+} from "./server";
+export type { TokenCacheConfig, RateLimitConfig } from "./server/types";
