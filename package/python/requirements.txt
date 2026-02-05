@@ -1,0 +1,11 @@
+# Aether Identity Python SDK - Core Dependencies
+
+# HTTP client library
+httpx>=0.25.0
+
+# Data validation and serialization
+pydantic>=2.0.0
+
+# Optional server dependencies (install with: pip install "aether-identity[server]")
+# fastapi>=0.100.0
+# flask>=2.0.0
