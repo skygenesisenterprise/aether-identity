@@ -5,7 +5,7 @@ services:
     build:
       context: ..
       dockerfile: infra/Dockerfile
-    container_name: aether-identity-frontend
+    container_name: identity-frontend
     expose:
       - "3001"
     environment:
@@ -23,14 +23,14 @@ services:
       start_period: 10s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.aether-app.rule=Host(`localhost`) || Host(`aether.local`)"
-      - "traefik.http.routers.aether-app.entrypoints=web"
-      - "traefik.http.services.aether-app.loadbalancer.server.port=3001"
-      - "traefik.http.routers.aether-app.priority=1"
+      - "traefik.http.routers.identity-app.rule=Host(`localhost`) || Host(`identity.local`)"
+      - "traefik.http.routers.identity-app.entrypoints=web"
+      - "traefik.http.services.identity-app.loadbalancer.server.port=3001"
+      - "traefik.http.routers.identity-app.priority=1"
     networks:
-      - aether-network
+      - identity-network
 
 networks:
-  aether-network:
-    name: aether-network
+  identity-network:
+    name: identity-network
     driver: bridge

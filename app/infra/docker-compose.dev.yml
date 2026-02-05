@@ -5,7 +5,7 @@ services:
     build:
       context: ..
       dockerfile: infra/Dockerfile.dev
-    container_name: aether-identity-frontend-dev
+    container_name: identity-frontend-dev
 
     # Le port est uniquement visible dans le réseau Docker
     expose:
@@ -37,16 +37,16 @@ services:
     # 🔑 Indexation par Traefik (l’infra décide de l’exposition)
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.aether-app.rule=Host(`localhost`) || Host(`aether.local`)"
-      - "traefik.http.routers.aether-app.entrypoints=web"
-      - "traefik.http.services.aether-app.loadbalancer.server.port=3001"
-      - "traefik.http.routers.aether-app.priority=1"
+      - "traefik.http.routers.identity-app.rule=Host(`localhost`) || Host(`identity.local`)"
+      - "traefik.http.routers.identity-app.entrypoints=web"
+      - "traefik.http.services.identity-app.loadbalancer.server.port=3001"
+      - "traefik.http.routers.identity-app.priority=1"
 
     networks:
-      - aether-network-dev
+      - identity-network-dev
 
 networks:
-  aether-network-dev:
+  identity-network-dev:
     name: aether-network-dev
     driver: bridge
 

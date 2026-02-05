@@ -17,26 +17,26 @@ services:
       - "--log.level=INFO"
       - "--accesslog=true"
     networks:
-      - aether-network
+      - identity-network
     restart: unless-stopped
 
   # Service pour l'application frontend Aether Identity (Next.js)
   # Etend la configuration de app/infra/docker-compose.yml
-  aether-app:
+  identity-app:
     extends:
       file: ../../app/infra/docker-compose.yml
       service: app
     ports: []
     labels: [] # Override pour supprimer les labels Traefik (configuration statique utilisée)
     networks:
-      - aether-network-dev
+      - identity-network
 
   # Service pour le serveur Aether Identity (Go)
-  aether-server:
+  identity-server:
     build:
       context: ../../server
       dockerfile: infra/Dockerfile
-    container_name: aether-identity-server
+    container_name: identity-server
     expose:
       - "8080"
     environment:
@@ -63,7 +63,7 @@ services:
       retries: 5
       start_period: 10s
     networks:
-      - aether-network
+      - identity-network
 
   # Service Database unique - PostgreSQL avec migrations Prisma automatiques
   # Étend la configuration de @prisma/infra/docker-compose.yml mais
@@ -75,8 +75,8 @@ services:
     build:
       context: ../..
       dockerfile: infrastructure/docker/Dockerfile.postgres
-    image: aether-database
-    container_name: aether-database
+    image: identity-database
+    container_name: identity-database
     # Override pour utiliser PostgreSQL comme processus principal (pas la commande Prisma)
     command: ["postgres", "-c", "listen_addresses=*"]
     environment:
@@ -89,7 +89,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - aether-network
+      - identity-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -99,9 +99,9 @@ services:
 
 # Reseau pour la communication entre les services
 networks:
-  aether-network:
+  identity-network:
     driver: bridge
-    name: aether-network
+    name: identity-network
 
 # Volumes pour persister les donnees
 volumes:

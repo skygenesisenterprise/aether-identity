@@ -2,11 +2,11 @@ version: "3.9"
 
 services:
   # Service pour le serveur Aether Identity
-  aether-server:
+  identity-server:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    container_name: aether-server
+    container_name: identity-server
     # Port interne uniquement (pas de publication publique)
     expose:
       - "8080"
@@ -33,9 +33,9 @@ services:
       - "" # Par defaut disponible
 
   # Service aether-server avec port public expose (pour developpement standalone)
-  aether-server-public:
+  identity-server-public:
     extends:
-      service: aether-server
+      service: identity-server
     ports:
       - "8080:8080"
     profiles:
@@ -43,23 +43,10 @@ services:
     depends_on:
       - postgres
 
-  # Service Adminer pour l'interface d'administration de la base de donnees
-  adminer:
-    image: adminer:latest
-    container_name: aether-adminer
-    ports:
-      - "8081:8080"
-    depends_on:
-      - postgres
-    networks:
-      - aether-network
-    profiles:
-      - standalone # Ne demarre qu'avec --profile standalone
-
   # Service PostgreSQL pour le developpement standalone
   postgres:
     image: postgres:16-alpine
-    container_name: aether-postgres
+    container_name: identity-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -69,7 +56,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - aether-network
+      - identity-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -80,9 +67,9 @@ services:
 
 # Reseau pour la communication entre les services en mode standalone
 networks:
-  aether-network:
+  identity-network:
     driver: bridge
-    name: aether-network
+    name: identity-network
 
 # Volumes pour persister les donnees
 volumes:
