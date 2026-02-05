@@ -110,7 +110,7 @@
     "@prisma/client": "^7.3.0",
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
-    "loglayer": "^8.4.0",
+    "loglayer": "^8.4.1",
     "pino": "^10.3.0"
   }
 }
