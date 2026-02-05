@@ -1,59 +1,91 @@
-version: '3.9'
+version: "3.9"
 
 services:
-  # Service pour l'application frontend Aether Identity
-  aether-app:
-    build:
-      context: ../..
-      dockerfile: infrastructure/docker/Dockerfile
-    container_name: aether-identity-app
+  # Traefik Reverse Proxy - Seul service avec port expose publiquement (3001)
+  traefik:
+    image: traefik:v3.4
+    container_name: aether-traefik
     ports:
-      - "3001:3000"
-    environment:
-      NODE_ENV: production
-      PORT: 3000
-      HOSTNAME: 0.0.0.0
-      NEXT_PUBLIC_API_URL: "http://aether-server:8080"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      - "3001:80"
+    volumes:
+      - ./traefik.yml:/traefik.yml:ro
+    command:
+      - "--api.dashboard=false"
+      - "--providers.file.filename=/traefik.yml"
+      - "--providers.file.watch=true"
+      - "--entrypoints.web.address=:80"
+      - "--log.level=INFO"
+      - "--accesslog=true"
     networks:
       - aether-network
+    restart: unless-stopped
 
-  # Service pour le serveur Aether Identity
+  # Service pour l'application frontend Aether Identity (Next.js)
+  # Etend la configuration de app/infra/docker-compose.yml
+  aether-app:
+    extends:
+      file: ../../app/infra/docker-compose.yml
+      service: app
+    ports: []
+    labels: [] # Override pour supprimer les labels Traefik (configuration statique utilisée)
+    networks:
+      - aether-network-dev
+
+  # Service pour le serveur Aether Identity (Go)
   aether-server:
     build:
-      context: ../..
-      dockerfile: infrastructure/docker/Dockerfile
+      context: ../../server
+      dockerfile: infra/Dockerfile
     container_name: aether-identity-server
-    ports:
-      - "8081:8080"
+    expose:
+      - "8080"
     environment:
-      - JWT_SECRET=${JWT_SECRET:-votre-cle-secrete-ici}
-      - ACCESS_TOKEN_EXP=${ACCESS_TOKEN_EXP:-15}
-      - REFRESH_TOKEN_EXP=${REFRESH_TOKEN_EXP:-720}
-      - DATABASE_URL=${DATABASE_URL:-host=postgres user=postgres password=postgres dbname=aether_identity port=5432 sslmode=disable}
-      - PORT=${PORT:-8080}
+      - JWT_SECRET=${JWT_SECRET:-secret-key-change-in-production}
+      - ACCESS_TOKEN_EXP=15
+      - REFRESH_TOKEN_EXP=720
+      - DATABASE_URL=postgresql://postgres:postgres@database:5432/aether_identity?sslmode=disable
+      - PORT=8080
+      - SYSTEM_KEY=${SYSTEM_KEY:-sk_system_default_key_change_in_production}
+      - CORS_ALLOWED_ORIGINS=http://localhost:3001
+      - DEFAULT_POST_LOGIN_PATH=/
+      - DEFAULT_POST_LOGOUT_PATH=/
     depends_on:
-      - postgres
+      database:
+        condition: service_healthy
+    volumes:
+      - ../../server:/app
+    restart: unless-stopped
+    healthcheck:
+      test:
+        ["CMD", "wget", "--spider", "-q", "http://localhost:8080/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - aether-network
-    restart: unless-stopped
 
-  # Service PostgreSQL pour la production
-  postgres:
-    image: postgres:16-alpine
-    container_name: aether-postgres
+  # Service Database unique - PostgreSQL avec migrations Prisma automatiques
+  # Étend la configuration de @prisma/infra/docker-compose.yml mais
+  # utilise une image PostgreSQL personnalisée avec Prisma intégré
+  database:
+    extends:
+      file: ../../prisma/infra/docker-compose.yml
+      service: database
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.postgres
+    image: aether-database
+    container_name: aether-database
+    # Override pour utiliser PostgreSQL comme processus principal (pas la commande Prisma)
+    command: ["postgres", "-c", "listen_addresses=*"]
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: aether_identity
-    ports:
-      - "5432:5432"
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/aether_identity?schema=public
+    expose:
+      - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -63,14 +95,17 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
-# Réseau pour la communication entre les services
+# Reseau pour la communication entre les services
 networks:
   aether-network:
     driver: bridge
     name: aether-network
 
-# Volumes pour persister les données
+# Volumes pour persister les donnees
 volumes:
   postgres_data:
+    driver: local
+  app_next:
     driver: local

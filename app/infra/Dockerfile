@@ -1,67 +1,33 @@
-# Dockerfile - Production and Development build stages
+# Dockerfile — Next.js Production
+# Multi-stage build for optimized image size and security
 
-# ----------------------------
-# Builder stage
-# ----------------------------
-FROM node:20-alpine AS builder
-
-# Install system dependencies
-RUN apk add --no-cache libc6-compat git bash curl
-
-# Enable Corepack and pnpm
-RUN corepack enable && corepack prepare pnpm@10.28.1 --activate
-
-# Set working directory
+# Dependencies stage
+FROM node:20-alpine AS deps
+RUN apk add --no-cache libc6-compat
+RUN npm install -g pnpm@10.28.1
 WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --no-frozen-lockfile
 
-# Copy package files
-COPY package.json ./
-
-# Install dependencies
-RUN pnpm install --force
-
-# Copy app source
+# Builder stage
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-# Build the application for production
+ENV NODE_ENV=production
 RUN pnpm build
 
-# ----------------------------
-# Development stage
-# ----------------------------
-FROM node:20-alpine AS dev
-
-# Install system dependencies
-RUN apk add --no-cache libc6-compat git bash curl
-
-# Enable Corepack and pnpm
-RUN corepack enable && corepack prepare pnpm@10.28.1 --activate
-
-# Set working directory
+# Runner stage
+FROM node:20-alpine AS runner
 WORKDIR /app
-
-# Expose dev ports
-EXPOSE 3000 24678
-
-# Environment variables
-ENV NODE_ENV=development
-ENV PORT=3000
+ENV NODE_ENV=production
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+USER nextjs
+EXPOSE 3001
+ENV PORT=3001
 ENV HOSTNAME=0.0.0.0
-ENV CHOKIDAR_USEPOLLING=true
-
-# Copy package files and install dependencies
-COPY package.json pnpm-lock.yaml ./
-
-# Copy built files from builder stage
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
-
-# Install dependencies as root (avoids permission issues)
-RUN pnpm install --force
-
-# Copy app source
-COPY . .
-
-# Start dev server as root (for volume permissions)
-CMD ["pnpm", "dev", "--hostname", "0.0.0.0", "--port", "3000"]
+CMD ["node", "server.js"]

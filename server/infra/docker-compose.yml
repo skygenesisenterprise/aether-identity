@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  aether-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aether-identity-server
+    expose:
+      - "8080"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - ACCESS_TOKEN_EXP=15
+      - REFRESH_TOKEN_EXP=720
+      - DATABASE_URL=${DATABASE_URL}
+      - PORT=8080
+      - SYSTEM_KEY=${SYSTEM_KEY}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-https://localhost}
+      - DEFAULT_POST_LOGIN_PATH=/
+      - DEFAULT_POST_LOGOUT_PATH=/
+    restart: unless-stopped
+    healthcheck:
+      test:
+        ["CMD", "wget", "--spider", "-q", "http://localhost:8080/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - aether-network
+
+networks:
+  aether-network:
+    driver: bridge
+    name: aether-network
