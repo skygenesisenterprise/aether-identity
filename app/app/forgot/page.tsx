@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { Footer } from "@/components/Footer";
 
 export default function ForgotPage() {
   const [step, setStep] = useState<"email" | "code" | "password">("email");
