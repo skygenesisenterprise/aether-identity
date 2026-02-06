@@ -2,12 +2,12 @@
 
 import type React from "react";
 
-import { useState, useRef } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { Search, ChevronLeft } from "lucide-react";
-import Link from "next/link";
-import { CreateIdentityClient, IdentityClient } from "aether-identity";
 import { Footer } from "@/components/Footer";
+import { CreateIdentityClient, IdentityClient } from "aether-identity";
+import { ChevronLeft, Search } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useRef, useState } from "react";
 
 interface OAuthParams {
   client_id?: string;

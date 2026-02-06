@@ -2,6 +2,7 @@
 
 import { ArrowLeft, Fingerprint, Github, Building2 } from "lucide-react"
 import Link from "next/link"
+import { Footer } from "@/components/Footer";
 
 export default function LoginOptionsPage() {
   return (
@@ -82,19 +83,7 @@ export default function LoginOptionsPage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="absolute bottom-0 left-0 right-0 py-3 px-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-xs text-[#605e5c]">
-        <button className="hover:underline focus:underline">...</button>
-        <a href="#" className="hover:underline focus:underline">
-          Conditions d&apos;utilisation
-        </a>
-        <a href="#" className="hover:underline focus:underline">
-          Confidentialité et cookies
-        </a>
-        <a href="#" className="hover:underline focus:underline">
-          Accessibilité : partiellement conforme
-        </a>
-      </footer>
+      <Footer variant="absolute" />
     </div>
   )
 }

@@ -2,12 +2,13 @@
 
 import type React from "react";
 
-import { useState, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Footer } from "@/components/Footer";
+import { CreateIdentityClient, IdentityClient } from "aether-identity";
+import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { CreateIdentityClient, IdentityClient } from "aether-identity";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 
 export default function RegisterPage() {
   const [step, setStep] = useState<"email" | "password" | "confirm">("email");
@@ -454,19 +455,7 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="absolute bottom-0 left-0 right-0 py-3 px-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-xs text-[#605e5c]">
-        <button className="hover:underline focus:underline">...</button>
-        <a href="#" className="hover:underline focus:underline">
-          Conditions d&apos;utilisation
-        </a>
-        <a href="#" className="hover:underline focus:underline">
-          Confidentialité et cookies
-        </a>
-        <a href="#" className="hover:underline focus:underline">
-          Accessibilité : partiellement conforme
-        </a>
-      </footer>
+      <Footer variant="absolute" />
     </div>
   );
 }

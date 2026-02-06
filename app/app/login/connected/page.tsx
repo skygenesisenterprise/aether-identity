@@ -1,5 +1,6 @@
 "use client";
 
+import { Footer } from "@/components/Footer";
 import { CheckCircle } from "lucide-react";
 
 export default function ConnectedPage() {
@@ -85,19 +86,7 @@ export default function ConnectedPage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="absolute bottom-0 left-0 right-0 py-3 px-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-xs text-[#605e5c]">
-        <button className="hover:underline focus:underline">...</button>
-        <a href="#" className="hover:underline focus:underline">
-          Terms of Use
-        </a>
-        <a href="#" className="hover:underline focus:underline">
-          Privacy & Cookies
-        </a>
-        <a href="#" className="hover:underline focus:underline">
-          Accessibility: Partially Conforming
-        </a>
-      </footer>
+      <Footer variant="absolute" />
     </div>
   );
 }
