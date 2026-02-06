@@ -13,6 +13,7 @@ type Colors struct {
 	Success string
 	Warning string
 	Error   string
+	Label   string
 }
 
 // GetColors retourne la palette de couleurs par défaut
@@ -29,5 +30,6 @@ func GetColors() *Colors {
 		Success: "\033[32m", // Vert
 		Warning: "\033[33m", // Jaune
 		Error:   "\033[31m", // Rouge
+		Label:   "\033[94m", // Bleu
 	}
 }

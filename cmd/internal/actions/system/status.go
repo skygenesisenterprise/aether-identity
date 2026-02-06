@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/skygenesisenterprise/aether-identity/cmd/internal/context"
-	"github.com/skygenesisenterprise/aether-identity/cmd/internal/menu/types"
+	"github.com/skygenesisenterprise/aether-identity/cmd/internal/types"
 	"github.com/skygenesisenterprise/aether-identity/cmd/internal/ui/theme"
 )
 

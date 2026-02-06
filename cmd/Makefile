@@ -1,63 +1,105 @@
-.PHONY: build install dev test lint clean
+.PHONY: build run test clean docker-build docker-run docker-shell help
 
 # Variables
-BINARY=vaultctl
+BINARY=aether-console
 BUILD_DIR=build
-GO_FILES=$(shell find . -name "*.go" -type f)
+DOCKER_IMAGE=aether-identity/console
 
 # Build
 build:
-	@echo "Building $(BINARY)..."
+	@echo "🏗️  Building $(BINARY)..."
 	@mkdir -p $(BUILD_DIR)
 	@go build -o $(BUILD_DIR)/$(BINARY) ./main.go
+	@echo "✅ Build complete: $(BUILD_DIR)/$(BINARY)"
 
-# Install
-install: build
-	@echo "Installing $(BINARY)..."
-	@sudo cp $(BUILD_DIR)/$(BINARY) /usr/local/bin/
-	@sudo chmod +x /usr/local/bin/$(BINARY)
-	@sudo cp scripts/service.sh /etc/systemd/system/vaultctl.service
-	@sudo systemctl daemon-reload
-	@sudo systemctl enable vaultctl
+# Run locally
+run: build
+	@echo "🚀 Running $(BINARY)..."
+	@./$(BUILD_DIR)/$(BINARY)
 
-# Dev
+# Run development mode (direct)
 dev:
-	@echo "Running $(BINARY) in development mode..."
+	@echo "🚀 Running in dev mode..."
 	@go run ./main.go
 
 # Test
 test:
-	@echo "Running tests..."
+	@echo "🧪 Running tests..."
 	@go test -v ./...
-
-# Lint
-lint:
-	@echo "Running linter..."
-	@golangci-lint run
 
 # Clean
 clean:
-	@echo "Cleaning up..."
+	@echo "🧹 Cleaning up..."
 	@rm -rf $(BUILD_DIR)
 	@go clean
 
 # Format
 fmt:
-	@echo "Formatting code..."
-	@go fmt $(GO_FILES)
+	@echo "✨ Formatting code..."
+	@go fmt ./...
 
 # Dependencies
 deps:
-	@echo "Downloading dependencies..."
+	@echo "📦 Downloading dependencies..."
 	@go mod download
 	@go mod tidy
 
-# Docker build (for testing)
+# Docker build
 docker-build:
-	@echo "Building Docker image..."
-	@docker build -t aether-vault/cmd .
+	@echo "🐳 Building Docker image..."
+	@docker build -t $(DOCKER_IMAGE):latest -f infra/Dockerfile .
 
-# Run tests in Docker
-docker-test: docker-build
-	@echo "Running tests in Docker..."
-	@docker run --rm aether-vault/cmd make test
+# Docker interactive shell (console)
+docker-shell: docker-build
+	@echo "🖥️  Starting interactive console in Docker..."
+	@docker run -it --rm --name aether-console $(DOCKER_IMAGE):latest
+
+# Docker compose up (interactive)
+docker-up:
+	@echo "🚀 Starting with Docker Compose (interactive)..."
+	@cd infra && docker-compose run --rm aether-console
+
+# Docker compose down
+docker-down:
+	@echo "🛑 Stopping Docker Compose..."
+	@cd infra && docker-compose down
+
+# Install locally
+install: build
+	@echo "💿 Installing $(BINARY) to /usr/local/bin..."
+	@sudo cp $(BUILD_DIR)/$(BINARY) /usr/local/bin/
+	@sudo chmod +x /usr/local/bin/$(BINARY)
+	@echo "✅ Installation complete!"
+	@echo "Run '$(BINARY)' to start the console"
+
+# Uninstall
+uninstall:
+	@echo "🗑️  Uninstalling $(BINARY)..."
+	@sudo rm -f /usr/local/bin/$(BINARY)
+	@echo "✅ Uninstall complete"
+
+# Show help
+help:
+	@echo "🛡️  Aether Identity Console - Available Commands:"
+	@echo ""
+	@echo "Development:"
+	@echo "  make build         - Build the binary"
+	@echo "  make run           - Build and run locally"
+	@echo "  make dev           - Run directly with go run"
+	@echo "  make test          - Run tests"
+	@echo "  make fmt           - Format code"
+	@echo "  make clean         - Clean build artifacts"
+	@echo ""
+	@echo "Docker:"
+	@echo "  make docker-build  - Build Docker image"
+	@echo "  make docker-shell  - Run interactive console in Docker"
+	@echo "  make docker-up     - Start with Docker Compose"
+	@echo "  make docker-down   - Stop Docker Compose"
+	@echo ""
+	@echo "Installation:"
+	@echo "  make install       - Install to /usr/local/bin"
+	@echo "  make uninstall     - Remove from /usr/local/bin"
+	@echo ""
+	@echo "Usage:"
+	@echo "  Once running, type a number (0-13) and press Enter"
+	@echo "  0 = Quitter, 1-13 = Actions diverses"
