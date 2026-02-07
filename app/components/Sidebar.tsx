@@ -5,6 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/dashboard/ui/collapsible";
 
 import {
   LayoutDashboard,
@@ -17,6 +22,32 @@ import {
   Activity,
   LucideIcon,
   ChevronDown,
+  Globe,
+  Layers,
+  Server,
+  Database,
+  Cloud,
+  Link2,
+  UserCircle,
+  UsersRound,
+  ShieldCheck,
+  FileKey,
+  Building,
+  FileLock,
+  FileWarning,
+  FileSearch,
+  Lock,
+  Key,
+  Eye,
+  ShieldAlert,
+  UserCog,
+  Bell,
+  EyeIcon,
+  Workflow,
+  Mail,
+  Palette,
+  Briefcase,
+  Settings2,
 } from "lucide-react";
 
 interface ChildMenuItem {
@@ -42,94 +73,146 @@ const menuItems: MenuItem[] = [
     order: 0,
   },
   {
-    title: "Platform",
-    href: "/admin/platform",
-    icon: Building2,
+    title: "Integrations",
+    href: "/admin/integrations",
+    icon: Puzzle,
     order: 1,
     children: [
-      { title: "Identity", href: "/admin/platform/identity" },
-      { title: "System", href: "/admin/platform/system" },
-      { title: "Policy", href: "/admin/platform/policy" },
-      { title: "Token", href: "/admin/platform/token" },
-      { title: "Key", href: "/admin/platform/key" },
-    ],
-  },
-  {
-    title: "Organization",
-    href: "/admin/organization",
-    icon: Users,
-    order: 2,
-    children: [
-      { title: "Structure", href: "/admin/organization/structure" },
-      { title: "People", href: "/admin/organization/people" },
-      { title: "RBAC", href: "/admin/organization/rbac" },
-      { title: "Policies", href: "/admin/organization/policies" },
-      { title: "Trust", href: "/admin/organization/trust" },
+      { title: "External", href: "/admin/integrations/external", icon: Globe },
+      {
+        title: "Providers",
+        href: "/admin/integrations/providers",
+        icon: Layers,
+      },
+      {
+        title: "Provisioning",
+        href: "/admin/integrations/provisioning",
+        icon: Server,
+      },
+      { title: "Webhooks", href: "/admin/integrations/webhooks", icon: Link2 },
     ],
   },
   {
     title: "Operations",
     href: "/admin/operations",
     icon: Activity,
+    order: 2,
+    children: [
+      { title: "Services", href: "/admin/operations/services", icon: Cloud },
+      {
+        title: "Observability",
+        href: "/admin/operations/observability",
+        icon: Eye,
+      },
+      {
+        title: "Environments",
+        href: "/admin/operations/environments",
+        icon: Server,
+      },
+      {
+        title: "Deployments",
+        href: "/admin/operations/deployments",
+        icon: Workflow,
+      },
+      { title: "Database", href: "/admin/operations/database", icon: Database },
+    ],
+  },
+  {
+    title: "Organization",
+    href: "/admin/organization",
+    icon: Users,
     order: 3,
     children: [
-      { title: "Services", href: "/admin/operations/services" },
-      { title: "Observability", href: "/admin/operations/observability" },
-      { title: "Environments", href: "/admin/operations/environments" },
-      { title: "Deployments", href: "/admin/operations/deployments" },
-      { title: "Database", href: "/admin/operations/database" },
+      {
+        title: "Structure",
+        href: "/admin/organization/structure",
+        icon: Building,
+      },
+      { title: "People", href: "/admin/organization/people", icon: UserCircle },
+      { title: "RBAC", href: "/admin/organization/rbac", icon: ShieldCheck },
+      {
+        title: "Policies",
+        href: "/admin/organization/policies",
+        icon: FileLock,
+      },
+      { title: "Trust", href: "/admin/organization/trust", icon: Shield },
     ],
   },
   {
-    title: "Security",
-    href: "/admin/security",
-    icon: Shield,
+    title: "Platform",
+    href: "/admin/platform",
+    icon: Building2,
     order: 4,
     children: [
-      { title: "Secrets", href: "/admin/security/secrets" },
-      { title: "Audit", href: "/admin/security/audit" },
-      { title: "Identity", href: "/admin/security/identity" },
-      { title: "Compliance", href: "/admin/security/compliance" },
-    ],
-  },
-  {
-    title: "Settings",
-    href: "/admin/settings",
-    icon: Settings,
-    order: 5,
-    children: [
-      { title: "Naming", href: "/admin/settings/naming" },
-      { title: "Context", href: "/admin/settings/context" },
-      { title: "Data", href: "/admin/settings/data" },
-      { title: "Automation", href: "/admin/settings/automation" },
-      { title: "Notifications", href: "/admin/settings/notifications" },
-      { title: "Views", href: "/admin/settings/views" },
-      { title: "Workspace", href: "/admin/settings/workspace" },
+      { title: "Identity", href: "/admin/platform/identity", icon: UserCircle },
+      { title: "System", href: "/admin/platform/system", icon: Settings2 },
+      { title: "Policy", href: "/admin/platform/policy", icon: FileLock },
+      { title: "Token", href: "/admin/platform/token", icon: Key },
+      { title: "Key", href: "/admin/platform/key", icon: Lock },
     ],
   },
   {
     title: "Reports",
     href: "/admin/report",
     icon: FileText,
-    order: 6,
+    order: 5,
     children: [
-      { title: "Access", href: "/admin/report/access" },
-      { title: "Compliance", href: "/admin/report/compliance" },
-      { title: "Cross Authority", href: "/admin/report/cross_authority" },
-      { title: "Dormant", href: "/admin/report/dormant" },
-      { title: "Privilege", href: "/admin/report/privilege" },
+      { title: "Access", href: "/admin/report/access", icon: FileSearch },
+      {
+        title: "Compliance",
+        href: "/admin/report/compliance",
+        icon: ShieldCheck,
+      },
+      {
+        title: "Cross Authority",
+        href: "/admin/report/cross_authority",
+        icon: UsersRound,
+      },
+      { title: "Dormant", href: "/admin/report/dormant", icon: FileWarning },
+      { title: "Privilege", href: "/admin/report/privilege", icon: FileKey },
     ],
   },
   {
-    title: "Integrations",
-    href: "/admin/integrations",
-    icon: Puzzle,
+    title: "Security",
+    href: "/admin/security",
+    icon: Shield,
+    order: 6,
+    children: [
+      { title: "Secrets", href: "/admin/security/secrets", icon: Lock },
+      { title: "Audit", href: "/admin/security/audit", icon: EyeIcon },
+      { title: "Identity", href: "/admin/security/identity", icon: UserCog },
+      {
+        title: "Compliance",
+        href: "/admin/security/compliance",
+        icon: ShieldCheck,
+      },
+    ],
+  },
+  {
+    title: "Settings",
+    href: "/admin/settings",
+    icon: Settings,
     order: 7,
     children: [
-      { title: "External", href: "/admin/integrations/external" },
-      { title: "Providers", href: "/admin/integrations/providers" },
-      { title: "Provisioning", href: "/admin/integrations/provisioning" },
-      { title: "Webhooks", href: "/admin/integrations/webhooks" },
+      { title: "Naming", href: "/admin/settings/naming", icon: FileText },
+      { title: "Context", href: "/admin/settings/context", icon: Layers },
+      { title: "Data", href: "/admin/settings/data", icon: Database },
+      {
+        title: "Automation",
+        href: "/admin/settings/automation",
+        icon: Workflow,
+      },
+      {
+        title: "Notifications",
+        href: "/admin/settings/notifications",
+        icon: Bell,
+      },
+      { title: "Views", href: "/admin/settings/views", icon: Eye },
+      {
+        title: "Workspace",
+        href: "/admin/settings/workspace",
+        icon: Briefcase,
+      },
     ],
   },
 ];
@@ -138,8 +221,6 @@ interface MenuItemProps {
   item: MenuItem | ChildMenuItem;
   level?: number;
   pathname: string;
-  expandedItems: Set<string>;
-  toggleExpanded: (item: string) => void;
 }
 
 function hasActiveChild(children: ChildMenuItem[], pathname: string): boolean {
@@ -159,53 +240,45 @@ function renderChildMenuItem(
   item: ChildMenuItem,
   level: number,
   pathname: string,
-  expandedItems: Set<string>,
-  toggleExpanded: (item: string) => void,
 ): React.ReactElement {
-  const isExpanded =
-    expandedItems.has(item.href) ||
-    (hasActiveChild(item.children || [], pathname) &&
-      !expandedItems.has(item.href));
   const isActive =
     pathname === item.href || pathname.startsWith(item.href + "/");
   const hasChildren = item.children && item.children.length > 0;
+  const isChildActive = hasActiveChild(item.children || [], pathname);
+  const defaultOpen = isActive || isChildActive;
 
   const marginLeft = level * 12;
 
   if (hasChildren) {
     return (
-      <div key={item.href} className="w-full">
-        <Button
-          variant="ghost"
-          onClick={() => toggleExpanded(item.href)}
-          className={cn(
-            "w-full justify-between h-6 px-2 text-xs font-semibold text-gray-400 uppercase tracking-wide hover:bg-gray-800",
-            isActive && "text-blue-400 hover:bg-gray-800",
-          )}
-          style={{ marginLeft: `${marginLeft}px` }}
-        >
-          <span className="text-left truncate max-w-[140px]">{item.title}</span>
-          <ChevronDown
+      <Collapsible key={item.href} defaultOpen={defaultOpen}>
+        <CollapsibleTrigger asChild>
+          <Button
+            variant="ghost"
             className={cn(
-              "h-3 w-3 shrink-0 transition-transform",
-              isExpanded && "rotate-180",
+              "w-full justify-between h-6 px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide hover:bg-sidebar-accent",
+              (isActive || isChildActive) &&
+                "text-black bg-sidebar-accent hover:bg-sidebar-accent",
             )}
-          />
-        </Button>
-        {isExpanded && (
+            style={{ marginLeft: `${marginLeft}px` }}
+          >
+            <span className="flex items-center gap-2">
+              {item.icon && <item.icon className="h-3 w-3 shrink-0" />}
+              <span className="text-left truncate max-w-[120px]">
+                {item.title}
+              </span>
+            </span>
+            <ChevronDown className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down overflow-hidden">
           <div className="mt-1 space-y-1">
             {item.children?.map((child) =>
-              renderChildMenuItem(
-                child,
-                level + 1,
-                pathname,
-                expandedItems,
-                toggleExpanded,
-              ),
+              renderChildMenuItem(child, level + 1, pathname),
             )}
           </div>
-        )}
-      </div>
+        </CollapsibleContent>
+      </Collapsible>
     );
   }
 
@@ -215,8 +288,8 @@ function renderChildMenuItem(
       asChild
       variant="ghost"
       className={cn(
-        "w-full justify-between h-8 px-2 text-sm font-normal text-gray-300 hover:bg-gray-800",
-        isActive && "bg-gray-800 text-blue-400 hover:bg-gray-700",
+        "w-full justify-between h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent",
+        isActive && "bg-sidebar-accent text-black hover:bg-sidebar-accent/80",
       )}
       style={{ marginLeft: `${marginLeft}px` }}
     >
@@ -225,7 +298,21 @@ function renderChildMenuItem(
         className="flex justify-between items-center w-full"
       >
         <span className="flex items-center gap-2">
-          <span className="w-2 h-2 bg-gray-600 rounded-full shrink-0" />
+          {item.icon ? (
+            <item.icon
+              className={cn(
+                "h-3 w-3 shrink-0",
+                isActive ? "text-black" : "text-muted-foreground",
+              )}
+            />
+          ) : (
+            <span
+              className={cn(
+                "w-2 h-2 rounded-full shrink-0",
+                isActive ? "bg-black" : "bg-muted-foreground/50",
+              )}
+            />
+          )}
           <span className="truncate max-w-[140px]">{item.title}</span>
         </span>
       </Link>
@@ -233,20 +320,12 @@ function renderChildMenuItem(
   );
 }
 
-function MenuItem({
-  item,
-  level = 0,
-  pathname,
-  expandedItems,
-  toggleExpanded,
-}: MenuItemProps) {
-  const isExpanded =
-    expandedItems.has(item.href) ||
-    (hasActiveChild(item.children || [], pathname) &&
-      !expandedItems.has(item.href));
+function MenuItem({ item, level = 0, pathname }: MenuItemProps) {
   const isActive =
     pathname === item.href || pathname.startsWith(item.href + "/");
   const hasChildren = item.children && item.children.length > 0;
+  const isChildActive = hasActiveChild(item.children || [], pathname);
+  const defaultOpen = isActive || isChildActive;
 
   const marginLeft = level * 12;
 
@@ -257,41 +336,39 @@ function MenuItem({
 
   if (hasChildren) {
     return (
-      <div className="w-full">
-        <Button
-          variant="ghost"
-          onClick={() => toggleExpanded(item.href)}
-          className={cn(
-            "w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-gray-300 hover:bg-gray-800",
-            isActive && "bg-gray-800 text-blue-400 hover:bg-gray-700",
-          )}
-          style={{ marginLeft: `${marginLeft}px` }}
-        >
-          {isMenuItem(item) && <item.icon className="h-4 w-4 shrink-0" />}
-          <span className="flex-1 text-left truncate max-w-[120px]">
-            {item.title}
-          </span>
-          <ChevronDown
+      <Collapsible defaultOpen={defaultOpen}>
+        <CollapsibleTrigger asChild>
+          <Button
+            variant="ghost"
             className={cn(
-              "h-4 w-4 shrink-0 transition-transform",
-              isExpanded && "rotate-180",
+              "w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent group",
+              (isActive || isChildActive) &&
+                "bg-sidebar-accent text-black hover:bg-sidebar-accent/80",
             )}
-          />
-        </Button>
-        {isExpanded && (
+            style={{ marginLeft: `${marginLeft}px` }}
+          >
+            {isMenuItem(item) && (
+              <item.icon
+                className={cn(
+                  "h-4 w-4 shrink-0",
+                  (isActive || isChildActive) && "text-black",
+                )}
+              />
+            )}
+            <span className="flex-1 text-left truncate max-w-[120px]">
+              {item.title}
+            </span>
+            <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down overflow-hidden">
           <div className="mt-1 space-y-1">
             {item.children?.map((child) =>
-              renderChildMenuItem(
-                child,
-                level + 1,
-                pathname,
-                expandedItems,
-                toggleExpanded,
-              ),
+              renderChildMenuItem(child, level + 1, pathname),
             )}
           </div>
-        )}
-      </div>
+        </CollapsibleContent>
+      </Collapsible>
     );
   }
 
@@ -300,13 +377,17 @@ function MenuItem({
       asChild
       variant="ghost"
       className={cn(
-        "w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-gray-300 hover:bg-gray-800",
-        isActive && "bg-gray-800 text-blue-400 hover:bg-gray-700",
+        "w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent",
+        isActive && "bg-sidebar-accent text-black hover:bg-sidebar-accent/80",
       )}
       style={{ marginLeft: `${marginLeft}px` }}
     >
       <Link href={item.href}>
-        {isMenuItem(item) && <item.icon className="h-4 w-4 shrink-0" />}
+        {isMenuItem(item) && (
+          <item.icon
+            className={cn("h-4 w-4 shrink-0", isActive && "text-black")}
+          />
+        )}
         <span className="truncate max-w-[100px]">{item.title}</span>
       </Link>
     </Button>
@@ -315,56 +396,16 @@ function MenuItem({
 
 export function Sidebar() {
   const pathname = usePathname();
-  const [expandedItems, setExpandedItems] = React.useState<Set<string>>(
-    new Set(),
-  );
-
-  const toggleExpanded = (item: string) => {
-    setExpandedItems((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(item)) {
-        newSet.delete(item);
-      } else {
-        newSet.add(item);
-      }
-      return newSet;
-    });
-  };
 
   return (
-    <div className="flex h-full w-64 flex-col bg-gray-900 border-r border-gray-800">
-      <div className="flex h-14 items-center border-b border-gray-800 px-4">
-        <Link href="/admin/home" className="flex items-center gap-2">
-          <Shield className="h-6 w-6 text-blue-400" />
-          <h1 className="text-lg font-semibold text-gray-200">Admin Console</h1>
-        </Link>
-      </div>
+    <div className="flex h-full w-64 flex-col bg-sidebar border-r border-sidebar-border">
       <nav className="flex-1 overflow-hidden p-2 space-y-1 hover:overflow-auto">
         {menuItems
           .sort((a, b) => a.order - b.order)
           .map((item) => (
-            <MenuItem
-              key={item.href}
-              item={item}
-              pathname={pathname}
-              expandedItems={expandedItems}
-              toggleExpanded={toggleExpanded}
-            />
+            <MenuItem key={item.href} item={item} pathname={pathname} />
           ))}
       </nav>
-      <div className="border-t border-gray-800 p-4">
-        <div className="flex items-center gap-3 rounded-lg bg-gray-800 px-3 py-2">
-          <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center">
-            <span className="text-xs font-bold text-white">AD</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-gray-200">
-              Admin User
-            </span>
-            <span className="text-xs text-gray-400">admin@company.com</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

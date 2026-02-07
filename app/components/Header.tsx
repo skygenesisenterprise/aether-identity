@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/dashboard/ui/badge";
 import {
   Bell,
   Search,
@@ -12,60 +13,98 @@ import {
   LogOut,
   HelpCircle,
   Menu,
+  Shield,
+  Building2,
+  Layers,
+  ChevronDown,
+  UserCircle,
+  Key,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/dashboard/ui/dropdown-menu";
 
 export function Header() {
   const pathname = usePathname();
 
-  // Generate breadcrumb from pathname
-  const breadcrumbItems = React.useMemo(() => {
-    const parts = pathname.replace("/admin/", "").split("/");
-    return parts.map((part, index) => {
-      const href = "/admin/" + parts.slice(0, index + 1).join("/");
-      const label =
-        part.charAt(0).toUpperCase() + part.slice(1).replace(/_/g, " ");
-      return { label, href, isLast: index === parts.length - 1 };
-    });
-  }, [pathname]);
+  // Context data (could be moved to context/state management)
+  const contextData = {
+    authority: "Acme Corporation",
+    workspace: "Production",
+    environment: "US-East",
+    userRole: "Identity Admin",
+    isPrivileged: true,
+  };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-6">
+    <header className="flex h-16 w-full items-center gap-4 border-b bg-background px-6">
       {/* Mobile Menu Button */}
       <Button variant="ghost" size="icon" className="lg:hidden">
         <Menu className="h-5 w-5" />
       </Button>
 
-      {/* Breadcrumb */}
-      <nav className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
-        <Link
-          href="/admin/home"
-          className="hover:text-foreground transition-colors"
-        >
-          Admin
+      {/* Logo & Context Selectors */}
+      <div className="hidden md:flex items-center gap-6">
+        <Link href="/admin/home" className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
+            <Shield className="h-4 w-4 text-primary-foreground" />
+          </div>
+          <span className="text-lg font-semibold text-foreground">
+            Aether Identity
+          </span>
         </Link>
-        {breadcrumbItems.length > 0 && (
-          <>
-            <span>/</span>
-            {breadcrumbItems.map((item, index) => (
-              <React.Fragment key={item.href}>
-                {index > 0 && <span>/</span>}
-                {item.isLast ? (
-                  <span className="font-medium text-foreground">
-                    {item.label}
-                  </span>
-                ) : (
-                  <Link
-                    href={item.href}
-                    className="hover:text-foreground transition-colors"
-                  >
-                    {item.label}
-                  </Link>
-                )}
-              </React.Fragment>
-            ))}
-          </>
-        )}
-      </nav>
+
+        {/* Context Selectors */}
+        <div className="flex items-center gap-1 text-sm">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1 text-muted-foreground hover:text-foreground"
+              >
+                <Building2 className="h-3.5 w-3.5" />
+                {contextData.authority}
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem>{contextData.authority}</DropdownMenuItem>
+              <DropdownMenuItem>Global Authority</DropdownMenuItem>
+              <DropdownMenuItem>Regional Authority</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <span className="text-muted-foreground/50">/</span>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1 text-muted-foreground hover:text-foreground"
+              >
+                <Layers className="h-3.5 w-3.5" />
+                {contextData.workspace}
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem>{contextData.workspace}</DropdownMenuItem>
+              <DropdownMenuItem>Development</DropdownMenuItem>
+              <DropdownMenuItem>Staging</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Badge variant="outline" className="ml-2 text-xs font-normal">
+            {contextData.environment}
+          </Badge>
+        </div>
+      </div>
 
       {/* Right Side Actions */}
       <div className="ml-auto flex items-center gap-2">
@@ -103,21 +142,63 @@ export function Header() {
           </Link>
         </Button>
 
-        {/* User Profile */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative h-8 w-8 rounded-full"
-        >
-          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-            <User className="h-4 w-4 text-primary-foreground" />
-          </div>
-        </Button>
-
-        {/* Logout */}
-        <Button variant="ghost" size="icon" className="text-muted-foreground">
-          <LogOut className="h-4 w-4" />
-        </Button>
+        {/* Account Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="relative h-8 px-2 gap-2 text-muted-foreground hover:text-foreground"
+            >
+              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+                <User className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <span className="hidden sm:inline text-sm">Account</span>
+              <ChevronDown className="h-3 w-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <div className="flex items-center gap-2 p-2">
+              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+                <User className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium">Admin User</span>
+                <span className="text-xs text-muted-foreground">
+                  admin@company.com
+                </span>
+              </div>
+            </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/admin/settings/profile" className="cursor-pointer">
+                <UserCircle className="mr-2 h-4 w-4" />
+                Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/admin/settings" className="cursor-pointer">
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/admin/security/secrets" className="cursor-pointer">
+                <Key className="mr-2 h-4 w-4" />
+                API Keys
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link
+                href="/login"
+                className="cursor-pointer text-destructive focus:text-destructive"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );
