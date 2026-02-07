@@ -12,13 +12,13 @@ RUN apk add --no-cache \
 
 # Install pnpm
 RUN npm install -g pnpm@10.28.1
+RUN npm install -g next
 
 # App directory
 WORKDIR /app
 
 # Copy package files first (for better caching)
-COPY package.json ./
-COPY pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies during build
 # This ensures node_modules is populated in the image
@@ -38,4 +38,4 @@ EXPOSE 3001
 
 # Start the development server
 # Dependencies are already installed, so no need to install at runtime
-CMD ["./start-dev.sh"]
+CMD ["pnpm", "dev"]
