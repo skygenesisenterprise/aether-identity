@@ -8,8 +8,18 @@ import {
 } from "@/components/dashboard/ui/card";
 import { Progress } from "@/components/dashboard/ui/progress";
 import { Badge } from "@/components/dashboard/ui/badge";
-import { ShieldCheck, ShieldAlert, Lock, AlertTriangle } from "lucide-react";
+import {
+  ShieldCheck,
+  ShieldAlert,
+  Lock,
+  AlertTriangle,
+  Users,
+  XCircle,
+  Activity,
+  ChevronRight,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface SecurityItem {
   label: string;
@@ -24,11 +34,18 @@ interface PolicyChange {
   type: "policy" | "access" | "role";
 }
 
+interface RiskIndicators {
+  highRiskUsers: number;
+  failedLogins24h: number;
+  anomalousActivities: number;
+}
+
 interface SecurityPostureProps {
   mfaAdoptionRate: number;
   flaggedIdentities: number;
   securityScore: number;
   recentChanges: PolicyChange[];
+  riskIndicators?: RiskIndicators;
 }
 
 export function SecurityPosture({
@@ -36,6 +53,11 @@ export function SecurityPosture({
   flaggedIdentities,
   securityScore,
   recentChanges,
+  riskIndicators = {
+    highRiskUsers: 0,
+    failedLogins24h: 0,
+    anomalousActivities: 0,
+  },
 }: SecurityPostureProps) {
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-accent";
@@ -149,6 +171,39 @@ export function SecurityPosture({
           ))}
         </div>
 
+        {/* Risk Indicators Grid */}
+        <div className="grid grid-cols-3 gap-3">
+          <RiskIndicatorCard
+            icon={Users}
+            label="High-Risk Users"
+            value={riskIndicators.highRiskUsers}
+            href="/admin/security/users"
+            variant={riskIndicators.highRiskUsers > 0 ? "warning" : "good"}
+          />
+          <RiskIndicatorCard
+            icon={XCircle}
+            label="Failed Logins (24h)"
+            value={riskIndicators.failedLogins24h}
+            href="/admin/security/events"
+            variant={
+              riskIndicators.failedLogins24h > 10
+                ? "critical"
+                : riskIndicators.failedLogins24h > 0
+                  ? "warning"
+                  : "good"
+            }
+          />
+          <RiskIndicatorCard
+            icon={Activity}
+            label="Anomalies"
+            value={riskIndicators.anomalousActivities}
+            href="/admin/security/anomalies"
+            variant={
+              riskIndicators.anomalousActivities > 0 ? "warning" : "good"
+            }
+          />
+        </div>
+
         {/* Flagged Identities */}
         {flaggedIdentities > 0 && (
           <div className="flex items-center gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 p-3">
@@ -190,5 +245,58 @@ export function SecurityPosture({
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+// Sub-component for risk indicator cards
+interface RiskIndicatorCardProps {
+  icon: React.ElementType;
+  label: string;
+  value: number;
+  href: string;
+  variant: "good" | "warning" | "critical";
+}
+
+function RiskIndicatorCard({
+  icon: Icon,
+  label,
+  value,
+  href,
+  variant,
+}: RiskIndicatorCardProps) {
+  const variantStyles = {
+    good: {
+      bg: "bg-emerald-500/10",
+      text: "text-emerald-600",
+      icon: "text-emerald-500",
+    },
+    warning: {
+      bg: "bg-amber-500/10",
+      text: "text-amber-600",
+      icon: "text-amber-500",
+    },
+    critical: {
+      bg: "bg-red-500/10",
+      text: "text-red-600",
+      icon: "text-red-500",
+    },
+  };
+
+  const styles = variantStyles[variant];
+
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "flex flex-col items-center p-3 rounded-lg transition-colors hover:opacity-80",
+        styles.bg,
+      )}
+    >
+      <Icon className={cn("h-4 w-4 mb-1.5", styles.icon)} />
+      <span className={cn("text-lg font-bold", styles.text)}>{value}</span>
+      <span className="text-[10px] text-muted-foreground text-center leading-tight">
+        {label}
+      </span>
+    </Link>
   );
 }

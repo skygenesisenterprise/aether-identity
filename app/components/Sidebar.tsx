@@ -48,6 +48,8 @@ import {
   Palette,
   Briefcase,
   Settings2,
+  Github,
+  ExternalLink,
 } from "lucide-react";
 
 interface ChildMenuItem {
@@ -341,22 +343,24 @@ function MenuItem({ item, level = 0, pathname }: MenuItemProps) {
           <Button
             variant="ghost"
             className={cn(
-              "w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent group",
+              "w-full justify-between gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent group",
               (isActive || isChildActive) &&
                 "bg-sidebar-accent text-black hover:bg-sidebar-accent/80",
             )}
             style={{ marginLeft: `${marginLeft}px` }}
           >
-            {isMenuItem(item) && (
-              <item.icon
-                className={cn(
-                  "h-4 w-4 shrink-0",
-                  (isActive || isChildActive) && "text-black",
-                )}
-              />
-            )}
-            <span className="flex-1 text-left truncate max-w-[120px]">
-              {item.title}
+            <span className="flex items-center gap-2">
+              {isMenuItem(item) && (
+                <item.icon
+                  className={cn(
+                    "h-4 w-4 shrink-0",
+                    (isActive || isChildActive) && "text-black",
+                  )}
+                />
+              )}
+              <span className="text-left truncate max-w-[120px]">
+                {item.title}
+              </span>
             </span>
             <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
           </Button>
@@ -406,6 +410,40 @@ export function Sidebar() {
             <MenuItem key={item.href} item={item} pathname={pathname} />
           ))}
       </nav>
+      <div className="border-t border-sidebar-border p-2 space-y-1">
+        <Button
+          asChild
+          variant="ghost"
+          className="w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent"
+        >
+          <a
+            href="https://github.com/skygenesisenterprise/aether-identity"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2"
+          >
+            <Github className="h-4 w-4 shrink-0" />
+            <span className="truncate">GitHub Project</span>
+            <ExternalLink className="h-3 w-3 shrink-0 ml-auto text-muted-foreground" />
+          </a>
+        </Button>
+        <Button
+          asChild
+          variant="ghost"
+          className="w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent"
+        >
+          <a
+            href="https://skygenesisenterprise.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2"
+          >
+            <Globe className="h-4 w-4 shrink-0" />
+            <span className="truncate">Main Website</span>
+            <ExternalLink className="h-3 w-3 shrink-0 ml-auto text-muted-foreground" />
+          </a>
+        </Button>
+      </div>
     </div>
   );
 }
