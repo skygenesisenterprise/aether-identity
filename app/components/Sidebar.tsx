@@ -403,6 +403,21 @@ export function Sidebar() {
 
   return (
     <div className="flex h-full w-64 flex-col bg-sidebar border-r border-sidebar-border">
+      {/* Logo Header */}
+      <div className="border-b border-sidebar-border p-3">
+        <Link
+          href="/admin/home"
+          className="flex items-center gap-2 px-2 py-1.5"
+        >
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
+            <Shield className="h-4 w-4 text-primary-foreground" />
+          </div>
+          <span className="text-lg font-semibold text-sidebar-foreground">
+            Aether Identity
+          </span>
+        </Link>
+      </div>
+
       <nav className="flex-1 overflow-hidden p-2 space-y-1 hover:overflow-auto">
         {menuItems
           .sort((a, b) => a.order - b.order)

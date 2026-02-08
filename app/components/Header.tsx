@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/dashboard/ui/badge";
+import { cn } from "@/lib/utils";
 import {
   Bell,
   Search,
@@ -13,12 +14,14 @@ import {
   LogOut,
   HelpCircle,
   Menu,
-  Shield,
   Building2,
   Layers,
   ChevronDown,
   UserCircle,
   Key,
+  Check,
+  Sun,
+  Moon,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -31,10 +34,30 @@ import {
 export function Header() {
   const pathname = usePathname();
 
+  // Available options
+  const authorities = [
+    "Acme Corporation",
+    "Global Authority",
+    "Regional Authority",
+  ];
+  const workspaces = ["Production", "Development", "Staging"];
+
+  // State for selections
+  const [authority, setAuthority] = React.useState("Acme Corporation");
+  const [workspace, setWorkspace] = React.useState("Production");
+  const [theme, setTheme] = React.useState<"light" | "dark">("light");
+
+  // Toggle theme function
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
+  };
+
   // Context data (could be moved to context/state management)
   const contextData = {
-    authority: "Acme Corporation",
-    workspace: "Production",
+    authority,
+    workspace,
     environment: "US-East",
     userRole: "Identity Admin",
     isPrivileged: true,
@@ -47,17 +70,8 @@ export function Header() {
         <Menu className="h-5 w-5" />
       </Button>
 
-      {/* Logo & Context Selectors */}
+      {/* Context Selectors */}
       <div className="hidden md:flex items-center gap-6">
-        <Link href="/admin/home" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-            <Shield className="h-4 w-4 text-primary-foreground" />
-          </div>
-          <span className="text-lg font-semibold text-foreground">
-            Aether Identity
-          </span>
-        </Link>
-
         {/* Context Selectors */}
         <div className="flex items-center gap-1 text-sm">
           <DropdownMenu>
@@ -73,9 +87,16 @@ export function Header() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-              <DropdownMenuItem>{contextData.authority}</DropdownMenuItem>
-              <DropdownMenuItem>Global Authority</DropdownMenuItem>
-              <DropdownMenuItem>Regional Authority</DropdownMenuItem>
+              {authorities.map((auth) => (
+                <DropdownMenuItem
+                  key={auth}
+                  onClick={() => setAuthority(auth)}
+                  className="cursor-pointer flex items-center justify-between"
+                >
+                  <span>{auth}</span>
+                  {authority === auth && <Check className="h-4 w-4 ml-2" />}
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -94,9 +115,16 @@ export function Header() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-              <DropdownMenuItem>{contextData.workspace}</DropdownMenuItem>
-              <DropdownMenuItem>Development</DropdownMenuItem>
-              <DropdownMenuItem>Staging</DropdownMenuItem>
+              {workspaces.map((ws) => (
+                <DropdownMenuItem
+                  key={ws}
+                  onClick={() => setWorkspace(ws)}
+                  className="cursor-pointer flex items-center justify-between"
+                >
+                  <span>{ws}</span>
+                  {workspace === ws && <Check className="h-4 w-4 ml-2" />}
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -109,37 +137,168 @@ export function Header() {
       {/* Right Side Actions */}
       <div className="ml-auto flex items-center gap-2">
         {/* Search */}
-        <Button variant="ghost" size="icon" className="text-muted-foreground">
-          <Search className="h-4 w-4" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground"
+            >
+              <Search className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-96">
+            <div className="p-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="w-full rounded-md border border-input bg-background pl-9 pr-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  autoFocus
+                />
+              </div>
+            </div>
+            <DropdownMenuSeparator />
+            <div className="max-h-80 overflow-y-auto py-2">
+              <div className="px-2 pb-2 text-xs font-medium text-muted-foreground">
+                Recent searches
+              </div>
+              <DropdownMenuItem className="cursor-pointer gap-2">
+                <Search className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-sm">Security policies</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer gap-2">
+                <Search className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-sm">API keys</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer gap-2">
+                <Search className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-sm">User permissions</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <div className="px-2 py-2 text-xs font-medium text-muted-foreground">
+                Quick actions
+              </div>
+              <DropdownMenuItem asChild>
+                <Link href="/admin/settings" className="cursor-pointer gap-2">
+                  <Settings className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-sm">Open settings</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  href="/admin/security/secrets"
+                  className="cursor-pointer gap-2"
+                >
+                  <Key className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-sm">Manage API keys</span>
+                </Link>
+              </DropdownMenuItem>
+            </div>
+            <DropdownMenuSeparator />
+            <div className="p-2 text-xs text-muted-foreground text-center">
+              Press <kbd className="rounded border px-1 font-mono">⌘K</kbd> to
+              search
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Notifications */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative text-muted-foreground"
-        >
-          <Bell className="h-4 w-4" />
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-destructive-foreground">
-            3
-          </span>
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative text-muted-foreground"
+            >
+              <Bell className="h-4 w-4" />
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-destructive-foreground">
+                3
+              </span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-80">
+            <div className="flex items-center justify-between p-2 border-b">
+              <span className="text-sm font-medium">Notifications</span>
+              <Button variant="ghost" size="sm" className="h-6 text-xs">
+                Mark all as read
+              </Button>
+            </div>
+            <div className="max-h-80 overflow-y-auto py-2">
+              <DropdownMenuItem className="flex flex-col items-start gap-1 p-3 cursor-pointer">
+                <div className="flex items-center gap-2 w-full">
+                  <div className="h-2 w-2 rounded-full bg-primary shrink-0" />
+                  <span className="text-sm font-medium flex-1">
+                    New policy update
+                  </span>
+                  <span className="text-xs text-muted-foreground">2m ago</span>
+                </div>
+                <span className="text-xs text-muted-foreground ml-4">
+                  A new security policy has been applied to your workspace.
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex flex-col items-start gap-1 p-3 cursor-pointer">
+                <div className="flex items-center gap-2 w-full">
+                  <div className="h-2 w-2 rounded-full bg-primary shrink-0" />
+                  <span className="text-sm font-medium flex-1">
+                    API key expiring
+                  </span>
+                  <span className="text-xs text-muted-foreground">1h ago</span>
+                </div>
+                <span className="text-xs text-muted-foreground ml-4">
+                  Your API key will expire in 3 days. Please renew it.
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex flex-col items-start gap-1 p-3 cursor-pointer">
+                <div className="flex items-center gap-2 w-full">
+                  <div className="h-2 w-2 rounded-full bg-muted-foreground/30 shrink-0" />
+                  <span className="text-sm font-medium flex-1">
+                    User login detected
+                  </span>
+                  <span className="text-xs text-muted-foreground">3h ago</span>
+                </div>
+                <span className="text-xs text-muted-foreground ml-4">
+                  New login from IP 192.168.1.100
+                </span>
+              </DropdownMenuItem>
+            </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link
+                href="/admin/notifications"
+                className="cursor-pointer justify-center text-sm text-muted-foreground"
+              >
+                View all notifications
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Help */}
-        <Button variant="ghost" size="icon" className="text-muted-foreground">
-          <HelpCircle className="h-4 w-4" />
-        </Button>
-
-        {/* Settings */}
         <Button
           variant="ghost"
           size="icon"
           className="text-muted-foreground"
           asChild
         >
-          <Link href="/admin/settings">
-            <Settings className="h-4 w-4" />
+          <Link href="/docs/home">
+            <HelpCircle className="h-4 w-4" />
           </Link>
+        </Button>
+
+        {/* Theme Toggle */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-muted-foreground"
+          onClick={toggleTheme}
+        >
+          {theme === "light" ? (
+            <Sun className="h-4 w-4" />
+          ) : (
+            <Moon className="h-4 w-4" />
+          )}
         </Button>
 
         {/* Account Dropdown */}
