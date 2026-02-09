@@ -22,6 +22,7 @@ import {
   Check,
   Sun,
   Moon,
+  Monitor,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -45,13 +46,20 @@ export function Header() {
   // State for selections
   const [authority, setAuthority] = React.useState("Acme Corporation");
   const [workspace, setWorkspace] = React.useState("Production");
-  const [theme, setTheme] = React.useState<"light" | "dark">("light");
+  const [theme, setTheme] = React.useState<"light" | "dark" | "system">(
+    "light",
+  );
 
-  // Toggle theme function
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
+  const setThemeWithSystem = (newTheme: "light" | "dark" | "system") => {
     setTheme(newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
+    if (newTheme === "system") {
+      const systemDark = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      ).matches;
+      document.documentElement.classList.toggle("dark", systemDark);
+    } else {
+      document.documentElement.classList.toggle("dark", newTheme === "dark");
+    }
   };
 
   // Context data (could be moved to context/state management)
@@ -287,19 +295,56 @@ export function Header() {
           </Link>
         </Button>
 
-        {/* Theme Toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-muted-foreground"
-          onClick={toggleTheme}
-        >
-          {theme === "light" ? (
-            <Sun className="h-4 w-4" />
-          ) : (
-            <Moon className="h-4 w-4" />
-          )}
-        </Button>
+        {/* Theme Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground"
+            >
+              {theme === "light" ? (
+                <Sun className="h-4 w-4" />
+              ) : theme === "dark" ? (
+                <Moon className="h-4 w-4" />
+              ) : (
+                <Monitor className="h-4 w-4" />
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuItem
+              onClick={() => setThemeWithSystem("light")}
+              className="cursor-pointer flex items-center justify-between"
+            >
+              <span className="flex items-center gap-2">
+                <Sun className="h-4 w-4" />
+                Light
+              </span>
+              {theme === "light" && <Check className="h-4 w-4 ml-2" />}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setThemeWithSystem("dark")}
+              className="cursor-pointer flex items-center justify-between"
+            >
+              <span className="flex items-center gap-2">
+                <Moon className="h-4 w-4" />
+                Dark
+              </span>
+              {theme === "dark" && <Check className="h-4 w-4 ml-2" />}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setThemeWithSystem("system")}
+              className="cursor-pointer flex items-center justify-between"
+            >
+              <span className="flex items-center gap-2">
+                <Monitor className="h-4 w-4" />
+                System
+              </span>
+              {theme === "system" && <Check className="h-4 w-4 ml-2" />}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Account Dropdown */}
         <DropdownMenu>
