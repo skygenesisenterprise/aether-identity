@@ -50,7 +50,9 @@ export function MetricCard({
                 valueColorClass,
               )}
             >
-              {typeof value === "number" ? value.toLocaleString() : value}
+              {typeof value === "number"
+                ? value.toLocaleString("en-US")
+                : value}
             </p>
             {subtitle && (
               <p className="text-xs text-muted-foreground">{subtitle}</p>
