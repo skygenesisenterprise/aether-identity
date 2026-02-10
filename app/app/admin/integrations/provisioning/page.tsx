@@ -6,6 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/dashboard/ui/card";
 import { Button } from "@/components/dashboard/ui/button";
 import { Badge } from "@/components/dashboard/ui/badge";
@@ -38,7 +39,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/dashboard/ui/alert-dialog";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/dashboard/ui/tabs";
+import { Progress } from "@/components/dashboard/ui/progress";
+import { MetricCard } from "@/components/dashboard/metric-card";
 import {
   Users,
   Smartphone,
@@ -63,14 +71,22 @@ import {
   Server,
   ArrowRightLeft,
   Zap,
+  Filter,
+  Search,
+  ChevronRight,
+  LayoutGrid,
+  List,
+  Terminal,
+  Lock,
+  Globe,
+  Database,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type SourceType = "scim" | "api" | "csv" | "webhook";
 type SyncMode = "create_only" | "update_only" | "full_sync";
-type SourceStatus = "enabled" | "disabled" | "error";
+type SourceStatus = "enabled" | "disabled" | "error" | "syncing";
 type AuthMethod = "token" | "basic" | "mtls" | "oauth";
-
 type ProvisioningTarget = "users" | "devices" | "credentials";
 
 interface ProvisioningSource {
@@ -93,6 +109,22 @@ interface ProvisioningSource {
   maxObjectsPerRun: number;
   approvalRequired: boolean;
   allowedTargets: ProvisioningTarget[];
+  successRate: number;
+  avgSyncTime: string;
+}
+
+interface ProvisioningRun {
+  id: string;
+  sourceId: string;
+  sourceName: string;
+  status: "success" | "partial" | "failed" | "running";
+  startedAt: string;
+  completedAt?: string;
+  objectsCreated: number;
+  objectsUpdated: number;
+  objectsRevoked: number;
+  errors: string[];
+  triggeredBy: "scheduled" | "manual" | "webhook";
 }
 
 const typeIcons: Record<
@@ -106,66 +138,68 @@ const typeIcons: Record<
 };
 
 const typeLabels: Record<SourceType, string> = {
-  scim: "SCIM",
-  api: "API",
+  scim: "SCIM 2.0",
+  api: "REST API",
   csv: "CSV Import",
   webhook: "Webhook",
 };
 
-const syncModeLabels: Record<SyncMode, string> = {
-  create_only: "Create Only",
-  update_only: "Update Only",
-  full_sync: "Full Sync",
-};
+// ============================================================================
+// MOCK DATA
+// ============================================================================
 
 const mockSources: ProvisioningSource[] = [
   {
     id: "scim-okta",
-    name: "Okta SCIM",
+    name: "Okta Directory",
     type: "scim",
     status: "enabled",
-    description: "Okta directory synchronization via SCIM 2.0",
+    description: "Enterprise directory synchronization via SCIM 2.0 protocol",
     authMethod: "token",
-    endpoint: "https://identity.example.com/scim/v2",
+    endpoint: "https://acme.okta.com/scim/v2",
     syncMode: "full_sync",
     schedule: "Every 15 minutes",
     lastActivity: "2 minutes ago",
     lastRunStatus: "success",
-    objectsCreated: 47,
-    objectsUpdated: 12,
-    objectsRevoked: 3,
+    objectsCreated: 2847,
+    objectsUpdated: 342,
+    objectsRevoked: 23,
     errorCount: 0,
     dryRunMode: false,
-    maxObjectsPerRun: 1000,
+    maxObjectsPerRun: 5000,
     approvalRequired: false,
-    allowedTargets: ["users"],
+    allowedTargets: ["users", "devices"],
+    successRate: 99.2,
+    avgSyncTime: "12s",
   },
   {
     id: "api-workday",
-    name: "Workday API",
+    name: "Workday HRIS",
     type: "api",
     status: "enabled",
-    description: "Workday HRIS integration via REST API",
+    description: "HR system integration for employee lifecycle management",
     authMethod: "oauth",
     syncMode: "create_only",
     schedule: "Daily at 2:00 AM",
     lastActivity: "5 hours ago",
     lastRunStatus: "partial",
-    objectsCreated: 23,
+    objectsCreated: 156,
     objectsUpdated: 0,
     objectsRevoked: 0,
-    errorCount: 2,
+    errorCount: 3,
     dryRunMode: false,
-    maxObjectsPerRun: 500,
+    maxObjectsPerRun: 1000,
     approvalRequired: true,
     allowedTargets: ["users"],
+    successRate: 94.5,
+    avgSyncTime: "45s",
   },
   {
     id: "webhook-bamboo",
-    name: "BambooHR Webhook",
+    name: "BambooHR Events",
     type: "webhook",
     status: "error",
-    description: "Real-time updates from BambooHR events",
+    description: "Real-time updates from BambooHR webhook events",
     authMethod: "token",
     syncMode: "full_sync",
     lastActivity: "3 days ago",
@@ -175,16 +209,18 @@ const mockSources: ProvisioningSource[] = [
     objectsRevoked: 0,
     errorCount: 15,
     dryRunMode: false,
-    maxObjectsPerRun: 100,
+    maxObjectsPerRun: 500,
     approvalRequired: false,
     allowedTargets: ["users"],
+    successRate: 23.1,
+    avgSyncTime: "N/A",
   },
   {
     id: "csv-import",
-    name: "Legacy CSV Import",
+    name: "Legacy Import",
     type: "csv",
     status: "disabled",
-    description: "Manual CSV file import for bulk operations",
+    description: "Manual CSV import for bulk data migration",
     authMethod: "token",
     syncMode: "create_only",
     lastActivity: "Never",
@@ -196,7 +232,57 @@ const mockSources: ProvisioningSource[] = [
     dryRunMode: true,
     maxObjectsPerRun: 10000,
     approvalRequired: true,
-    allowedTargets: ["users", "devices"],
+    allowedTargets: ["users", "devices", "credentials"],
+    successRate: 0,
+    avgSyncTime: "N/A",
+  },
+];
+
+const mockRuns: ProvisioningRun[] = [
+  {
+    id: "run-001",
+    sourceId: "scim-okta",
+    sourceName: "Okta Directory",
+    status: "success",
+    startedAt: "2 minutes ago",
+    completedAt: "2 minutes ago",
+    objectsCreated: 3,
+    objectsUpdated: 7,
+    objectsRevoked: 0,
+    errors: [],
+    triggeredBy: "scheduled",
+  },
+  {
+    id: "run-002",
+    sourceId: "api-workday",
+    sourceName: "Workday HRIS",
+    status: "partial",
+    startedAt: "5 hours ago",
+    completedAt: "5 hours ago",
+    objectsCreated: 23,
+    objectsUpdated: 0,
+    objectsRevoked: 0,
+    errors: [
+      "Duplicate email: john.doe@company.com",
+      "Invalid department ID: DEPT-999",
+    ],
+    triggeredBy: "scheduled",
+  },
+  {
+    id: "run-003",
+    sourceId: "webhook-bamboo",
+    sourceName: "BambooHR Events",
+    status: "failed",
+    startedAt: "3 days ago",
+    completedAt: "3 days ago",
+    objectsCreated: 0,
+    objectsUpdated: 0,
+    objectsRevoked: 0,
+    errors: [
+      "Authentication failed: Invalid bearer token",
+      "Endpoint returned 401",
+    ],
+    triggeredBy: "webhook",
   },
 ];
 
@@ -205,116 +291,177 @@ interface TargetConfig {
   name: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
+  color: string;
   dependencies?: ProvisioningTarget[];
 }
 
 const targetConfigs: TargetConfig[] = [
   {
     id: "users",
-    name: "Users",
-    description: "Provision user identities and accounts",
+    name: "User Identities",
+    description: "Provision and manage user accounts and profiles",
     icon: Users,
+    color: "blue",
   },
   {
     id: "devices",
-    name: "Devices",
-    description: "Provision device identities and registrations",
+    name: "Device Registrations",
+    description: "Provision device identities and trust relationships",
     icon: Smartphone,
+    color: "purple",
     dependencies: ["users"],
   },
   {
     id: "credentials",
-    name: "Credentials",
-    description: "Provision badges, wallets, and machine identities",
+    name: "Digital Credentials",
+    description: "Provision badges, wallets, and machine credentials",
     icon: Key,
+    color: "amber",
     dependencies: ["users"],
   },
 ];
 
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+function getStatusBadge(status: SourceStatus) {
+  const configs = {
+    enabled: {
+      variant: "default" as const,
+      label: "Active",
+      icon: CheckCircle2,
+      className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+    },
+    disabled: {
+      variant: "secondary" as const,
+      label: "Disabled",
+      icon: Pause,
+      className: "bg-muted text-muted-foreground",
+    },
+    error: {
+      variant: "destructive" as const,
+      label: "Error",
+      icon: AlertCircle,
+      className: "",
+    },
+    syncing: {
+      variant: "default" as const,
+      label: "Syncing",
+      icon: RefreshCw,
+      className: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+    },
+  };
+  const config = configs[status];
+  return (
+    <Badge
+      variant={config.variant}
+      className={cn("text-xs gap-1.5 px-2 py-0.5", config.className)}
+    >
+      <config.icon
+        className={cn("h-3 w-3", status === "syncing" && "animate-spin")}
+      />
+      {config.label}
+    </Badge>
+  );
+}
+
+function getRunStatusBadge(status: ProvisioningRun["status"]) {
+  const configs = {
+    success: {
+      className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+      icon: CheckCircle2,
+      label: "Success",
+    },
+    partial: {
+      className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+      icon: AlertTriangle,
+      label: "Partial",
+    },
+    failed: {
+      className: "bg-red-500/10 text-red-600 border-red-500/20",
+      icon: AlertCircle,
+      label: "Failed",
+    },
+    running: {
+      className: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+      icon: RefreshCw,
+      label: "Running",
+    },
+  };
+  const config = configs[status];
+  return (
+    <Badge
+      variant="outline"
+      className={cn("text-xs gap-1.5", config.className)}
+    >
+      <config.icon
+        className={cn("h-3 w-3", status === "running" && "animate-spin")}
+      />
+      {config.label}
+    </Badge>
+  );
+}
+
+function getSuccessRateColor(rate: number): string {
+  if (rate >= 95) return "text-emerald-600";
+  if (rate >= 80) return "text-amber-600";
+  return "text-red-600";
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
 export default function ProvisioningPage() {
+  // State
+  const idCounterRef = React.useRef(0);
   const [sources, setSources] =
     React.useState<ProvisioningSource[]>(mockSources);
   const [enabledTargets, setEnabledTargets] = React.useState<
     ProvisioningTarget[]
-  >(["users"]);
+  >(["users", "devices"]);
   const [isProvisioningEnabled, setIsProvisioningEnabled] =
     React.useState(true);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState(false);
   const [selectedSource, setSelectedSource] =
     React.useState<ProvisioningSource | null>(null);
   const [isConfigOpen, setIsConfigOpen] = React.useState(false);
   const [sourceToDelete, setSourceToDelete] =
     React.useState<ProvisioningSource | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
-  const [pendingTargetChanges, setPendingTargetChanges] = React.useState<
-    ProvisioningTarget[] | null
-  >(null);
-  const [showTargetConfirm, setShowTargetConfirm] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState("overview");
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [statusFilter, setStatusFilter] = React.useState<SourceStatus | "all">(
+    "all",
+  );
+  const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
 
+  // Derived metrics
   const enabledCount = sources.filter((s) => s.status === "enabled").length;
   const errorCount = sources.filter((s) => s.status === "error").length;
-  const totalSources = sources.length;
+  const syncingCount = sources.filter((s) => s.status === "syncing").length;
+  const totalObjects = sources.reduce(
+    (acc, s) => acc + s.objectsCreated + s.objectsUpdated,
+    0,
+  );
+  const avgSuccessRate =
+    sources.length > 0
+      ? sources
+          .filter((s) => s.status === "enabled")
+          .reduce((acc, s) => acc + s.successRate, 0) / enabledCount
+      : 0;
 
-  const getStatusBadge = (status: SourceStatus) => {
-    const configs = {
-      enabled: {
-        variant: "default" as const,
-        label: "Enabled",
-        icon: CheckCircle2,
-      },
-      disabled: {
-        variant: "secondary" as const,
-        label: "Disabled",
-        icon: Pause,
-      },
-      error: {
-        variant: "destructive" as const,
-        label: "Error",
-        icon: AlertCircle,
-      },
-    };
-    const config = configs[status];
-    return (
-      <Badge variant={config.variant} className="text-xs gap-1">
-        {config.icon && <config.icon className="h-3 w-3" />}
-        {config.label}
-      </Badge>
-    );
-  };
+  // Filtered sources
+  const filteredSources = sources.filter((source) => {
+    const matchesSearch =
+      source.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      source.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || source.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
-  const getLastRunBadge = (
-    status: "success" | "partial" | "failed" | null | undefined,
-  ) => {
-    if (!status)
-      return <span className="text-xs text-muted-foreground">Never run</span>;
-
-    if (status === "success") {
-      return (
-        <Badge
-          variant="default"
-          className="text-xs bg-green-500/10 text-green-600 border-green-500/20 hover:bg-green-500/20"
-        >
-          Success
-        </Badge>
-      );
-    }
-    if (status === "partial") {
-      return (
-        <Badge
-          variant="outline"
-          className="text-xs bg-amber-500/10 text-amber-600 border-amber-500/20 hover:bg-amber-500/20"
-        >
-          Partial
-        </Badge>
-      );
-    }
-    return (
-      <Badge variant="destructive" className="text-xs">
-        Failed
-      </Badge>
-    );
-  };
-
+  // Handlers
   const handleToggleSource = (sourceId: string) => {
     setSources((prev) =>
       prev.map((s) => {
@@ -323,41 +470,6 @@ export default function ProvisioningPage() {
         return { ...s, status: newStatus };
       }),
     );
-    setHasUnsavedChanges(true);
-  };
-
-  const handleTargetToggle = (target: ProvisioningTarget, checked: boolean) => {
-    const newTargets = checked
-      ? [...enabledTargets, target]
-      : enabledTargets.filter((t) => t !== target);
-
-    // Check dependencies
-    if (!checked) {
-      const dependentTargets = targetConfigs.filter(
-        (t) => t.dependencies?.includes(target) && newTargets.includes(t.id),
-      );
-      if (dependentTargets.length > 0) {
-        // Would disable dependent targets too
-        const toRemove = dependentTargets.map((t) => t.id);
-        setPendingTargetChanges(
-          newTargets.filter((t) => !toRemove.includes(t)),
-        );
-      } else {
-        setPendingTargetChanges(newTargets);
-      }
-    } else {
-      setPendingTargetChanges(newTargets);
-    }
-    setShowTargetConfirm(true);
-  };
-
-  const confirmTargetChanges = () => {
-    if (pendingTargetChanges) {
-      setEnabledTargets(pendingTargetChanges);
-      setHasUnsavedChanges(true);
-    }
-    setShowTargetConfirm(false);
-    setPendingTargetChanges(null);
   };
 
   const handleConfigure = (source: ProvisioningSource) => {
@@ -372,7 +484,6 @@ export default function ProvisioningPage() {
     );
     setIsConfigOpen(false);
     setSelectedSource(null);
-    setHasUnsavedChanges(true);
   };
 
   const handleDelete = (source: ProvisioningSource) => {
@@ -383,12 +494,12 @@ export default function ProvisioningPage() {
     if (!sourceToDelete) return;
     setSources((prev) => prev.filter((s) => s.id !== sourceToDelete.id));
     setSourceToDelete(null);
-    setHasUnsavedChanges(true);
   };
 
   const handleAddSource = (type: SourceType) => {
+    idCounterRef.current += 1;
     const newSource: ProvisioningSource = {
-      id: `new-${Date.now()}`,
+      id: `new-${idCounterRef.current}`,
       name: `New ${typeLabels[type]}`,
       type,
       status: "disabled",
@@ -405,15 +516,33 @@ export default function ProvisioningPage() {
       maxObjectsPerRun: 1000,
       approvalRequired: false,
       allowedTargets: ["users"],
+      successRate: 0,
+      avgSyncTime: "N/A",
     };
     setSources((prev) => [...prev, newSource]);
     setIsAddDialogOpen(false);
-    setHasUnsavedChanges(true);
     handleConfigure(newSource);
   };
 
-  const handleSave = () => {
-    setHasUnsavedChanges(false);
+  const handleManualSync = (sourceId: string) => {
+    setSources((prev) =>
+      prev.map((s) => (s.id === sourceId ? { ...s, status: "syncing" } : s)),
+    );
+    // Simulate sync completion
+    setTimeout(() => {
+      setSources((prev) =>
+        prev.map((s) =>
+          s.id === sourceId
+            ? {
+                ...s,
+                status: "enabled",
+                lastActivity: "Just now",
+                lastRunStatus: "success",
+              }
+            : s,
+        ),
+      );
+    }, 2000);
   };
 
   const canEnableTarget = (target: ProvisioningTarget): boolean => {
@@ -426,16 +555,22 @@ export default function ProvisioningPage() {
 
   return (
     <div className="space-y-6 text-foreground">
-      {/* Page Header */}
-      <div className="flex items-start justify-between">
+      {/* =========================================================================
+          HEADER SECTION
+          ========================================================================= */}
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-semibold text-card-foreground">
-              Provisioning
+              Identity Provisioning
             </h1>
             <Badge
               variant={isProvisioningEnabled ? "default" : "secondary"}
-              className="text-xs gap-1"
+              className={cn(
+                "text-xs gap-1.5",
+                isProvisioningEnabled &&
+                  "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+              )}
             >
               {isProvisioningEnabled ? (
                 <>
@@ -449,16 +584,10 @@ export default function ProvisioningPage() {
                 </>
               )}
             </Badge>
-            {errorCount > 0 && (
-              <Badge variant="destructive" className="text-xs gap-1">
-                <AlertCircle className="h-3 w-3" />
-                {errorCount} errors
-              </Badge>
-            )}
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            Configure automated identity lifecycle management from external
-            systems.
+            Automate identity lifecycle management from external systems and
+            directories
           </p>
         </div>
         <div className="flex gap-2">
@@ -470,495 +599,923 @@ export default function ProvisioningPage() {
             <Plus className="h-4 w-4" />
             Add Source
           </Button>
-          {hasUnsavedChanges && (
-            <Button onClick={handleSave} className="gap-2">
-              <RefreshCw className="h-4 w-4" />
-              Save Changes
-            </Button>
-          )}
+          <Button className="gap-2">
+            <Settings className="h-4 w-4" />
+            Configure
+          </Button>
         </div>
       </div>
 
-      {/* Provisioning Overview */}
-      <section>
-        <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground mb-3">
+      {/* =========================================================================
+          PROVISIONING METRICS
+          ========================================================================= */}
+      <section className="space-y-4">
+        <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
           Provisioning Overview
         </h2>
-        <Card className="border-border bg-card">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary">
-                <RefreshCw className="h-6 w-6 text-muted-foreground" />
-              </div>
-              <div className="flex-1 space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Provisioning automates the lifecycle management of identities
-                  from external systems into Aether Identity. When enabled,
-                  external sources can create, update, and revoke users,
-                  devices, and credentials without manual intervention.
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  All provisioning actions respect your organization&apos;s
-                  policies and RBAC configurations. Manual changes to
-                  provisioned identities may be overridden during subsequent
-                  sync operations.
-                </p>
-                <div className="flex items-center gap-2 pt-2">
-                  <Switch
-                    id="provisioning-master-toggle"
-                    checked={isProvisioningEnabled}
-                    onCheckedChange={(checked) => {
-                      setIsProvisioningEnabled(checked);
-                      setHasUnsavedChanges(true);
-                    }}
-                  />
-                  <Label
-                    htmlFor="provisioning-master-toggle"
-                    className="text-sm font-medium cursor-pointer"
-                  >
-                    {isProvisioningEnabled
-                      ? "Provisioning is enabled"
-                      : "Provisioning is disabled"}
-                  </Label>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Provisioning Targets */}
-      <section>
-        <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground mb-3">
-          Provisioning Targets
-        </h2>
-        <Card className="border-border bg-card">
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground mb-4">
-              Select which identity objects can be provisioned from external
-              sources. Changes require confirmation and may affect active
-              provisioning jobs.
-            </p>
-            <div className="space-y-4">
-              {targetConfigs.map((target) => {
-                const Icon = target.icon;
-                const isEnabled = enabledTargets.includes(target.id);
-                const canEnable = canEnableTarget(target.id);
-                const hasMissingDeps =
-                  !isEnabled &&
-                  target.dependencies?.some(
-                    (dep) => !enabledTargets.includes(dep),
-                  );
-
-                return (
-                  <div
-                    key={target.id}
-                    className={cn(
-                      "flex items-start justify-between p-4 rounded-lg border",
-                      isEnabled
-                        ? "border-primary/20 bg-primary/5"
-                        : "border-border bg-secondary/30",
-                    )}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div
-                        className={cn(
-                          "flex h-9 w-9 items-center justify-center rounded-md",
-                          isEnabled ? "bg-primary/10" : "bg-secondary",
-                        )}
-                      >
-                        <Icon
-                          className={cn(
-                            "h-4 w-4",
-                            isEnabled
-                              ? "text-primary"
-                              : "text-muted-foreground",
-                          )}
-                        />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={cn(
-                              "font-medium",
-                              isEnabled
-                                ? "text-foreground"
-                                : "text-muted-foreground",
-                            )}
-                          >
-                            {target.name}
-                          </span>
-                          {isEnabled && (
-                            <Badge variant="default" className="text-xs">
-                              Enabled
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {target.description}
-                        </p>
-                        {target.dependencies &&
-                          target.dependencies.length > 0 && (
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Requires:{" "}
-                              {target.dependencies
-                                .map(
-                                  (d) =>
-                                    targetConfigs.find((t) => t.id === d)?.name,
-                                )
-                                .join(", ")}
-                            </p>
-                          )}
-                        {hasMissingDeps && (
-                          <p className="text-xs text-destructive mt-1">
-                            Enable required dependencies first
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <Switch
-                      checked={isEnabled}
-                      onCheckedChange={(checked) =>
-                        handleTargetToggle(target.id, checked)
-                      }
-                      disabled={!canEnable && !isEnabled}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Provisioning Sources */}
-      <section>
-        <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground mb-3">
-          Provisioning Sources
-          <span className="ml-2 text-xs normal-case">
-            ({enabledCount} active / {totalSources} total)
-          </span>
-        </h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          {sources.map((source) => {
-            const Icon = typeIcons[source.type];
-            const isError = source.status === "error";
-
-            return (
-              <Card
-                key={source.id}
-                className={cn(
-                  "border-border bg-card",
-                  source.status === "disabled" && "opacity-75",
-                  isError && "border-destructive/50",
-                )}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-md bg-secondary">
-                        <Icon className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <CardTitle className="text-sm font-medium text-foreground">
-                            {source.name}
-                          </CardTitle>
-                          <Badge variant="outline" className="text-xs">
-                            {typeLabels[source.type]}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          {source.description}
-                        </p>
-                      </div>
-                    </div>
-                    {getStatusBadge(source.status)}
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {isError && (
-                    <Alert
-                      variant="destructive"
-                      className="border-red-500/30 bg-red-500/10 py-2"
-                    >
-                      <AlertCircle className="h-4 w-4 text-red-400" />
-                      <AlertDescription className="text-xs text-red-400">
-                        Provisioning failed. {source.errorCount} errors
-                        detected. Review logs for details.
-                      </AlertDescription>
-                    </Alert>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-4 text-xs">
-                    <div>
-                      <span className="text-muted-foreground">Last Run</span>
-                      <div className="mt-1">
-                        {getLastRunBadge(source.lastRunStatus)}
-                      </div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">
-                        Last Activity
-                      </span>
-                      <div className="mt-1 font-medium">
-                        {source.lastActivity}
-                      </div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Sync Mode</span>
-                      <div className="mt-1 font-medium">
-                        {syncModeLabels[source.syncMode]}
-                      </div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Schedule</span>
-                      <div className="mt-1 font-medium">
-                        {source.schedule || "On demand"}
-                      </div>
-                    </div>
-                  </div>
-
-                  {(source.objectsCreated > 0 ||
-                    source.objectsUpdated > 0 ||
-                    source.objectsRevoked > 0) && (
-                    <div className="flex items-center gap-4 rounded-md bg-secondary/50 px-3 py-2">
-                      <div className="text-xs">
-                        <span className="text-muted-foreground">Created: </span>
-                        <span className="font-medium text-green-600">
-                          {source.objectsCreated}
-                        </span>
-                      </div>
-                      <div className="text-xs">
-                        <span className="text-muted-foreground">Updated: </span>
-                        <span className="font-medium text-blue-600">
-                          {source.objectsUpdated}
-                        </span>
-                      </div>
-                      <div className="text-xs">
-                        <span className="text-muted-foreground">Revoked: </span>
-                        <span className="font-medium text-amber-600">
-                          {source.objectsRevoked}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-2">
-                    <Shield className="h-3 w-3 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">
-                      Targets: {source.allowedTargets.join(", ")}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-border">
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        id={`${source.id}-toggle`}
-                        checked={source.status === "enabled"}
-                        onCheckedChange={() => handleToggleSource(source.id)}
-                      />
-                      <Label
-                        htmlFor={`${source.id}-toggle`}
-                        className="text-sm text-muted-foreground cursor-pointer"
-                      >
-                        {source.status === "enabled" ? "Enabled" : "Disabled"}
-                      </Label>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleConfigure(source)}
-                        className="gap-1"
-                      >
-                        <Settings className="h-3.5 w-3.5" />
-                        Configure
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(source)}
-                        className="h-8 w-8 text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <MetricCard
+            title="Active Sources"
+            value={enabledCount}
+            subtitle={`${errorCount > 0 ? `${errorCount} with errors` : "All healthy"}`}
+            icon={Server}
+            variant={errorCount > 0 ? "warning" : "default"}
+          />
+          <MetricCard
+            title="Objects Synced"
+            value={totalObjects.toLocaleString()}
+            subtitle="Total provisioned"
+            icon={Database}
+            trend={{ value: 12.5, isPositive: true }}
+          />
+          <MetricCard
+            title="Success Rate"
+            value={`${avgSuccessRate.toFixed(1)}%`}
+            subtitle="Last 30 days"
+            icon={Activity}
+            variant={
+              avgSuccessRate >= 95
+                ? "default"
+                : avgSuccessRate >= 80
+                  ? "warning"
+                  : "destructive"
+            }
+          />
+          <MetricCard
+            title="Queue Status"
+            value={syncingCount > 0 ? "Syncing" : "Idle"}
+            subtitle={
+              syncingCount > 0
+                ? `${syncingCount} jobs running`
+                : "No active jobs"
+            }
+            icon={RefreshCw}
+            variant={syncingCount > 0 ? "accent" : "default"}
+          />
         </div>
       </section>
 
-      {/* Logs & Execution State */}
-      <section>
-        <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground mb-3">
-          Recent Activity
-        </h2>
-        <Card className="border-border bg-card">
-          <CardContent className="pt-6">
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 p-3 rounded-lg bg-secondary/30">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500/10">
-                  <CheckCircle2 className="h-4 w-4 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">
-                    Okta SCIM sync completed
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    47 created, 12 updated, 3 revoked • 2 minutes ago
-                  </p>
-                </div>
-                <Badge variant="outline" className="text-xs">
-                  Success
-                </Badge>
-              </div>
+      {/* =========================================================================
+          MAIN CONTENT TABS
+          ========================================================================= */}
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+      >
+        <TabsList className="grid w-full grid-cols-4 lg:w-fit">
+          <TabsTrigger value="overview" className="gap-2">
+            <LayoutGrid className="h-4 w-4" />
+            <span className="hidden sm:inline">Overview</span>
+          </TabsTrigger>
+          <TabsTrigger value="sources" className="gap-2">
+            <Server className="h-4 w-4" />
+            <span className="hidden sm:inline">Sources</span>
+          </TabsTrigger>
+          <TabsTrigger value="activity" className="gap-2">
+            <History className="h-4 w-4" />
+            <span className="hidden sm:inline">Activity</span>
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="gap-2">
+            <Settings className="h-4 w-4" />
+            <span className="hidden sm:inline">Settings</span>
+          </TabsTrigger>
+        </TabsList>
 
-              <div className="flex items-center gap-4 p-3 rounded-lg bg-secondary/30">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/10">
-                  <AlertTriangle className="h-4 w-4 text-amber-600" />
+        {/* OVERVIEW TAB */}
+        <TabsContent value="overview" className="space-y-6">
+          {/* System Health */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Card className="lg:col-span-2 border-border bg-card">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-base font-medium">
+                      Provisioning Health
+                    </CardTitle>
+                    <CardDescription>
+                      Real-time status of all provisioning sources
+                    </CardDescription>
+                  </div>
+                  <Badge variant="outline" className="gap-1.5">
+                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                    Live
+                  </Badge>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">
-                    Workday API sync partial
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    23 created, 2 errors (duplicate emails) • 5 hours ago
-                  </p>
-                </div>
-                <Badge variant="outline" className="text-xs">
-                  Partial
-                </Badge>
-              </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {sources.slice(0, 3).map((source) => {
+                    const Icon = typeIcons[source.type];
+                    const isError = source.status === "error";
+                    const isSyncing = source.status === "syncing";
 
-              <div className="flex items-center gap-4 p-3 rounded-lg bg-secondary/30">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500/10">
-                  <AlertCircle className="h-4 w-4 text-red-600" />
+                    return (
+                      <div
+                        key={source.id}
+                        className={cn(
+                          "flex items-center gap-4 p-4 rounded-lg border transition-colors",
+                          isError
+                            ? "border-red-500/20 bg-red-500/5"
+                            : "border-border bg-secondary/30",
+                          isSyncing && "border-blue-500/20 bg-blue-500/5",
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "flex h-10 w-10 items-center justify-center rounded-md",
+                            isError
+                              ? "bg-red-500/10"
+                              : isSyncing
+                                ? "bg-blue-500/10"
+                                : "bg-secondary",
+                          )}
+                        >
+                          <Icon
+                            className={cn(
+                              "h-5 w-5",
+                              isError
+                                ? "text-red-500"
+                                : isSyncing
+                                  ? "text-blue-500"
+                                  : "text-muted-foreground",
+                            )}
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-sm">
+                              {source.name}
+                            </span>
+                            {getStatusBadge(source.status)}
+                          </div>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {source.description}
+                          </p>
+                          <div className="flex items-center gap-4 mt-1 text-xs">
+                            <span className="text-muted-foreground">
+                              Success rate:{" "}
+                              <span
+                                className={getSuccessRateColor(
+                                  source.successRate,
+                                )}
+                              >
+                                {source.successRate}%
+                              </span>
+                            </span>
+                            <span className="text-muted-foreground">
+                              Last: {source.lastActivity}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {source.status === "enabled" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleManualSync(source.id)}
+                              className="gap-1"
+                            >
+                              <RefreshCw className="h-3.5 w-3.5" />
+                              Sync Now
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleConfigure(source)}
+                            className="h-8 w-8"
+                          >
+                            <Settings className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {sources.length > 3 && (
+                    <Button
+                      variant="ghost"
+                      className="w-full gap-2 text-muted-foreground"
+                      onClick={() => setActiveTab("sources")}
+                    >
+                      View all {sources.length} sources
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">BambooHR webhook failed</p>
-                  <p className="text-xs text-muted-foreground">
-                    Authentication error • 3 days ago
-                  </p>
-                </div>
-                <Badge variant="destructive" className="text-xs">
-                  Failed
-                </Badge>
-              </div>
+              </CardContent>
+            </Card>
 
-              <div className="flex items-center justify-center pt-2">
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <History className="h-4 w-4" />
-                  View Full Audit Log
+            {/* Quick Stats */}
+            <Card className="border-border bg-card">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-medium">
+                  Quick Stats
+                </CardTitle>
+                <CardDescription>Last 24 hours activity</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Created</span>
+                    <span className="font-medium text-emerald-600">+47</span>
+                  </div>
+                  <Progress value={75} className="h-2 bg-secondary" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Updated</span>
+                    <span className="font-medium text-blue-600">+128</span>
+                  </div>
+                  <Progress value={60} className="h-2 bg-secondary" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Revoked</span>
+                    <span className="font-medium text-amber-600">-12</span>
+                  </div>
+                  <Progress value={20} className="h-2 bg-secondary" />
+                </div>
+                <div className="pt-4 border-t">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">
+                      Total Changes
+                    </span>
+                    <span className="text-lg font-semibold">163</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Recent Activity */}
+          <Card className="border-border bg-card">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base font-medium">
+                    Recent Activity
+                  </CardTitle>
+                  <CardDescription>
+                    Latest provisioning operations
+                  </CardDescription>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setActiveTab("activity")}
+                >
+                  View all
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {mockRuns.slice(0, 3).map((run, index) => (
+                  <div
+                    key={run.id}
+                    className={cn(
+                      "flex items-center gap-4 p-3 rounded-lg",
+                      index !== mockRuns.length - 1 &&
+                        "border-b border-border/50",
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "flex h-8 w-8 items-center justify-center rounded-full",
+                        run.status === "success" && "bg-emerald-500/10",
+                        run.status === "partial" && "bg-amber-500/10",
+                        run.status === "failed" && "bg-red-500/10",
+                      )}
+                    >
+                      {run.status === "success" && (
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                      )}
+                      {run.status === "partial" && (
+                        <AlertTriangle className="h-4 w-4 text-amber-600" />
+                      )}
+                      {run.status === "failed" && (
+                        <AlertCircle className="h-4 w-4 text-red-600" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-sm">
+                          {run.sourceName}
+                        </span>
+                        {getRunStatusBadge(run.status)}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {run.objectsCreated > 0 &&
+                          `${run.objectsCreated} created `}
+                        {run.objectsUpdated > 0 &&
+                          `${run.objectsUpdated} updated `}
+                        {run.objectsRevoked > 0 &&
+                          `${run.objectsRevoked} revoked`}
+                        {run.errors.length > 0 &&
+                          ` • ${run.errors.length} errors`}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-muted-foreground">
+                        {run.startedAt}
+                      </p>
+                      <Badge variant="outline" className="text-[10px] mt-1">
+                        {run.triggeredBy}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* SOURCES TAB */}
+        <TabsContent value="sources" className="space-y-6">
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search sources..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Select
+                value={statusFilter}
+                onValueChange={(v) =>
+                  setStatusFilter(v as SourceStatus | "all")
+                }
+              >
+                <SelectTrigger className="w-[140px]">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="enabled">Active</SelectItem>
+                  <SelectItem value="disabled">Disabled</SelectItem>
+                  <SelectItem value="error">Error</SelectItem>
+                  <SelectItem value="syncing">Syncing</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="flex border rounded-md">
+                <Button
+                  variant={viewMode === "grid" ? "secondary" : "ghost"}
+                  size="icon"
+                  className="h-9 w-9 rounded-none rounded-l-md"
+                  onClick={() => setViewMode("grid")}
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "secondary" : "ghost"}
+                  size="icon"
+                  className="h-9 w-9 rounded-none rounded-r-md"
+                  onClick={() => setViewMode("list")}
+                >
+                  <List className="h-4 w-4" />
                 </Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </section>
+          </div>
 
-      {/* Security & Policy Notes */}
-      <section>
-        <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground mb-3">
-          Security & Policy Information
-        </h2>
-        <Card className="border-border bg-card">
-          <CardContent className="pt-6 space-y-4">
-            <div className="flex items-start gap-3">
-              <Info className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div className="space-y-3 flex-1">
-                <div>
-                  <h4 className="text-sm font-medium text-foreground">
-                    Audit & Compliance
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    All provisioning actions are fully audited with detailed
-                    logs of each operation. Changes made by provisioning sources
-                    are attributed and can be traced back to the originating
-                    system. Audit logs are retained for compliance purposes.
-                  </p>
-                </div>
+          {/* Sources Grid */}
+          {viewMode === "grid" ? (
+            <div className="grid gap-4 md:grid-cols-2">
+              {filteredSources.map((source) => {
+                const Icon = typeIcons[source.type];
+                const isError = source.status === "error";
 
-                <div>
-                  <h4 className="text-sm font-medium text-foreground">
-                    Policy Enforcement
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Provisioning never bypasses RBAC, security policies, or
-                    context restrictions. All provisioned identities are subject
-                    to the same policies as manually created identities. Admin
-                    and console contexts cannot be provisioned.
-                  </p>
-                </div>
+                return (
+                  <Card
+                    key={source.id}
+                    className={cn(
+                      "border-border bg-card overflow-hidden",
+                      source.status === "disabled" && "opacity-75",
+                      isError && "border-red-500/50",
+                    )}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={cn(
+                              "flex h-10 w-10 items-center justify-center rounded-lg",
+                              isError ? "bg-red-500/10" : "bg-secondary",
+                            )}
+                          >
+                            <Icon
+                              className={cn(
+                                "h-5 w-5",
+                                isError
+                                  ? "text-red-500"
+                                  : "text-muted-foreground",
+                              )}
+                            />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <CardTitle className="text-sm font-medium text-foreground">
+                                {source.name}
+                              </CardTitle>
+                              <Badge variant="outline" className="text-[10px]">
+                                {typeLabels[source.type]}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground line-clamp-1">
+                              {source.description}
+                            </p>
+                          </div>
+                        </div>
+                        {getStatusBadge(source.status)}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {isError && (
+                        <div className="flex items-center gap-2 p-2 rounded-md bg-red-500/10 text-red-600 text-xs">
+                          <AlertCircle className="h-4 w-4 shrink-0" />
+                          <span>{source.errorCount} errors detected</span>
+                        </div>
+                      )}
 
-                <div>
-                  <h4 className="text-sm font-medium text-foreground">
-                    Conflict Resolution
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    When provisioning encounters conflicts (e.g., duplicate
-                    identifiers), the configured resolution strategy determines
-                    the outcome. Manual changes to provisioned objects may be
-                    overridden during subsequent sync operations depending on
-                    sync mode.
-                  </p>
-                </div>
+                      <div className="grid grid-cols-2 gap-3 text-xs">
+                        <div className="p-2 rounded-md bg-secondary/50">
+                          <span className="text-muted-foreground block">
+                            Success Rate
+                          </span>
+                          <span
+                            className={cn(
+                              "font-medium",
+                              getSuccessRateColor(source.successRate),
+                            )}
+                          >
+                            {source.successRate}%
+                          </span>
+                        </div>
+                        <div className="p-2 rounded-md bg-secondary/50">
+                          <span className="text-muted-foreground block">
+                            Avg Sync
+                          </span>
+                          <span className="font-medium">
+                            {source.avgSyncTime}
+                          </span>
+                        </div>
+                        <div className="p-2 rounded-md bg-secondary/50">
+                          <span className="text-muted-foreground block">
+                            Created
+                          </span>
+                          <span className="font-medium text-emerald-600">
+                            {source.objectsCreated}
+                          </span>
+                        </div>
+                        <div className="p-2 rounded-md bg-secondary/50">
+                          <span className="text-muted-foreground block">
+                            Updated
+                          </span>
+                          <span className="font-medium text-blue-600">
+                            {source.objectsUpdated}
+                          </span>
+                        </div>
+                      </div>
 
-                <div>
-                  <h4 className="text-sm font-medium text-foreground">
-                    Safety Controls
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Dry-run mode allows testing provisioning configurations
-                    without making actual changes. Rate limiting and maximum
-                    object counts prevent accidental bulk operations. Approval
-                    workflows can be enabled for high-risk provisioning sources.
-                  </p>
-                </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Clock className="h-3.5 w-3.5" />
+                        <span>Last activity: {source.lastActivity}</span>
+                      </div>
 
-                <div className="rounded-md bg-secondary/50 p-3">
-                  <p className="text-xs text-muted-foreground">
-                    <strong className="text-foreground">Security Note:</strong>{" "}
-                    Authentication credentials for provisioning sources are
-                    encrypted at rest and transmitted securely. Credential
-                    rotation should be performed regularly according to your
-                    security policies.
-                  </p>
-                </div>
-              </div>
+                      <div className="flex items-center justify-between pt-3 border-t border-border">
+                        <Switch
+                          checked={source.status === "enabled"}
+                          onCheckedChange={() => handleToggleSource(source.id)}
+                        />
+                        <div className="flex gap-1">
+                          {source.status === "enabled" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleManualSync(source.id)}
+                              className="h-8 gap-1"
+                            >
+                              <RefreshCw className="h-3.5 w-3.5" />
+                              Sync
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleConfigure(source)}
+                            className="h-8 w-8"
+                          >
+                            <Settings className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(source)}
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
-          </CardContent>
-        </Card>
-      </section>
+          ) : (
+            <Card className="border-border bg-card">
+              <CardContent className="p-0">
+                {filteredSources.map((source, index) => {
+                  const Icon = typeIcons[source.type];
+                  return (
+                    <div
+                      key={source.id}
+                      className={cn(
+                        "flex items-center gap-4 p-4",
+                        index !== filteredSources.length - 1 &&
+                          "border-b border-border",
+                      )}
+                    >
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary">
+                        <Icon className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{source.name}</span>
+                          <Badge variant="outline" className="text-[10px]">
+                            {typeLabels[source.type]}
+                          </Badge>
+                          {getStatusBadge(source.status)}
+                        </div>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {source.description}
+                        </p>
+                      </div>
+                      <div className="hidden md:flex items-center gap-6 text-sm">
+                        <div className="text-right">
+                          <span className="text-muted-foreground block text-xs">
+                            Success Rate
+                          </span>
+                          <span
+                            className={getSuccessRateColor(source.successRate)}
+                          >
+                            {source.successRate}%
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-muted-foreground block text-xs">
+                            Objects
+                          </span>
+                          <span>
+                            {source.objectsCreated + source.objectsUpdated}
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-muted-foreground block text-xs">
+                            Last Run
+                          </span>
+                          <span>{source.lastActivity}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Switch
+                          checked={source.status === "enabled"}
+                          onCheckedChange={() => handleToggleSource(source.id)}
+                        />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleConfigure(source)}
+                        >
+                          <Settings className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
 
-      {/* Target Changes Confirmation Dialog */}
-      <AlertDialog open={showTargetConfirm} onOpenChange={setShowTargetConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Target Changes</AlertDialogTitle>
-            <AlertDialogDescription>
-              Changing provisioning targets may affect active provisioning jobs.
-              Existing sources targeting disabled objects will be unable to
-              sync. This action will be logged for audit purposes.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => {
-                setPendingTargetChanges(null);
-              }}
-            >
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={confirmTargetChanges}>
-              Confirm Changes
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        {/* ACTIVITY TAB */}
+        <TabsContent value="activity" className="space-y-6">
+          <Card className="border-border bg-card">
+            <CardHeader>
+              <CardTitle className="text-base font-medium">
+                Provisioning Runs
+              </CardTitle>
+              <CardDescription>
+                History of all provisioning operations
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {mockRuns.map((run) => (
+                  <div
+                    key={run.id}
+                    className="flex items-start gap-4 p-4 rounded-lg border border-border hover:bg-secondary/30 transition-colors"
+                  >
+                    <div
+                      className={cn(
+                        "flex h-10 w-10 items-center justify-center rounded-full shrink-0",
+                        run.status === "success" && "bg-emerald-500/10",
+                        run.status === "partial" && "bg-amber-500/10",
+                        run.status === "failed" && "bg-red-500/10",
+                      )}
+                    >
+                      {run.status === "success" && (
+                        <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                      )}
+                      {run.status === "partial" && (
+                        <AlertTriangle className="h-5 w-5 text-amber-600" />
+                      )}
+                      {run.status === "failed" && (
+                        <AlertCircle className="h-5 w-5 text-red-600" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{run.sourceName}</span>
+                        {getRunStatusBadge(run.status)}
+                        <Badge variant="outline" className="text-[10px]">
+                          {run.triggeredBy}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-4 mt-1 text-sm">
+                        {run.objectsCreated > 0 && (
+                          <span className="text-emerald-600">
+                            +{run.objectsCreated} created
+                          </span>
+                        )}
+                        {run.objectsUpdated > 0 && (
+                          <span className="text-blue-600">
+                            +{run.objectsUpdated} updated
+                          </span>
+                        )}
+                        {run.objectsRevoked > 0 && (
+                          <span className="text-amber-600">
+                            -{run.objectsRevoked} revoked
+                          </span>
+                        )}
+                      </div>
+                      {run.errors.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          {run.errors.map((error, idx) => (
+                            <div
+                              key={idx}
+                              className="flex items-center gap-2 text-xs text-red-600"
+                            >
+                              <AlertCircle className="h-3 w-3" />
+                              {error}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-right text-sm text-muted-foreground">
+                      <p>{run.startedAt}</p>
+                      {run.completedAt && run.completedAt !== run.startedAt && (
+                        <p className="text-xs">Completed {run.completedAt}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* SETTINGS TAB */}
+        <TabsContent value="settings" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Global Settings */}
+            <Card className="border-border bg-card">
+              <CardHeader>
+                <CardTitle className="text-base font-medium">
+                  Global Configuration
+                </CardTitle>
+                <CardDescription>
+                  Manage provisioning system-wide settings
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-sm">Enable Provisioning</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Master toggle for all provisioning operations
+                    </p>
+                  </div>
+                  <Switch
+                    checked={isProvisioningEnabled}
+                    onCheckedChange={setIsProvisioningEnabled}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-sm">Dry Run Mode</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Simulate changes without applying them
+                    </p>
+                  </div>
+                  <Switch />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-sm">Auto-retry Failed Jobs</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Automatically retry failed provisioning runs
+                    </p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Default Max Objects Per Run</Label>
+                  <Input type="number" defaultValue={5000} />
+                  <p className="text-xs text-muted-foreground">
+                    Safety limit for bulk operations
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Targets Configuration */}
+            <Card className="border-border bg-card">
+              <CardHeader>
+                <CardTitle className="text-base font-medium">
+                  Provisioning Targets
+                </CardTitle>
+                <CardDescription>
+                  Enable identity types for provisioning
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {targetConfigs.map((target) => {
+                    const Icon = target.icon;
+                    const isEnabled = enabledTargets.includes(target.id);
+                    const canEnable = canEnableTarget(target.id);
+
+                    return (
+                      <div
+                        key={target.id}
+                        className={cn(
+                          "flex items-start gap-3 p-3 rounded-lg border transition-colors",
+                          isEnabled
+                            ? "border-primary/20 bg-primary/5"
+                            : "border-border bg-secondary/30",
+                        )}
+                      >
+                        <Checkbox
+                          id={target.id}
+                          checked={isEnabled}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setEnabledTargets([...enabledTargets, target.id]);
+                            } else {
+                              setEnabledTargets(
+                                enabledTargets.filter((t) => t !== target.id),
+                              );
+                            }
+                          }}
+                          disabled={!canEnable && !isEnabled}
+                        />
+                        <div className="flex-1">
+                          <Label
+                            htmlFor={target.id}
+                            className="flex items-center gap-2 cursor-pointer"
+                          >
+                            <Icon className="h-4 w-4" />
+                            {target.name}
+                          </Label>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {target.description}
+                          </p>
+                          {target.dependencies &&
+                            target.dependencies.length > 0 && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Requires:{" "}
+                                {target.dependencies
+                                  .map(
+                                    (d) =>
+                                      targetConfigs.find((t) => t.id === d)
+                                        ?.name,
+                                  )
+                                  .join(", ")}
+                              </p>
+                            )}
+                          {!canEnable && !isEnabled && (
+                            <p className="text-xs text-destructive mt-1">
+                              Enable required dependencies first
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Security Settings */}
+            <Card className="border-border bg-card lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="text-base font-medium">
+                  Security & Compliance
+                </CardTitle>
+                <CardDescription>
+                  Configure security policies for provisioning
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm flex items-center gap-2">
+                        <Lock className="h-4 w-4" />
+                        Require Approval for Deletes
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Admin approval required for identity revocation
+                      </p>
+                    </div>
+                    <Switch />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm flex items-center gap-2">
+                        <Shield className="h-4 w-4" />
+                        Enforce MFA for API Access
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Require MFA for provisioning API calls
+                      </p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm flex items-center gap-2">
+                        <Terminal className="h-4 w-4" />
+                        Audit All Operations
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Log all provisioning actions for compliance
+                      </p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm flex items-center gap-2">
+                        <Globe className="h-4 w-4" />
+                        IP Allowlist Enforcement
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Restrict provisioning sources to allowed IPs
+                      </p>
+                    </div>
+                    <Switch />
+                  </div>
+                </div>
+
+                <div className="rounded-md bg-secondary/50 p-4">
+                  <div className="flex items-start gap-3">
+                    <Info className="h-5 w-5 text-muted-foreground mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium">Security Note</h4>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Authentication credentials for provisioning sources are
+                        encrypted at rest using AES-256 and transmitted securely
+                        via TLS 1.3. Credential rotation should be performed
+                        regularly according to your security policies.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* =========================================================================
+          DIALOGS
+          ========================================================================= */}
 
       {/* Configuration Dialog */}
       <Dialog open={isConfigOpen} onOpenChange={setIsConfigOpen}>
@@ -972,14 +1529,12 @@ export default function ProvisioningPage() {
               Configure {selectedSource?.name}
             </DialogTitle>
             <DialogDescription>
-              Update provisioning source settings and synchronization
-              parameters.
+              Update provisioning source settings and synchronization parameters
             </DialogDescription>
           </DialogHeader>
 
           {selectedSource && (
             <div className="space-y-6 py-4">
-              {/* Source Settings */}
               <div className="space-y-4">
                 <h3 className="text-sm font-medium text-foreground">
                   Source Settings
@@ -1040,8 +1595,7 @@ export default function ProvisioningPage() {
                 )}
               </div>
 
-              {/* Sync Configuration */}
-              <div className="space-y-4 pt-4 border-t border-border">
+              <div className="space-y-4 pt-4 border-t">
                 <h3 className="text-sm font-medium text-foreground">
                   Sync Configuration
                 </h3>
@@ -1063,9 +1617,6 @@ export default function ProvisioningPage() {
                       <SelectItem value="full_sync">Full Sync</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground">
-                    Full sync allows create, update, and revoke operations.
-                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -1079,69 +1630,7 @@ export default function ProvisioningPage() {
                         schedule: e.target.value,
                       })
                     }
-                    placeholder="e.g., Every 15 minutes or Daily at 2:00 AM"
-                  />
-                </div>
-              </div>
-
-              {/* Targets */}
-              <div className="space-y-4 pt-4 border-t border-border">
-                <h3 className="text-sm font-medium text-foreground">
-                  Provisioning Targets
-                </h3>
-                <div className="space-y-2">
-                  {targetConfigs.map((target) => (
-                    <div key={target.id} className="flex items-center gap-2">
-                      <Checkbox
-                        id={`target-${target.id}`}
-                        checked={selectedSource.allowedTargets.includes(
-                          target.id,
-                        )}
-                        onCheckedChange={(checked) => {
-                          const newTargets = checked
-                            ? [...selectedSource.allowedTargets, target.id]
-                            : selectedSource.allowedTargets.filter(
-                                (t) => t !== target.id,
-                              );
-                          setSelectedSource({
-                            ...selectedSource,
-                            allowedTargets: newTargets,
-                          });
-                        }}
-                      />
-                      <Label
-                        htmlFor={`target-${target.id}`}
-                        className="text-sm cursor-pointer"
-                      >
-                        {target.name}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Safety Options */}
-              <div className="space-y-4 pt-4 border-t border-border">
-                <h3 className="text-sm font-medium text-foreground">
-                  Safety Options
-                </h3>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="dry-run">Dry-Run Mode</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Simulate operations without making changes
-                    </p>
-                  </div>
-                  <Switch
-                    id="dry-run"
-                    checked={selectedSource.dryRunMode}
-                    onCheckedChange={(checked) =>
-                      setSelectedSource({
-                        ...selectedSource,
-                        dryRunMode: checked,
-                      })
-                    }
+                    placeholder="e.g., Every 15 minutes"
                   />
                 </div>
 
@@ -1159,16 +1648,41 @@ export default function ProvisioningPage() {
                     }
                   />
                 </div>
+              </div>
+
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-sm font-medium text-foreground">
+                  Safety Options
+                </h3>
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="approval-required">Require Approval</Label>
+                    <Label htmlFor="dry-run">Dry-Run Mode</Label>
                     <p className="text-xs text-muted-foreground">
-                      Queue changes for admin approval before applying
+                      Simulate without making changes
                     </p>
                   </div>
                   <Switch
-                    id="approval-required"
+                    id="dry-run"
+                    checked={selectedSource.dryRunMode}
+                    onCheckedChange={(checked) =>
+                      setSelectedSource({
+                        ...selectedSource,
+                        dryRunMode: checked,
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="approval">Require Approval</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Queue for admin approval
+                    </p>
+                  </div>
+                  <Switch
+                    id="approval"
                     checked={selectedSource.approvalRequired}
                     onCheckedChange={(checked) =>
                       setSelectedSource({
@@ -1199,66 +1713,50 @@ export default function ProvisioningPage() {
           <DialogHeader>
             <DialogTitle>Add Provisioning Source</DialogTitle>
             <DialogDescription>
-              Select the type of provisioning source to configure.
+              Select the type of provisioning source to configure
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <button
-              onClick={() => handleAddSource("scim")}
-              className="flex items-center gap-4 rounded-lg border border-border p-4 text-left transition-colors hover:bg-secondary/50"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-secondary">
-                <Server className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="font-medium text-foreground">SCIM Provider</p>
-                <p className="text-sm text-muted-foreground">
-                  Okta, Azure AD, OneLogin, etc.
-                </p>
-              </div>
-            </button>
-            <button
-              onClick={() => handleAddSource("api")}
-              className="flex items-center gap-4 rounded-lg border border-border p-4 text-left transition-colors hover:bg-secondary/50"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-secondary">
-                <ArrowRightLeft className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="font-medium text-foreground">REST API</p>
-                <p className="text-sm text-muted-foreground">
-                  Workday, custom HRIS, etc.
-                </p>
-              </div>
-            </button>
-            <button
-              onClick={() => handleAddSource("webhook")}
-              className="flex items-center gap-4 rounded-lg border border-border p-4 text-left transition-colors hover:bg-secondary/50"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-secondary">
-                <Zap className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="font-medium text-foreground">Webhook</p>
-                <p className="text-sm text-muted-foreground">
-                  Real-time event-driven updates
-                </p>
-              </div>
-            </button>
-            <button
-              onClick={() => handleAddSource("csv")}
-              className="flex items-center gap-4 rounded-lg border border-border p-4 text-left transition-colors hover:bg-secondary/50"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-secondary">
-                <Upload className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="font-medium text-foreground">CSV Import</p>
-                <p className="text-sm text-muted-foreground">
-                  Manual bulk import from files
-                </p>
-              </div>
-            </button>
+          <div className="grid gap-3 py-4">
+            {[
+              {
+                type: "scim" as const,
+                icon: Server,
+                title: "SCIM Provider",
+                desc: "Okta, Azure AD, OneLogin",
+              },
+              {
+                type: "api" as const,
+                icon: ArrowRightLeft,
+                title: "REST API",
+                desc: "Workday, custom HRIS",
+              },
+              {
+                type: "webhook" as const,
+                icon: Zap,
+                title: "Webhook",
+                desc: "Real-time event updates",
+              },
+              {
+                type: "csv" as const,
+                icon: Upload,
+                title: "CSV Import",
+                desc: "Manual bulk import",
+              },
+            ].map(({ type, icon: Icon, title, desc }) => (
+              <button
+                key={type}
+                onClick={() => handleAddSource(type)}
+                className="flex items-center gap-4 rounded-lg border border-border p-4 text-left transition-colors hover:bg-secondary/50"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-secondary">
+                  <Icon className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">{title}</p>
+                  <p className="text-sm text-muted-foreground">{desc}</p>
+                </div>
+              </button>
+            ))}
           </div>
         </DialogContent>
       </Dialog>

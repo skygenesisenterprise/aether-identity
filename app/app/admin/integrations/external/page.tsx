@@ -6,6 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/dashboard/ui/card";
 import { Button } from "@/components/dashboard/ui/button";
 import { Badge } from "@/components/dashboard/ui/badge";
@@ -13,13 +14,22 @@ import { Input } from "@/components/dashboard/ui/input";
 import { Label } from "@/components/dashboard/ui/label";
 import { Switch } from "@/components/dashboard/ui/switch";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/dashboard/ui/select";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/dashboard/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/dashboard/ui/tooltip";
+import { Progress } from "@/components/dashboard/ui/progress";
+import { Separator } from "@/components/dashboard/ui/separator";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+
 import {
   Globe,
   LogIn,
@@ -27,16 +37,34 @@ import {
   KeyRound,
   CheckCircle,
   AlertTriangle,
-  ExternalLink,
   Shield,
   Info,
-  AlertCircle,
   RefreshCw,
+  Server,
+  Cloud,
+  Layers,
+  Activity,
+  Check,
+  X,
+  ChevronRight,
+  Zap,
+  Lock,
+  History,
+  Settings2,
+  ArrowUpRight,
+  FileText,
+  Cpu,
+  Network,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+
+// ============================================================================
+// TYPES & INTERFACES
+// ============================================================================
 
 type IntegrationMode = "internal" | "external" | "hybrid";
 type PageStatus = "internal" | "external" | "disabled";
+type ConnectionHealth = "healthy" | "degraded" | "unhealthy" | "unknown";
+type EnvironmentType = "cloud" | "self-hosted";
 
 interface PublicPageConfig {
   id: string;
@@ -47,79 +75,253 @@ interface PublicPageConfig {
   url?: string;
   urlError?: string;
   isValidating?: boolean;
+  lastHealthCheck?: Date;
+  healthStatus?: ConnectionHealth;
+  responseTime?: number;
 }
 
-const modeDescriptions: Record<IntegrationMode, string> = {
-  internal:
-    "All public pages are served internally by Identity. No external configuration required.",
-  external:
-    "All public pages are hosted externally. Requires full external URL configuration.",
-  hybrid:
-    "Mix of internal and external pages. Configure each page individually.",
+interface IntegrationStats {
+  totalPages: number;
+  externalPages: number;
+  internalPages: number;
+  disabledPages: number;
+  avgResponseTime: number;
+  lastSync: Date;
+}
+
+interface AuditEvent {
+  id: string;
+  type: "mode_change" | "page_config" | "health_check" | "security_alert";
+  description: string;
+  actor: string;
+  timestamp: Date;
+  severity?: "info" | "warning" | "critical";
+}
+
+// ============================================================================
+// MOCK DATA
+// ============================================================================
+
+const modeConfig: Record<
+  IntegrationMode,
+  {
+    label: string;
+    description: string;
+    icon: React.ComponentType<{ className?: string }>;
+    color: string;
+    benefits: string[];
+    considerations: string[];
+  }
+> = {
+  internal: {
+    label: "Internal Hosting",
+    description: "All pages served by Aether Identity",
+    icon: Server,
+    color: "emerald",
+    benefits: [
+      "Zero external dependencies",
+      "Simplified maintenance",
+      "Built-in security controls",
+      "Automatic updates",
+    ],
+    considerations: ["Limited customization"],
+  },
+  external: {
+    label: "External Hosting",
+    description: "Full control on your infrastructure",
+    icon: Cloud,
+    color: "blue",
+    benefits: [
+      "Complete customization",
+      "Brand consistency",
+      "Advanced theming",
+      "Custom workflows",
+    ],
+    considerations: [
+      "Requires HTTPS endpoints",
+      "Self-managed availability",
+      "Security compliance needed",
+    ],
+  },
+  hybrid: {
+    label: "Hybrid Mode",
+    description: "Mix internal and external pages",
+    icon: Layers,
+    color: "violet",
+    benefits: [
+      "Flexible migration path",
+      "Gradual transition",
+      "Selective customization",
+      "Best of both worlds",
+    ],
+    considerations: [
+      "Complex configuration",
+      "Requires planning",
+      "Monitoring essential",
+    ],
+  },
 };
 
-const modeWarnings: Record<IntegrationMode, string | null> = {
-  internal: null,
-  external:
-    "External mode requires all public pages to be hosted on your own infrastructure. Ensure high availability and security compliance.",
-  hybrid:
-    "Hybrid mode requires careful configuration. Ensure redirect validation and context enforcement are properly implemented.",
+const initialPages: PublicPageConfig[] = [
+  {
+    id: "login",
+    name: "Authentication",
+    description: "Primary login and SSO entry point",
+    icon: LogIn,
+    status: "internal",
+    url: "",
+    healthStatus: "healthy",
+    responseTime: 145,
+  },
+  {
+    id: "register",
+    name: "Registration",
+    description: "New user onboarding flow",
+    icon: UserPlus,
+    status: "internal",
+    url: "",
+    healthStatus: "healthy",
+    responseTime: 132,
+  },
+  {
+    id: "password-reset",
+    name: "Password Recovery",
+    description: "Secure password reset workflow",
+    icon: KeyRound,
+    status: "internal",
+    url: "",
+    healthStatus: "healthy",
+    responseTime: 128,
+  },
+  {
+    id: "consent",
+    name: "Consent & Permissions",
+    description: "OAuth scopes and data permissions",
+    icon: CheckCircle,
+    status: "internal",
+    url: "",
+    healthStatus: "healthy",
+    responseTime: 156,
+  },
+  {
+    id: "error",
+    name: "Error Handling",
+    description: "Error pages and maintenance mode",
+    icon: AlertTriangle,
+    status: "internal",
+    url: "",
+    healthStatus: "healthy",
+    responseTime: 98,
+  },
+];
+
+const recentActivity: AuditEvent[] = [
+  {
+    id: "evt-1",
+    type: "health_check",
+    description: "All endpoints responding normally",
+    actor: "system",
+    timestamp: new Date(Date.now() - 1000 * 60 * 5),
+    severity: "info",
+  },
+  {
+    id: "evt-2",
+    type: "page_config",
+    description: "Login page URL validated",
+    actor: "admin@acme.com",
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
+    severity: "info",
+  },
+  {
+    id: "evt-3",
+    type: "security_alert",
+    description: "External URL certificate expires in 14 days",
+    actor: "system",
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
+    severity: "warning",
+  },
+];
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+const formatRelativeTime = (date: Date): string => {
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (seconds < 60) return "Just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
 };
+
+const getHealthColor = (status: ConnectionHealth): string => {
+  const colors = {
+    healthy: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
+    degraded: "text-amber-500 bg-amber-500/10 border-amber-500/20",
+    unhealthy: "text-red-500 bg-red-500/10 border-red-500/20",
+    unknown: "text-slate-500 bg-slate-500/10 border-slate-500/20",
+  };
+  return colors[status];
+};
+
+const getHealthIcon = (status: ConnectionHealth) => {
+  const icons = {
+    healthy: Check,
+    degraded: AlertTriangle,
+    unhealthy: X,
+    unknown: Activity,
+  };
+  return icons[status];
+};
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
 
 export default function ExternalIntegrationsPage() {
+  // State
   const [mode, setMode] = React.useState<IntegrationMode>("internal");
+  const [pages, setPages] = React.useState<PublicPageConfig[]>(initialPages);
   const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState(false);
-  const [showConfirmDialog, setShowConfirmDialog] = React.useState(false);
+  const [isSaving, setIsSaving] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState("overview");
+  const [environment] = React.useState<EnvironmentType>("cloud");
+  const [showModeConfirm, setShowModeConfirm] = React.useState(false);
   const [pendingMode, setPendingMode] = React.useState<IntegrationMode | null>(
     null,
   );
 
-  const [pages, setPages] = React.useState<PublicPageConfig[]>([
-    {
-      id: "login",
-      name: "Login Page",
-      description: "User authentication entry point",
-      icon: LogIn,
-      status: "internal",
-      url: "",
-    },
-    {
-      id: "register",
-      name: "Registration Page",
-      description: "New user registration flow",
-      icon: UserPlus,
-      status: "internal",
-      url: "",
-    },
-    {
-      id: "password-reset",
-      name: "Password Reset",
-      description: "Forgot password and reset flow",
-      icon: KeyRound,
-      status: "internal",
-      url: "",
-    },
-    {
-      id: "consent",
-      name: "Consent Page",
-      description: "OAuth and permission consent",
-      icon: CheckCircle,
-      status: "internal",
-      url: "",
-    },
-    {
-      id: "error",
-      name: "Error & Maintenance",
-      description: "Error pages and maintenance mode",
-      icon: AlertTriangle,
-      status: "internal",
-      url: "",
-    },
-  ]);
+  // Derived state
+  const stats: IntegrationStats = React.useMemo(() => {
+    const external = pages.filter((p) => p.status === "external").length;
+    const internal = pages.filter((p) => p.status === "internal").length;
+    const disabled = pages.filter((p) => p.status === "disabled").length;
+    const avgResponse =
+      pages.reduce((acc, p) => acc + (p.responseTime || 0), 0) / pages.length;
 
+    return {
+      totalPages: pages.length,
+      externalPages: external,
+      internalPages: internal,
+      disabledPages: disabled,
+      avgResponseTime: Math.round(avgResponse),
+      lastSync: new Date(),
+    };
+  }, [pages]);
+
+  const externalPercentage = Math.round(
+    (stats.externalPages / stats.totalPages) * 100,
+  );
+
+  const hasIssues = pages.some((p) => p.healthStatus === "unhealthy");
+  const hasWarnings = pages.some((p) => p.healthStatus === "degraded");
+
+  // Validation
   const validateUrl = (url: string): string | undefined => {
-    if (!url) return "URL is required for external pages";
-    if (!url.startsWith("https://")) return "URL must use HTTPS";
+    if (!url) return "URL is required";
+    if (!url.startsWith("https://")) return "HTTPS required";
     try {
       new URL(url);
       return undefined;
@@ -128,17 +330,18 @@ export default function ExternalIntegrationsPage() {
     }
   };
 
-  const handleModeChange = (newMode: IntegrationMode) => {
+  // Handlers
+  const handleModeSelect = (newMode: IntegrationMode) => {
     if (newMode === mode) return;
     setPendingMode(newMode);
-    setShowConfirmDialog(true);
+    setShowModeConfirm(true);
   };
 
   const confirmModeChange = () => {
     if (pendingMode) {
       setMode(pendingMode);
       setHasUnsavedChanges(true);
-      setShowConfirmDialog(false);
+      setShowModeConfirm(false);
       setPendingMode(null);
     }
   };
@@ -149,7 +352,7 @@ export default function ExternalIntegrationsPage() {
         if (page.id !== pageId) return page;
         const updated = { ...page, status: newStatus };
         if (newStatus === "external" && !page.url) {
-          updated.urlError = "URL is required";
+          updated.urlError = "URL required";
         } else {
           updated.urlError = undefined;
         }
@@ -163,368 +366,980 @@ export default function ExternalIntegrationsPage() {
     setPages((prev) =>
       prev.map((page) => {
         if (page.id !== pageId) return page;
-        const error = validateUrl(url);
+        const error = url ? validateUrl(url) : undefined;
         return { ...page, url, urlError: error };
       }),
     );
     setHasUnsavedChanges(true);
   };
 
-  const handleTestUrl = async (pageId: string) => {
+  const handleTestConnection = async (pageId: string) => {
     setPages((prev) =>
       prev.map((page) =>
         page.id === pageId ? { ...page, isValidating: true } : page,
       ),
     );
 
-    // Simulate URL validation
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     setPages((prev) =>
       prev.map((page) =>
-        page.id === pageId ? { ...page, isValidating: false } : page,
+        page.id === pageId
+          ? {
+              ...page,
+              isValidating: false,
+              healthStatus: "healthy",
+              responseTime: Math.floor(Math.random() * 200) + 50,
+              lastHealthCheck: new Date(),
+            }
+          : page,
       ),
     );
   };
 
-  const handleSave = () => {
-    // Simulate save
+  const handleSave = async () => {
+    setIsSaving(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setIsSaving(false);
     setHasUnsavedChanges(false);
   };
 
-  const getStatusBadge = (status: PageStatus) => {
+  const runHealthCheck = async () => {
+    setPages((prev) => prev.map((page) => ({ ...page, isValidating: true })));
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    setPages((prev) =>
+      prev.map((page) => ({
+        ...page,
+        isValidating: false,
+        healthStatus: Math.random() > 0.2 ? "healthy" : "degraded",
+        responseTime: Math.floor(Math.random() * 300) + 50,
+        lastHealthCheck: new Date(),
+      })),
+    );
+  };
+
+  // Render helpers
+  const ModeCard = ({
+    modeKey,
+    isActive,
+  }: {
+    modeKey: IntegrationMode;
+    isActive: boolean;
+  }) => {
+    const config = modeConfig[modeKey];
+    const Icon = config.icon;
+
+    return (
+      <button
+        onClick={() => handleModeSelect(modeKey)}
+        className={cn(
+          "relative flex flex-col items-start gap-3 rounded-xl border p-5 text-left transition-all duration-200",
+          isActive
+            ? `border-${config.color}-500 bg-${config.color}-500/5 shadow-sm`
+            : "border-border bg-card hover:border-muted-foreground/30 hover:bg-muted/50",
+        )}
+      >
+        {isActive && (
+          <div
+            className={cn(
+              "absolute top-3 right-3 h-2 w-2 rounded-full",
+              `bg-${config.color}-500`,
+            )}
+          />
+        )}
+
+        <div
+          className={cn(
+            "flex h-10 w-10 items-center justify-center rounded-lg",
+            isActive ? `bg-${config.color}-500/10` : "bg-muted",
+          )}
+        >
+          <Icon
+            className={cn(
+              "h-5 w-5",
+              isActive ? `text-${config.color}-500` : "text-muted-foreground",
+            )}
+          />
+        </div>
+
+        <div className="space-y-1">
+          <h3 className="font-semibold text-foreground">{config.label}</h3>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            {config.description}
+          </p>
+        </div>
+
+        <div className="w-full pt-2 space-y-1.5">
+          {config.benefits.slice(0, 2).map((benefit, idx) => (
+            <div key={idx} className="flex items-center gap-1.5 text-xs">
+              <Check className="h-3 w-3 text-emerald-500" />
+              <span className="text-muted-foreground">{benefit}</span>
+            </div>
+          ))}
+        </div>
+      </button>
+    );
+  };
+
+  const StatusBadge = ({ status }: { status: PageStatus }) => {
     const configs = {
-      internal: { variant: "default" as const, label: "Internal" },
-      external: { variant: "outline" as const, label: "External" },
-      disabled: { variant: "secondary" as const, label: "Disabled" },
+      internal: {
+        variant: "default" as const,
+        label: "Internal",
+        icon: Server,
+      },
+      external: {
+        variant: "outline" as const,
+        label: "External",
+        icon: Cloud,
+      },
+      disabled: {
+        variant: "secondary" as const,
+        label: "Disabled",
+        icon: X,
+      },
     };
     const config = configs[status];
+    const Icon = config.icon;
+
     return (
-      <Badge variant={config.variant} className="text-xs">
+      <Badge variant={config.variant} className="gap-1 text-xs font-medium">
+        <Icon className="h-3 w-3" />
         {config.label}
       </Badge>
     );
-  };
-
-  const getModeBadge = () => {
-    const configs = {
-      internal: { variant: "default" as const, label: "Internal" },
-      external: { variant: "outline" as const, label: "External" },
-      hybrid: { variant: "secondary" as const, label: "Hybrid" },
-    };
-    const config = configs[mode];
-    return (
-      <Badge variant={config.variant} className="ml-3">
-        {config.label}
-      </Badge>
-    );
-  };
-
-  const hasDangerousConfig = () => {
-    const externalLogin =
-      pages.find((p) => p.id === "login")?.status === "external";
-    const internalError =
-      pages.find((p) => p.id === "error")?.status === "internal";
-    return externalLogin && internalError && mode !== "internal";
   };
 
   return (
-    <div className="space-y-6 text-foreground">
-      {/* Page Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="flex items-center">
-            <h1 className="text-2xl font-semibold text-card-foreground">
-              External Integrations
-            </h1>
-            {getModeBadge()}
-          </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            Configure external public pages used during authentication flows.
-          </p>
-        </div>
-        {hasUnsavedChanges && (
-          <Button onClick={handleSave} className="gap-2">
-            <RefreshCw className="h-4 w-4" />
-            Save Changes
-          </Button>
-        )}
-      </div>
-
-      {/* Danger Warning */}
-      {hasDangerousConfig() && (
-        <Alert variant="destructive" className="border-red-500/50">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Configuration Warning</AlertTitle>
-          <AlertDescription>
-            External login page is configured without an external error page.
-            This may result in inconsistent user experience during failures.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Section A: Global Mode */}
-      <section>
-        <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground mb-3">
-          Global Configuration
-        </h2>
-        <Card className="border-border bg-card">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <Globe className="h-5 w-5 text-muted-foreground" />
-              <CardTitle className="text-base font-medium text-foreground">
-                Integration Mode
-              </CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-3">
-              {(["internal", "external", "hybrid"] as IntegrationMode[]).map(
-                (m) => (
-                  <button
-                    key={m}
-                    onClick={() => handleModeChange(m)}
-                    className={cn(
-                      "relative flex flex-col items-start gap-2 rounded-lg border p-4 text-left transition-colors hover:bg-secondary/50",
-                      mode === m
-                        ? "border-primary bg-primary/5"
-                        : "border-border",
-                    )}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={cn(
-                          "h-4 w-4 rounded-full border",
-                          mode === m
-                            ? "border-primary bg-primary"
-                            : "border-muted-foreground",
-                        )}
-                      >
-                        {mode === m && (
-                          <div className="m-1 h-2 w-2 rounded-full bg-primary-foreground" />
-                        )}
-                      </div>
-                      <span className="font-medium capitalize">{m}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {modeDescriptions[m]}
-                    </p>
-                  </button>
-                ),
+    <TooltipProvider>
+      <div className="space-y-6 text-foreground">
+        {/* =========================================================================
+            HEADER SECTION
+            ========================================================================= */}
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-semibold text-card-foreground">
+                External Integrations
+              </h1>
+              <Badge
+                variant={mode === "internal" ? "default" : "outline"}
+                className="font-medium"
+              >
+                {modeConfig[mode].label}
+              </Badge>
+              {environment === "self-hosted" && (
+                <Badge variant="secondary" className="font-medium">
+                  <Cpu className="h-3 w-3 mr-1" />
+                  Self-Hosted
+                </Badge>
               )}
             </div>
+            <p className="text-sm text-muted-foreground">
+              Configure how public authentication pages are served and managed
+            </p>
+          </div>
 
-            {modeWarnings[mode] && (
-              <Alert className="border-amber-500/30 bg-amber-500/10">
-                <AlertTriangle className="h-4 w-4 text-amber-400" />
-                <AlertDescription className="text-amber-400">
-                  {modeWarnings[mode]}
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {showConfirmDialog && (
-              <div className="rounded-lg border border-border bg-secondary/50 p-4">
-                <p className="text-sm text-foreground mb-3">
-                  Changing the integration mode will affect how users access
-                  public pages. This action will be logged for audit purposes.
-                </p>
-                <div className="flex gap-2">
-                  <Button size="sm" onClick={confirmModeChange}>
-                    Confirm Change
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      setShowConfirmDialog(false);
-                      setPendingMode(null);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Section B: Public Pages Configuration */}
-      <section>
-        <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground mb-3">
-          Public Pages Configuration
-        </h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          {pages.map((page) => {
-            const Icon = page.icon;
-            const showUrlField =
-              mode === "external" ||
-              (mode === "hybrid" && page.status === "external");
-
-            return (
-              <Card
-                key={page.id}
-                className={cn(
-                  "border-border bg-card",
-                  page.status === "disabled" && "opacity-75",
-                )}
+          <div className="flex items-center gap-2">
+            {hasUnsavedChanges && (
+              <Badge
+                variant="outline"
+                className="text-amber-500 border-amber-500/30"
               >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-md bg-secondary">
-                        <Icon className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-sm font-medium text-foreground">
-                          {page.name}
-                        </CardTitle>
-                        <p className="text-xs text-muted-foreground">
-                          {page.description}
-                        </p>
-                      </div>
-                    </div>
-                    {getStatusBadge(page.status)}
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {mode === "hybrid" && (
-                    <div className="flex items-center justify-between">
-                      <Label
-                        htmlFor={`${page.id}-toggle`}
-                        className="text-sm text-muted-foreground"
-                      >
-                        Use External Page
-                      </Label>
-                      <Switch
-                        id={`${page.id}-toggle`}
-                        checked={page.status === "external"}
-                        onCheckedChange={(checked) =>
-                          handlePageStatusChange(
-                            page.id,
-                            checked ? "external" : "internal",
-                          )
-                        }
-                      />
-                    </div>
-                  )}
+                Unsaved changes
+              </Badge>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={runHealthCheck}
+              className="gap-2"
+            >
+              <Activity className="h-4 w-4" />
+              Health Check
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={!hasUnsavedChanges || isSaving}
+              className="gap-2"
+            >
+              {isSaving ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="h-4 w-4" />
+              )}
+              Save Changes
+            </Button>
+          </div>
+        </div>
 
-                  {showUrlField && (
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor={`${page.id}-url`}
-                        className="text-xs text-muted-foreground"
-                      >
-                        External URL
-                      </Label>
-                      <div className="flex gap-2">
-                        <Input
-                          id={`${page.id}-url`}
-                          type="url"
-                          placeholder="https://auth.example.com/login"
-                          value={page.url}
-                          onChange={(e) =>
-                            handleUrlChange(page.id, e.target.value)
-                          }
-                          className={cn(
-                            "flex-1",
-                            page.urlError && "border-destructive",
-                          )}
-                        />
+        {/* =========================================================================
+            OVERVIEW DASHBOARD
+            ========================================================================= */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div
+              className={cn(
+                "h-2 w-2 rounded-full",
+                hasIssues
+                  ? "bg-red-500 animate-pulse"
+                  : hasWarnings
+                    ? "bg-amber-500"
+                    : "bg-emerald-500",
+              )}
+            />
+            <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+              System Overview
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Integration Progress */}
+            <Card className="border-border bg-card md:col-span-2">
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      External Integration
+                    </p>
+                    <p className="text-2xl font-semibold mt-1">
+                      {externalPercentage}%
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {stats.externalPages} of {stats.totalPages} pages
+                      externalized
+                    </p>
+                  </div>
+                  <div
+                    className={cn(
+                      "h-10 w-10 rounded-lg flex items-center justify-center",
+                      externalPercentage === 0
+                        ? "bg-emerald-500/10"
+                        : externalPercentage === 100
+                          ? "bg-blue-500/10"
+                          : "bg-violet-500/10",
+                    )}
+                  >
+                    <Globe
+                      className={cn(
+                        "h-5 w-5",
+                        externalPercentage === 0
+                          ? "text-emerald-500"
+                          : externalPercentage === 100
+                            ? "text-blue-500"
+                            : "text-violet-500",
+                      )}
+                    />
+                  </div>
+                </div>
+                <Progress value={externalPercentage} className="h-2" />
+                <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+                  <span>Internal</span>
+                  <span>Hybrid</span>
+                  <span>External</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Response Time */}
+            <Card className="border-border bg-card">
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Avg Response
+                    </p>
+                    <p className="text-2xl font-semibold mt-1">
+                      {stats.avgResponseTime}ms
+                    </p>
+                    <p className="text-xs text-emerald-500 mt-0.5">
+                      Optimal performance
+                    </p>
+                  </div>
+                  <div className="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                    <Zap className="h-5 w-5 text-emerald-500" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Security Status */}
+            <Card className="border-border bg-card">
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Security Status
+                    </p>
+                    <p className="text-2xl font-semibold mt-1">
+                      {hasIssues ? "Issues" : hasWarnings ? "Warnings" : "Good"}
+                    </p>
+                    <p
+                      className={cn(
+                        "text-xs mt-0.5",
+                        hasIssues
+                          ? "text-red-500"
+                          : hasWarnings
+                            ? "text-amber-500"
+                            : "text-emerald-500",
+                      )}
+                    >
+                      {hasIssues
+                        ? "Action required"
+                        : hasWarnings
+                          ? "Review recommended"
+                          : "All checks passed"}
+                    </p>
+                  </div>
+                  <div
+                    className={cn(
+                      "h-10 w-10 rounded-lg flex items-center justify-center",
+                      hasIssues
+                        ? "bg-red-500/10"
+                        : hasWarnings
+                          ? "bg-amber-500/10"
+                          : "bg-emerald-500/10",
+                    )}
+                  >
+                    <Shield
+                      className={cn(
+                        "h-5 w-5",
+                        hasIssues
+                          ? "text-red-500"
+                          : hasWarnings
+                            ? "text-amber-500"
+                            : "text-emerald-500",
+                      )}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* =========================================================================
+            MAIN CONTENT TABS
+            ========================================================================= */}
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
+          <TabsList className="bg-muted/50">
+            <TabsTrigger value="overview" className="gap-2">
+              <Settings2 className="h-4 w-4" />
+              Configuration
+            </TabsTrigger>
+            <TabsTrigger value="pages" className="gap-2">
+              <FileText className="h-4 w-4" />
+              Public Pages
+              <Badge variant="secondary" className="ml-1 text-xs">
+                {pages.length}
+              </Badge>
+            </TabsTrigger>
+            <TabsTrigger value="monitoring" className="gap-2">
+              <Activity className="h-4 w-4" />
+              Monitoring
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="gap-2">
+              <History className="h-4 w-4" />
+              Activity
+            </TabsTrigger>
+          </TabsList>
+
+          {/* CONFIGURATION TAB */}
+          <TabsContent value="overview" className="space-y-6">
+            {/* Mode Selection */}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-foreground">
+                    Architecture Mode
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Choose how public pages are hosted and served
+                  </p>
+                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Info className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p>
+                      Changing modes affects all users immediately. Ensure you
+                      have tested your configuration.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                {(["internal", "external", "hybrid"] as IntegrationMode[]).map(
+                  (m) => (
+                    <ModeCard key={m} modeKey={m} isActive={mode === m} />
+                  ),
+                )}
+              </div>
+
+              {/* Mode Confirmation */}
+              {showModeConfirm && pendingMode && (
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5" />
+                    <div className="flex-1">
+                      <h4 className="text-sm font-medium text-amber-700">
+                        Confirm Architecture Change
+                      </h4>
+                      <p className="text-sm text-amber-600 mt-1">
+                        Switching to {modeConfig[pendingMode].label} will
+                        {pendingMode === "external"
+                          ? " require all external URLs to be configured"
+                          : pendingMode === "internal"
+                            ? " disable all external page configurations"
+                            : " require per-page configuration"}
+                        . This change will be logged for audit purposes.
+                      </p>
+                      <div className="flex gap-2 mt-3">
+                        <Button size="sm" onClick={confirmModeChange}>
+                          Confirm Change
+                        </Button>
                         <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleTestUrl(page.id)}
-                          disabled={!!page.urlError || !page.url}
-                          className="shrink-0"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setShowModeConfirm(false);
+                            setPendingMode(null);
+                          }}
                         >
-                          {page.isValidating ? (
-                            <RefreshCw className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <ExternalLink className="h-4 w-4" />
-                          )}
+                          Cancel
                         </Button>
                       </div>
-                      {page.urlError && (
-                        <p className="text-xs text-destructive">
-                          {page.urlError}
-                        </p>
-                      )}
                     </div>
-                  )}
+                  </div>
+                </div>
+              )}
+            </section>
 
-                  <div className="flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-2">
-                    <Shield className="h-3 w-3 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">
-                      Context: user scope only
-                    </span>
+            {/* Quick Stats */}
+            <section className="grid gap-4 md:grid-cols-3">
+              <Card className="border-border bg-card">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                      <Network className="h-4 w-4 text-blue-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">
+                        Endpoints
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {stats.externalPages} external configured
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-            );
-          })}
-        </div>
-      </section>
 
-      {/* Section C: Security & Flow Notes */}
-      <section>
-        <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground mb-3">
-          Security & Flow Information
-        </h2>
-        <Card className="border-border bg-card">
-          <CardContent className="pt-6 space-y-4">
-            <div className="flex items-start gap-3">
-              <Info className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div className="space-y-3 flex-1">
-                <div>
-                  <h4 className="text-sm font-medium text-foreground">
-                    Redirect Validation
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    All redirect URLs are validated against a whitelist of
-                    allowed domains. Wildcard redirects are not permitted. Each
-                    external page must be explicitly configured and verified.
-                  </p>
-                </div>
+              <Card className="border-border bg-card">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                      <Lock className="h-4 w-4 text-violet-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">
+                        SSL/TLS
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        All external endpoints use HTTPS
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-                <div>
-                  <h4 className="text-sm font-medium text-foreground">
-                    Context Enforcement
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Public pages operate strictly within the user context scope.
-                    Admin and console contexts are never allowed for external
-                    page configurations. Context elevation is blocked at the API
-                    level.
-                  </p>
-                </div>
+              <Card className="border-border bg-card">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-emerald-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">
+                        Validation
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        All URLs verified and active
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+          </TabsContent>
 
-                <div>
-                  <h4 className="text-sm font-medium text-foreground">
-                    Token-Based Flow Security
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Authentication flows use cryptographically signed flow
-                    tokens (flow_token) that bind the session to the originating
-                    request. Tokens are single-use and time-bound to prevent
-                    replay attacks.
-                  </p>
-                </div>
-
-                <div className="rounded-md bg-secondary/50 p-3">
-                  <p className="text-xs text-muted-foreground">
-                    <strong className="text-foreground">Audit Logging:</strong>{" "}
-                    All changes to external integration settings are logged with
-                    administrator identification, timestamp, and change details.
-                    Configuration history is retained for 90 days.
-                  </p>
-                </div>
+          {/* PAGES TAB */}
+          <TabsContent value="pages" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium text-foreground">
+                  Public Page Configuration
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Manage individual page hosting and routing
+                </p>
               </div>
+              {mode === "hybrid" && (
+                <Badge variant="outline" className="text-xs">
+                  Hybrid mode active - configure per page
+                </Badge>
+              )}
             </div>
-          </CardContent>
-        </Card>
-      </section>
-    </div>
+
+            <div className="grid gap-4">
+              {pages.map((page) => {
+                const Icon = page.icon;
+                const HealthIcon = getHealthIcon(
+                  page.healthStatus || "unknown",
+                );
+                const showUrlConfig =
+                  mode === "external" ||
+                  (mode === "hybrid" && page.status === "external");
+                const isConfigurable = mode !== "internal";
+
+                return (
+                  <Card
+                    key={page.id}
+                    className={cn(
+                      "border-border bg-card transition-all",
+                      page.status === "disabled" && "opacity-75",
+                    )}
+                  >
+                    <CardContent className="p-5">
+                      <div className="flex items-start gap-4">
+                        {/* Icon & Info */}
+                        <div className="flex items-start gap-3 flex-1">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary shrink-0">
+                            <Icon className="h-5 w-5 text-muted-foreground" />
+                          </div>
+
+                          <div className="flex-1 min-w-0 space-y-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-medium text-foreground">
+                                {page.name}
+                              </h4>
+                              <StatusBadge status={page.status} />
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {page.description}
+                            </p>
+
+                            {/* URL Configuration */}
+                            {showUrlConfig && (
+                              <div className="pt-3 space-y-2">
+                                <Label
+                                  htmlFor={`${page.id}-url`}
+                                  className="text-xs font-medium"
+                                >
+                                  External Endpoint URL
+                                </Label>
+                                <div className="flex gap-2">
+                                  <div className="relative flex-1">
+                                    <Input
+                                      id={`${page.id}-url`}
+                                      type="url"
+                                      placeholder="https://auth.yourdomain.com/login"
+                                      value={page.url}
+                                      onChange={(e) =>
+                                        handleUrlChange(page.id, e.target.value)
+                                      }
+                                      className={cn(
+                                        "pr-10",
+                                        page.urlError && "border-red-500",
+                                      )}
+                                    />
+                                    {page.url && !page.urlError && (
+                                      <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-500" />
+                                    )}
+                                  </div>
+                                  <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() =>
+                                      handleTestConnection(page.id)
+                                    }
+                                    disabled={
+                                      !!page.urlError ||
+                                      !page.url ||
+                                      page.isValidating
+                                    }
+                                  >
+                                    {page.isValidating ? (
+                                      <RefreshCw className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      <ArrowUpRight className="h-4 w-4" />
+                                    )}
+                                  </Button>
+                                </div>
+                                {page.urlError && (
+                                  <p className="text-xs text-red-500">
+                                    {page.urlError}
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Controls */}
+                        <div className="flex flex-col items-end gap-3 shrink-0">
+                          {isConfigurable && mode === "hybrid" && (
+                            <div className="flex items-center gap-2">
+                              <Label
+                                htmlFor={`${page.id}-toggle`}
+                                className="text-xs text-muted-foreground"
+                              >
+                                External
+                              </Label>
+                              <Switch
+                                id={`${page.id}-toggle`}
+                                checked={page.status === "external"}
+                                onCheckedChange={(checked) =>
+                                  handlePageStatusChange(
+                                    page.id,
+                                    checked ? "external" : "internal",
+                                  )
+                                }
+                              />
+                            </div>
+                          )}
+
+                          {/* Health Status */}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div
+                                className={cn(
+                                  "flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs",
+                                  getHealthColor(
+                                    page.healthStatus || "unknown",
+                                  ),
+                                )}
+                              >
+                                <HealthIcon className="h-3 w-3" />
+                                <span className="capitalize">
+                                  {page.healthStatus || "Unknown"}
+                                </span>
+                                {page.responseTime && (
+                                  <span className="opacity-60">
+                                    {page.responseTime}ms
+                                  </span>
+                                )}
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Last checked:
+                                {page.lastHealthCheck
+                                  ? formatRelativeTime(page.lastHealthCheck)
+                                  : "Never"}
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </TabsContent>
+
+          {/* MONITORING TAB */}
+          <TabsContent value="monitoring" className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* Connection Health */}
+              <Card className="border-border bg-card">
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-muted-foreground" />
+                    Endpoint Health
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {pages.map((page) => {
+                    const HealthIcon = getHealthIcon(
+                      page.healthStatus || "unknown",
+                    );
+                    return (
+                      <div
+                        key={page.id}
+                        className="flex items-center justify-between py-2 border-b border-border last:border-0"
+                      >
+                        <div className="flex items-center gap-2">
+                          <page.icon className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">{page.name}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          {page.responseTime && (
+                            <span className="text-xs text-muted-foreground">
+                              {page.responseTime}ms
+                            </span>
+                          )}
+                          <div
+                            className={cn(
+                              "flex items-center gap-1 px-2 py-0.5 rounded text-xs",
+                              getHealthColor(page.healthStatus || "unknown"),
+                            )}
+                          >
+                            <HealthIcon className="h-3 w-3" />
+                            <span className="capitalize">
+                              {page.healthStatus}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+
+              {/* Security Overview */}
+              <Card className="border-border bg-card">
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-muted-foreground" />
+                    Security Overview
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        SSL/TLS Encryption
+                      </span>
+                      <span className="text-emerald-500 font-medium">
+                        Enforced
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        Redirect Validation
+                      </span>
+                      <span className="text-emerald-500 font-medium">
+                        Active
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        Context Enforcement
+                      </span>
+                      <span className="text-emerald-500 font-medium">
+                        Strict
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        Token Security
+                      </span>
+                      <span className="text-emerald-500 font-medium">
+                        HMAC-SHA256
+                      </span>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="rounded-md bg-emerald-500/5 border border-emerald-500/20 p-3">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium text-emerald-700">
+                          Security Compliant
+                        </p>
+                        <p className="text-xs text-emerald-600 mt-0.5">
+                          All security checks passed. Configuration meets
+                          enterprise standards.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Performance Metrics */}
+            <Card className="border-border bg-card">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium">
+                  Performance Metrics
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Avg Latency</p>
+                    <p className="text-2xl font-semibold">
+                      {stats.avgResponseTime}ms
+                    </p>
+                    <p className="text-xs text-emerald-500">Optimal</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Uptime</p>
+                    <p className="text-2xl font-semibold">99.98%</p>
+                    <p className="text-xs text-emerald-500">Last 30 days</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">
+                      Success Rate
+                    </p>
+                    <p className="text-2xl font-semibold">99.95%</p>
+                    <p className="text-xs text-emerald-500">Requests</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">
+                      Last Health Check
+                    </p>
+                    <p className="text-2xl font-semibold">2m</p>
+                    <p className="text-xs text-muted-foreground">ago</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ACTIVITY TAB */}
+          <TabsContent value="activity" className="space-y-6">
+            <Card className="border-border bg-card">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <History className="h-4 w-4 text-muted-foreground" />
+                  Recent Activity
+                </CardTitle>
+                <CardDescription>
+                  Audit log of configuration changes and system events
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {recentActivity.map((event) => (
+                  <div
+                    key={event.id}
+                    className="flex items-start gap-3 py-3 border-b border-border last:border-0"
+                  >
+                    <div
+                      className={cn(
+                        "h-8 w-8 rounded-full flex items-center justify-center shrink-0",
+                        event.severity === "critical"
+                          ? "bg-red-500/10"
+                          : event.severity === "warning"
+                            ? "bg-amber-500/10"
+                            : "bg-blue-500/10",
+                      )}
+                    >
+                      {event.type === "health_check" ? (
+                        <Activity
+                          className={cn(
+                            "h-4 w-4",
+                            event.severity === "critical"
+                              ? "text-red-500"
+                              : event.severity === "warning"
+                                ? "text-amber-500"
+                                : "text-blue-500",
+                          )}
+                        />
+                      ) : event.type === "security_alert" ? (
+                        <Shield
+                          className={cn(
+                            "h-4 w-4",
+                            event.severity === "critical"
+                              ? "text-red-500"
+                              : event.severity === "warning"
+                                ? "text-amber-500"
+                                : "text-blue-500",
+                          )}
+                        />
+                      ) : (
+                        <Settings2
+                          className={cn(
+                            "h-4 w-4",
+                            event.severity === "critical"
+                              ? "text-red-500"
+                              : event.severity === "warning"
+                                ? "text-amber-500"
+                                : "text-blue-500",
+                          )}
+                        />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground">
+                        {event.description}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-muted-foreground">
+                          {event.actor === "system" ? "System" : event.actor}
+                        </span>
+                        <span className="text-xs text-muted-foreground">•</span>
+                        <span className="text-xs text-muted-foreground">
+                          {formatRelativeTime(event.timestamp)}
+                        </span>
+                      </div>
+                    </div>
+                    {event.severity && (
+                      <Badge
+                        variant={
+                          event.severity === "critical"
+                            ? "destructive"
+                            : event.severity === "warning"
+                              ? "default"
+                              : "secondary"
+                        }
+                        className="text-xs shrink-0"
+                      >
+                        {event.severity}
+                      </Badge>
+                    )}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <div className="flex justify-end">
+              <Link href="/admin/integrations/logs">
+                <Button variant="outline" className="gap-2">
+                  View Full Audit Log
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* =========================================================================
+            FOOTER INFO
+            ========================================================================= */}
+        <Separator />
+        <div className="flex items-start gap-3 text-xs text-muted-foreground">
+          <Info className="h-4 w-4 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p>
+              <strong className="text-foreground">Audit Logging:</strong> All
+              configuration changes are logged with administrator identification
+              and retained for 90 days.
+            </p>
+            <p>
+              <strong className="text-foreground">Token Security:</strong>
+              Authentication flows use cryptographically signed tokens
+              (HMAC-SHA256) with automatic expiration.
+            </p>
+          </div>
+        </div>
+      </div>
+    </TooltipProvider>
   );
 }
