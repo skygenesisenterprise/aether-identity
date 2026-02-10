@@ -52,6 +52,14 @@ import {
   ExternalLink,
   ArchiveRestore,
   ListChecks,
+  FolderTree,
+  Share2,
+  AppWindow,
+  RefreshCw,
+  IdCard,
+  Zap,
+  Monitor,
+  LogIn,
 } from "lucide-react";
 
 interface ChildMenuItem {
@@ -94,6 +102,18 @@ const menuItems: MenuItem[] = [
         icon: Server,
       },
       { title: "Webhooks", href: "/admin/integrations/webhooks", icon: Link2 },
+      {
+        title: "Services",
+        href: "/admin/integrations/services",
+        icon: AppWindow,
+      },
+      { title: "Email", href: "/admin/integrations/email", icon: Mail },
+      { title: "SCIM", href: "/admin/integrations/scim", icon: Share2 },
+      {
+        title: "Directory",
+        href: "/admin/integrations/directory",
+        icon: FolderTree,
+      },
       { title: "Logs", href: "/admin/integrations/logs", icon: FileText },
     ],
   },
@@ -141,6 +161,23 @@ const menuItems: MenuItem[] = [
         icon: Building,
       },
       { title: "People", href: "/admin/organization/people", icon: UserCircle },
+      { title: "Groups", href: "/admin/organization/groups", icon: Users },
+      { title: "Profiles", href: "/admin/organization/profiles", icon: IdCard },
+      {
+        title: "Lifecycle",
+        href: "/admin/organization/lifecycle",
+        icon: RefreshCw,
+      },
+      {
+        title: "Provisioning",
+        href: "/admin/organization/provisioning",
+        icon: Zap,
+      },
+      {
+        title: "Sessions",
+        href: "/admin/organization/sessions",
+        icon: Monitor,
+      },
       { title: "RBAC", href: "/admin/organization/rbac", icon: ShieldCheck },
       {
         title: "Policies",
@@ -158,6 +195,7 @@ const menuItems: MenuItem[] = [
     order: 4,
     children: [
       { title: "Identity", href: "/admin/platform/identity", icon: UserCircle },
+      { title: "SSO", href: "/admin/platform/sso", icon: LogIn },
       { title: "System", href: "/admin/platform/system", icon: Settings2 },
       { title: "Policy", href: "/admin/platform/policy", icon: FileLock },
       { title: "Token", href: "/admin/platform/token", icon: Key },
