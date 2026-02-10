@@ -522,7 +522,7 @@ export default function ExternalIntegrationsPage() {
           <div className="space-y-1">
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-semibold text-card-foreground">
-                External Integrations
+                Identity External Integrations
               </h1>
               <Badge
                 variant={mode === "internal" ? "default" : "outline"}
