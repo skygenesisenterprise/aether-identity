@@ -50,6 +50,8 @@ import {
   Settings2,
   Github,
   ExternalLink,
+  ArchiveRestore,
+  ListChecks,
 } from "lucide-react";
 
 interface ChildMenuItem {
@@ -92,6 +94,7 @@ const menuItems: MenuItem[] = [
         icon: Server,
       },
       { title: "Webhooks", href: "/admin/integrations/webhooks", icon: Link2 },
+      { title: "Logs", href: "/admin/integrations/logs", icon: FileText },
     ],
   },
   {
@@ -117,6 +120,13 @@ const menuItems: MenuItem[] = [
         icon: Workflow,
       },
       { title: "Database", href: "/admin/operations/database", icon: Database },
+      {
+        title: "Backups",
+        href: "/admin/operations/backups",
+        icon: ArchiveRestore,
+      },
+      { title: "Tasks", href: "/admin/operations/tasks", icon: ListChecks },
+      { title: "Logs", href: "/admin/operations/logs", icon: FileText },
     ],
   },
   {
@@ -138,6 +148,7 @@ const menuItems: MenuItem[] = [
         icon: FileLock,
       },
       { title: "Trust", href: "/admin/organization/trust", icon: Shield },
+      { title: "Logs", href: "/admin/organization/logs", icon: FileText },
     ],
   },
   {
@@ -151,6 +162,7 @@ const menuItems: MenuItem[] = [
       { title: "Policy", href: "/admin/platform/policy", icon: FileLock },
       { title: "Token", href: "/admin/platform/token", icon: Key },
       { title: "Key", href: "/admin/platform/key", icon: Lock },
+      { title: "Logs", href: "/admin/platform/logs", icon: FileText },
     ],
   },
   {
@@ -172,6 +184,7 @@ const menuItems: MenuItem[] = [
       },
       { title: "Dormant", href: "/admin/report/dormant", icon: FileWarning },
       { title: "Privilege", href: "/admin/report/privilege", icon: FileKey },
+      { title: "Logs", href: "/admin/report/logs", icon: FileText },
     ],
   },
   {
@@ -188,6 +201,7 @@ const menuItems: MenuItem[] = [
         href: "/admin/security/compliance",
         icon: ShieldCheck,
       },
+      { title: "Logs", href: "/admin/security/logs", icon: FileText },
     ],
   },
   {
