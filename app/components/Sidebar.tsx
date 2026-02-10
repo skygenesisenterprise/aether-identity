@@ -71,6 +71,12 @@ import {
   Crown,
   Fingerprint,
   Scale,
+  HardDrive,
+  Calendar,
+  MapPin,
+  CreditCard,
+  LifeBuoy,
+  Activity as ActivityIcon,
 } from "lucide-react";
 
 interface ChildMenuItem {
@@ -215,10 +221,21 @@ const menuItems: MenuItem[] = [
     children: [
       { title: "Identity", href: "/admin/platform/identity", icon: UserCircle },
       { title: "SSO", href: "/admin/platform/sso", icon: LogIn },
-      { title: "System", href: "/admin/platform/system", icon: Settings2 },
-      { title: "Policy", href: "/admin/platform/policy", icon: FileLock },
+      { title: "Domains", href: "/admin/platform/domains", icon: Globe },
+      { title: "Protocols", href: "/admin/platform/protocols", icon: Workflow },
+      {
+        title: "Certificates",
+        href: "/admin/platform/certificates",
+        icon: ShieldCheck,
+      },
+      { title: "Encryption", href: "/admin/platform/encryption", icon: Lock },
+      { title: "Cache", href: "/admin/platform/cache", icon: HardDrive },
+      { title: "Regions", href: "/admin/platform/regions", icon: MapPin },
+      { title: "Events", href: "/admin/platform/events", icon: Calendar },
       { title: "Token", href: "/admin/platform/token", icon: Key },
       { title: "Key", href: "/admin/platform/key", icon: Lock },
+      { title: "Policy", href: "/admin/platform/policy", icon: FileLock },
+      { title: "System", href: "/admin/platform/system", icon: Settings2 },
       { title: "Logs", href: "/admin/platform/logs", icon: FileText },
     ],
   },
@@ -349,9 +366,7 @@ function renderChildMenuItem(
           <Button
             variant="ghost"
             className={cn(
-              "w-full justify-between h-6 px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide hover:bg-sidebar-accent",
-              (isActive || isChildActive) &&
-                "text-black bg-sidebar-accent hover:bg-sidebar-accent",
+              "w-full justify-between h-6 px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide",
             )}
             style={{ marginLeft: `${marginLeft}px` }}
           >
@@ -382,7 +397,7 @@ function renderChildMenuItem(
       variant="ghost"
       className={cn(
         "w-full justify-between h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent",
-        isActive && "bg-sidebar-accent text-black hover:bg-sidebar-accent/80",
+        isActive && "bg-sidebar-accent text-sidebar-foreground",
       )}
       style={{ marginLeft: `${marginLeft}px` }}
     >
@@ -395,14 +410,14 @@ function renderChildMenuItem(
             <item.icon
               className={cn(
                 "h-3 w-3 shrink-0",
-                isActive ? "text-black" : "text-muted-foreground",
+                isActive ? "text-sidebar-foreground" : "text-muted-foreground",
               )}
             />
           ) : (
             <span
               className={cn(
                 "w-2 h-2 rounded-full shrink-0",
-                isActive ? "bg-black" : "bg-muted-foreground/50",
+                isActive ? "bg-sidebar-foreground" : "bg-muted-foreground/50",
               )}
             />
           )}
@@ -427,6 +442,9 @@ function MenuItem({ item, level = 0, pathname }: MenuItemProps) {
     return "icon" in item && item.icon !== undefined;
   };
 
+  // Pour les parents : actif seulement si exactement sur cette route, pas sur un enfant
+  const isExactlyActive = pathname === item.href;
+
   if (hasChildren) {
     return (
       <Collapsible defaultOpen={defaultOpen}>
@@ -435,8 +453,7 @@ function MenuItem({ item, level = 0, pathname }: MenuItemProps) {
             variant="ghost"
             className={cn(
               "w-full justify-between gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent group",
-              (isActive || isChildActive) &&
-                "bg-sidebar-accent text-black hover:bg-sidebar-accent/80",
+              isExactlyActive && "bg-sidebar-accent text-sidebar-foreground",
             )}
             style={{ marginLeft: `${marginLeft}px` }}
           >
@@ -445,7 +462,7 @@ function MenuItem({ item, level = 0, pathname }: MenuItemProps) {
                 <item.icon
                   className={cn(
                     "h-4 w-4 shrink-0",
-                    (isActive || isChildActive) && "text-black",
+                    isExactlyActive && "text-sidebar-foreground",
                   )}
                 />
               )}
@@ -473,14 +490,17 @@ function MenuItem({ item, level = 0, pathname }: MenuItemProps) {
       variant="ghost"
       className={cn(
         "w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent",
-        isActive && "bg-sidebar-accent text-black hover:bg-sidebar-accent/80",
+        isActive && "bg-sidebar-accent text-sidebar-foreground",
       )}
       style={{ marginLeft: `${marginLeft}px` }}
     >
       <Link href={item.href}>
         {isMenuItem(item) && (
           <item.icon
-            className={cn("h-4 w-4 shrink-0", isActive && "text-black")}
+            className={cn(
+              "h-4 w-4 shrink-0",
+              isActive && "text-sidebar-foreground",
+            )}
           />
         )}
         <span className="truncate max-w-[100px]">{item.title}</span>
@@ -517,6 +537,52 @@ export function Sidebar() {
           ))}
       </nav>
       <div className="border-t border-sidebar-border p-2 space-y-1">
+        <Button
+          asChild
+          variant="ghost"
+          className="w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent"
+        >
+          <Link href="/admin/profile" className="flex items-center gap-2">
+            <UserCircle className="h-4 w-4 shrink-0" />
+            <span className="truncate">Profile</span>
+          </Link>
+        </Button>
+        <Button
+          asChild
+          variant="ghost"
+          className="w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent"
+        >
+          <Link href="/admin/billing" className="flex items-center gap-2">
+            <CreditCard className="h-4 w-4 shrink-0" />
+            <span className="truncate">Billing</span>
+          </Link>
+        </Button>
+        <Button
+          asChild
+          variant="ghost"
+          className="w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent"
+        >
+          <Link href="/admin/support" className="flex items-center gap-2">
+            <LifeBuoy className="h-4 w-4 shrink-0" />
+            <span className="truncate">Support</span>
+          </Link>
+        </Button>
+        <Button
+          asChild
+          variant="ghost"
+          className="w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent"
+        >
+          <a
+            href="https://status.skygenesisenterprise.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2"
+          >
+            <ActivityIcon className="h-4 w-4 shrink-0" />
+            <span className="truncate">Status</span>
+            <ExternalLink className="h-3 w-3 shrink-0 ml-auto text-muted-foreground" />
+          </a>
+        </Button>
         <Button
           asChild
           variant="ghost"
