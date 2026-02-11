@@ -39,13 +39,11 @@ import {
   Lock,
   Key,
   Eye,
-  ShieldAlert,
   UserCog,
   Bell,
   EyeIcon,
   Workflow,
   Mail,
-  Palette,
   Briefcase,
   Settings2,
   Github,
@@ -169,7 +167,11 @@ const menuItems: MenuItem[] = [
         icon: TrendingUp,
       },
       { title: "Costs", href: "/admin/operations/costs", icon: DollarSign },
-      { title: "DR", href: "/admin/operations/dr", icon: AlertTriangle },
+      {
+        title: "Disaster Recovery",
+        href: "/admin/operations/dr",
+        icon: AlertTriangle,
+      },
       { title: "IaC", href: "/admin/operations/iac", icon: Code },
       { title: "Logs", href: "/admin/operations/logs", icon: FileText },
     ],
@@ -515,7 +517,7 @@ export function Sidebar() {
   return (
     <div className="flex h-full w-64 flex-col bg-sidebar border-r border-sidebar-border">
       {/* Logo Header */}
-      <div className="border-b border-sidebar-border p-3">
+      <div className="border-b border-sidebar-border p-2">
         <Link
           href="/admin/home"
           className="flex items-center gap-2 px-2 py-1.5"
@@ -536,41 +538,41 @@ export function Sidebar() {
             <MenuItem key={item.href} item={item} pathname={pathname} />
           ))}
       </nav>
-      <div className="border-t border-sidebar-border p-2 space-y-1">
+      <div className="border-t border-sidebar-border p-1.5 space-y-0.5">
         <Button
           asChild
           variant="ghost"
-          className="w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent"
+          className="w-full justify-start gap-2 h-7 px-2 text-xs font-normal text-sidebar-foreground hover:bg-sidebar-accent"
         >
           <Link href="/admin/profile" className="flex items-center gap-2">
-            <UserCircle className="h-4 w-4 shrink-0" />
+            <UserCircle className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">Profile</span>
           </Link>
         </Button>
         <Button
           asChild
           variant="ghost"
-          className="w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent"
+          className="w-full justify-start gap-2 h-7 px-2 text-xs font-normal text-sidebar-foreground hover:bg-sidebar-accent"
         >
           <Link href="/admin/billing" className="flex items-center gap-2">
-            <CreditCard className="h-4 w-4 shrink-0" />
+            <CreditCard className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">Billing</span>
           </Link>
         </Button>
         <Button
           asChild
           variant="ghost"
-          className="w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent"
+          className="w-full justify-start gap-2 h-7 px-2 text-xs font-normal text-sidebar-foreground hover:bg-sidebar-accent"
         >
           <Link href="/admin/support" className="flex items-center gap-2">
-            <LifeBuoy className="h-4 w-4 shrink-0" />
+            <LifeBuoy className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">Support</span>
           </Link>
         </Button>
         <Button
           asChild
           variant="ghost"
-          className="w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent"
+          className="w-full justify-start gap-2 h-7 px-2 text-xs font-normal text-sidebar-foreground hover:bg-sidebar-accent"
         >
           <a
             href="https://status.skygenesisenterprise.com"
@@ -578,7 +580,7 @@ export function Sidebar() {
             rel="noopener noreferrer"
             className="flex items-center gap-2"
           >
-            <ActivityIcon className="h-4 w-4 shrink-0" />
+            <ActivityIcon className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">Status</span>
             <ExternalLink className="h-3 w-3 shrink-0 ml-auto text-muted-foreground" />
           </a>
@@ -586,7 +588,7 @@ export function Sidebar() {
         <Button
           asChild
           variant="ghost"
-          className="w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent"
+          className="w-full justify-start gap-2 h-7 px-2 text-xs font-normal text-sidebar-foreground hover:bg-sidebar-accent"
         >
           <a
             href="https://github.com/skygenesisenterprise/aether-identity"
@@ -594,7 +596,7 @@ export function Sidebar() {
             rel="noopener noreferrer"
             className="flex items-center gap-2"
           >
-            <Github className="h-4 w-4 shrink-0" />
+            <Github className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">GitHub Project</span>
             <ExternalLink className="h-3 w-3 shrink-0 ml-auto text-muted-foreground" />
           </a>
@@ -602,7 +604,7 @@ export function Sidebar() {
         <Button
           asChild
           variant="ghost"
-          className="w-full justify-start gap-2 h-8 px-2 text-sm font-normal text-sidebar-foreground hover:bg-sidebar-accent"
+          className="w-full justify-start gap-2 h-7 px-2 text-xs font-normal text-sidebar-foreground hover:bg-sidebar-accent"
         >
           <a
             href="https://skygenesisenterprise.com/"
@@ -610,7 +612,7 @@ export function Sidebar() {
             rel="noopener noreferrer"
             className="flex items-center gap-2"
           >
-            <Globe className="h-4 w-4 shrink-0" />
+            <Globe className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">Main Website</span>
             <ExternalLink className="h-3 w-3 shrink-0 ml-auto text-muted-foreground" />
           </a>
