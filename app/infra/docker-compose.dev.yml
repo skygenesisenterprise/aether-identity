@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  app-dev:
+  identity-frontend-dev:
     build:
       context: ..
       dockerfile: infra/Dockerfile.dev

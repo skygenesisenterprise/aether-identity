@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   # Service Database - Prisma Migrations et gestion du schema
-  database:
+  identity-database:
     build:
       context: ..
       dockerfile: infra/Dockerfile.dev

@@ -39,7 +39,7 @@ http:
     identity-frontend:
       loadBalancer:
         servers:
-          - url: "http://identity-app:3001"
+          - url: "http://identity-frontend-dev:3001"
         healthCheck:
           path: "/login"
           interval: "10s"
@@ -49,7 +49,7 @@ http:
     identity-backend:
       loadBalancer:
         servers:
-          - url: "http://identity-server:8080"
+          - url: "http://identity-server-dev:8080"
         healthCheck:
           path: "/api/v1/health"
           interval: "10s"

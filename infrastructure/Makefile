@@ -47,8 +47,7 @@ up: check-docker ## Start all services (detached mode)
 	@echo "$(GREEN)Services started!$(NC)"
 	@echo "$(YELLOW)URLs:$(NC)"
 	@echo "  - App:       http://localhost:3001"
-	@echo "  - API:       http://localhost:3001/api"
-	@echo "  - Adminer:   http://localhost:3001/admin"
+	@echo "  - API:       http://localhost:3001/api/v1"
 	@echo "  - Traefik:   http://localhost:8082"
 
 up-logs: check-docker ## Start all services with logs attached

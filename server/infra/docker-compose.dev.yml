@@ -2,11 +2,11 @@ version: "3.9"
 
 services:
   # Service pour le serveur Aether Identity
-  identity-server:
+  identity-server-dev:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    container_name: identity-server
+    container_name: identity-server-dev
     # Port interne uniquement (pas de publication publique)
     expose:
       - "8080"
@@ -35,7 +35,7 @@ services:
   # Service aether-server avec port public expose (pour developpement standalone)
   identity-server-public:
     extends:
-      service: identity-server
+      service: identity-server-dev
     ports:
       - "8080:8080"
     profiles:
@@ -56,7 +56,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - identity-network
+      - identity-network-dev
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s

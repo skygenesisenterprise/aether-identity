@@ -20,17 +20,17 @@ services:
 
   # Service pour l'application frontend Aether Identity (Next.js)
   # Etend la configuration de app/infra/docker-compose.dev.yml
-  identity-app:
+  identity-frontend-dev:
     extends:
       file: ../../app/infra/docker-compose.dev.yml
-      service: app-dev
+      service: identity-frontend-dev
     ports: []
     labels: [] # Override pour supprimer les labels Traefik (configuration statique utilisée)
     networks:
       - identity-network-dev
 
   # Service pour le serveur Aether Identity (Go)
-  identity-server:
+  identity-server-dev:
     build:
       context: ../../server
       dockerfile: infra/Dockerfile.dev
@@ -41,14 +41,14 @@ services:
       - JWT_SECRET=${JWT_SECRET:-dev-secret-key-change-in-prod}
       - ACCESS_TOKEN_EXP=15
       - REFRESH_TOKEN_EXP=720
-      - DATABASE_URL=postgresql://postgres:postgres@database:5432/aether_identity?sslmode=disable
+      - DATABASE_URL=postgresql://postgres:postgres@identity-database:5432/aether_identity?sslmode=disable
       - PORT=8080
       - SYSTEM_KEY=${SYSTEM_KEY:-sk_dev_local_key}
       - CORS_ALLOWED_ORIGINS=http://localhost:3001
       - DEFAULT_POST_LOGIN_PATH=/
       - DEFAULT_POST_LOGOUT_PATH=/
     depends_on:
-      database:
+      identity-database:
         condition: service_healthy
     volumes:
       - ../../server:/app
@@ -66,10 +66,10 @@ services:
   # Service Database unique - PostgreSQL avec migrations Prisma automatiques
   # Étend la configuration de @prisma/infra/docker-compose.dev.yml mais
   # utilise une image PostgreSQL personnalisée avec Prisma intégré
-  database:
+  identity-database:
     extends:
       file: ../../prisma/infra/docker-compose.dev.yml
-      service: database
+      service: identity-database
     build:
       context: ../..
       dockerfile: infrastructure/docker/Dockerfile.postgres
