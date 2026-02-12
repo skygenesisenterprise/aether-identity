@@ -19,11 +19,11 @@ accessLog:
 http:
   routers:
     # Route pour le frontend Next.js - toutes les requêtes sauf /api
-    identity-frontend:
+    identity-frontend-dev:
       rule: "Host(`localhost`) || Host(`identity.local`)"
       entryPoints:
         - web
-      service: identity-frontend
+      service: identity-frontend-dev
       priority: 10
 
     # Route pour le backend Go - uniquement les chemins /api
@@ -36,7 +36,7 @@ http:
 
   services:
     # Service frontend Next.js
-    identity-frontend:
+    identity-frontend-dev:
       loadBalancer:
         servers:
           - url: "http://identity-frontend-dev:3001"
@@ -46,7 +46,7 @@ http:
           timeout: "5s"
 
     # Service backend Go
-    identity-backend:
+    identity-server-dev:
       loadBalancer:
         servers:
           - url: "http://identity-server-dev:8080"

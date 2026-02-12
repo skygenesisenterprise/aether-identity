@@ -37,10 +37,10 @@ services:
     # 🔑 Indexation par Traefik (l’infra décide de l’exposition)
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.identity-app.rule=Host(`localhost`) || Host(`identity.local`)"
-      - "traefik.http.routers.identity-app.entrypoints=web"
-      - "traefik.http.services.identity-app.loadbalancer.server.port=3001"
-      - "traefik.http.routers.identity-app.priority=1"
+      - "traefik.http.routers.identity-frontend-dev.rule=Host(`localhost`) || Host(`identity.local`)"
+      - "traefik.http.routers.identity-frontend-dev.entrypoints=web"
+      - "traefik.http.services.identity-frontend-dev.loadbalancer.server.port=3001"
+      - "traefik.http.routers.identity-frontend-dev.priority=1"
 
     networks:
       - identity-network-dev

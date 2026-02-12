@@ -4,7 +4,7 @@ services:
     image: traefik:v3.4
     container_name: identity-traefik-dev
     ports:
-      - "3001:80"
+      - "0.0.0.0:3001:80"
     volumes:
       - ./traefik.yml:/traefik.yml:ro
     command:
