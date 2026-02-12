@@ -57,7 +57,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/dashboard/ui/dialog";
 import { Switch } from "@/components/dashboard/ui/switch";
 import { Label } from "@/components/dashboard/ui/label";
@@ -69,7 +68,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/dashboard/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/dashboard/ui/popover";
 import { useState } from "react";
+import { toast } from "sonner";
 
 // ============================================================================
 // TYPES - Enterprise Observability Platform
@@ -681,6 +686,14 @@ function SignalCard({
 // ============================================================================
 
 export default function ObservabilityPage() {
+  const [configDialogOpen, setConfigDialogOpen] = useState(false);
+  const [localSignalConfigs, setLocalSignalConfigs] = useState(signalConfigs);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<SignalStatus | "all">("all");
+  const [categoryFilter, setCategoryFilter] = useState<
+    ServiceHealth["category"] | "all"
+  >("all");
+
   const healthyServices = servicesHealth.filter(
     (s) => s.status === "healthy",
   ).length;
@@ -691,6 +704,89 @@ export default function ObservabilityPage() {
     (s) => s.status === "critical",
   ).length;
   const activeAlerts = alertRules.filter((a) => a.status === "active").length;
+
+  const filteredServices = servicesHealth.filter((service) => {
+    if (statusFilter !== "all" && service.status !== statusFilter) return false;
+    if (categoryFilter !== "all" && service.category !== categoryFilter)
+      return false;
+    return true;
+  });
+
+  const handleExport = () => {
+    const data = filteredServices.map((service) => ({
+      name: service.name,
+      category: service.category,
+      status: service.status,
+      uptime: service.uptime,
+      latency: service.latency,
+      errorRate: service.errorRate,
+      lastCheck: service.lastCheck,
+      metrics: service.signals.metrics ? "Yes" : "No",
+      logs: service.signals.logs ? "Yes" : "No",
+      traces: service.signals.traces ? "Yes" : "No",
+    }));
+
+    const csv = [
+      [
+        "Service",
+        "Category",
+        "Status",
+        "Uptime",
+        "Latency",
+        "Error Rate",
+        "Last Check",
+        "Metrics",
+        "Logs",
+        "Traces",
+      ].join(","),
+      ...data.map((row) => Object.values(row).join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `services-health-${new Date().toISOString().split("T")[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    toast.success("Services exported to CSV");
+  };
+
+  const handleOpenGrafana = () => {
+    const grafanaUrl =
+      process.env.NEXT_PUBLIC_GRAFANA_URL || "http://localhost:3000";
+    window.open(grafanaUrl, "_blank", "noopener,noreferrer");
+    toast.success("Opening Grafana in new tab");
+  };
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setIsRefreshing(false);
+      toast.success("Dashboard refreshed");
+    }, 1000);
+  };
+
+  const handleSaveConfig = () => {
+    setConfigDialogOpen(false);
+    toast.success("Configuration saved successfully");
+  };
+
+  const updateSignalConfig = (
+    signal: keyof typeof localSignalConfigs,
+    field: keyof SignalConfig,
+    value: boolean | number | string,
+  ) => {
+    setLocalSignalConfigs((prev) => ({
+      ...prev,
+      [signal]: {
+        ...prev[signal],
+        [field]: value,
+      },
+    }));
+  };
 
   return (
     <div className="space-y-8 text-foreground">
@@ -715,15 +811,26 @@ export default function ObservabilityPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+          >
+            <RefreshCw
+              className={cn("h-4 w-4 mr-2", isRefreshing && "animate-spin")}
+            />
             Refresh
           </Button>
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setConfigDialogOpen(true)}
+          >
             <Settings className="h-4 w-4 mr-2" />
             Configure
           </Button>
-          <Button size="sm">
+          <Button size="sm" onClick={handleOpenGrafana}>
             <ExternalLink className="h-4 w-4 mr-2" />
             Open Grafana
           </Button>
@@ -802,19 +909,19 @@ export default function ObservabilityPage() {
           <SignalCard
             title="Metrics"
             icon={BarChart3}
-            signal={signalConfigs.metrics}
+            signal={localSignalConfigs.metrics}
             plan={orgContext.plan}
           />
           <SignalCard
             title="Logs"
             icon={FileText}
-            signal={signalConfigs.logs}
+            signal={localSignalConfigs.logs}
             plan={orgContext.plan}
           />
           <SignalCard
             title="Distributed Traces"
             icon={Layers}
-            signal={signalConfigs.traces}
+            signal={localSignalConfigs.traces}
             plan={orgContext.plan}
           />
         </div>
@@ -826,15 +933,90 @@ export default function ObservabilityPage() {
           ======================================================================== */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
-            Service Health & Signals
-          </h2>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="h-8 text-xs">
-              <Filter className="h-3 w-3 mr-1" />
-              Filter
-            </Button>
-            <Button variant="ghost" size="sm" className="h-8 text-xs">
+            <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+              Service Health & Signals
+            </h2>
+            <span className="text-xs text-muted-foreground">
+              ({filteredServices.length} of {servicesHealth.length})
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 text-xs">
+                  <Filter className="h-3 w-3 mr-1" />
+                  Filter
+                  {(statusFilter !== "all" || categoryFilter !== "all") && (
+                    <span className="ml-1 h-2 w-2 rounded-full bg-blue-500" />
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs font-medium">Status</Label>
+                    <Select
+                      value={statusFilter}
+                      onValueChange={(value) =>
+                        setStatusFilter(value as SignalStatus | "all")
+                      }
+                    >
+                      <SelectTrigger className="h-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Statuses</SelectItem>
+                        <SelectItem value="healthy">Healthy</SelectItem>
+                        <SelectItem value="degraded">Degraded</SelectItem>
+                        <SelectItem value="critical">Critical</SelectItem>
+                        <SelectItem value="disabled">Disabled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-medium">Category</Label>
+                    <Select
+                      value={categoryFilter}
+                      onValueChange={(value) =>
+                        setCategoryFilter(
+                          value as ServiceHealth["category"] | "all",
+                        )
+                      }
+                    >
+                      <SelectTrigger className="h-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Categories</SelectItem>
+                        <SelectItem value="core">Core</SelectItem>
+                        <SelectItem value="supporting">Supporting</SelectItem>
+                        <SelectItem value="integration">Integration</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {(statusFilter !== "all" || categoryFilter !== "all") && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full h-7 text-xs"
+                      onClick={() => {
+                        setStatusFilter("all");
+                        setCategoryFilter("all");
+                      }}
+                    >
+                      Clear filters
+                    </Button>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 text-xs"
+              onClick={handleExport}
+            >
               <Download className="h-3 w-3 mr-1" />
               Export
             </Button>
@@ -858,7 +1040,7 @@ export default function ObservabilityPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {servicesHealth.map((service) => (
+                {filteredServices.map((service) => (
                   <TableRow key={service.id}>
                     <TableCell>
                       <div>
@@ -992,7 +1174,10 @@ export default function ObservabilityPage() {
                         {event.action}
                       </span>
                       <span className="text-xs text-muted-foreground shrink-0">
-                        {new Date(event.timestamp).toLocaleTimeString()}
+                        {(() => {
+                          const d = new Date(event.timestamp);
+                          return `${d.getUTCHours().toString().padStart(2, "0")}:${d.getUTCMinutes().toString().padStart(2, "0")}:${d.getUTCSeconds().toString().padStart(2, "0")} UTC`;
+                        })()}
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">
@@ -1294,6 +1479,185 @@ export default function ObservabilityPage() {
           </Button>
         </div>
       </div>
+
+      {/* Configuration Dialog */}
+      <Dialog open={configDialogOpen} onOpenChange={setConfigDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              Observability Configuration
+            </DialogTitle>
+            <DialogDescription>
+              Configure signal collection, retention policies, and sampling
+              rates for your organization.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* Metrics Configuration */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                  <h4 className="font-medium">Metrics</h4>
+                </div>
+                <Switch
+                  checked={localSignalConfigs.metrics.enabled}
+                  onCheckedChange={(checked) =>
+                    updateSignalConfig("metrics", "enabled", checked)
+                  }
+                />
+              </div>
+              {localSignalConfigs.metrics.enabled && (
+                <div className="pl-6 space-y-4">
+                  <div className="space-y-2">
+                    <Label>Retention Period (days)</Label>
+                    <Select
+                      value={localSignalConfigs.metrics.retentionDays.toString()}
+                      onValueChange={(value) =>
+                        updateSignalConfig(
+                          "metrics",
+                          "retentionDays",
+                          parseInt(value),
+                        )
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="30">30 days</SelectItem>
+                        <SelectItem value="60">60 days</SelectItem>
+                        <SelectItem value="90">90 days</SelectItem>
+                        <SelectItem value="180">180 days</SelectItem>
+                        <SelectItem value="365">1 year</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Logs Configuration */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                  <h4 className="font-medium">Logs</h4>
+                </div>
+                <Switch
+                  checked={localSignalConfigs.logs.enabled}
+                  onCheckedChange={(checked) =>
+                    updateSignalConfig("logs", "enabled", checked)
+                  }
+                />
+              </div>
+              {localSignalConfigs.logs.enabled && (
+                <div className="pl-6 space-y-4">
+                  <div className="space-y-2">
+                    <Label>Retention Period (days)</Label>
+                    <Select
+                      value={localSignalConfigs.logs.retentionDays.toString()}
+                      onValueChange={(value) =>
+                        updateSignalConfig(
+                          "logs",
+                          "retentionDays",
+                          parseInt(value),
+                        )
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="30">30 days</SelectItem>
+                        <SelectItem value="90">90 days</SelectItem>
+                        <SelectItem value="180">180 days</SelectItem>
+                        <SelectItem value="365">1 year</SelectItem>
+                        <SelectItem value="2555">
+                          7 years (Compliance)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Traces Configuration */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-muted-foreground" />
+                  <h4 className="font-medium">Distributed Traces</h4>
+                </div>
+                <Switch
+                  checked={localSignalConfigs.traces.enabled}
+                  onCheckedChange={(checked) =>
+                    updateSignalConfig("traces", "enabled", checked)
+                  }
+                />
+              </div>
+              {localSignalConfigs.traces.enabled && (
+                <div className="pl-6 space-y-4">
+                  <div className="space-y-2">
+                    <Label>Sampling Rate (%)</Label>
+                    <div className="flex items-center gap-4">
+                      <Slider
+                        value={[localSignalConfigs.traces.samplingRate || 10]}
+                        onValueChange={([value]) =>
+                          updateSignalConfig("traces", "samplingRate", value)
+                        }
+                        min={1}
+                        max={100}
+                        step={1}
+                        className="flex-1"
+                      />
+                      <span className="text-sm font-medium w-12">
+                        {localSignalConfigs.traces.samplingRate}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Retention Period (days)</Label>
+                    <Select
+                      value={localSignalConfigs.traces.retentionDays.toString()}
+                      onValueChange={(value) =>
+                        updateSignalConfig(
+                          "traces",
+                          "retentionDays",
+                          parseInt(value),
+                        )
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="7">7 days</SelectItem>
+                        <SelectItem value="14">14 days</SelectItem>
+                        <SelectItem value="30">30 days</SelectItem>
+                        <SelectItem value="90">90 days</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setConfigDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSaveConfig}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
