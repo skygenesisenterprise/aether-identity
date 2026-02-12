@@ -46,6 +46,12 @@ export function Header() {
   // State for selections
   const [authority, setAuthority] = React.useState("Acme Corporation");
   const [workspace, setWorkspace] = React.useState("Production");
+  const [deploymentMode, setDeploymentMode] = React.useState<
+    "self_hosted" | "saas"
+  >("self_hosted");
+  const [plan, setPlan] = React.useState<"free" | "premium" | "enterprise">(
+    "enterprise",
+  );
   const [theme, setTheme] = React.useState<"light" | "dark" | "system">(
     "light",
   );
@@ -69,6 +75,34 @@ export function Header() {
     environment: "US-East",
     userRole: "Identity Admin",
     isPrivileged: true,
+    deploymentMode,
+    plan,
+  };
+
+  const deploymentModeConfig = {
+    self_hosted: {
+      label: "Self-Hosted",
+      color: "text-purple-500 border-purple-500/30 bg-purple-500/10",
+    },
+    saas: {
+      label: "SaaS",
+      color: "text-blue-500 border-blue-500/30 bg-blue-500/10",
+    },
+  };
+
+  const planConfig = {
+    free: {
+      label: "Free",
+      color: "text-emerald-500 border-emerald-500/30 bg-emerald-500/10",
+    },
+    premium: {
+      label: "Premium",
+      color: "text-blue-500 border-blue-500/30 bg-blue-500/10",
+    },
+    enterprise: {
+      label: "Enterprise",
+      color: "text-orange-500 border-orange-500/30 bg-orange-500/10",
+    },
   };
 
   return (
@@ -138,6 +172,23 @@ export function Header() {
 
           <Badge variant="outline" className="ml-2 text-xs font-normal">
             {contextData.environment}
+          </Badge>
+
+          <Badge
+            variant="outline"
+            className={cn(
+              "ml-2 text-xs font-normal",
+              deploymentModeConfig[deploymentMode].color,
+            )}
+          >
+            {deploymentModeConfig[deploymentMode].label}
+          </Badge>
+
+          <Badge
+            variant="outline"
+            className={cn("ml-2 text-xs font-normal", planConfig[plan].color)}
+          >
+            {planConfig[plan].label}
           </Badge>
         </div>
       </div>
