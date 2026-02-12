@@ -325,6 +325,7 @@ const menuItems: MenuItem[] = [
         icon: Briefcase,
       },
       { title: "Governance", href: "/admin/settings/governance", icon: Scale },
+      { title: "Updates", href: "/admin/settings/updates", icon: RefreshCw },
     ],
   },
 ];
