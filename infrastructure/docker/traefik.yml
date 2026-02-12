@@ -27,11 +27,11 @@ http:
       priority: 10
 
     # Route pour le backend Go - uniquement les chemins /api
-    identity-backend:
+    identity-server-dev:
       rule: "(Host(`localhost`) || Host(`identity.local`)) && PathPrefix(`/api`)"
       entryPoints:
         - web
-      service: identity-backend
+      service: identity-server-dev
       priority: 20
 
   services:
