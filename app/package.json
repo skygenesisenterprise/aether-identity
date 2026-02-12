@@ -15,7 +15,7 @@
     "clean": "rm -rf .next"
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.9.1",
+    "@hookform/resolvers": "^5.2.2",
     "@loglayer/transport-pino": "^2.2.16",
     "@prisma/client": "7.3.0",
     "@radix-ui/react-accordion": "1.2.12",
