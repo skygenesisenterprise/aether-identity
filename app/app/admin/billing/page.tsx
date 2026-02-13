@@ -11,7 +11,61 @@ import {
   BillingInfo,
   type BillingAddress,
 } from "@/components/billing/billing-info";
-import { Users, Fingerprint, Zap, Database } from "lucide-react";
+import { MetricCard } from "@/components/dashboard/metric-card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Progress } from "@/components/dashboard/ui/progress";
+import { cn } from "@/lib/utils";
+import {
+  Users,
+  Fingerprint,
+  Zap,
+  Database,
+  Receipt,
+  Calendar,
+  CreditCard,
+  AlertCircle,
+  CheckCircle2,
+  TrendingUp,
+  ArrowUpRight,
+  ArrowRight,
+  FileText,
+  Building2,
+  Mail,
+  HelpCircle,
+} from "lucide-react";
+
+// ============================================================================
+// TYPES & CONFIGURATION
+// ============================================================================
+
+interface UsageMetric {
+  id: string;
+  name: string;
+  icon: typeof Users;
+  used: number;
+  limit: number;
+  unit: string;
+  warningThreshold: number;
+}
+
+interface PaymentMethod {
+  id: string;
+  type: "card" | "bank_transfer";
+  brand?: string;
+  last4: string;
+  expMonth?: number;
+  expYear?: number;
+  isDefault: boolean;
+  status: "active" | "expiring_soon";
+}
 
 // ============================================================================
 // MOCK DATA - Billing State
@@ -26,6 +80,8 @@ const subscriptionData = {
     status: "active" as const,
     currentPeriodStart: "Feb 1, 2025",
     currentPeriodEnd: "Mar 1, 2025",
+    nextBillingDate: "Mar 1, 2025",
+    daysUntilRenewal: 17,
   },
   features: [
     "Up to 5,000 users",
@@ -80,37 +136,37 @@ const usageData = {
   ],
 };
 
-const paymentMethodsData = [
+const paymentMethodsData: PaymentMethod[] = [
   {
     id: "pm_001",
-    type: "card" as const,
+    type: "card",
     brand: "visa",
     last4: "4242",
     expMonth: 12,
     expYear: 2026,
     isDefault: true,
-    status: "active" as const,
+    status: "active",
   },
   {
     id: "pm_002",
-    type: "card" as const,
+    type: "card",
     brand: "mastercard",
     last4: "8888",
     expMonth: 8,
     expYear: 2025,
     isDefault: false,
-    status: "expiring_soon" as const,
+    status: "expiring_soon",
   },
 ];
 
-const invoicesData = [
+const invoicesData: Invoice[] = [
   {
     id: "inv_001",
     number: "INV-2025-002",
     date: "2025-02-01",
     amount: 79.0,
     currency: "usd",
-    status: "paid" as const,
+    status: "paid",
     description: "Professional Plan - Monthly",
   },
   {
@@ -119,7 +175,7 @@ const invoicesData = [
     date: "2025-01-01",
     amount: 79.0,
     currency: "usd",
-    status: "paid" as const,
+    status: "paid",
     description: "Professional Plan - Monthly",
   },
   {
@@ -128,7 +184,7 @@ const invoicesData = [
     date: "2024-12-01",
     amount: 79.0,
     currency: "usd",
-    status: "paid" as const,
+    status: "paid",
     description: "Professional Plan - Monthly",
   },
   {
@@ -137,7 +193,7 @@ const invoicesData = [
     date: "2024-11-01",
     amount: 79.0,
     currency: "usd",
-    status: "paid" as const,
+    status: "paid",
     description: "Professional Plan - Monthly",
   },
   {
@@ -146,12 +202,12 @@ const invoicesData = [
     date: "2024-10-01",
     amount: 79.0,
     currency: "usd",
-    status: "paid" as const,
+    status: "paid",
     description: "Professional Plan - Monthly",
   },
 ];
 
-const billingAddressData = {
+const billingAddressData: BillingAddress = {
   companyName: "Acme Corporation",
   addressLine1: "123 Innovation Drive",
   addressLine2: "Suite 456",
@@ -163,70 +219,379 @@ const billingAddressData = {
   taxId: "12-3456789",
 };
 
+const upcomingInvoiceData = {
+  date: "Mar 1, 2025",
+  amount: 79.0,
+  currency: "usd",
+  period: "Mar 1 - Apr 1, 2025",
+  lineItems: [
+    { description: "Professional Plan (Monthly)", amount: 79.0 },
+    { description: "Additional API calls (0 overage)", amount: 0 },
+    { description: "Additional storage (0 overage)", amount: 0 },
+  ],
+};
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+function calculateBillingHealth(metrics: UsageMetric[]): {
+  status: "healthy" | "warning" | "critical";
+  label: string;
+  percentage: number;
+} {
+  const criticalCount = metrics.filter(
+    (m) => (m.used / m.limit) * 100 >= 100,
+  ).length;
+  const warningCount = metrics.filter((m) => {
+    const pct = (m.used / m.limit) * 100;
+    return pct >= m.warningThreshold && pct < 100;
+  }).length;
+
+  if (criticalCount > 0) {
+    return { status: "critical", label: "Action Required", percentage: 100 };
+  }
+  if (warningCount > 0) {
+    return {
+      status: "warning",
+      label: `${warningCount} warning${warningCount > 1 ? "s" : ""}`,
+      percentage: 75,
+    };
+  }
+  return { status: "healthy", label: "All Systems Normal", percentage: 100 };
+}
+
+function getTotalUsagePercentage(metrics: UsageMetric[]): number {
+  const totalUsed = metrics.reduce((sum, m) => sum + m.used / m.limit, 0);
+  return Math.round((totalUsed / metrics.length) * 100);
+}
+
+// ============================================================================
+// SUB-COMPONENTS
+// ============================================================================
+
+function BillingHealthCard({
+  health,
+}: {
+  health: { status: string; label: string; percentage: number };
+}) {
+  const statusConfig = {
+    healthy: {
+      icon: CheckCircle2,
+      color: "text-accent",
+      bgColor: "bg-accent/10",
+      progressColor: "bg-accent",
+    },
+    warning: {
+      icon: AlertCircle,
+      color: "text-amber-400",
+      bgColor: "bg-amber-400/10",
+      progressColor: "bg-amber-400",
+    },
+    critical: {
+      icon: AlertCircle,
+      color: "text-destructive",
+      bgColor: "bg-destructive/10",
+      progressColor: "bg-destructive",
+    },
+  };
+
+  const config = statusConfig[health.status as keyof typeof statusConfig];
+  const Icon = config.icon;
+
+  return (
+    <Card className="border-border bg-card">
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Billing Health
+            </p>
+            <div className="flex items-center gap-2">
+              <p className={cn("text-2xl font-semibold", config.color)}>
+                {health.label}
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {health.status === "healthy"
+                ? "No issues detected"
+                : health.status === "warning"
+                  ? "Review usage limits"
+                  : "Immediate action required"}
+            </p>
+          </div>
+          <div className={cn("rounded-md p-2", config.bgColor, config.color)}>
+            <Icon className="h-4 w-4" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function UpcomingInvoiceCard({
+  invoice,
+  onViewDetails,
+}: {
+  invoice: typeof upcomingInvoiceData;
+  onViewDetails?: () => void;
+}) {
+  return (
+    <Card className="border-border bg-card">
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <Receipt className="h-5 w-5 text-accent" />
+              Upcoming Invoice
+            </CardTitle>
+            <CardDescription className="text-sm mt-1">
+              Estimated charges for next billing period
+            </CardDescription>
+          </div>
+          <Badge variant="outline" className="text-xs">
+            <Calendar className="h-3 w-3 mr-1" />
+            {invoice.date}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-baseline gap-2">
+          <span className="text-3xl font-bold text-foreground">
+            ${invoice.amount.toFixed(2)}
+          </span>
+          <span className="text-sm text-muted-foreground">
+            {invoice.currency.toUpperCase()}
+          </span>
+        </div>
+
+        <div className="space-y-2">
+          {invoice.lineItems.map((item, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between text-sm"
+            >
+              <span className="text-muted-foreground">{item.description}</span>
+              <span className="font-medium text-foreground">
+                ${item.amount.toFixed(2)}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="pt-3 border-t border-border">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-foreground">
+              Total Estimated
+            </span>
+            <span className="text-lg font-bold text-foreground">
+              ${invoice.amount.toFixed(2)}
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Billing period: {invoice.period}
+          </p>
+        </div>
+
+        {onViewDetails && (
+          <Button variant="outline" className="w-full" size="sm">
+            View Invoice Details
+            <ArrowRight className="h-4 w-4 ml-2" />
+          </Button>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function DaysUntilRenewalCard({ days }: { days: number }) {
+  const isUrgent = days <= 7;
+  const isWarning = days <= 14;
+
+  return (
+    <Card className="border-border bg-card">
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Renewal In
+            </p>
+            <p
+              className={cn(
+                "text-2xl font-semibold tabular-nums",
+                isUrgent
+                  ? "text-destructive"
+                  : isWarning
+                    ? "text-amber-400"
+                    : "text-foreground",
+              )}
+            >
+              {days} days
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {isUrgent
+                ? "Renewal approaching"
+                : isWarning
+                  ? "Plan ahead"
+                  : "On schedule"}
+            </p>
+          </div>
+          <div
+            className={cn(
+              "rounded-md p-2",
+              isUrgent
+                ? "bg-destructive/10 text-destructive"
+                : isWarning
+                  ? "bg-amber-400/10 text-amber-400"
+                  : "bg-secondary text-muted-foreground",
+            )}
+          >
+            <Calendar className="h-4 w-4" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 // ============================================================================
 // MAIN PAGE COMPONENT
 // ============================================================================
 
 export default function BillingPage() {
+  const billingHealth = calculateBillingHealth(usageData.metrics);
+  const totalUsagePercentage = getTotalUsagePercentage(usageData.metrics);
+  const hasExpiringCard = paymentMethodsData.some(
+    (m) => m.status === "expiring_soon",
+  );
+
   const handleUpgrade = () => {
-    // TODO: Navigate to upgrade flow
     console.log("Navigate to upgrade");
   };
 
   const handleManageSubscription = () => {
-    // TODO: Navigate to subscription management
     console.log("Manage subscription");
   };
 
   const handleAddPaymentMethod = () => {
-    // TODO: Open add payment method modal
     console.log("Add payment method");
   };
 
   const handleRemovePaymentMethod = (id: string) => {
-    // TODO: Remove payment method
     console.log("Remove payment method:", id);
   };
 
   const handleSetDefaultPaymentMethod = (id: string) => {
-    // TODO: Set default payment method
     console.log("Set default payment method:", id);
   };
 
   const handleDownloadInvoice = (invoice: Invoice) => {
-    // TODO: Download invoice PDF
     console.log("Download invoice:", invoice.id);
   };
 
   const handleSaveBillingInfo = (address: BillingAddress) => {
-    // TODO: Save billing address
     console.log("Save billing info:", address);
   };
 
   return (
     <div className="space-y-6 text-foreground">
-      {/* =========================================================================
+      {/* =====================================================================
           HEADER SECTION
-          Page title and description
-          ========================================================================= */}
-      <div>
-        <h1 className="text-2xl font-semibold text-card-foreground">Billing</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Manage your subscription, payment methods, and billing history
-        </p>
+          Strategic title with status indicator and quick context
+          ===================================================================== */}
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-2xl font-semibold text-card-foreground">
+              Aether Identity | Billing & Subscription
+            </h1>
+            <Badge
+              variant={
+                billingHealth.status === "healthy" ? "default" : "destructive"
+              }
+              className={cn(
+                billingHealth.status === "healthy"
+                  ? "bg-accent/10 text-accent border-accent/20"
+                  : billingHealth.status === "warning"
+                    ? "bg-amber-400/10 text-amber-400 border-amber-400/20"
+                    : "bg-destructive/10 text-destructive border-destructive/20",
+              )}
+            >
+              {billingHealth.status === "healthy" ? (
+                <>
+                  <CheckCircle2 className="h-3 w-3 mr-1" />
+                  Active
+                </>
+              ) : (
+                <>
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  {billingHealth.label}
+                </>
+              )}
+            </Badge>
+          </div>
+          <p className="text-sm text-muted-foreground max-w-2xl">
+            Manage your subscription, monitor usage, and control billing
+            settings. Your next billing date is{" "}
+            <strong>{subscriptionData.plan.nextBillingDate}</strong>.
+          </p>
+        </div>
+        <Button onClick={handleUpgrade} className="gap-2">
+          <TrendingUp className="h-4 w-4" />
+          Upgrade Plan
+        </Button>
       </div>
 
-      {/* =========================================================================
-          SECTION 1: SUBSCRIPTION OVERVIEW
-          Current plan details and usage summary
-          ========================================================================= */}
+      {/* =====================================================================
+          SECTION 1: KPI METRICS
+          Quick overview of billing health and key metrics
+          ===================================================================== */}
       <section className="space-y-4">
         <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
-          Subscription
+          Overview
         </h2>
 
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <MetricCard
+            title="Monthly Spend"
+            value={`$${subscriptionData.plan.price}`}
+            subtitle="Professional Plan"
+            icon={CreditCard}
+            variant="accent"
+          />
+          <MetricCard
+            title="Total Usage"
+            value={`${totalUsagePercentage}%`}
+            subtitle="Across all resources"
+            icon={Zap}
+            trend={{ value: 5.2, isPositive: false }}
+          />
+          <DaysUntilRenewalCard days={subscriptionData.plan.daysUntilRenewal} />
+          <BillingHealthCard health={billingHealth} />
+        </div>
+      </section>
+
+      {/* =====================================================================
+          SECTION 2: SUBSCRIPTION & USAGE
+          Current plan details and consumption metrics
+          ===================================================================== */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+            Subscription & Usage
+          </h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleManageSubscription}
+            className="text-accent"
+          >
+            Manage Subscription
+            <ArrowRight className="h-4 w-4 ml-1" />
+          </Button>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* Subscription Card - Takes 3 columns */}
           <div className="lg:col-span-3">
             <SubscriptionCard
               plan={subscriptionData.plan}
@@ -235,8 +600,6 @@ export default function BillingPage() {
               onManage={handleManageSubscription}
             />
           </div>
-
-          {/* Usage Stats - Takes 2 columns */}
           <div className="lg:col-span-2">
             <UsageStats
               metrics={usageData.metrics}
@@ -246,25 +609,45 @@ export default function BillingPage() {
         </div>
       </section>
 
-      {/* =========================================================================
-          SECTION 2: PAYMENT METHODS & BILLING INFO
-          Payment management and legal information
-          ========================================================================= */}
+      {/* =====================================================================
+          SECTION 3: PAYMENT & BILLING INFO
+          Payment methods and company billing details
+          ===================================================================== */}
       <section className="space-y-4">
         <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
-          Payment & Information
+          Payment & Billing Information
         </h2>
 
+        {hasExpiringCard && (
+          <div className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-4 flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-amber-400">
+                Payment Method Expiring Soon
+              </p>
+              <p className="text-sm text-amber-400/80 mt-1">
+                One of your payment methods expires soon. Update it to avoid
+                service interruption.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-amber-400/30 text-amber-400 hover:bg-amber-400/10"
+              onClick={handleAddPaymentMethod}
+            >
+              Update Payment Method
+            </Button>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Payment Methods */}
           <PaymentMethods
             methods={paymentMethodsData}
             onAddMethod={handleAddPaymentMethod}
             onRemoveMethod={handleRemovePaymentMethod}
             onSetDefault={handleSetDefaultPaymentMethod}
           />
-
-          {/* Billing Information */}
           <BillingInfo
             address={billingAddressData}
             onSave={handleSaveBillingInfo}
@@ -272,82 +655,119 @@ export default function BillingPage() {
         </div>
       </section>
 
-      {/* =========================================================================
-          SECTION 3: INVOICE HISTORY
-          Past billing records
-          ========================================================================= */}
+      {/* =====================================================================
+          SECTION 4: INVOICE HISTORY & UPCOMING
+          Past billing records and upcoming charges preview
+          ===================================================================== */}
       <section className="space-y-4">
         <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
-          History
+          Billing History & Forecast
         </h2>
 
-        <InvoiceHistory
-          invoices={invoicesData}
-          onDownload={handleDownloadInvoice}
-        />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <InvoiceHistory
+              invoices={invoicesData}
+              onDownload={handleDownloadInvoice}
+            />
+          </div>
+          <div className="lg:col-span-1">
+            <UpcomingInvoiceCard invoice={upcomingInvoiceData} />
+          </div>
+        </div>
       </section>
 
-      {/* =========================================================================
-          SECTION 4: BILLING SUPPORT
-          Help and support links
-          ========================================================================= */}
+      {/* =====================================================================
+          SECTION 5: SUPPORT & RESOURCES
+          Help links and support options
+          ===================================================================== */}
       <section className="space-y-4">
         <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
-          Support
+          Support & Resources
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 rounded-lg border border-border bg-card">
-            <h3 className="font-medium text-foreground mb-1">
-              Billing Questions?
-            </h3>
-            <p className="text-sm text-muted-foreground mb-3">
-              Contact our support team for help with invoices, refunds, or
-              billing issues.
-            </p>
-            <a
-              href="/admin/support"
-              className="text-sm text-accent hover:underline font-medium"
-            >
-              Contact Support →
-            </a>
-          </div>
+          <Card className="border-border bg-card hover:border-accent/30 transition-colors group">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-4">
+                <div className="rounded-lg bg-accent/10 p-2.5 group-hover:bg-accent/20 transition-colors">
+                  <HelpCircle className="h-5 w-5 text-accent" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-foreground mb-1">
+                    Billing Questions?
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Get help with invoices, refunds, or billing issues from our
+                    support team.
+                  </p>
+                  <a
+                    href="/admin/support"
+                    className="inline-flex items-center text-sm text-accent hover:underline font-medium"
+                  >
+                    Contact Support
+                    <ArrowUpRight className="h-3.5 w-3.5 ml-1" />
+                  </a>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-          <div className="p-4 rounded-lg border border-border bg-card">
-            <h3 className="font-medium text-foreground mb-1">
-              Need a Custom Plan?
-            </h3>
-            <p className="text-sm text-muted-foreground mb-3">
-              Enterprise organizations with specific requirements can contact
-              our sales team.
-            </p>
-            <a
-              href="https://skygenesisenterprise.com/contact"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-accent hover:underline font-medium"
-            >
-              Contact Sales →
-            </a>
-          </div>
+          <Card className="border-border bg-card hover:border-accent/30 transition-colors group">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-4">
+                <div className="rounded-lg bg-secondary p-2.5 group-hover:bg-secondary/80 transition-colors">
+                  <Building2 className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-foreground mb-1">
+                    Enterprise Solutions
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Custom plans for large organizations with specific
+                    requirements.
+                  </p>
+                  <a
+                    href="https://skygenesisenterprise.com/contact"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-sm text-accent hover:underline font-medium"
+                  >
+                    Contact Sales
+                    <ArrowUpRight className="h-3.5 w-3.5 ml-1" />
+                  </a>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-          <div className="p-4 rounded-lg border border-border bg-card">
-            <h3 className="font-medium text-foreground mb-1">
-              Understanding Your Bill
-            </h3>
-            <p className="text-sm text-muted-foreground mb-3">
-              Learn more about our pricing, billing cycles, and how charges are
-              calculated.
-            </p>
-            <a
-              href="https://docs.skygenesisenterprise.com/billing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-accent hover:underline font-medium"
-            >
-              View Documentation →
-            </a>
-          </div>
+          <Card className="border-border bg-card hover:border-accent/30 transition-colors group">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-4">
+                <div className="rounded-lg bg-secondary p-2.5 group-hover:bg-secondary/80 transition-colors">
+                  <FileText className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-foreground mb-1">
+                    Documentation
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Learn about pricing, billing cycles, and how charges are
+                    calculated.
+                  </p>
+                  <a
+                    href="https://docs.skygenesisenterprise.com/billing"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-sm text-accent hover:underline font-medium"
+                  >
+                    View Docs
+                    <ArrowUpRight className="h-3.5 w-3.5 ml-1" />
+                  </a>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
     </div>
