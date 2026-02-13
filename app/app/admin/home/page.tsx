@@ -267,7 +267,7 @@ export default function DashboardPage() {
           ========================================================================= */}
       <div>
         <h1 className="text-2xl font-semibold text-card-foreground">
-          Dashboard
+          Aether Identity | Dashboard
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
           Identity and access management overview for your workspace

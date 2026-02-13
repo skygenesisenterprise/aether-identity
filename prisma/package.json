@@ -15,6 +15,7 @@
     "migrate:deploy:prod": "prisma migrate deploy --name init",
     "studio": "prisma studio",
     "seed": "tsx prisma/seed.ts",
+    "seed:default": "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/aether_identity?schema=public tsx prisma/seed.ts",
     "validate": "prisma validate",
     "format": "prisma format",
     "clean": "rimraf ./node_modules ./dist",
@@ -25,6 +26,8 @@
     "db:pull": "prisma db pull",
     "db:studio": "prisma studio",
     "test": "tsx prisma/test.ts",
+    "test:db": "tsx test-db-connection.ts",
+    "test:db:watch": "tsx watch test-db-connection.ts",
     "lint": "eslint prisma/**/*.ts --fix",
     "precommit": "prisma format && prisma validate && npm run generate"
   },

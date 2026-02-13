@@ -35,6 +35,38 @@ import {
 export function Header() {
   const pathname = usePathname();
 
+  // Lire les variables d'environnement pour la licence
+  const envLicenseType = process.env.NEXT_PUBLIC_LICENSE_TYPE || "enterprise";
+  const envLicenseKey = process.env.NEXT_PUBLIC_LICENSE_KEY || "ENTERPRISE-PROD-KEY-987654321";
+  const envLicenseExpiration = process.env.NEXT_PUBLIC_LICENSE_EXPIRATION || "2025-12-31";
+
+  // Déterminer le type de licence et le statut
+  const licenseType = envLicenseType as "self-hosted" | "enterprise" | "premium" | "free" | "trial";
+  const isEnterprise = licenseType === "enterprise";
+  const isSelfHosted = licenseType === "self-hosted";
+  
+  // Vérifier si la licence est expirée
+  let licenseStatus: "active" | "expired" | "invalid" | "grace_period" = "active";
+  if (envLicenseExpiration) {
+    try {
+      const expirationDate = new Date(envLicenseExpiration);
+      if (new Date() > expirationDate) {
+        licenseStatus = "expired";
+      }
+    } catch (error) {
+      console.error("Invalid expiration date format");
+    }
+  }
+
+  // Valider la clé de licence
+  if (!envLicenseKey) {
+    licenseStatus = "invalid";
+  } else if (envLicenseKey.startsWith("ENTERPRISE-") && !isEnterprise) {
+    licenseStatus = "invalid";
+  } else if (envLicenseKey.startsWith("SELF-") && !isSelfHosted) {
+    licenseStatus = "invalid";
+  }
+
   // Available options
   const authorities = [
     "Acme Corporation",
@@ -46,12 +78,9 @@ export function Header() {
   // State for selections
   const [authority, setAuthority] = React.useState("Acme Corporation");
   const [workspace, setWorkspace] = React.useState("Production");
-  const [deploymentMode, setDeploymentMode] = React.useState<
-    "self_hosted" | "saas"
-  >("self_hosted");
-  const [plan, setPlan] = React.useState<"free" | "premium" | "enterprise">(
-    "enterprise",
-  );
+  const [environment, setEnvironment] = React.useState("EU-West");
+  const [deploymentMode, setDeploymentMode] = React.useState<"self_hosted" | "saas">("self_hosted");
+  const [plan, setPlan] = React.useState<"free" | "premium" | "enterprise" | "trial" | "self_hosted">("enterprise");
   const [theme, setTheme] = React.useState<"light" | "dark" | "system">(
     "light",
   );
@@ -72,11 +101,12 @@ export function Header() {
   const contextData = {
     authority,
     workspace,
-    environment: "US-East",
+    environment,
     userRole: "Identity Admin",
     isPrivileged: true,
     deploymentMode,
     plan,
+    licenseStatus,
   };
 
   const deploymentModeConfig = {
@@ -101,6 +131,33 @@ export function Header() {
     },
     enterprise: {
       label: "Enterprise",
+      color: "text-orange-500 border-orange-500/30 bg-orange-500/10",
+    },
+    trial: {
+      label: "Trial",
+      color: "text-yellow-500 border-yellow-500/30 bg-yellow-500/10",
+    },
+    self_hosted: {
+      label: "Self-Hosted",
+      color: "text-purple-500 border-purple-500/30 bg-purple-500/10",
+    },
+  };
+
+  const licenseStatusConfig = {
+    active: {
+      label: "Active",
+      color: "text-green-500 border-green-500/30 bg-green-500/10",
+    },
+    expired: {
+      label: "Expired",
+      color: "text-red-500 border-red-500/30 bg-red-500/10",
+    },
+    invalid: {
+      label: "Invalid",
+      color: "text-yellow-500 border-yellow-500/30 bg-yellow-500/10",
+    },
+    grace_period: {
+      label: "Grace Period",
       color: "text-orange-500 border-orange-500/30 bg-orange-500/10",
     },
   };

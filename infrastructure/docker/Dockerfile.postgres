@@ -22,5 +22,14 @@ RUN pnpm install
 COPY infrastructure/docker/init-migrations.sh /docker-entrypoint-initdb.d/99-init-migrations.sh
 RUN chmod +x /docker-entrypoint-initdb.d/99-init-migrations.sh
 
+# Copy the seed script
+COPY prisma/seed.ts /prisma/seed.ts
+COPY prisma/package.json /prisma/package.json
+COPY prisma/pnpm-lock.yaml /prisma/pnpm-lock.yaml 2>/dev/null || true
+COPY prisma/package-lock.json /prisma/package-lock.json 2>/dev/null || true
+
+# Install seed dependencies
+RUN cd /prisma && pnpm install --prod
+
 # PostgreSQL will automatically execute scripts in /docker-entrypoint-initdb.d/
 # during the first startup (when data directory is empty)

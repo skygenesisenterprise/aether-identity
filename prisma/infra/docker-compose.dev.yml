@@ -1,6 +1,25 @@
 version: "3.9"
 
 services:
+  # Service PostgreSQL pour la base de donnees
+  postgres:
+    image: postgres:16-alpine
+    container_name: identity-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: aether_identity
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   # Service Database - Prisma Migrations et gestion du schema
   identity-database:
     build:
@@ -9,13 +28,15 @@ services:
     container_name: identity-database
     environment:
       # La DATABASE_URL sera surchargee par l'orchestrateur
-      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/aether_identity?schema=public}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/aether_identity?schema=public}
     volumes:
       - ..:/app
     command: >
       sh -c "npx prisma migrate deploy && npx prisma generate"
     restart: "no"
-    # Le network et depends_on seront definis par l'orchestrateur
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   # Service Prisma Studio pour l'interface graphique de gestion
   prisma-studio:
@@ -24,7 +45,7 @@ services:
       dockerfile: infra/Dockerfile.dev
     container_name: identity-prisma-studio
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/aether_identity?schema=public}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/aether_identity?schema=public}
     ports:
       - "5555:5555"
     volumes:
@@ -32,5 +53,11 @@ services:
     command: >
       sh -c "npx prisma generate && npx prisma studio --hostname 0.0.0.0 --port 5555"
     restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
     profiles:
       - studio # Ne demarre qu'avec --profile studio
+
+volumes:
+  postgres_data:

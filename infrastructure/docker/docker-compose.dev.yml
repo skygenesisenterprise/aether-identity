@@ -64,18 +64,13 @@ services:
       - identity-network-dev
 
   # Service Database unique - PostgreSQL avec migrations Prisma automatiques
-  # Étend la configuration de @prisma/infra/docker-compose.dev.yml mais
-  # utilise une image PostgreSQL personnalisée avec Prisma intégré
+  # Utilise une image PostgreSQL personnalisée avec Prisma intégré
   identity-database:
-    extends:
-      file: ../../prisma/infra/docker-compose.dev.yml
-      service: identity-database
     build:
       context: ../..
       dockerfile: infrastructure/docker/Dockerfile.postgres
     image: identity-database:dev
     container_name: identity-database-dev
-    # Override pour utiliser PostgreSQL comme processus principal (pas la commande Prisma)
     command: ["postgres", "-c", "listen_addresses=*"]
     environment:
       POSTGRES_USER: postgres

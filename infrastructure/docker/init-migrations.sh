@@ -30,4 +30,9 @@ cd /prisma
 npx prisma generate
 echo "✅ Prisma client generated"
 
+# Run seed script to create default user
+echo "🌱 Running seed script..."
+npx tsx seed.ts
+echo "✅ Seed script completed"
+
 echo "🎉 Database initialization complete"
