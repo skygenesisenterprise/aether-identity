@@ -10,7 +10,7 @@ RUN apk add --no-cache libc6-compat openssl postgresql-client
 RUN npm install -g pnpm@10.28.1
 
 # Copier package.json
-COPY package*.json ./
+COPY package.json ./
 
 # Installer les dependances
 RUN pnpm install
