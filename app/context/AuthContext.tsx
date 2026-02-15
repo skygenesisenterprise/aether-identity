@@ -27,6 +27,7 @@ interface AuthContextType {
   ) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  verifyTotp: (code: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -133,6 +134,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const verifyTotp = async (code: string) => {
+    setIsLoading(true);
+    try {
+      const identity = identityRef.current;
+      if (!identity) {
+        throw new Error("Identity client not initialized");
+      }
+
+      await identity.auth.verifyTotp({ code });
+      await checkAuth();
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -142,6 +160,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         logout,
         checkAuth,
+        verifyTotp,
       }}
     >
       {children}

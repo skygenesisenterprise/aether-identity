@@ -1,7 +1,13 @@
 // Environment types for the admin panel
 
+import { CheckCircle2, AlertCircle, XCircle, HelpCircle } from "lucide-react";
+
 export type EnvironmentType = "dev" | "staging" | "production" | "custom";
-export type EnvironmentStatus = "healthy" | "degraded" | "unhealthy" | "unknown";
+export type EnvironmentStatus =
+  | "healthy"
+  | "degraded"
+  | "unhealthy"
+  | "unknown";
 
 export interface Environment {
   id: string;
@@ -33,8 +39,8 @@ export interface Environment {
     services: string[];
     externalIdPs: string[];
   };
-  lastError?: string;
-  lastWarning?: string;
+  lastError?: string | null;
+  lastWarning?: string | null;
 }
 
 // Mock data for environments
@@ -59,7 +65,11 @@ export const environmentsData: Environment[] = [
       devices: 5000,
       apiCalls: 1000000,
     },
-    activeModules: ["identity-api", "authentication-engine", "authorization-engine"],
+    activeModules: [
+      "identity-api",
+      "authentication-engine",
+      "authorization-engine",
+    ],
     configuration: {
       runtimeMode: "production",
       keyFlags: ["REPLICAS: 3", "RATE_LIMIT: 10k/min", "BACKUP: nightly"],

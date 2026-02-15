@@ -86,7 +86,7 @@ if (payload.isValid) {
         <div className="callout-content">
           <h4 className="callout-title">Congratulations!</h4>
           <p>
-            You've successfully integrated Aether Identity into your
+            You&apos;ve successfully integrated Aether Identity into your
             application. Check out the{" "}
             <Link href="/docs/sdk/core" className="docs-link">
               Core SDK

@@ -9,7 +9,7 @@ import { useState } from "react";
 
 export default function TotpPage() {
   const [totpCode, setTotpCode] = useState("");
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isTransitioning] = useState(false);
   const [error, setError] = useState("");
 
   const { isLoading, verifyTotp } = useAuth();
