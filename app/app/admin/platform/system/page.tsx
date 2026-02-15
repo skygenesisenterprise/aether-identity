@@ -37,9 +37,7 @@ import {
   Info,
   Layers,
   LayoutGrid,
-  Lock,
   Monitor,
-  Play,
   RefreshCw,
   RotateCcw,
   ScrollText,
@@ -47,7 +45,6 @@ import {
   Settings,
   Shield,
   Terminal,
-  Upload,
   Wrench,
   XCircle,
 } from "lucide-react";
