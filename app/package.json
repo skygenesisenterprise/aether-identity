@@ -73,7 +73,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@capacitor/core": "^8.0.2",
+    "@capacitor/core": "^8.1.0",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "^22",
     "@types/react": "^19",
