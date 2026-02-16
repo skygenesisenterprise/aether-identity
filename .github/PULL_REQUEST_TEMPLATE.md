@@ -1,6 +1,6 @@
 # Pull Request
 
-Thank you for contributing to **Aether Mailer**!  
+Thank you for contributing to **Aether Identity**!  
 Please fill out the following information to help us review your changes effectively.
 
 ---
