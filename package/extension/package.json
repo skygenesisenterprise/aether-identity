@@ -103,7 +103,7 @@
     "jest": "^29.7.0",
     "ts-loader": "^9.5.1",
     "typescript": "^5.9.3",
-    "web-ext": "^8.2.0",
+    "web-ext": "^9.3.0",
     "webpack": "^5.91.0",
     "webpack-cli": "^5.1.4"
   },
