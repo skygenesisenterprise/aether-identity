@@ -24,8 +24,8 @@ importers:
         specifier: ^0.7.1
         version: 0.7.1
       loglayer:
-        specifier: ^8.4.1
-        version: 8.4.1
+        specifier: ^9.1.0
+        version: 9.1.0
       pino:
         specifier: ^10.3.1
         version: 10.3.1
@@ -175,8 +175,8 @@ importers:
         specifier: 1.4.2
         version: 1.4.2(react-dom@19.2.4)(react@19.2.4)
       loglayer:
-        specifier: ^8.4.1
-        version: 8.4.1
+        specifier: ^9.1.0
+        version: 9.1.0
       lucide-react:
         specifier: ^0.544.0
         version: 0.544.0(react@19.2.4)
@@ -1657,29 +1657,34 @@ packages:
       - supports-color
     dev: true
 
-  /@loglayer/context-manager@1.2.0:
-    resolution: {integrity: sha512-0bIN4NP6GDcgVVQi5K9kDfxK9T8IV3PHpLVCih23q7LlxNUlBwWEZpdhpEkkum0nlVYviLw0ugBbogsd5IijTw==}
+  /@loglayer/context-manager@2.0.2:
+    resolution: {integrity: sha512-IVt/iqACGw2GnucKOpyJ69MbGQSRzsArOwsTNMuOAfzm36zTphGIH4K7g7lhRvcd2jY0dZzvWA6tCqannpgXXg==}
     engines: {node: '>=18'}
     dependencies:
-      '@loglayer/shared': 3.3.0
+      '@loglayer/shared': 4.1.0
     dev: false
 
-  /@loglayer/log-level-manager@1.0.5:
-    resolution: {integrity: sha512-kEeJqkc7iJO4hwvUjMVS9gPJJzTEPGRpI3DzMaW8pQRYhSsg4PyJnHDaCd8UqEyrxnuT8YJ7iqsZ9BdyuO9Ckg==}
+  /@loglayer/log-level-manager@2.0.2:
+    resolution: {integrity: sha512-hq6hjkXzrYyz0DwYUqizP0hS3jhPl5S/7U33Cd0EPbfLmDjYWzzcM0mQKUdtBi6qNX4DAPpag3oBGytB2zmghg==}
     engines: {node: '>=18'}
     dependencies:
-      '@loglayer/shared': 3.3.0
+      '@loglayer/shared': 4.1.0
     dev: false
 
-  /@loglayer/plugin@2.2.7:
-    resolution: {integrity: sha512-k9O21Z7TxFemZUrC4YL2pJZG48QQPLCPVJQ1zg42y0kYveACuIb0a7abe40MkfrZOu9ApNHQHC5wcggQf0V7pA==}
+  /@loglayer/plugin@3.0.2:
+    resolution: {integrity: sha512-ghIYpuPw/Q0jdlr7ErkaySfsSCsIigwIb1lvR5qhZrz3oEqGotDFZzhgU1YeO7BacA042ygv/xww3Ip3ROokeg==}
     engines: {node: '>=18'}
     dependencies:
-      '@loglayer/shared': 3.3.0
+      '@loglayer/shared': 4.1.0
     dev: false
 
   /@loglayer/shared@3.3.0:
     resolution: {integrity: sha512-E596RsJSRthGkG7PTGAeja5OIwB0fK3FCvZYXx7nFSv+J1Bk8RJO/vb6IB5th8dB9zoaQ/ahvlZ1Jfhg0dy/Mg==}
+    engines: {node: '>=18'}
+    dev: false
+
+  /@loglayer/shared@4.1.0:
+    resolution: {integrity: sha512-hGSWhLhMF9L7sB0rXippvKhku9D9dT8imZ5OFpa4VHAVnclY0DQ+3wIPE37rzu0QAiBbyR3/HH03Q1Cgik8zYA==}
     engines: {node: '>=18'}
     dev: false
 
@@ -1698,6 +1703,13 @@ packages:
     engines: {node: '>=18'}
     dependencies:
       '@loglayer/shared': 3.3.0
+    dev: false
+
+  /@loglayer/transport@3.0.2:
+    resolution: {integrity: sha512-5t0lj/ibQQxGPpghNta8u10zl8owU0my/i2fHF/LdcCAtpw/IHblmpKSgOzdH9XE19Ub/i0VYj0JrFrFv8/NXw==}
+    engines: {node: '>=18'}
+    dependencies:
+      '@loglayer/shared': 4.1.0
     dev: false
 
   /@manypkg/find-root@1.1.0:
@@ -8060,15 +8072,15 @@ packages:
       wrap-ansi: 9.0.2
     dev: true
 
-  /loglayer@8.4.1:
-    resolution: {integrity: sha512-Etc1Q9UOSWbqoZelVPvCT9SyOXFl3xxNftk9Cf22NYi/WB/3q4Kgynu7n3BxInGkYcnaL1pcR4Xw1DdDSb9Njw==}
+  /loglayer@9.1.0:
+    resolution: {integrity: sha512-KFCtoydUtfshszDMIEMa180MMT4jDgBz7FkkO0r3mLDzOkfqGUCbtH9DRszK/pEPrG7999FXfBsyv4DNhvmrag==}
     engines: {node: '>=18'}
     dependencies:
-      '@loglayer/context-manager': 1.2.0
-      '@loglayer/log-level-manager': 1.0.5
-      '@loglayer/plugin': 2.2.7
-      '@loglayer/shared': 3.3.0
-      '@loglayer/transport': 2.3.13
+      '@loglayer/context-manager': 2.0.2
+      '@loglayer/log-level-manager': 2.0.2
+      '@loglayer/plugin': 3.0.2
+      '@loglayer/shared': 4.1.0
+      '@loglayer/transport': 3.0.2
     dev: false
 
   /long@5.3.2:
