@@ -12,8 +12,8 @@ importers:
         specifier: ^8.1.0
         version: 8.1.0
       '@loglayer/transport-pino':
-        specifier: ^2.2.16
-        version: 2.2.17(pino@10.3.1)
+        specifier: ^3.0.2
+        version: 3.0.2(pino@10.3.1)
       '@prisma/client':
         specifier: ^7.3.0
         version: 7.3.0(prisma@7.4.0)(typescript@5.9.3)
@@ -64,8 +64,8 @@ importers:
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.71.1)
       '@loglayer/transport-pino':
-        specifier: ^2.2.16
-        version: 2.2.17(pino@10.3.1)
+        specifier: ^3.0.2
+        version: 3.0.2(pino@10.3.1)
       '@prisma/client':
         specifier: 7.3.0
         version: 7.3.0(prisma@7.4.0)(typescript@5.9.3)
@@ -1678,31 +1678,19 @@ packages:
       '@loglayer/shared': 4.1.0
     dev: false
 
-  /@loglayer/shared@3.3.0:
-    resolution: {integrity: sha512-E596RsJSRthGkG7PTGAeja5OIwB0fK3FCvZYXx7nFSv+J1Bk8RJO/vb6IB5th8dB9zoaQ/ahvlZ1Jfhg0dy/Mg==}
-    engines: {node: '>=18'}
-    dev: false
-
   /@loglayer/shared@4.1.0:
     resolution: {integrity: sha512-hGSWhLhMF9L7sB0rXippvKhku9D9dT8imZ5OFpa4VHAVnclY0DQ+3wIPE37rzu0QAiBbyR3/HH03Q1Cgik8zYA==}
     engines: {node: '>=18'}
     dev: false
 
-  /@loglayer/transport-pino@2.2.17(pino@10.3.1):
-    resolution: {integrity: sha512-c4Lc+nu+NTdG7iTvsOJ7BzMYfqmm7+F2CjJnvo0X9OKYVbJIlK4FZOB9cTI/QTi3d/+2D21mTPwhOI2ejQbuGQ==}
+  /@loglayer/transport-pino@3.0.2(pino@10.3.1):
+    resolution: {integrity: sha512-JQnYQRctO0nI5L0Mk26uwngK52fMpkRs9qb7N3tCgSoAjFd3DQZyxV2FhcAsgpp45utJzczWNxmlB5788PJEXA==}
     engines: {node: '>=18'}
     peerDependencies:
       pino: '*'
     dependencies:
-      '@loglayer/transport': 2.3.13
+      '@loglayer/transport': 3.0.2
       pino: 10.3.1
-    dev: false
-
-  /@loglayer/transport@2.3.13:
-    resolution: {integrity: sha512-sfw6xvsIOzTh4l8ZpSH7Vfj3ajH/y+PUBShclqjaLtXxurKGh8xZuciDsL3wuern+Ea/r8+iT2vzK3d2BSUyQQ==}
-    engines: {node: '>=18'}
-    dependencies:
-      '@loglayer/shared': 3.3.0
     dev: false
 
   /@loglayer/transport@3.0.2:
