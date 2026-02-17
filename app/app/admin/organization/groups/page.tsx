@@ -1072,7 +1072,7 @@ export default function GroupsPage() {
                 <Button size="sm">
                   <Plus className="h-4 w-4 mr-2" />
                   Create Group
-                </Button>q
+                </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-125">
                 <DialogHeader>

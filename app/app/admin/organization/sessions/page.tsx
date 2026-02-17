@@ -1448,12 +1448,12 @@ export default function SessionsPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm">
+                        <span className="text-sm" suppressHydrationWarning>
                           {formatTime(session.loginTime)}
                         </span>
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm">
+                        <span className="text-sm" suppressHydrationWarning>
                           {getRelativeTime(session.lastActivity)}
                         </span>
                       </TableCell>

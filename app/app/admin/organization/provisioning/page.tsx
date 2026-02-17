@@ -801,6 +801,7 @@ function KpiCard({
                 "text-3xl font-bold tabular-nums",
                 styles.valueColor,
               )}
+              suppressHydrationWarning
             >
               {value}
             </p>
