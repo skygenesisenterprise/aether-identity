@@ -40,7 +40,7 @@
     "config": "link:@prisma/client/config",
     "jsonwebtoken": "^9.0.2",
     "qrcode": "^1.5.4",
-    "redis": "^5.10.0",
+    "redis": "^5.11.0",
     "speakeasy": "^2.0.0",
     "uuid": "^9.0.1",
     "zod": "^4.3.6"
