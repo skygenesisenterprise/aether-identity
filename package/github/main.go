@@ -148,10 +148,8 @@ func main() {
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	select {
-	case <-shutdownCtx.Done():
-		fmt.Println("\033[1;32m[✓] Server stopped gracefully\033[0m")
-	}
+	<-shutdownCtx.Done()
+	fmt.Println("\033[1;32m[✓] Server stopped gracefully\033[0m")
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
