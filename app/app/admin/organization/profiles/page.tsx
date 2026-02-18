@@ -32,6 +32,13 @@ import {
   ChevronRight,
   Filter,
   ShieldCheckIcon,
+  ChevronDown,
+  ChevronUp,
+  MoreHorizontal,
+  Eye,
+  Download,
+  Edit,
+  User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -60,6 +67,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/dashboard/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/dashboard/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/dashboard/ui/dropdown-menu";
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -299,7 +321,7 @@ function StatusBadge({
         "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border",
         config.bgColor,
         config.color,
-        config.borderColor,
+        config.borderColor
       )}
       title={config.description}
     >
@@ -309,13 +331,7 @@ function StatusBadge({
   );
 }
 
-function MfaBadge({
-  enabled,
-  required,
-}: {
-  enabled: boolean;
-  required: boolean;
-}) {
+function MfaBadge({ enabled, required }: { enabled: boolean; required: boolean }) {
   if (enabled) {
     return (
       <span
@@ -351,9 +367,7 @@ function MfaBadge({
 
 function GroupBadges({ groups }: { groups: string[] }) {
   if (groups.length === 0) {
-    return (
-      <span className="text-xs text-muted-foreground italic">No groups</span>
-    );
+    return <span className="text-xs text-muted-foreground italic">No groups</span>;
   }
   return (
     <div className="flex flex-wrap items-center gap-1">
@@ -366,10 +380,7 @@ function GroupBadges({ groups }: { groups: string[] }) {
         </span>
       ))}
       {groups.length > 2 && (
-        <span
-          className="text-xs text-muted-foreground"
-          title={`${groups.length - 2} more groups`}
-        >
+        <span className="text-xs text-muted-foreground" title={`${groups.length - 2} more groups`}>
           +{groups.length - 2}
         </span>
       )}
@@ -389,13 +400,7 @@ interface KpiCardProps {
   variant?: "default" | "success" | "warning" | "danger" | "info";
 }
 
-function KpiCard({
-  title,
-  value,
-  subtitle,
-  icon: Icon,
-  variant = "default",
-}: KpiCardProps) {
+function KpiCard({ title, value, subtitle, icon: Icon, variant = "default" }: KpiCardProps) {
   const variantStyles = {
     default: {
       iconBg: "bg-muted",
@@ -434,12 +439,8 @@ function KpiCard({
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               {title}
             </p>
-            <p className={cn("text-2xl font-bold", styles.valueColor)}>
-              {value}
-            </p>
-            {subtitle && (
-              <p className="text-xs text-muted-foreground">{subtitle}</p>
-            )}
+            <p className={cn("text-2xl font-bold", styles.valueColor)}>{value}</p>
+            {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
           </div>
           <div className={cn("rounded-lg p-2", styles.iconBg)}>
             <Icon className={cn("h-4 w-4", styles.iconColor)} />
@@ -465,21 +466,14 @@ interface SectionHeaderProps {
   };
 }
 
-function SectionHeader({
-  title,
-  description,
-  icon: Icon,
-  action,
-}: SectionHeaderProps) {
+function SectionHeader({ title, description, icon: Icon, action }: SectionHeaderProps) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
         <div>
           <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-          {description && (
-            <p className="text-xs text-muted-foreground">{description}</p>
-          )}
+          {description && <p className="text-xs text-muted-foreground">{description}</p>}
         </div>
       </div>
       {action && (
@@ -520,16 +514,14 @@ function ProfileListItem({
         "flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all border",
         isSelected
           ? "bg-primary/10 border-primary/30"
-          : "bg-card hover:bg-muted/50 border-transparent",
+          : "bg-card hover:bg-muted/50 border-transparent"
       )}
       onClick={onSelect}
     >
       <div
         className={cn(
           "h-10 w-10 rounded-full flex items-center justify-center text-sm font-semibold transition-colors",
-          isSelected
-            ? "bg-primary/20 text-primary"
-            : "bg-muted text-muted-foreground",
+          isSelected ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
         )}
       >
         {initials}
@@ -540,18 +532,11 @@ function ProfileListItem({
           <StatusBadge status={profile.status} showLabel={false} />
         </div>
         <div className="flex items-center gap-2 mt-0.5">
-          <span className="text-xs text-muted-foreground truncate">
-            {profile.email}
-          </span>
+          <span className="text-xs text-muted-foreground truncate">{profile.email}</span>
         </div>
         <div className="flex items-center gap-2 mt-1.5">
-          <MfaBadge
-            enabled={profile.mfaEnabled}
-            required={profile.mfaRequired}
-          />
-          <span className="text-xs text-muted-foreground">
-            {profile.groups.length} groups
-          </span>
+          <MfaBadge enabled={profile.mfaEnabled} required={profile.mfaRequired} />
+          <span className="text-xs text-muted-foreground">{profile.groups.length} groups</span>
         </div>
       </div>
       <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -619,9 +604,9 @@ function ProfileDetailPanel({
   allGroups: ProfileGroup[];
   onClose: () => void;
 }) {
-  const [activeTab, setActiveTab] = useState<
-    "overview" | "access" | "security" | "audit"
-  >("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "access" | "security" | "audit">(
+    "overview"
+  );
 
   if (!profile) {
     return (
@@ -630,9 +615,7 @@ function ProfileDetailPanel({
           <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
             <Users className="h-8 w-8 opacity-50" />
           </div>
-          <p className="text-sm font-medium">
-            Select a profile to view details
-          </p>
+          <p className="text-sm font-medium">Select a profile to view details</p>
           <p className="text-xs text-muted-foreground mt-1">
             Click on any profile to see its information
           </p>
@@ -641,9 +624,7 @@ function ProfileDetailPanel({
     );
   }
 
-  const profileGroups = allGroups.filter((g) =>
-    profile.groupIds.includes(g.id),
-  );
+  const profileGroups = allGroups.filter((g) => profile.groupIds.includes(g.id));
   const statusConf = statusConfig[profile.status];
   const initials = profile.displayName
     .split(" ")
@@ -660,18 +641,11 @@ function ProfileDetailPanel({
             {initials}
           </div>
           <div className="min-w-0">
-            <h3 className="font-semibold text-foreground truncate">
-              {profile.displayName}
-            </h3>
-            <p className="text-xs text-muted-foreground truncate">
-              {profile.email}
-            </p>
+            <h3 className="font-semibold text-foreground truncate">{profile.displayName}</h3>
+            <p className="text-xs text-muted-foreground truncate">{profile.email}</p>
           </div>
         </div>
-        <button
-          onClick={onClose}
-          className="p-1.5 hover:bg-muted rounded-md transition-colors"
-        >
+        <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-md transition-colors">
           <X className="h-4 w-4 text-muted-foreground" />
         </button>
       </div>
@@ -680,13 +654,9 @@ function ProfileDetailPanel({
       <div className="px-5 py-3 border-b space-y-2">
         <div className="flex items-center justify-between">
           <StatusBadge status={profile.status} />
-          <span className="text-xs text-muted-foreground font-mono">
-            {profile.id}
-          </span>
+          <span className="text-xs text-muted-foreground font-mono">{profile.id}</span>
         </div>
-        <p className="text-xs text-muted-foreground">
-          {statusConf.description}
-        </p>
+        <p className="text-xs text-muted-foreground">{statusConf.description}</p>
       </div>
 
       {/* Quick Actions */}
@@ -746,7 +716,7 @@ function ProfileDetailPanel({
               "flex-1 flex items-center justify-center gap-1 px-2 py-2.5 text-xs font-medium border-b-2 transition-colors",
               activeTab === tab.id
                 ? "border-primary text-primary bg-primary/5"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50",
+                : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
             )}
           >
             <tab.icon className="h-3.5 w-3.5" />
@@ -800,14 +770,8 @@ function ProfileDetailPanel({
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Last Login</span>
-                  <span
-                    className={cn(
-                      !profile.lastLogin && "text-muted-foreground",
-                    )}
-                  >
-                    {profile.lastLogin
-                      ? formatRelativeTime(profile.lastLogin)
-                      : "Never"}
+                  <span className={cn(!profile.lastLogin && "text-muted-foreground")}>
+                    {profile.lastLogin ? formatRelativeTime(profile.lastLogin) : "Never"}
                   </span>
                 </div>
               </div>
@@ -849,17 +813,13 @@ function ProfileDetailPanel({
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium">{group.name}</p>
-                        <p className="text-xs text-muted-foreground font-mono">
-                          {group.slug}
-                        </p>
+                        <p className="text-xs text-muted-foreground font-mono">{group.slug}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">
-                  Not member of any groups
-                </p>
+                <p className="text-sm text-muted-foreground">Not member of any groups</p>
               )}
             </section>
 
@@ -889,8 +849,8 @@ function ProfileDetailPanel({
               </h4>
               <div className="p-3 rounded-lg border bg-muted/30">
                 <p className="text-xs text-muted-foreground">
-                  Effective permissions will be calculated based on group
-                  memberships and role assignments (RBAC).
+                  Effective permissions will be calculated based on group memberships and role
+                  assignments (RBAC).
                 </p>
               </div>
             </section>
@@ -911,10 +871,7 @@ function ProfileDetailPanel({
                     <Shield className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm">MFA Status</span>
                   </div>
-                  <MfaBadge
-                    enabled={profile.mfaEnabled}
-                    required={profile.mfaRequired}
-                  />
+                  <MfaBadge enabled={profile.mfaEnabled} required={profile.mfaRequired} />
                 </div>
                 {profile.mfaEnabled && (
                   <button className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-amber-700 hover:bg-amber-50 rounded-lg transition-colors border border-amber-200">
@@ -962,8 +919,7 @@ function ProfileDetailPanel({
               </h4>
               <div className="p-3 rounded-lg border bg-muted/30">
                 <p className="text-sm text-muted-foreground">
-                  Audit log integration pending. Activity tracking will be
-                  displayed here.
+                  Audit log integration pending. Activity tracking will be displayed here.
                 </p>
               </div>
             </section>
@@ -997,12 +953,13 @@ function ProfileDetailPanel({
 // ============================================================================
 
 export default function ProfilesPage() {
-  const [selectedProfile, setSelectedProfile] =
-    useState<OrganizationProfile | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<OrganizationProfile | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<
-    OrganizationProfile["status"] | "all"
-  >("all");
+  const [statusFilter, setStatusFilter] = useState<OrganizationProfile["status"] | "all">("all");
+  const [sortBy, setSortBy] = useState<"displayName" | "email" | "createdAt" | "lastLogin">(
+    "displayName"
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [newProfile, setNewProfile] = useState({
@@ -1014,14 +971,10 @@ export default function ProfilesPage() {
   const stats = useMemo(() => {
     const total = mockProfiles.length;
     const active = mockProfiles.filter((p) => p.status === "active").length;
-    const suspended = mockProfiles.filter(
-      (p) => p.status === "suspended",
-    ).length;
+    const suspended = mockProfiles.filter((p) => p.status === "suspended").length;
     const pending = mockProfiles.filter((p) => p.status === "pending").length;
     const mfaEnabled = mockProfiles.filter((p) => p.mfaEnabled).length;
-    const mfaRequired = mockProfiles.filter(
-      (p) => p.mfaRequired && !p.mfaEnabled,
-    ).length;
+    const mfaRequired = mockProfiles.filter((p) => p.mfaRequired && !p.mfaEnabled).length;
 
     return {
       total,
@@ -1033,21 +986,51 @@ export default function ProfilesPage() {
     };
   }, []);
 
-  // Filtered profiles for display
+  // Filtered and sorted profiles for display
   const filteredProfiles = useMemo(() => {
-    return mockProfiles.filter((profile) => {
+    let result = mockProfiles.filter((profile) => {
       const matchesSearch =
         searchQuery === "" ||
         profile.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         profile.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
         profile.username.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesStatus =
-        statusFilter === "all" || profile.status === statusFilter;
+      const matchesStatus = statusFilter === "all" || profile.status === statusFilter;
 
       return matchesSearch && matchesStatus;
     });
-  }, [searchQuery, statusFilter]);
+
+    // Sort
+    result = [...result].sort((a, b) => {
+      let comparison = 0;
+      switch (sortBy) {
+        case "displayName":
+          comparison = a.displayName.localeCompare(b.displayName);
+          break;
+        case "email":
+          comparison = a.email.localeCompare(b.email);
+          break;
+        case "createdAt":
+          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          break;
+        case "lastLogin":
+          const aLastLogin = a.lastLogin ? new Date(a.lastLogin).getTime() : 0;
+          const bLastLogin = b.lastLogin ? new Date(b.lastLogin).getTime() : 0;
+          comparison = aLastLogin - bLastLogin;
+          break;
+      }
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
+
+    return result;
+  }, [searchQuery, statusFilter, sortBy, sortOrder]);
+
+  const hasActiveFilters = searchQuery || statusFilter !== "all";
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setStatusFilter("all");
+  };
 
   const handleCreateProfile = async () => {
     setIsCreating(true);
@@ -1079,36 +1062,28 @@ export default function ProfilesPage() {
               </Badge>
             </div>
             <p className="text-muted-foreground max-w-2xl">
-              Manage identities and access across your organization. View
-              profile details, group memberships, security settings, and audit
-              activity.
+              Manage identities and access across your organization. View profile details, group
+              memberships, security settings, and audit activity.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <Dialog
-              open={isCreateDialogOpen}
-              onOpenChange={setIsCreateDialogOpen}
-            >
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <UserPlus className="h-4 w-4 mr-2" />
                   Create Profile
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
+              <DialogContent className="sm:max-w-125">
                 <DialogHeader>
                   <DialogTitle>Create New Profile</DialogTitle>
                   <DialogDescription>
-                    Create a new organization profile to manage identity and
-                    access.
+                    Create a new organization profile to manage identity and access.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="grid gap-2">
-                    <label
-                      htmlFor="displayName"
-                      className="text-sm font-medium leading-none"
-                    >
+                    <label htmlFor="displayName" className="text-sm font-medium leading-none">
                       Display Name
                     </label>
                     <Input
@@ -1124,10 +1099,7 @@ export default function ProfilesPage() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <label
-                      htmlFor="email"
-                      className="text-sm font-medium leading-none"
-                    >
+                    <label htmlFor="email" className="text-sm font-medium leading-none">
                       Email
                     </label>
                     <Input
@@ -1144,10 +1116,7 @@ export default function ProfilesPage() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <label
-                      htmlFor="orgUnit"
-                      className="text-sm font-medium leading-none"
-                    >
+                    <label htmlFor="orgUnit" className="text-sm font-medium leading-none">
                       Organization Unit
                     </label>
                     <Input
@@ -1173,9 +1142,7 @@ export default function ProfilesPage() {
                   </Button>
                   <Button
                     onClick={handleCreateProfile}
-                    disabled={
-                      !newProfile.displayName || !newProfile.email || isCreating
-                    }
+                    disabled={!newProfile.displayName || !newProfile.email || isCreating}
                   >
                     {isCreating ? "Creating..." : "Create Profile"}
                   </Button>
@@ -1264,204 +1231,408 @@ export default function ProfilesPage() {
       </section>
 
       {/* ==========================================================================
-          PROFILE DIRECTORY SECTION - Enhanced UX
+          PROFILE DIRECTORY SECTION - Table Layout (like Session List)
           ========================================================================== */}
-      <section className="space-y-6">
-        {/* Header avec actions */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">
-              Profile Directory
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              Browse and manage organization profiles
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">
-              {filteredProfiles.length} of {mockProfiles.length} profiles
-            </span>
-          </div>
-        </div>
+      <section className="space-y-4">
+        {/* Filters & Search Section */}
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
+              <Filter className="h-4 w-4" />
+              Filters & Search
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name, email, or username..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded"
+                >
+                  <X className="h-3 w-3 text-muted-foreground" />
+                </button>
+              )}
+            </div>
 
-        {/* Filtres visuels par statut */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-muted-foreground mr-2">
-            Filter by status:
-          </span>
-          <button
-            onClick={() => setStatusFilter("all")}
-            className={cn(
-              "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all border",
-              statusFilter === "all"
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card hover:bg-muted/50 border-border text-muted-foreground",
-            )}
-          >
-            <Users className="h-3 w-3" />
-            All
-            <span
-              className={cn(
-                "ml-1 px-1.5 py-0.5 rounded-full text-[10px]",
-                statusFilter === "all"
-                  ? "bg-primary-foreground/20"
-                  : "bg-muted",
-              )}
-            >
-              {mockProfiles.length}
-            </span>
-          </button>
-          <button
-            onClick={() => setStatusFilter("active")}
-            className={cn(
-              "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all border",
-              statusFilter === "active"
-                ? "bg-emerald-100 text-emerald-700 border-emerald-300"
-                : "bg-card hover:bg-muted/50 border-border text-muted-foreground",
-            )}
-          >
-            <CheckCircle2 className="h-3 w-3" />
-            Active
-            <span
-              className={cn(
-                "ml-1 px-1.5 py-0.5 rounded-full text-[10px]",
-                statusFilter === "active" ? "bg-emerald-200" : "bg-muted",
-              )}
-            >
-              {mockProfiles.filter((p) => p.status === "active").length}
-            </span>
-          </button>
-          <button
-            onClick={() => setStatusFilter("pending")}
-            className={cn(
-              "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all border",
-              statusFilter === "pending"
-                ? "bg-amber-100 text-amber-700 border-amber-300"
-                : "bg-card hover:bg-muted/50 border-border text-muted-foreground",
-            )}
-          >
-            <Clock className="h-3 w-3" />
-            Pending
-            <span
-              className={cn(
-                "ml-1 px-1.5 py-0.5 rounded-full text-[10px]",
-                statusFilter === "pending" ? "bg-amber-200" : "bg-muted",
-              )}
-            >
-              {mockProfiles.filter((p) => p.status === "pending").length}
-            </span>
-          </button>
-          <button
-            onClick={() => setStatusFilter("suspended")}
-            className={cn(
-              "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all border",
-              statusFilter === "suspended"
-                ? "bg-red-100 text-red-700 border-red-300"
-                : "bg-card hover:bg-muted/50 border-border text-muted-foreground",
-            )}
-          >
-            <AlertCircle className="h-3 w-3" />
-            Suspended
-            <span
-              className={cn(
-                "ml-1 px-1.5 py-0.5 rounded-full text-[10px]",
-                statusFilter === "suspended" ? "bg-red-200" : "bg-muted",
-              )}
-            >
-              {mockProfiles.filter((p) => p.status === "suspended").length}
-            </span>
-          </button>
-        </div>
-
-        {/* Barre de recherche et actions */}
-        <div className="flex items-center gap-4">
-          <div className="relative flex-1 max-w-lg">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search by name, email, or username..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-10 py-2.5 text-sm border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded"
+            {/* Filter Controls */}
+            <div className="flex flex-wrap items-center gap-3">
+              <Select
+                value={statusFilter}
+                onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}
               >
-                <X className="h-3 w-3 text-muted-foreground" />
-              </button>
-            )}
-          </div>
+                <SelectTrigger className="w-35">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="suspended">Suspended</SelectItem>
+                </SelectContent>
+              </Select>
 
-          {(searchQuery || statusFilter !== "all") && (
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setStatusFilter("all");
-              }}
-              className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <RefreshCcw className="h-3 w-3" />
-              Clear filters
-            </button>
-          )}
+              <div className="flex items-center gap-2 ml-auto">
+                <Select value={sortBy} onValueChange={(v) => setSortBy(v as typeof sortBy)}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="displayName">Name</SelectItem>
+                    <SelectItem value="email">Email</SelectItem>
+                    <SelectItem value="createdAt">Created Date</SelectItem>
+                    <SelectItem value="lastLogin">Last Login</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                >
+                  {sortOrder === "asc" ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Active Filters Indicator */}
+            {hasActiveFilters && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 border">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
+                  Showing {filteredProfiles.length} of {mockProfiles.length} profiles
+                </span>
+                <button
+                  onClick={clearFilters}
+                  className="ml-auto text-xs text-primary hover:underline"
+                >
+                  Clear all filters
+                </button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Profile Table Section */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+            Profile List
+          </h2>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          </div>
         </div>
 
-        {/* Résultats filtrés indicator */}
-        {(searchQuery || statusFilter !== "all") && (
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 border border-border">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">
-              Showing {filteredProfiles.length} profile
-              {filteredProfiles.length !== 1 ? "s" : ""}
-              {searchQuery && ` matching "${searchQuery}"`}
-              {statusFilter !== "all" && ` with status "${statusFilter}"`}
-            </span>
-          </div>
-        )}
+        <Card className="border-border overflow-hidden">
+          {filteredProfiles.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                <Users className="h-8 w-8 text-muted-foreground/50" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground">No profiles found</h3>
+              <p className="text-sm text-muted-foreground mt-1 max-w-md">
+                {hasActiveFilters
+                  ? "Try adjusting your search or filters to find what you're looking for."
+                  : "There are no profiles to display at the moment."}
+              </p>
+              {hasActiveFilters && (
+                <Button variant="outline" className="mt-4" onClick={clearFilters}>
+                  <RefreshCcw className="h-4 w-4 mr-2" />
+                  Clear Filters
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Username</TableHead>
+                    <TableHead>Groups</TableHead>
+                    <TableHead>Organization Unit</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>MFA</TableHead>
+                    <TableHead>Last Login</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead className="w-25">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredProfiles.map((profile) => (
+                    <TableRow
+                      key={profile.id}
+                      className={cn(
+                        "cursor-pointer",
+                        selectedProfile?.id === profile.id && "bg-primary/5"
+                      )}
+                      onClick={() => setSelectedProfile(profile)}
+                    >
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold">
+                            {profile.displayName
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">{profile.displayName}</p>
+                            <p className="text-xs text-muted-foreground">{profile.email}</p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
+                          {profile.username}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {profile.groups.slice(0, 2).map((group) => (
+                            <span
+                              key={group}
+                              className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground border"
+                            >
+                              {group}
+                            </span>
+                          ))}
+                          {profile.groups.length > 2 && (
+                            <span className="text-[10px] text-muted-foreground">
+                              +{profile.groups.length - 2}
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm">{profile.primaryOrgUnit}</span>
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={profile.status} />
+                      </TableCell>
+                      <TableCell>
+                        <MfaBadge enabled={profile.mfaEnabled} required={profile.mfaRequired} />
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={cn("text-sm", !profile.lastLogin && "text-muted-foreground")}
+                        >
+                          {profile.lastLogin ? formatRelativeTime(profile.lastLogin) : "Never"}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm text-muted-foreground">
+                          {formatDate(profile.createdAt)}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => setSelectedProfile(profile)}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit Profile
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            {profile.status === "active" && (
+                              <DropdownMenuItem className="text-amber-600 focus:text-amber-600">
+                                <Lock className="h-4 w-4 mr-2" />
+                                Suspend
+                              </DropdownMenuItem>
+                            )}
+                            {profile.status === "suspended" && (
+                              <DropdownMenuItem className="text-emerald-600 focus:text-emerald-600">
+                                <Unlock className="h-4 w-4 mr-2" />
+                                Reactivate
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem className="text-destructive focus:text-destructive">
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </Card>
       </section>
 
       {/* ==========================================================================
-          MAIN CONTENT SECTION - Two Column Layout
+          PROFILE DETAIL DIALOG
           ========================================================================== */}
-      <section className="pb-8">
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-          {/* Profile List - Left Column */}
-          <div className="xl:col-span-1">
-            <Card className="border-border">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-semibold">
-                    Profiles
-                  </CardTitle>
-                  <span className="text-xs text-muted-foreground">
-                    {filteredProfiles.length} shown
-                  </span>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <ProfileList
-                  profiles={filteredProfiles}
-                  selectedProfileId={selectedProfile?.id || null}
-                  onSelectProfile={setSelectedProfile}
-                  searchQuery={searchQuery}
-                  statusFilter={statusFilter}
-                />
-              </CardContent>
-            </Card>
-          </div>
+      <Dialog open={!!selectedProfile} onOpenChange={(open) => !open && setSelectedProfile(null)}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          {selectedProfile && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  Profile Details
+                </DialogTitle>
+                <DialogDescription>
+                  Detailed information about the organization profile and access settings.
+                </DialogDescription>
+              </DialogHeader>
 
-          {/* Detail Panel - Right Column */}
-          <div className="xl:col-span-3">
-            <ProfileDetailPanel
-              profile={selectedProfile}
-              allGroups={mockGroups}
-              onClose={() => setSelectedProfile(null)}
-            />
-          </div>
-        </div>
-      </section>
+              <div className="space-y-6 py-4">
+                {/* User Info Header */}
+                <div className="flex items-start gap-4 p-4 rounded-lg bg-muted/30 border">
+                  <div className="h-12 w-12 rounded-full bg-linear-to-br from-primary/20 to-primary/5 flex items-center justify-center text-sm font-bold text-primary border border-primary/20">
+                    {selectedProfile.displayName
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-foreground">
+                        {selectedProfile.displayName}
+                      </h3>
+                      <StatusBadge status={selectedProfile.status} />
+                    </div>
+                    <p className="text-sm text-muted-foreground">{selectedProfile.email}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      {selectedProfile.groups.map((group) => (
+                        <span
+                          key={group}
+                          className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground border border-border/50"
+                        >
+                          {group}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground font-mono">{selectedProfile.id}</p>
+                  </div>
+                </div>
+
+                {/* Profile Info */}
+                <div className="space-y-4">
+                  <section>
+                    <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3 flex items-center gap-2">
+                      <Fingerprint className="h-3.5 w-3.5" />
+                      Identity Information
+                    </h4>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Display Name</span>
+                        <span className="font-medium">{selectedProfile.displayName}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Email</span>
+                        <span className="text-xs">{selectedProfile.email}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Username</span>
+                        <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
+                          {selectedProfile.username}
+                        </span>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="pt-4 border-t">
+                    <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3 flex items-center gap-2">
+                      <Building2 className="h-3.5 w-3.5" />
+                      Organization
+                    </h4>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Primary Unit</span>
+                        <span>{selectedProfile.primaryOrgUnit}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Created At</span>
+                        <span>{formatDate(selectedProfile.createdAt)}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Last Login</span>
+                        <span className={!selectedProfile.lastLogin ? "text-muted-foreground" : ""}>
+                          {selectedProfile.lastLogin
+                            ? formatRelativeTime(selectedProfile.lastLogin)
+                            : "Never"}
+                        </span>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="pt-4 border-t">
+                    <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3 flex items-center gap-2">
+                      <Shield className="h-3.5 w-3.5" />
+                      Security
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center p-3 rounded-lg border bg-card">
+                        <span className="text-sm">MFA Status</span>
+                        <MfaBadge
+                          enabled={selectedProfile.mfaEnabled}
+                          required={selectedProfile.mfaRequired}
+                        />
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="pt-4 border-t">
+                    <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3 flex items-center gap-2">
+                      <Layers className="h-3.5 w-3.5" />
+                      Roles ({selectedProfile.roles.length})
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedProfile.roles.map((role) => (
+                        <span
+                          key={role}
+                          className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-muted text-foreground border border-border"
+                        >
+                          {role}
+                        </span>
+                      ))}
+                    </div>
+                  </section>
+                </div>
+              </div>
+
+              <DialogFooter className="gap-2">
+                <Button variant="outline" onClick={() => setSelectedProfile(null)}>
+                  Close
+                </Button>
+                <Button variant="default">
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
