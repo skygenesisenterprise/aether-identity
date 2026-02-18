@@ -34,11 +34,21 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/dashboard/ui/card";
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/dashboard/ui/card";
 import { Badge } from "@/components/dashboard/ui/badge";
 import { Button } from "@/components/dashboard/ui/button";
 import {
@@ -72,12 +82,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/dashboard/ui/select";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/dashboard/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/dashboard/ui/tabs";
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -288,6 +293,67 @@ const mockSessions: UserSession[] = [
 ];
 
 // ============================================================================
+// CHART DATA & CONFIGURATION
+// ============================================================================
+
+const COLORS = [
+  "#3b82f6", // blue
+  "#10b981", // emerald
+  "#f59e0b", // amber
+  "#ef4444", // red
+  "#8b5cf6", // violet
+  "#ec4899", // pink
+  "#06b6d4", // cyan
+  "#f97316", // orange
+];
+
+const RISK_COLORS = [
+  "#10b981", // 0-20: Low - emerald
+  "#22c55e", // 21-40: Low-Medium - green
+  "#f59e0b", // 41-60: Medium - amber
+  "#ef4444", // 61-80: High - red
+  "#dc2626", // 81-100: Critical - dark red
+];
+
+// Données pour les graphiques basées sur mockSessions
+const deviceTypeData = [
+  { name: "Desktop", sessions: 5 },
+  { name: "Mobile", sessions: 2 },
+  { name: "Tablet", sessions: 1 },
+];
+
+const countryData = [
+  { name: "United States", value: 5 },
+  { name: "United Kingdom", value: 1 },
+  { name: "Canada", value: 1 },
+  { name: "Russia", value: 1 },
+];
+
+const activityData = [
+  { day: "Mon", active: 6, idle: 2, terminated: 1 },
+  { day: "Tue", active: 7, idle: 1, terminated: 0 },
+  { day: "Wed", active: 5, idle: 3, terminated: 2 },
+  { day: "Thu", active: 8, idle: 2, terminated: 1 },
+  { day: "Fri", active: 6, idle: 2, terminated: 0 },
+  { day: "Sat", active: 4, idle: 1, terminated: 0 },
+  { day: "Sun", active: 3, idle: 1, terminated: 0 },
+];
+
+const riskDistributionData = [
+  { range: "0-20", count: 3, label: "Faible" },
+  { range: "21-40", count: 2, label: "Moyen" },
+  { range: "41-60", count: 1, label: "Élevé" },
+  { range: "61-80", count: 1, label: "Critique" },
+  { range: "81-100", count: 1, label: "Extrême" },
+];
+
+const mfaData = [
+  { name: "Vérifié", value: 5 },
+  { name: "En attente", value: 1 },
+  { name: "Désactivé", value: 2 },
+];
+
+// ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
 
@@ -370,7 +436,7 @@ function StatusBadge({ status }: { status: UserSession["status"] }) {
         "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border",
         config.bgColor,
         config.color,
-        config.borderColor,
+        config.borderColor
       )}
     >
       <Icon className="h-3.5 w-3.5" />
@@ -379,13 +445,7 @@ function StatusBadge({ status }: { status: UserSession["status"] }) {
   );
 }
 
-function MfaBadge({
-  enabled,
-  verified,
-}: {
-  enabled: boolean;
-  verified: boolean;
-}) {
+function MfaBadge({ enabled, verified }: { enabled: boolean; verified: boolean }) {
   if (enabled && verified) {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-100 text-emerald-700 border border-emerald-200">
@@ -410,13 +470,7 @@ function MfaBadge({
   );
 }
 
-function RiskBadge({
-  score,
-  isSuspicious,
-}: {
-  score?: number;
-  isSuspicious?: boolean;
-}) {
+function RiskBadge({ score, isSuspicious }: { score?: number; isSuspicious?: boolean }) {
   if (isSuspicious || (score && score >= 70)) {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-red-100 text-red-700 border border-red-200">
@@ -463,13 +517,7 @@ interface KpiCardProps {
   variant?: "default" | "success" | "warning" | "danger" | "info";
 }
 
-function KpiCard({
-  title,
-  value,
-  subtitle,
-  icon: Icon,
-  variant = "default",
-}: KpiCardProps) {
+function KpiCard({ title, value, subtitle, icon: Icon, variant = "default" }: KpiCardProps) {
   const variantStyles = {
     default: {
       iconBg: "bg-muted",
@@ -508,12 +556,8 @@ function KpiCard({
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               {title}
             </p>
-            <p className={cn("text-2xl font-bold", styles.valueColor)}>
-              {value}
-            </p>
-            {subtitle && (
-              <p className="text-xs text-muted-foreground">{subtitle}</p>
-            )}
+            <p className={cn("text-2xl font-bold", styles.valueColor)}>{value}</p>
+            {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
           </div>
           <div className={cn("rounded-lg p-2", styles.iconBg)}>
             <Icon className={cn("h-4 w-4", styles.iconColor)} />
@@ -580,9 +624,7 @@ function SessionDetailsDialog({
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-foreground">
-                  {session.displayName}
-                </h3>
+                <h3 className="font-semibold text-foreground">{session.displayName}</h3>
                 <StatusBadge status={session.status} />
               </div>
               <p className="text-sm text-muted-foreground">{session.email}</p>
@@ -598,9 +640,7 @@ function SessionDetailsDialog({
               </div>
             </div>
             <div className="text-right">
-              <p className="text-xs text-muted-foreground font-mono">
-                {session.id}
-              </p>
+              <p className="text-xs text-muted-foreground font-mono">{session.id}</p>
               <p className="text-xs text-muted-foreground">{session.userId}</p>
             </div>
           </div>
@@ -639,9 +679,7 @@ function SessionDetailsDialog({
                   </div>
                   <div className="space-y-1">
                     <span className="text-muted-foreground">Type</span>
-                    <p className="font-medium capitalize">
-                      {session.deviceType}
-                    </p>
+                    <p className="font-medium capitalize">{session.deviceType}</p>
                   </div>
                 </div>
               </section>
@@ -661,9 +699,7 @@ function SessionDetailsDialog({
                   </div>
                   <div className="space-y-1">
                     <span className="text-muted-foreground">Location</span>
-                    <p className="font-medium">
-                      {session.location || "Unknown"}
-                    </p>
+                    <p className="font-medium">{session.location || "Unknown"}</p>
                   </div>
                 </div>
               </section>
@@ -677,23 +713,15 @@ function SessionDetailsDialog({
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="space-y-1">
                     <span className="text-muted-foreground">Login Time</span>
-                    <p className="font-medium">
-                      {formatDateTime(session.loginTime)}
-                    </p>
+                    <p className="font-medium">{formatDateTime(session.loginTime)}</p>
                   </div>
                   <div className="space-y-1">
                     <span className="text-muted-foreground">Last Activity</span>
-                    <p className="font-medium">
-                      {getRelativeTime(session.lastActivity)}
-                    </p>
+                    <p className="font-medium">{getRelativeTime(session.lastActivity)}</p>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-muted-foreground">
-                      Session Duration
-                    </span>
-                    <p className="font-medium">
-                      {formatDuration(session.loginTime)}
-                    </p>
+                    <span className="text-muted-foreground">Session Duration</span>
+                    <p className="font-medium">{formatDuration(session.loginTime)}</p>
                   </div>
                 </div>
               </section>
@@ -709,10 +737,7 @@ function SessionDetailsDialog({
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 rounded-lg border bg-card">
                     <span className="text-sm">MFA Status</span>
-                    <MfaBadge
-                      enabled={session.mfaEnabled}
-                      verified={session.mfaVerified}
-                    />
+                    <MfaBadge enabled={session.mfaEnabled} verified={session.mfaVerified} />
                   </div>
                 </div>
               </section>
@@ -726,20 +751,13 @@ function SessionDetailsDialog({
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 rounded-lg border bg-card">
                     <span className="text-sm">Risk Level</span>
-                    <RiskBadge
-                      score={session.riskScore}
-                      isSuspicious={session.isSuspicious}
-                    />
+                    <RiskBadge score={session.riskScore} isSuspicious={session.isSuspicious} />
                   </div>
                   {session.riskScore && (
                     <div className="p-3 rounded-lg border bg-muted/30">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-xs text-muted-foreground">
-                          Risk Score
-                        </span>
-                        <span className="text-sm font-medium">
-                          {session.riskScore}/100
-                        </span>
+                        <span className="text-xs text-muted-foreground">Risk Score</span>
+                        <span className="text-sm font-medium">{session.riskScore}/100</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
                         <div
@@ -749,7 +767,7 @@ function SessionDetailsDialog({
                               ? "bg-red-500"
                               : session.riskScore >= 40
                                 ? "bg-amber-500"
-                                : "bg-emerald-500",
+                                : "bg-emerald-500"
                           )}
                           style={{ width: `${session.riskScore}%` }}
                         />
@@ -760,13 +778,10 @@ function SessionDetailsDialog({
                     <div className="p-3 rounded-lg border border-red-200 bg-red-50">
                       <div className="flex items-center gap-2 text-red-700">
                         <ShieldAlert className="h-4 w-4" />
-                        <span className="text-sm font-medium">
-                          Suspicious Activity Detected
-                        </span>
+                        <span className="text-sm font-medium">Suspicious Activity Detected</span>
                       </div>
                       <p className="text-xs text-red-600 mt-1">
-                        This session has been flagged due to unusual location or
-                        behavior patterns.
+                        This session has been flagged due to unusual location or behavior patterns.
                       </p>
                     </div>
                   )}
@@ -781,8 +796,8 @@ function SessionDetailsDialog({
                 </h4>
                 <div className="p-3 rounded-lg border bg-muted/30">
                   <p className="text-sm text-muted-foreground">
-                    Effective permissions will be displayed here based on group
-                    memberships and role assignments.
+                    Effective permissions will be displayed here based on group memberships and role
+                    assignments.
                   </p>
                 </div>
               </section>
@@ -830,12 +845,8 @@ function SessionDetailsDialog({
                       <div className="h-2 w-2 rounded-full bg-muted" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Current Status
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Session {session.status}
-                      </p>
+                      <p className="text-sm font-medium text-muted-foreground">Current Status</p>
+                      <p className="text-xs text-muted-foreground">Session {session.status}</p>
                     </div>
                   </div>
                 </div>
@@ -849,11 +860,7 @@ function SessionDetailsDialog({
             Close
           </Button>
           {session.status !== "terminated" && (
-            <Button
-              variant="destructive"
-              onClick={handleTerminate}
-              disabled={isTerminating}
-            >
+            <Button variant="destructive" onClick={handleTerminate} disabled={isTerminating}>
               {isTerminating ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -910,8 +917,8 @@ function TerminateAllDialog({
           </DialogTitle>
           <DialogDescription>
             This action will terminate {sessionCount} active session
-            {sessionCount !== 1 ? "s" : ""}. All affected users will be logged
-            out immediately and will need to re-authenticate.
+            {sessionCount !== 1 ? "s" : ""}. All affected users will be logged out immediately and
+            will need to re-authenticate.
           </DialogDescription>
         </DialogHeader>
 
@@ -921,26 +928,18 @@ function TerminateAllDialog({
             <div>
               <p className="text-sm font-medium text-red-800">Warning</p>
               <p className="text-xs text-red-600 mt-1">
-                This action cannot be undone. Users may lose unsaved work.
-                Consider notifying users before proceeding.
+                This action cannot be undone. Users may lose unsaved work. Consider notifying users
+                before proceeding.
               </p>
             </div>
           </div>
         </div>
 
         <DialogFooter className="gap-2">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isTerminating}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isTerminating}>
             Cancel
           </Button>
-          <Button
-            variant="destructive"
-            onClick={handleConfirm}
-            disabled={isTerminating}
-          >
+          <Button variant="destructive" onClick={handleConfirm} disabled={isTerminating}>
             {isTerminating ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -960,32 +959,452 @@ function TerminateAllDialog({
 }
 
 // ============================================================================
+// REPORT DIALOG COMPONENT
+// ============================================================================
+
+interface ReportDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  sessions: UserSession[];
+}
+
+function ReportDialog({ open, onOpenChange, sessions }: ReportDialogProps) {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [reportType, setReportType] = useState<"csv" | "json">("csv");
+
+  const handleGenerateReport = async () => {
+    setIsGenerating(true);
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    // Générer le rapport
+    const reportData = sessions.map((s) => ({
+      id: s.id,
+      user: s.displayName,
+      email: s.email,
+      device: s.device,
+      browser: s.browser,
+      location: s.location,
+      ipAddress: s.ipAddress,
+      loginTime: s.loginTime,
+      lastActivity: s.lastActivity,
+      status: s.status,
+      mfaEnabled: s.mfaEnabled,
+      mfaVerified: s.mfaVerified,
+      riskScore: s.riskScore,
+      isSuspicious: s.isSuspicious,
+    }));
+
+    const content =
+      reportType === "csv" ? convertToCSV(reportData) : JSON.stringify(reportData, null, 2);
+
+    const blob = new Blob([content], {
+      type: reportType === "csv" ? "text/csv" : "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `session-report-${new Date().toISOString().split("T")[0]}.${reportType}`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    setIsGenerating(false);
+    onOpenChange(false);
+  };
+
+  const convertToCSV = (data: object[]) => {
+    if (data.length === 0) return "";
+    const headers = Object.keys(data[0]);
+    const rows = data.map((obj) =>
+      headers
+        .map((header) => JSON.stringify((obj as Record<string, unknown>)[header] ?? ""))
+        .join(",")
+    );
+    return [headers.join(","), ...rows].join("\n");
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Generate Session Report
+          </DialogTitle>
+          <DialogDescription>
+            Export session data for compliance and audit purposes.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Report Format</label>
+            <Select value={reportType} onValueChange={(v) => setReportType(v as "csv" | "json")}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="csv">CSV (Excel)</SelectItem>
+                <SelectItem value="json">JSON</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="p-3 rounded-lg bg-muted/50 border">
+            <p className="text-xs text-muted-foreground">
+              <strong>{sessions.length}</strong> sessions will be included in the report
+            </p>
+          </div>
+        </div>
+
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleGenerateReport} disabled={isGenerating}>
+            {isGenerating ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4 mr-2" />
+                Download Report
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ============================================================================
+// RISK ANALYSIS DIALOG COMPONENT
+// ============================================================================
+
+interface RiskAnalysisDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  sessions: UserSession[];
+}
+
+function RiskAnalysisDialog({ open, onOpenChange, sessions }: RiskAnalysisDialogProps) {
+  const riskStats = useMemo(() => {
+    const highRisk = sessions.filter(
+      (s) => s.isSuspicious || (s.riskScore && s.riskScore >= 70)
+    ).length;
+    const mediumRisk = sessions.filter(
+      (s) => s.riskScore && s.riskScore >= 40 && s.riskScore < 70
+    ).length;
+    const lowRisk = sessions.filter((s) => !s.riskScore || s.riskScore < 40).length;
+    const avgRiskScore =
+      sessions.reduce((acc, s) => acc + (s.riskScore || 0), 0) / (sessions.length || 1);
+
+    return { highRisk, mediumRisk, lowRisk, avgRiskScore };
+  }, [sessions]);
+
+  const suspiciousSessions = sessions.filter((s) => s.isSuspicious);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-amber-600" />
+            Risk Analysis Report
+          </DialogTitle>
+          <DialogDescription>
+            Comprehensive risk assessment and anomaly detection overview.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-6 py-4">
+          {/* Risk Summary Cards */}
+          <div className="grid grid-cols-2 gap-4">
+            <Card className="border-red-200 bg-red-50">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-red-600 font-medium">High Risk</p>
+                    <p className="text-2xl font-bold text-red-700">{riskStats.highRisk}</p>
+                  </div>
+                  <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground font-medium">Avg Risk Score</p>
+                    <p className="text-2xl font-bold">{riskStats.avgRiskScore.toFixed(1)}</p>
+                  </div>
+                  <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                    <Activity className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Suspicious Sessions */}
+          {suspiciousSessions.length > 0 && (
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold flex items-center gap-2">
+                <ShieldAlert className="h-4 w-4 text-red-600" />
+                Suspicious Sessions Detected
+              </h4>
+              <div className="space-y-2">
+                {suspiciousSessions.map((session) => (
+                  <div
+                    key={session.id}
+                    className="p-3 rounded-lg border border-red-200 bg-red-50 flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center text-xs font-semibold text-red-700">
+                        {session.displayName
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{session.displayName}</p>
+                        <p className="text-xs text-muted-foreground">{session.email}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <RiskBadge score={session.riskScore} isSuspicious={session.isSuspicious} />
+                      <p className="text-xs text-muted-foreground mt-1">{session.location}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Risk Distribution Chart */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-semibold">Risk Distribution</h4>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={[
+                    { name: "Low (0-39)", count: riskStats.lowRisk, color: "#10b981" },
+                    { name: "Medium (40-69)", count: riskStats.mediumRisk, color: "#f59e0b" },
+                    { name: "High (70+)", count: riskStats.highRisk, color: "#ef4444" },
+                  ]}
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                  <YAxis tick={{ fontSize: 12 }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "6px",
+                    }}
+                  />
+                  <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                    <Cell fill="#10b981" />
+                    <Cell fill="#f59e0b" />
+                    <Cell fill="#ef4444" />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ============================================================================
+// HISTORY DIALOG COMPONENT
+// ============================================================================
+
+interface HistoryDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  sessions: UserSession[];
+}
+
+function HistoryDialog({ open, onOpenChange, sessions }: HistoryDialogProps) {
+  const [selectedDateRange, setSelectedDateRange] = useState<"7" | "30" | "90">("7");
+
+  const terminatedSessions = sessions.filter((s) => s.status === "terminated");
+
+  const recentSessions = useMemo(() => {
+    const days = parseInt(selectedDateRange);
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+    return sessions.filter((s) => new Date(s.loginTime) >= cutoff);
+  }, [sessions, selectedDateRange]);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <History className="h-5 w-5" />
+            Session History
+          </DialogTitle>
+          <DialogDescription>
+            Historical session data and terminated session logs.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-6 py-4">
+          {/* Date Range Filter */}
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-medium">Time Range:</span>
+            <Select
+              value={selectedDateRange}
+              onValueChange={(v) => setSelectedDateRange(v as "7" | "30" | "90")}
+            >
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7">Last 7 days</SelectItem>
+                <SelectItem value="30">Last 30 days</SelectItem>
+                <SelectItem value="90">Last 90 days</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground">Total Sessions</p>
+                <p className="text-2xl font-bold">{recentSessions.length}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground">Active</p>
+                <p className="text-2xl font-bold text-emerald-600">
+                  {recentSessions.filter((s) => s.status === "active").length}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground">Terminated</p>
+                <p className="text-2xl font-bold text-red-600">{terminatedSessions.length}</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Session History Table */}
+          {recentSessions.length > 0 ? (
+            <div className="border rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Login Time</TableHead>
+                    <TableHead>Duration</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Location</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentSessions.map((session) => (
+                    <TableRow key={session.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-semibold">
+                            {session.displayName
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .toUpperCase()}
+                          </div>
+                          <span className="text-sm">{session.displayName}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm">{formatDateTime(session.loginTime)}</TableCell>
+                      <TableCell className="text-sm">
+                        {formatDuration(session.loginTime, session.lastActivity)}
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={session.status} />
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {session.location || "Unknown"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <p>No session history for the selected period.</p>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ============================================================================
 // MAIN PAGE COMPONENT
 // ============================================================================
 
 export default function SessionsPage() {
   const [sessions, setSessions] = useState<UserSession[]>(mockSessions);
-  const [selectedSession, setSelectedSession] = useState<UserSession | null>(
-    null,
-  );
+  const [selectedSession, setSelectedSession] = useState<UserSession | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isTerminateAllOpen, setIsTerminateAllOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Report & Audit Dialogs
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+  const [isRiskAnalysisOpen, setIsRiskAnalysisOpen] = useState(false);
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
+
+  // Monitoring Chart Selection
+  type ChartType = "overview" | "devices" | "geography" | "activity" | "risk" | "mfa";
+  const [selectedChart, setSelectedChart] = useState<ChartType>("overview");
+
+  const chartTitles: Record<ChartType, string> = {
+    overview: "Vue d'ensemble - Activité sur 7 jours",
+    devices: "Sessions par Type d'Appareil",
+    geography: "Répartition Géographique",
+    activity: "Activité Temporelle Détaillée",
+    risk: "Distribution des Scores de Risque",
+    mfa: "Statut de l'Authentification MFA",
+  };
+
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<
-    UserSession["status"] | "all"
-  >("all");
-  const [riskFilter, setRiskFilter] = useState<
-    "all" | "high" | "medium" | "low"
-  >("all");
-  const [deviceFilter, setDeviceFilter] = useState<
-    UserSession["deviceType"] | "all"
-  >("all");
-  const [sortBy, setSortBy] = useState<
-    "lastActivity" | "loginTime" | "riskScore"
-  >("lastActivity");
+  const [statusFilter, setStatusFilter] = useState<UserSession["status"] | "all">("all");
+  const [riskFilter, setRiskFilter] = useState<"all" | "high" | "medium" | "low">("all");
+  const [deviceFilter, setDeviceFilter] = useState<UserSession["deviceType"] | "all">("all");
+  const [sortBy, setSortBy] = useState<"lastActivity" | "loginTime" | "riskScore">("lastActivity");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   // Statistics
@@ -993,11 +1412,9 @@ export default function SessionsPage() {
     const active = sessions.filter((s) => s.status === "active").length;
     const idle = sessions.filter((s) => s.status === "idle").length;
     const highRisk = sessions.filter(
-      (s) => s.isSuspicious || (s.riskScore && s.riskScore >= 70),
+      (s) => s.isSuspicious || (s.riskScore && s.riskScore >= 70)
     ).length;
-    const mfaProtected = sessions.filter(
-      (s) => s.mfaEnabled && s.mfaVerified,
-    ).length;
+    const mfaProtected = sessions.filter((s) => s.mfaEnabled && s.mfaVerified).length;
 
     return {
       totalActive: active + idle,
@@ -1017,23 +1434,19 @@ export default function SessionsPage() {
         session.device.toLowerCase().includes(searchQuery.toLowerCase()) ||
         session.ipAddress.includes(searchQuery);
 
-      const matchesStatus =
-        statusFilter === "all" || session.status === statusFilter;
+      const matchesStatus = statusFilter === "all" || session.status === statusFilter;
 
       const matchesRisk =
         riskFilter === "all" ||
         (riskFilter === "high" &&
-          (session.isSuspicious ||
-            (session.riskScore && session.riskScore >= 70))) ||
+          (session.isSuspicious || (session.riskScore && session.riskScore >= 70))) ||
         (riskFilter === "medium" &&
           session.riskScore &&
           session.riskScore >= 40 &&
           session.riskScore < 70) ||
-        (riskFilter === "low" &&
-          (!session.riskScore || session.riskScore < 40));
+        (riskFilter === "low" && (!session.riskScore || session.riskScore < 40));
 
-      const matchesDevice =
-        deviceFilter === "all" || session.deviceType === deviceFilter;
+      const matchesDevice = deviceFilter === "all" || session.deviceType === deviceFilter;
 
       return matchesSearch && matchesStatus && matchesRisk && matchesDevice;
     });
@@ -1043,13 +1456,10 @@ export default function SessionsPage() {
       let comparison = 0;
       switch (sortBy) {
         case "lastActivity":
-          comparison =
-            new Date(a.lastActivity).getTime() -
-            new Date(b.lastActivity).getTime();
+          comparison = new Date(a.lastActivity).getTime() - new Date(b.lastActivity).getTime();
           break;
         case "loginTime":
-          comparison =
-            new Date(a.loginTime).getTime() - new Date(b.loginTime).getTime();
+          comparison = new Date(a.loginTime).getTime() - new Date(b.loginTime).getTime();
           break;
         case "riskScore":
           comparison = (a.riskScore || 0) - (b.riskScore || 0);
@@ -1059,15 +1469,7 @@ export default function SessionsPage() {
     });
 
     return result;
-  }, [
-    sessions,
-    searchQuery,
-    statusFilter,
-    riskFilter,
-    deviceFilter,
-    sortBy,
-    sortOrder,
-  ]);
+  }, [sessions, searchQuery, statusFilter, riskFilter, deviceFilter, sortBy, sortOrder]);
 
   // Handlers
   const handleViewDetails = (session: UserSession) => {
@@ -1077,17 +1479,13 @@ export default function SessionsPage() {
 
   const handleTerminateSession = (sessionId: string) => {
     setSessions((prev) =>
-      prev.map((s) =>
-        s.id === sessionId ? { ...s, status: "terminated" } : s,
-      ),
+      prev.map((s) => (s.id === sessionId ? { ...s, status: "terminated" } : s))
     );
   };
 
   const handleTerminateAll = () => {
     setSessions((prev) =>
-      prev.map((s) =>
-        s.status !== "terminated" ? { ...s, status: "terminated" } : s,
-      ),
+      prev.map((s) => (s.status !== "terminated" ? { ...s, status: "terminated" } : s))
     );
   };
 
@@ -1104,10 +1502,7 @@ export default function SessionsPage() {
   };
 
   const hasActiveFilters =
-    searchQuery ||
-    statusFilter !== "all" ||
-    riskFilter !== "all" ||
-    deviceFilter !== "all";
+    searchQuery || statusFilter !== "all" || riskFilter !== "all" || deviceFilter !== "all";
 
   return (
     <div className="space-y-6 text-foreground">
@@ -1126,21 +1521,13 @@ export default function SessionsPage() {
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground max-w-2xl">
-              Monitor and control active user sessions across the organization.
-              Review session details, identify risks, and terminate sessions
-              when necessary.
+              Monitor and control active user sessions across the organization. Review session
+              details, identify risks, and terminate sessions when necessary.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefresh}
-              disabled={isLoading}
-            >
-              <RefreshCw
-                className={cn("h-4 w-4 mr-2", isLoading && "animate-spin")}
-              />
+            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading}>
+              <RefreshCw className={cn("h-4 w-4 mr-2", isLoading && "animate-spin")} />
               Refresh
             </Button>
             <Button
@@ -1270,10 +1657,7 @@ export default function SessionsPage() {
               </Select>
 
               <div className="flex items-center gap-2 ml-auto">
-                <Select
-                  value={sortBy}
-                  onValueChange={(v) => setSortBy(v as typeof sortBy)}
-                >
+                <Select value={sortBy} onValueChange={(v) => setSortBy(v as typeof sortBy)}>
                   <SelectTrigger className="w-40">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
@@ -1286,9 +1670,7 @@ export default function SessionsPage() {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() =>
-                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-                  }
+                  onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
                 >
                   {sortOrder === "asc" ? (
                     <ChevronUp className="h-4 w-4" />
@@ -1304,8 +1686,7 @@ export default function SessionsPage() {
               <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 border">
                 <Filter className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">
-                  Showing {filteredSessions.length} of {sessions.length}{" "}
-                  sessions
+                  Showing {filteredSessions.length} of {sessions.length} sessions
                 </span>
                 <button
                   onClick={clearFilters}
@@ -1328,7 +1709,7 @@ export default function SessionsPage() {
             Session List
           </h2>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" disabled>
+            <Button variant="outline" size="sm" onClick={() => setIsReportDialogOpen(true)}>
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
@@ -1341,20 +1722,14 @@ export default function SessionsPage() {
               <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
                 <Monitor className="h-8 w-8 text-muted-foreground/50" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground">
-                No sessions found
-              </h3>
+              <h3 className="text-lg font-semibold text-foreground">No sessions found</h3>
               <p className="text-sm text-muted-foreground mt-1 max-w-md">
                 {hasActiveFilters
                   ? "Try adjusting your search or filters to find what you're looking for."
                   : "There are no active sessions to display at the moment."}
               </p>
               {hasActiveFilters && (
-                <Button
-                  variant="outline"
-                  className="mt-4"
-                  onClick={clearFilters}
-                >
+                <Button variant="outline" className="mt-4" onClick={clearFilters}>
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Clear Filters
                 </Button>
@@ -1383,7 +1758,7 @@ export default function SessionsPage() {
                       key={session.id}
                       className={cn(
                         "cursor-pointer",
-                        session.isSuspicious && "bg-red-50/50 hover:bg-red-50",
+                        session.isSuspicious && "bg-red-50/50 hover:bg-red-50"
                       )}
                       onClick={() => handleViewDetails(session)}
                     >
@@ -1397,12 +1772,8 @@ export default function SessionsPage() {
                               .toUpperCase()}
                           </div>
                           <div>
-                            <p className="font-medium text-sm">
-                              {session.displayName}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {session.email}
-                            </p>
+                            <p className="font-medium text-sm">{session.displayName}</p>
+                            <p className="text-xs text-muted-foreground">{session.email}</p>
                           </div>
                         </div>
                       </TableCell>
@@ -1428,9 +1799,7 @@ export default function SessionsPage() {
                           <DeviceIcon type={session.deviceType} />
                           <div>
                             <p className="text-sm">{session.device}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {session.browser}
-                            </p>
+                            <p className="text-xs text-muted-foreground">{session.browser}</p>
                           </div>
                         </div>
                       </TableCell>
@@ -1438,9 +1807,7 @@ export default function SessionsPage() {
                         <div className="flex items-center gap-1.5">
                           <Globe className="h-3.5 w-3.5 text-muted-foreground" />
                           <div>
-                            <p className="text-sm">
-                              {session.location || "Unknown"}
-                            </p>
+                            <p className="text-sm">{session.location || "Unknown"}</p>
                             <p className="text-xs text-muted-foreground font-mono">
                               {session.ipAddress}
                             </p>
@@ -1461,35 +1828,20 @@ export default function SessionsPage() {
                         <StatusBadge status={session.status} />
                       </TableCell>
                       <TableCell>
-                        <MfaBadge
-                          enabled={session.mfaEnabled}
-                          verified={session.mfaVerified}
-                        />
+                        <MfaBadge enabled={session.mfaEnabled} verified={session.mfaVerified} />
                       </TableCell>
                       <TableCell>
-                        <RiskBadge
-                          score={session.riskScore}
-                          isSuspicious={session.isSuspicious}
-                        />
+                        <RiskBadge score={session.riskScore} isSuspicious={session.isSuspicious} />
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
-                          <DropdownMenuTrigger
-                            asChild
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                            >
+                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => handleViewDetails(session)}
-                            >
+                            <DropdownMenuItem onClick={() => handleViewDetails(session)}>
                               <Eye className="h-4 w-4 mr-2" />
                               View Details
                             </DropdownMenuItem>
@@ -1515,14 +1867,14 @@ export default function SessionsPage() {
       </section>
 
       {/* =========================================================================
-          REPORTS & AUDIT SECTION (Placeholder)
+          REPORTS & AUDIT SECTION
           ========================================================================= */}
       <section className="space-y-4">
         <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
           Reports & Audit
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="border-dashed border-2 border-border/50 bg-muted/20">
+          <Card className="border-border">
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -1531,8 +1883,7 @@ export default function SessionsPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-sm">Session Report</h3>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Generate detailed session activity reports for compliance
-                    and audit purposes.
+                    Generate detailed session activity reports for compliance and audit purposes.
                   </p>
                 </div>
               </div>
@@ -1540,7 +1891,7 @@ export default function SessionsPage() {
                 variant="outline"
                 size="sm"
                 className="w-full mt-4"
-                disabled
+                onClick={() => setIsReportDialogOpen(true)}
               >
                 <Download className="h-4 w-4 mr-2" />
                 Generate Report
@@ -1548,7 +1899,7 @@ export default function SessionsPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-dashed border-2 border-border/50 bg-muted/20">
+          <Card className="border-border">
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
@@ -1557,8 +1908,7 @@ export default function SessionsPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-sm">Risk Analysis</h3>
                   <p className="text-xs text-muted-foreground mt-1">
-                    View comprehensive risk analysis and anomaly detection
-                    reports.
+                    View comprehensive risk analysis and anomaly detection reports.
                   </p>
                 </div>
               </div>
@@ -1566,7 +1916,7 @@ export default function SessionsPage() {
                 variant="outline"
                 size="sm"
                 className="w-full mt-4"
-                disabled
+                onClick={() => setIsRiskAnalysisOpen(true)}
               >
                 <Eye className="h-4 w-4 mr-2" />
                 View Analysis
@@ -1574,7 +1924,7 @@ export default function SessionsPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-dashed border-2 border-border/50 bg-muted/20">
+          <Card className="border-border">
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <div className="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
@@ -1591,7 +1941,7 @@ export default function SessionsPage() {
                 variant="outline"
                 size="sm"
                 className="w-full mt-4"
-                disabled
+                onClick={() => setIsHistoryDialogOpen(true)}
               >
                 <History className="h-4 w-4 mr-2" />
                 View History
@@ -1602,47 +1952,281 @@ export default function SessionsPage() {
       </section>
 
       {/* =========================================================================
-          FUTURE FEATURES SECTION
+          MONITORING SECTION - Dashboard unifié avec sélection intelligente
           ========================================================================= */}
       <section className="space-y-4">
-        <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
-          Coming Soon
-        </h2>
-        <Card className="border-dashed border-2 border-border/50 bg-muted/20">
-          <CardContent className="p-6">
-            <div className="flex items-start gap-4">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Shield className="h-6 w-6 text-primary" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold">Enhanced Security Features</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Future enhancements include MFA enforcement policies,
-                  real-time risk scoring, device trust verification, and
-                  conditional access rules.
-                </p>
-                <div className="flex flex-wrap gap-4 mt-4">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <ShieldCheck className="h-3.5 w-3.5" />
-                    <span>MFA Enforcement</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <AlertTriangle className="h-3.5 w-3.5" />
-                    <span>Risk Scoring</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Smartphone className="h-3.5 w-3.5" />
-                    <span>Device Trust</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Globe className="h-3.5 w-3.5" />
-                    <span>Conditional Access</span>
-                  </div>
-                </div>
-              </div>
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+            Monitoring
+          </h2>
+          <div className="flex items-center gap-2">
+            <Select value={selectedChart} onValueChange={(v) => setSelectedChart(v as ChartType)}>
+              <SelectTrigger className="w-56">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="overview">Vue d&apos;ensemble</SelectItem>
+                <SelectItem value="devices">Par Type d&apos;Appareil</SelectItem>
+                <SelectItem value="geography">Répartition Géographique</SelectItem>
+                <SelectItem value="activity">Activité Temporelle</SelectItem>
+                <SelectItem value="risk">Distribution des Risques</SelectItem>
+                <SelectItem value="mfa">Statut MFA</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <Card className="border-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
+              {selectedChart === "overview" && <Activity className="h-4 w-4" />}
+              {selectedChart === "devices" && <Laptop className="h-4 w-4" />}
+              {selectedChart === "geography" && <Globe className="h-4 w-4" />}
+              {selectedChart === "activity" && <Clock className="h-4 w-4" />}
+              {selectedChart === "risk" && <AlertTriangle className="h-4 w-4" />}
+              {selectedChart === "mfa" && <ShieldCheck className="h-4 w-4" />}
+              {chartTitles[selectedChart]}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                {selectedChart === "overview" ? (
+                  <LineChart
+                    data={activityData}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="day" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="active"
+                      name="Sessions Actives"
+                      stroke="#10b981"
+                      strokeWidth={2}
+                      dot={{ fill: "#10b981" }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="idle"
+                      name="Sessions Inactives"
+                      stroke="#f59e0b"
+                      strokeWidth={2}
+                      dot={{ fill: "#f59e0b" }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="terminated"
+                      name="Sessions Terminées"
+                      stroke="#ef4444"
+                      strokeWidth={2}
+                      dot={{ fill: "#ef4444" }}
+                    />
+                  </LineChart>
+                ) : selectedChart === "devices" ? (
+                  <BarChart
+                    data={deviceTypeData}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Bar dataKey="sessions" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                ) : selectedChart === "geography" ? (
+                  <PieChart>
+                    <Pie
+                      data={countryData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={5}
+                      dataKey="value"
+                      label={({ name, percent }) =>
+                        `${name}: ${((percent || 0) * 100).toFixed(0)}%`
+                      }
+                    >
+                      {countryData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Legend />
+                  </PieChart>
+                ) : selectedChart === "activity" ? (
+                  <LineChart
+                    data={activityData}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="day" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="active"
+                      name="Sessions Actives"
+                      stroke="#3b82f6"
+                      strokeWidth={3}
+                      dot={{ fill: "#3b82f6", r: 5 }}
+                    />
+                  </LineChart>
+                ) : selectedChart === "risk" ? (
+                  <BarChart
+                    data={riskDistributionData}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="range" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 12 }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                      {riskDistributionData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={RISK_COLORS[index]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                ) : (
+                  <PieChart>
+                    <Pie
+                      data={mfaData}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      dataKey="value"
+                      label={({ name, percent }) =>
+                        `${name}: ${((percent || 0) * 100).toFixed(0)}%`
+                      }
+                    >
+                      <Cell fill="#10b981" />
+                      <Cell fill="#f59e0b" />
+                      <Cell fill="#6b7280" />
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Legend />
+                  </PieChart>
+                )}
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
+
+        {/* Quick Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <button
+            onClick={() => setSelectedChart("devices")}
+            className={cn(
+              "p-3 rounded-lg border text-left transition-all hover:shadow-md",
+              selectedChart === "devices"
+                ? "border-primary bg-primary/5"
+                : "border-border bg-card hover:border-primary/50"
+            )}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Laptop className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Appareils</span>
+            </div>
+            <p className="text-lg font-semibold">
+              {deviceTypeData.reduce((a, b) => a + b.sessions, 0)}
+            </p>
+            <p className="text-xs text-muted-foreground">{deviceTypeData.length} types</p>
+          </button>
+
+          <button
+            onClick={() => setSelectedChart("geography")}
+            className={cn(
+              "p-3 rounded-lg border text-left transition-all hover:shadow-md",
+              selectedChart === "geography"
+                ? "border-primary bg-primary/5"
+                : "border-border bg-card hover:border-primary/50"
+            )}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Globe className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Pays</span>
+            </div>
+            <p className="text-lg font-semibold">{countryData.length}</p>
+            <p className="text-xs text-muted-foreground">localisations</p>
+          </button>
+
+          <button
+            onClick={() => setSelectedChart("risk")}
+            className={cn(
+              "p-3 rounded-lg border text-left transition-all hover:shadow-md",
+              selectedChart === "risk"
+                ? "border-red-400 bg-red-50"
+                : "border-border bg-card hover:border-red-300"
+            )}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangle className="h-4 w-4 text-red-500" />
+              <span className="text-xs text-muted-foreground">Risque Élevé</span>
+            </div>
+            <p className="text-lg font-semibold text-red-600">{stats.highRiskSessions}</p>
+            <p className="text-xs text-muted-foreground">sessions</p>
+          </button>
+
+          <button
+            onClick={() => setSelectedChart("mfa")}
+            className={cn(
+              "p-3 rounded-lg border text-left transition-all hover:shadow-md",
+              selectedChart === "mfa"
+                ? "border-emerald-400 bg-emerald-50"
+                : "border-border bg-card hover:border-emerald-300"
+            )}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <ShieldCheck className="h-4 w-4 text-emerald-500" />
+              <span className="text-xs text-muted-foreground">MFA Actif</span>
+            </div>
+            <p className="text-lg font-semibold text-emerald-600">
+              {Math.round((stats.mfaProtected / (stats.totalActive || 1)) * 100)}%
+            </p>
+            <p className="text-xs text-muted-foreground">{stats.mfaProtected} sessions</p>
+          </button>
+        </div>
       </section>
 
       {/* =========================================================================
@@ -1660,6 +2244,24 @@ export default function SessionsPage() {
         onOpenChange={setIsTerminateAllOpen}
         sessionCount={stats.totalActive}
         onConfirm={handleTerminateAll}
+      />
+
+      <ReportDialog
+        open={isReportDialogOpen}
+        onOpenChange={setIsReportDialogOpen}
+        sessions={filteredSessions}
+      />
+
+      <RiskAnalysisDialog
+        open={isRiskAnalysisOpen}
+        onOpenChange={setIsRiskAnalysisOpen}
+        sessions={sessions}
+      />
+
+      <HistoryDialog
+        open={isHistoryDialogOpen}
+        onOpenChange={setIsHistoryDialogOpen}
+        sessions={sessions}
       />
     </div>
   );
