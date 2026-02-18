@@ -9,12 +9,7 @@ import {
   CardTitle,
 } from "@/components/dashboard/ui/card";
 import { MetricCard } from "@/components/dashboard/metric-card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/dashboard/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/dashboard/ui/tabs";
 import { Badge } from "@/components/dashboard/ui/badge";
 import { Button } from "@/components/dashboard/ui/button";
 import { Input } from "@/components/dashboard/ui/input";
@@ -33,11 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/dashboard/ui/table";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/dashboard/ui/chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/dashboard/ui/chart";
 import {
   BarChart,
   Bar,
@@ -79,14 +70,7 @@ export interface AccessEvent {
   id: string;
   timestamp: string;
   decision: "allow" | "deny" | "challenge";
-  subjectType:
-    | "user"
-    | "machine"
-    | "device"
-    | "service"
-    | "api_client"
-    | "network"
-    | "inter_org";
+  subjectType: "user" | "machine" | "device" | "service" | "api_client" | "network" | "inter_org";
   subjectId: string;
   subjectName: string;
   subjectEmail?: string;
@@ -200,13 +184,7 @@ const SUBJECT_TYPE_ICONS: Record<string, React.ElementType> = {
   inter_org: Globe,
 };
 
-function AccessEventDetailDialog({
-  event,
-  onClose,
-}: {
-  event: AccessEvent;
-  onClose: () => void;
-}) {
+function AccessEventDetailDialog({ event, onClose }: { event: AccessEvent; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <Card className="w-full max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -220,7 +198,7 @@ function AccessEventDetailDialog({
                     ? "bg-green-500/10 text-green-500"
                     : event.decision === "deny"
                       ? "bg-red-500/10 text-red-500"
-                      : "bg-yellow-500/10 text-yellow-500",
+                      : "bg-yellow-500/10 text-yellow-500"
                 )}
               >
                 {event.decision === "allow" ? (
@@ -245,10 +223,9 @@ function AccessEventDetailDialog({
                     : "default"
               }
               className={cn(
-                event.decision === "allow" &&
-                  "bg-green-500/10 text-green-500 border-green-500/20",
+                event.decision === "allow" && "bg-green-500/10 text-green-500 border-green-500/20",
                 event.decision === "challenge" &&
-                  "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
+                  "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
               )}
             >
               {event.decision.toUpperCase()}
@@ -328,9 +305,7 @@ function AccessEventDetailDialog({
                 {event.decisionReason && (
                   <div className="flex justify-between">
                     <span>Reason</span>
-                    <span className="text-right max-w-[200px]">
-                      {event.decisionReason}
-                    </span>
+                    <span className="text-right max-w-50">{event.decisionReason}</span>
                   </div>
                 )}
               </div>
@@ -348,8 +323,7 @@ function AccessEventDetailDialog({
                   <div className="flex justify-between">
                     <span>Location</span>
                     <span>
-                      {event.context.location.city},{" "}
-                      {event.context.location.country}
+                      {event.context.location.city}, {event.context.location.country}
                     </span>
                   </div>
                 )}
@@ -399,15 +373,10 @@ function AccessEventDetailDialog({
 
 function AccessTrendChart({ data }: { data: AccessSummary["trend"] }) {
   return (
-    <ChartContainer config={{}} className="h-[300px]">
+    <ChartContainer config={{}} className="h-75">
       <LineChart data={data}>
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-        <XAxis
-          dataKey="date"
-          className="text-xs"
-          tickLine={false}
-          axisLine={false}
-        />
+        <XAxis dataKey="date" className="text-xs" tickLine={false} axisLine={false} />
         <YAxis className="text-xs" tickLine={false} axisLine={false} />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Legend />
@@ -442,7 +411,7 @@ function AccessTrendChart({ data }: { data: AccessSummary["trend"] }) {
 
 function AccessDecisionChart({ data }: { data: AccessSummary["byDecision"] }) {
   return (
-    <ChartContainer config={{}} className="h-[250px]">
+    <ChartContainer config={{}} className="h-62.5">
       <PieChart>
         <Pie
           data={data}
@@ -453,16 +422,15 @@ function AccessDecisionChart({ data }: { data: AccessSummary["byDecision"] }) {
           paddingAngle={5}
           dataKey="count"
           nameKey="decision"
-          label={({ decision, percentage }) => `${decision}: ${percentage}%`}
+          label={(props) => {
+            const data = props as unknown as { decision: string; percentage: number };
+            return `${data.decision}: ${data.percentage}%`;
+          }}
         >
           {data.map((entry, index) => (
             <Cell
               key={`cell-${index}`}
-              fill={
-                DECISION_COLORS[
-                  entry.decision as keyof typeof DECISION_COLORS
-                ] || "#6b7280"
-              }
+              fill={DECISION_COLORS[entry.decision as keyof typeof DECISION_COLORS] || "#6b7280"}
             />
           ))}
         </Pie>
@@ -472,25 +440,12 @@ function AccessDecisionChart({ data }: { data: AccessSummary["byDecision"] }) {
   );
 }
 
-function AccessBySubjectTypeChart({
-  data,
-}: {
-  data: AccessSummary["bySubjectType"];
-}) {
+function AccessBySubjectTypeChart({ data }: { data: AccessSummary["bySubjectType"] }) {
   return (
-    <ChartContainer config={{}} className="h-[250px]">
+    <ChartContainer config={{}} className="h-62.5">
       <BarChart data={data} layout="vertical">
-        <CartesianGrid
-          strokeDasharray="3 3"
-          className="stroke-muted"
-          horizontal={false}
-        />
-        <XAxis
-          type="number"
-          className="text-xs"
-          tickLine={false}
-          axisLine={false}
-        />
+        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
+        <XAxis type="number" className="text-xs" tickLine={false} axisLine={false} />
         <YAxis
           dataKey="type"
           type="category"
@@ -506,21 +461,12 @@ function AccessBySubjectTypeChart({
   );
 }
 
-function AccessByEnvironmentChart({
-  data,
-}: {
-  data: AccessSummary["byEnvironment"];
-}) {
+function AccessByEnvironmentChart({ data }: { data: AccessSummary["byEnvironment"] }) {
   return (
-    <ChartContainer config={{}} className="h-[250px]">
+    <ChartContainer config={{}} className="h-62.5">
       <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-        <XAxis
-          dataKey="environment"
-          className="text-xs"
-          tickLine={false}
-          axisLine={false}
-        />
+        <XAxis dataKey="environment" className="text-xs" tickLine={false} axisLine={false} />
         <YAxis className="text-xs" tickLine={false} axisLine={false} />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Bar dataKey="count" fill="currentColor" radius={[4, 4, 0, 0]} />
@@ -529,31 +475,19 @@ function AccessByEnvironmentChart({
   );
 }
 
-function RiskDistributionChart({
-  data,
-}: {
-  data: AccessSummary["byRiskLevel"];
-}) {
+function RiskDistributionChart({ data }: { data: AccessSummary["byRiskLevel"] }) {
   return (
-    <ChartContainer config={{}} className="h-[200px]">
+    <ChartContainer config={{}} className="h-50">
       <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-        <XAxis
-          dataKey="level"
-          className="text-xs"
-          tickLine={false}
-          axisLine={false}
-        />
+        <XAxis dataKey="level" className="text-xs" tickLine={false} axisLine={false} />
         <YAxis className="text-xs" tickLine={false} axisLine={false} />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Bar dataKey="count" fill="currentColor" radius={[4, 4, 0, 0]}>
           {data.map((entry, index) => (
             <Cell
               key={`cell-${index}`}
-              fill={
-                RISK_COLORS[entry.level as keyof typeof RISK_COLORS] ||
-                "#6b7280"
-              }
+              fill={RISK_COLORS[entry.level as keyof typeof RISK_COLORS] || "#6b7280"}
             />
           ))}
         </Bar>
@@ -591,9 +525,7 @@ function AccessEventsTable({
                 <TableCell className="whitespace-nowrap">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">
-                      {new Date(event.timestamp).toLocaleString()}
-                    </span>
+                    <span className="text-sm">{new Date(event.timestamp).toLocaleString()}</span>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -609,18 +541,12 @@ function AccessEventsTable({
                       event.decision === "allow" &&
                         "bg-green-500/10 text-green-500 border-green-500/20",
                       event.decision === "challenge" &&
-                        "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
+                        "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
                     )}
                   >
-                    {event.decision === "allow" && (
-                      <ShieldCheck className="h-3 w-3 mr-1" />
-                    )}
-                    {event.decision === "deny" && (
-                      <ShieldX className="h-3 w-3 mr-1" />
-                    )}
-                    {event.decision === "challenge" && (
-                      <ShieldAlert className="h-3 w-3 mr-1" />
-                    )}
+                    {event.decision === "allow" && <ShieldCheck className="h-3 w-3 mr-1" />}
+                    {event.decision === "deny" && <ShieldX className="h-3 w-3 mr-1" />}
+                    {event.decision === "challenge" && <ShieldAlert className="h-3 w-3 mr-1" />}
                     {event.decision}
                   </Badge>
                 </TableCell>
@@ -638,9 +564,7 @@ function AccessEventsTable({
                 <TableCell>
                   <div>
                     <div className="font-medium">{event.resourceName}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {event.resourceType}
-                    </div>
+                    <div className="text-xs text-muted-foreground">{event.resourceType}</div>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -653,21 +577,14 @@ function AccessEventsTable({
                       ? `${event.context.location.country}`
                       : event.context.ipAddress}
                     {event.context.mfaUsed && (
-                      <span
-                        className="text-green-500 ml-1"
-                        title="MFA verified"
-                      >
+                      <span className="text-green-500 ml-1" title="MFA verified">
                         ✓
                       </span>
                     )}
                   </div>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onViewDetail(event)}
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => onViewDetail(event)}>
                     <Eye className="h-4 w-4" />
                   </Button>
                 </TableCell>
@@ -680,14 +597,8 @@ function AccessEventsTable({
   );
 }
 
-function DeniedAccessSection({
-  deniedEvents,
-}: {
-  deniedEvents: AccessEvent[];
-}) {
-  const highRiskDenied = deniedEvents.filter(
-    (e) => (e.context.riskScore || 0) >= 70,
-  );
+function DeniedAccessSection({ deniedEvents }: { deniedEvents: AccessEvent[] }) {
+  const highRiskDenied = deniedEvents.filter((e) => (e.context.riskScore || 0) >= 70);
   const mfaChallenges = deniedEvents.filter((e) => e.decision === "challenge");
   const policyViolations = deniedEvents.filter((e) => e.policyId);
 
@@ -706,9 +617,7 @@ function DeniedAccessSection({
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            High Risk Denials
-          </CardTitle>
+          <CardTitle className="text-sm font-medium">High Risk Denials</CardTitle>
           <AlertTriangle className="h-4 w-4 text-orange-500" />
         </CardHeader>
         <CardContent>
@@ -724,9 +633,7 @@ function DeniedAccessSection({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{mfaChallenges.length}</div>
-          <p className="text-xs text-muted-foreground">
-            Requiring verification
-          </p>
+          <p className="text-xs text-muted-foreground">Requiring verification</p>
         </CardContent>
       </Card>
 
@@ -734,9 +641,7 @@ function DeniedAccessSection({
         <Card className="md:col-span-3">
           <CardHeader>
             <CardTitle className="text-lg">Policy Violations</CardTitle>
-            <CardDescription>
-              Denied access due to policy enforcement
-            </CardDescription>
+            <CardDescription>Denied access due to policy enforcement</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -755,9 +660,7 @@ function DeniedAccessSection({
                     </div>
                   </div>
                   <div className="text-right">
-                    {event.policyName && (
-                      <Badge variant="outline">{event.policyName}</Badge>
-                    )}
+                    {event.policyName && <Badge variant="outline">{event.policyName}</Badge>}
                     {event.decisionReason && (
                       <div className="text-xs text-muted-foreground mt-1">
                         {event.decisionReason}
@@ -786,15 +689,13 @@ function FilterBar({
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div className="flex flex-1 gap-2 flex-wrap">
-        <div className="relative flex-1 min-w-[200px] max-w-[300px]">
+        <div className="relative flex-1 min-w-50 max-w-75">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search subjects, resources..."
             className="pl-9"
             value={filters.search || ""}
-            onChange={(e) =>
-              onFiltersChange({ ...filters, search: e.target.value })
-            }
+            onChange={(e) => onFiltersChange({ ...filters, search: e.target.value })}
           />
         </div>
         <Select
@@ -806,7 +707,7 @@ function FilterBar({
             })
           }
         >
-          <SelectTrigger className="w-[130px]">
+          <SelectTrigger className="w-32.5">
             <SelectValue placeholder="Decision" />
           </SelectTrigger>
           <SelectContent>
@@ -818,11 +719,9 @@ function FilterBar({
         </Select>
         <Select
           value={filters.subjectType || "all"}
-          onValueChange={(value) =>
-            onFiltersChange({ ...filters, subjectType: value })
-          }
+          onValueChange={(value) => onFiltersChange({ ...filters, subjectType: value })}
         >
-          <SelectTrigger className="w-[150px]">
+          <SelectTrigger className="w-37.5">
             <SelectValue placeholder="Subject Type" />
           </SelectTrigger>
           <SelectContent>
@@ -838,11 +737,9 @@ function FilterBar({
         </Select>
         <Select
           value={filters.environment || "all"}
-          onValueChange={(value) =>
-            onFiltersChange({ ...filters, environment: value })
-          }
+          onValueChange={(value) => onFiltersChange({ ...filters, environment: value })}
         >
-          <SelectTrigger className="w-[150px]">
+          <SelectTrigger className="w-37.5">
             <SelectValue placeholder="Environment" />
           </SelectTrigger>
           <SelectContent>
@@ -855,11 +752,9 @@ function FilterBar({
         </Select>
         <Select
           value={filters.riskLevel || "all"}
-          onValueChange={(value) =>
-            onFiltersChange({ ...filters, riskLevel: value })
-          }
+          onValueChange={(value) => onFiltersChange({ ...filters, riskLevel: value })}
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-35">
             <SelectValue placeholder="Risk Level" />
           </SelectTrigger>
           <SelectContent>
@@ -875,10 +770,8 @@ function FilterBar({
         <Button variant="outline" size="sm">
           <RefreshCw className="h-4 w-4 mr-2" /> Refresh
         </Button>
-        <Select
-          onValueChange={(value) => onExport(value as "csv" | "json" | "pdf")}
-        >
-          <SelectTrigger className="w-[140px]">
+        <Select onValueChange={(value) => onExport(value as "csv" | "json" | "pdf")}>
+          <SelectTrigger className="w-35">
             <SelectValue placeholder="Export" />
           </SelectTrigger>
           <SelectContent>
@@ -905,12 +798,7 @@ function FilterBar({
 }
 
 function Code({ className, ...props }: React.HTMLAttributes<HTMLPreElement>) {
-  return (
-    <pre
-      className={cn("bg-muted p-4 rounded-lg overflow-x-auto", className)}
-      {...props}
-    />
-  );
+  return <pre className={cn("bg-muted p-4 rounded-lg overflow-x-auto", className)} {...props} />;
 }
 
 function TimeDisplay() {
@@ -987,9 +875,7 @@ function MetricCards({ summary }: { summary: AccessSummary }) {
 
 export default function AccessReportPage() {
   const [filters, setFilters] = React.useState<AccessFilters>({});
-  const [selectedEvent, setSelectedEvent] = React.useState<AccessEvent | null>(
-    null,
-  );
+  const [selectedEvent, setSelectedEvent] = React.useState<AccessEvent | null>(null);
   const [activeTab, setActiveTab] = React.useState("overview");
 
   // Mock data - in production, these would come from API hooks
@@ -1185,7 +1071,7 @@ export default function AccessReportPage() {
   ];
 
   const deniedEvents: AccessEvent[] = events.filter(
-    (e) => e.decision === "deny" || e.decision === "challenge",
+    (e) => e.decision === "deny" || e.decision === "challenge"
   );
 
   const handleExport = (format: "csv" | "json" | "pdf") => {
@@ -1210,7 +1096,7 @@ export default function AccessReportPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4 lg:w-[600px]">
+        <TabsList className="grid w-full grid-cols-4 lg:w-150">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="events">All Events</TabsTrigger>
           <TabsTrigger value="denied">Denied Access</TabsTrigger>
@@ -1224,9 +1110,7 @@ export default function AccessReportPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Access Trend</CardTitle>
-                <CardDescription>
-                  Allow, deny, and challenge decisions over time
-                </CardDescription>
+                <CardDescription>Allow, deny, and challenge decisions over time</CardDescription>
               </CardHeader>
               <CardContent>
                 <AccessTrendChart data={summary.trend} />
@@ -1256,9 +1140,7 @@ export default function AccessReportPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Access by Environment</CardTitle>
-                <CardDescription>
-                  Distribution across environments
-                </CardDescription>
+                <CardDescription>Distribution across environments</CardDescription>
               </CardHeader>
               <CardContent>
                 <AccessByEnvironmentChart data={summary.byEnvironment} />
@@ -1277,11 +1159,7 @@ export default function AccessReportPage() {
         </TabsContent>
 
         <TabsContent value="events" className="space-y-6 mt-6">
-          <FilterBar
-            filters={filters}
-            onFiltersChange={setFilters}
-            onExport={handleExport}
-          />
+          <FilterBar filters={filters} onFiltersChange={setFilters} onExport={handleExport} />
           <AccessEventsTable events={events} onViewDetail={setSelectedEvent} />
         </TabsContent>
 
@@ -1290,15 +1168,10 @@ export default function AccessReportPage() {
           <Card>
             <CardHeader>
               <CardTitle>Denied Events Detail</CardTitle>
-              <CardDescription>
-                Full list of denied and challenged access attempts
-              </CardDescription>
+              <CardDescription>Full list of denied and challenged access attempts</CardDescription>
             </CardHeader>
             <CardContent>
-              <AccessEventsTable
-                events={deniedEvents}
-                onViewDetail={setSelectedEvent}
-              />
+              <AccessEventsTable events={deniedEvents} onViewDetail={setSelectedEvent} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -1308,31 +1181,22 @@ export default function AccessReportPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Top Denied Subjects</CardTitle>
-                <CardDescription>
-                  Subjects with most denied access attempts
-                </CardDescription>
+                <CardDescription>Subjects with most denied access attempts</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {summary.topDeniedSubjects.map((item, index) => (
-                    <div
-                      key={item.subjectId}
-                      className="flex items-center justify-between"
-                    >
+                    <div key={item.subjectId} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
                           {index + 1}
                         </div>
                         <div>
                           <div className="font-medium">{item.subjectName}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {item.subjectId}
-                          </div>
+                          <div className="text-xs text-muted-foreground">{item.subjectId}</div>
                         </div>
                       </div>
-                      <Badge variant="destructive">
-                        {item.denyCount} denials
-                      </Badge>
+                      <Badge variant="destructive">{item.denyCount} denials</Badge>
                     </div>
                   ))}
                 </div>
@@ -1341,31 +1205,22 @@ export default function AccessReportPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Top Denied Resources</CardTitle>
-                <CardDescription>
-                  Most frequently targeted resources
-                </CardDescription>
+                <CardDescription>Most frequently targeted resources</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {summary.topDeniedResources.map((item, index) => (
-                    <div
-                      key={item.resourceId}
-                      className="flex items-center justify-between"
-                    >
+                    <div key={item.resourceId} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
                           {index + 1}
                         </div>
                         <div>
                           <div className="font-medium">{item.resourceName}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {item.resourceId}
-                          </div>
+                          <div className="text-xs text-muted-foreground">{item.resourceId}</div>
                         </div>
                       </div>
-                      <Badge variant="destructive">
-                        {item.denyCount} denials
-                      </Badge>
+                      <Badge variant="destructive">{item.denyCount} denials</Badge>
                     </div>
                   ))}
                 </div>
@@ -1375,9 +1230,7 @@ export default function AccessReportPage() {
           <Card>
             <CardHeader>
               <CardTitle>Policy Enforcement</CardTitle>
-              <CardDescription>
-                Most active policies in access decisions
-              </CardDescription>
+              <CardDescription>Most active policies in access decisions</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -1392,9 +1245,7 @@ export default function AccessReportPage() {
                       </div>
                       <div>
                         <div className="font-medium">{item.policyName}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {item.policyId}
-                        </div>
+                        <div className="text-xs text-muted-foreground">{item.policyId}</div>
                       </div>
                     </div>
                     <Badge variant="outline">{item.denyCount} denials</Badge>
@@ -1407,10 +1258,7 @@ export default function AccessReportPage() {
       </Tabs>
 
       {selectedEvent && (
-        <AccessEventDetailDialog
-          event={selectedEvent}
-          onClose={() => setSelectedEvent(null)}
-        />
+        <AccessEventDetailDialog event={selectedEvent} onClose={() => setSelectedEvent(null)} />
       )}
     </div>
   );

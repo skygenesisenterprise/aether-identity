@@ -42,12 +42,7 @@ import { Switch } from "@/components/dashboard/ui/switch";
 import { Input } from "@/components/dashboard/ui/input";
 import { Label } from "@/components/dashboard/ui/label";
 import { Slider } from "@/components/dashboard/ui/slider";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/dashboard/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/dashboard/ui/tabs";
 import { ChartContainer, ChartTooltip } from "@/components/dashboard/ui/chart";
 import {
   Area,
@@ -111,13 +106,7 @@ type DeploymentMode = "saas_cloud" | "self_hosted" | "hybrid";
 type PlanTier = "free" | "pro" | "enterprise";
 type EnvironmentType = "production" | "staging" | "development";
 type CostStatus = "healthy" | "warning" | "critical";
-type CostCategory =
-  | "compute"
-  | "storage"
-  | "network"
-  | "backup"
-  | "integrations"
-  | "logs";
+type CostCategory = "compute" | "storage" | "network" | "backup" | "integrations" | "logs";
 type TrendDirection = "up" | "down" | "stable";
 type AlertSeverity = "critical" | "high" | "medium" | "low";
 
@@ -686,7 +675,7 @@ function StatusBadge({
         "font-medium border-0 flex items-center gap-1.5",
         config.bgColor,
         config.color,
-        sizeClasses[size],
+        sizeClasses[size]
       )}
     >
       <Icon className={cn(size === "lg" ? "h-5 w-5" : "h-4 w-4")} />
@@ -702,11 +691,7 @@ function AlertSeverityBadge({ severity }: { severity: AlertSeverity }) {
   return (
     <Badge
       variant="outline"
-      className={cn(
-        "font-medium border-0 flex items-center gap-1",
-        config.bgColor,
-        config.color,
-      )}
+      className={cn("font-medium border-0 flex items-center gap-1", config.bgColor, config.color)}
     >
       <Icon className="h-3 w-3" />
       {config.label}
@@ -714,13 +699,7 @@ function AlertSeverityBadge({ severity }: { severity: AlertSeverity }) {
   );
 }
 
-function TrendIndicator({
-  trend,
-  value,
-}: {
-  trend: TrendDirection;
-  value: number;
-}) {
+function TrendIndicator({ trend, value }: { trend: TrendDirection; value: number }) {
   const config = {
     up: { icon: TrendingUp, color: "text-amber-500", label: "Increasing" },
     down: {
@@ -761,16 +740,12 @@ function CostBreakdownRow({
       <CardContent className="p-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div
-              className={cn("p-2.5 rounded-lg shrink-0", statusInfo.bgColor)}
-            >
+            <div className={cn("p-2.5 rounded-lg shrink-0", statusInfo.bgColor)}>
               <CategoryIcon className={cn("h-5 w-5", categoryInfo.color)} />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="font-medium capitalize truncate">
-                  {item.category}
-                </h3>
+                <h3 className="font-medium capitalize truncate">{item.category}</h3>
                 <StatusBadge status={item.status} size="sm" />
               </div>
               <p className="text-sm text-muted-foreground truncate">
@@ -826,18 +801,12 @@ export default function CostsPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [timeRange, setTimeRange] = useState<"30d" | "90d" | "12m">("30d");
   const [showBudgetDialog, setShowBudgetDialog] = useState(false);
-  const [selectedCostItem, setSelectedCostItem] =
-    useState<CostBreakdownItem | null>(null);
+  const [selectedCostItem, setSelectedCostItem] = useState<CostBreakdownItem | null>(null);
 
   const activeAlerts = costAlerts.filter((a) => !a.acknowledged);
-  const budgetPercentage =
-    (costMetrics.budgetUsed / costMetrics.budgetLimit) * 100;
+  const budgetPercentage = (costMetrics.budgetUsed / costMetrics.budgetLimit) * 100;
   const budgetStatus =
-    budgetPercentage > 90
-      ? "critical"
-      : budgetPercentage > 75
-        ? "warning"
-        : "healthy";
+    budgetPercentage > 90 ? "critical" : budgetPercentage > 75 ? "warning" : "healthy";
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -859,8 +828,8 @@ export default function CostsPage() {
             Identity Operational Costs
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Monitor infrastructure usage, service-level consumption and cost
-            projections for your Identity instance.
+            Monitor infrastructure usage, service-level consumption and cost projections for your
+            Identity instance.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -874,12 +843,10 @@ export default function CostsPage() {
               "text-xs",
               orgContext.deploymentMode === "self_hosted"
                 ? "text-purple-500 bg-purple-500/10"
-                : "text-blue-500 bg-blue-500/10",
+                : "text-blue-500 bg-blue-500/10"
             )}
           >
-            {orgContext.deploymentMode === "self_hosted"
-              ? "Self-Hosted"
-              : "SaaS"}
+            {orgContext.deploymentMode === "self_hosted" ? "Self-Hosted" : "SaaS"}
           </Badge>
           <Badge
             variant="outline"
@@ -889,7 +856,7 @@ export default function CostsPage() {
                 ? "text-amber-500 bg-amber-500/10"
                 : orgContext.plan === "pro"
                   ? "text-blue-500 bg-blue-500/10"
-                  : "text-muted-foreground",
+                  : "text-muted-foreground"
             )}
           >
             {orgContext.plan.charAt(0).toUpperCase() + orgContext.plan.slice(1)}
@@ -907,11 +874,7 @@ export default function CostsPage() {
           <Receipt className="h-4 w-4 mr-2" />
           Billing Details
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowBudgetDialog(true)}
-        >
+        <Button variant="outline" size="sm" onClick={() => setShowBudgetDialog(true)}>
           <Wallet className="h-4 w-4 mr-2" />
           Configure Budget
         </Button>
@@ -920,24 +883,12 @@ export default function CostsPage() {
       {/* ============================================================================
           STATUS OVERVIEW BANNER
           ============================================================================ */}
-      <Card
-        className={cn(
-          "border-l-4 overflow-hidden",
-          statusConfig[budgetStatus].borderColor,
-        )}
-      >
+      <Card className={cn("border-l-4 overflow-hidden", statusConfig[budgetStatus].borderColor)}>
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div
-                className={cn(
-                  "p-3 rounded-lg shrink-0",
-                  statusConfig[budgetStatus].bgColor,
-                )}
-              >
-                <Gauge
-                  className={cn("h-8 w-8", statusConfig[budgetStatus].color)}
-                />
+              <div className={cn("p-3 rounded-lg shrink-0", statusConfig[budgetStatus].bgColor)}>
+                <Gauge className={cn("h-8 w-8", statusConfig[budgetStatus].color)} />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-3 mb-1">
@@ -946,24 +897,17 @@ export default function CostsPage() {
                 </div>
                 <p className="text-sm text-muted-foreground truncate">
                   {budgetPercentage.toFixed(0)}% of monthly budget consumed •{" "}
-                  {formatCurrency(
-                    costMetrics.budgetLimit - costMetrics.budgetUsed,
-                  )}{" "}
-                  remaining
+                  {formatCurrency(costMetrics.budgetLimit - costMetrics.budgetUsed)} remaining
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-4 sm:gap-6 text-sm justify-between sm:justify-end">
               <div className="text-center">
-                <p className="text-2xl font-semibold text-amber-500">
-                  {activeAlerts.length}
-                </p>
+                <p className="text-2xl font-semibold text-amber-500">{activeAlerts.length}</p>
                 <p className="text-muted-foreground">Active Alerts</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-semibold">
-                  {formatCurrency(costMetrics.budgetUsed)}
-                </p>
+                <p className="text-2xl font-semibold">{formatCurrency(costMetrics.budgetUsed)}</p>
                 <p className="text-muted-foreground">Used</p>
               </div>
               <div className="text-center">
@@ -1018,11 +962,7 @@ export default function CostsPage() {
       {/* ============================================================================
           MAIN CONTENT TABS
           ============================================================================ */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-4"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="bg-muted">
           <TabsTrigger value="overview" className="text-xs">
             <LayoutGrid className="h-3.5 w-3.5 mr-1.5" />
@@ -1070,38 +1010,20 @@ export default function CostsPage() {
             {/* Monthly Trend */}
             <Card className="border-border">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base font-medium">
-                  Monthly Cost Trend
-                </CardTitle>
-                <CardDescription>
-                  Last 7 months cost breakdown by category
-                </CardDescription>
+                <CardTitle className="text-base font-medium">Monthly Cost Trend</CardTitle>
+                <CardDescription>Last 7 months cost breakdown by category</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[250px]">
+                <div className="h-62.5">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
                       data={monthlyCostHistory}
                       margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
                     >
                       <defs>
-                        <linearGradient
-                          id="colorTotal"
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop
-                            offset="5%"
-                            stopColor="#8b5cf6"
-                            stopOpacity={0.3}
-                          />
-                          <stop
-                            offset="95%"
-                            stopColor="#8b5cf6"
-                            stopOpacity={0}
-                          />
+                        <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid
@@ -1130,7 +1052,7 @@ export default function CostsPage() {
                           border: "1px solid hsl(var(--border))",
                           borderRadius: "8px",
                         }}
-                        formatter={(value: number) => [`$${value}`, "Cost"]}
+                        formatter={(value: number | undefined) => [`${value ?? 0}`, "Cost"]}
                       />
                       <Area
                         type="monotone"
@@ -1149,15 +1071,11 @@ export default function CostsPage() {
             {/* Pie Chart Distribution */}
             <Card className="border-border">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base font-medium">
-                  Cost Distribution
-                </CardTitle>
-                <CardDescription>
-                  Current month breakdown by category
-                </CardDescription>
+                <CardTitle className="text-base font-medium">Cost Distribution</CardTitle>
+                <CardDescription>Current month breakdown by category</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[250px] flex items-center justify-center">
+                <div className="h-62.5 flex items-center justify-center">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -1179,17 +1097,14 @@ export default function CostsPage() {
                           border: "1px solid hsl(var(--border))",
                           borderRadius: "8px",
                         }}
-                        formatter={(value: number) => [`$${value}`, "Cost"]}
+                        formatter={(value: number | undefined) => [`${value ?? 0}`, "Cost"]}
                       />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
                 <div className="flex flex-wrap justify-center gap-3 mt-2">
                   {pieChartData.map((item) => (
-                    <div
-                      key={item.name}
-                      className="flex items-center gap-1.5 text-xs"
-                    >
+                    <div key={item.name} className="flex items-center gap-1.5 text-xs">
                       <div
                         className="w-2.5 h-2.5 rounded-full"
                         style={{ backgroundColor: item.color }}
@@ -1211,11 +1126,8 @@ export default function CostsPage() {
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Time Range:</span>
-              <Select
-                value={timeRange}
-                onValueChange={(v) => setTimeRange(v as typeof timeRange)}
-              >
-                <SelectTrigger className="w-[120px] h-8">
+              <Select value={timeRange} onValueChange={(v) => setTimeRange(v as typeof timeRange)}>
+                <SelectTrigger className="w-30 h-8">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -1247,27 +1159,18 @@ export default function CostsPage() {
                     const categoryInfo = categoryConfig[item.category];
                     const CategoryIcon = categoryInfo.icon;
                     const changePercent =
-                      ((item.currentCost - item.previousCost) /
-                        item.previousCost) *
-                      100;
+                      ((item.currentCost - item.previousCost) / item.previousCost) * 100;
 
                     return (
                       <TableRow key={item.category}>
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <div
-                              className={cn(
-                                "p-1.5 rounded-md",
-                                statusConfig[item.status].bgColor,
-                              )}
+                              className={cn("p-1.5 rounded-md", statusConfig[item.status].bgColor)}
                             >
-                              <CategoryIcon
-                                className={cn("h-4 w-4", categoryInfo.color)}
-                              />
+                              <CategoryIcon className={cn("h-4 w-4", categoryInfo.color)} />
                             </div>
-                            <span className="font-medium capitalize">
-                              {item.category}
-                            </span>
+                            <span className="font-medium capitalize">{item.category}</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-right font-medium tabular-nums">
@@ -1280,9 +1183,7 @@ export default function CostsPage() {
                           <span
                             className={cn(
                               "text-xs font-medium",
-                              changePercent > 0
-                                ? "text-amber-500"
-                                : "text-emerald-500",
+                              changePercent > 0 ? "text-amber-500" : "text-emerald-500"
                             )}
                           >
                             {changePercent > 0 ? "+" : ""}
@@ -1318,28 +1219,20 @@ export default function CostsPage() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">
-                      Egress Traffic
-                    </span>
+                    <span className="text-sm text-muted-foreground">Egress Traffic</span>
                     <span className="font-medium">1.8 TB</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">
-                      Ingress Traffic
-                    </span>
+                    <span className="text-sm text-muted-foreground">Ingress Traffic</span>
                     <span className="font-medium">0.6 TB</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">
-                      CDN Usage
-                    </span>
+                    <span className="text-sm text-muted-foreground">CDN Usage</span>
                     <Badge variant="outline">Enabled</Badge>
                   </div>
                   <div className="pt-4 border-t border-border">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">
-                        Cost per GB
-                      </span>
+                      <span className="text-sm text-muted-foreground">Cost per GB</span>
                       <span className="font-medium">$0.085</span>
                     </div>
                   </div>
@@ -1357,28 +1250,20 @@ export default function CostsPage() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">
-                      Database Storage
-                    </span>
+                    <span className="text-sm text-muted-foreground">Database Storage</span>
                     <span className="font-medium">420 GB</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">
-                      Backup Storage
-                    </span>
+                    <span className="text-sm text-muted-foreground">Backup Storage</span>
                     <span className="font-medium">380 GB</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">
-                      Log Storage
-                    </span>
+                    <span className="text-sm text-muted-foreground">Log Storage</span>
                     <span className="font-medium">47 GB</span>
                   </div>
                   <div className="pt-4 border-t border-border">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">
-                        Cost per GB
-                      </span>
+                      <span className="text-sm text-muted-foreground">Cost per GB</span>
                       <span className="font-medium">$0.023</span>
                     </div>
                   </div>
@@ -1418,9 +1303,7 @@ export default function CostsPage() {
                       <p className="text-3xl font-bold tabular-nums">
                         ${projection.projectedCost.toLocaleString()}
                       </p>
-                      <p className="text-sm text-muted-foreground">
-                        Projected total cost
-                      </p>
+                      <p className="text-sm text-muted-foreground">Projected total cost</p>
                     </div>
                     <div className="space-y-2">
                       {projection.scenarios.map((scenario) => (
@@ -1428,16 +1311,12 @@ export default function CostsPage() {
                           key={scenario.label}
                           className="flex items-center justify-between text-sm"
                         >
-                          <span className="text-muted-foreground">
-                            {scenario.label}
-                          </span>
+                          <span className="text-muted-foreground">{scenario.label}</span>
                           <div className="text-right">
                             <span
                               className={cn(
                                 "font-medium",
-                                scenario.impact > 0
-                                  ? "text-amber-500"
-                                  : "text-emerald-500",
+                                scenario.impact > 0 ? "text-amber-500" : "text-emerald-500"
                               )}
                             >
                               {scenario.impact > 0 ? "+" : ""}
@@ -1469,22 +1348,19 @@ export default function CostsPage() {
                       Cost Projection by User Count
                     </CardTitle>
                     <CardDescription>
-                      Current cost per user: $
-                      {userGrowthImpact.costPerUser.toFixed(2)}
+                      Current cost per user: ${userGrowthImpact.costPerUser.toFixed(2)}
                     </CardDescription>
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-bold">
                       {userGrowthImpact.currentUsers.toLocaleString("en-US")}
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      Current users
-                    </p>
+                    <p className="text-sm text-muted-foreground">Current users</p>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="h-[250px]">
+                <div className="h-62.5">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={userGrowthImpact.scenarios}
@@ -1516,16 +1392,12 @@ export default function CostsPage() {
                           border: "1px solid hsl(var(--border))",
                           borderRadius: "8px",
                         }}
-                        formatter={(value: number, name: string) => [
-                          `${value.toLocaleString("en-US")}`,
-                          name === "cost" ? "Estimated Cost" : name,
+                        formatter={(value: number | undefined, name: string | undefined) => [
+                          `${(value ?? 0).toLocaleString("en-US")}`,
+                          name === "cost" ? "Estimated Cost" : (name ?? ""),
                         ]}
                       />
-                      <Bar
-                        dataKey="cost"
-                        fill="#8b5cf6"
-                        radius={[4, 4, 0, 0]}
-                      />
+                      <Bar dataKey="cost" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -1546,9 +1418,7 @@ export default function CostsPage() {
                 <CardTitle className="text-base font-medium">
                   Estimate Impact of User Growth
                 </CardTitle>
-                <CardDescription>
-                  Adjust the slider to see estimated cost impact
-                </CardDescription>
+                <CardDescription>Adjust the slider to see estimated cost impact</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
@@ -1557,24 +1427,15 @@ export default function CostsPage() {
                       <Label>User Growth: +40%</Label>
                       <span className="text-sm font-medium">~4,000 users</span>
                     </div>
-                    <Slider
-                      defaultValue={[40]}
-                      max={100}
-                      step={10}
-                      className="w-full"
-                    />
+                    <Slider defaultValue={[40]} max={100} step={10} className="w-full" />
                   </div>
                   <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
                     <div>
-                      <p className="text-sm text-muted-foreground">
-                        Estimated Monthly Cost
-                      </p>
+                      <p className="text-sm text-muted-foreground">Estimated Monthly Cost</p>
                       <p className="text-2xl font-bold">$4,550</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">
-                        Cost per User
-                      </p>
+                      <p className="text-sm text-muted-foreground">Cost per User</p>
                       <p className="text-2xl font-bold">$1.14</p>
                     </div>
                   </div>
@@ -1622,7 +1483,7 @@ export default function CostsPage() {
                           : alert.severity === "medium"
                             ? "border-l-amber-500"
                             : "border-l-blue-500",
-                      !alert.acknowledged && "bg-amber-500/5",
+                      !alert.acknowledged && "bg-amber-500/5"
                     )}
                   >
                     <CardContent className="p-4">
@@ -1631,31 +1492,21 @@ export default function CostsPage() {
                           <div
                             className={cn(
                               "p-2 rounded-lg",
-                              alertSeverityConfig[alert.severity].bgColor,
+                              alertSeverityConfig[alert.severity].bgColor
                             )}
                           >
-                            <CategoryIcon
-                              className={cn("h-5 w-5", categoryInfo.color)}
-                            />
+                            <CategoryIcon className={cn("h-5 w-5", categoryInfo.color)} />
                           </div>
                           <div>
                             <div className="flex items-center gap-2 mb-1">
                               <AlertSeverityBadge severity={alert.severity} />
-                              <Badge
-                                variant="outline"
-                                className="text-xs capitalize"
-                              >
+                              <Badge variant="outline" className="text-xs capitalize">
                                 {alert.category}
                               </Badge>
                             </div>
-                            <p className="text-sm font-medium">
-                              {alert.message}
-                            </p>
+                            <p className="text-sm font-medium">{alert.message}</p>
                             <p className="text-xs text-muted-foreground mt-1">
-                              Triggered{" "}
-                              {new Date(alert.triggeredAt).toLocaleString(
-                                "en-US",
-                              )}
+                              Triggered {new Date(alert.triggeredAt).toLocaleString("en-US")}
                             </p>
                             {alert.recommendation && (
                               <p className="text-xs text-blue-500 mt-2">
@@ -1668,9 +1519,7 @@ export default function CostsPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() =>
-                              toast.success(`Alert ${alert.id} acknowledged`)
-                            }
+                            onClick={() => toast.success(`Alert ${alert.id} acknowledged`)}
                           >
                             Acknowledge
                           </Button>
@@ -1704,9 +1553,7 @@ export default function CostsPage() {
                     </div>
                     <div>
                       <p className="font-medium">Budget Threshold</p>
-                      <p className="text-sm text-muted-foreground">
-                        65% of budget consumed
-                      </p>
+                      <p className="text-sm text-muted-foreground">65% of budget consumed</p>
                     </div>
                   </div>
                   <div className="mt-4">
@@ -1723,9 +1570,7 @@ export default function CostsPage() {
                     </div>
                     <div>
                       <p className="font-medium">Log Growth</p>
-                      <p className="text-sm text-muted-foreground">
-                        37% increase vs last month
-                      </p>
+                      <p className="text-sm text-muted-foreground">37% increase vs last month</p>
                     </div>
                   </div>
                   <div className="mt-4">
@@ -1742,9 +1587,7 @@ export default function CostsPage() {
                     </div>
                     <div>
                       <p className="font-medium">Cost Trend</p>
-                      <p className="text-sm text-muted-foreground">
-                        8.3% month-over-month
-                      </p>
+                      <p className="text-sm text-muted-foreground">8.3% month-over-month</p>
                     </div>
                   </div>
                   <div className="mt-4">
@@ -1765,8 +1608,7 @@ export default function CostsPage() {
           <DialogHeader>
             <DialogTitle>Configure Budget</DialogTitle>
             <DialogDescription>
-              Set monthly budget limits and alert thresholds for operational
-              costs.
+              Set monthly budget limits and alert thresholds for operational costs.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -1774,33 +1616,19 @@ export default function CostsPage() {
               <Label>Monthly Budget Limit</Label>
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">$</span>
-                <Input
-                  type="number"
-                  defaultValue={costMetrics.budgetLimit}
-                  className="w-full"
-                />
+                <Input type="number" defaultValue={costMetrics.budgetLimit} className="w-full" />
               </div>
             </div>
             <div className="space-y-2">
               <Label>Warning Threshold (%)</Label>
-              <Slider
-                defaultValue={[75]}
-                max={100}
-                step={5}
-                className="w-full"
-              />
+              <Slider defaultValue={[75]} max={100} step={5} className="w-full" />
               <p className="text-xs text-muted-foreground">
                 Alert when budget usage exceeds this threshold
               </p>
             </div>
             <div className="space-y-2">
               <Label>Critical Threshold (%)</Label>
-              <Slider
-                defaultValue={[90]}
-                max={100}
-                step={5}
-                className="w-full"
-              />
+              <Slider defaultValue={[90]} max={100} step={5} className="w-full" />
               <p className="text-xs text-muted-foreground">
                 Critical alert when budget usage exceeds this threshold
               </p>
@@ -1813,10 +1641,7 @@ export default function CostsPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowBudgetDialog(false)}
-            >
+            <Button variant="outline" onClick={() => setShowBudgetDialog(false)}>
               Cancel
             </Button>
             <Button
@@ -1834,23 +1659,16 @@ export default function CostsPage() {
       {/* ============================================================================
           COST DETAILS DIALOG
           ============================================================================ */}
-      <Dialog
-        open={!!selectedCostItem}
-        onOpenChange={(open) => !open && setSelectedCostItem(null)}
-      >
+      <Dialog open={!!selectedCostItem} onOpenChange={(open) => !open && setSelectedCostItem(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 capitalize">
               {selectedCostItem && (
                 <>
                   {categoryConfig[selectedCostItem.category].icon &&
-                    React.createElement(
-                      categoryConfig[selectedCostItem.category].icon,
-                      {
-                        className:
-                          categoryConfig[selectedCostItem.category].color,
-                      },
-                    )}
+                    React.createElement(categoryConfig[selectedCostItem.category].icon, {
+                      className: categoryConfig[selectedCostItem.category].color,
+                    })}
                   {selectedCostItem.category} Details
                 </>
               )}
@@ -1896,12 +1714,8 @@ export default function CostsPage() {
                       key={detail.label}
                       className="flex justify-between items-center p-3 rounded-lg bg-muted/30"
                     >
-                      <span className="text-sm text-muted-foreground">
-                        {detail.label}
-                      </span>
-                      <span className="text-sm font-medium">
-                        {detail.value}
-                      </span>
+                      <span className="text-sm text-muted-foreground">{detail.label}</span>
+                      <span className="text-sm font-medium">{detail.value}</span>
                     </div>
                   ))}
                 </div>
@@ -1911,9 +1725,7 @@ export default function CostsPage() {
                 <h4 className="font-medium">Trend Analysis</h4>
                 <div className="p-4 rounded-lg border">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-muted-foreground">
-                      Monthly Trend
-                    </span>
+                    <span className="text-sm text-muted-foreground">Monthly Trend</span>
                     <StatusBadge status={selectedCostItem.status} />
                   </div>
                   <div className="flex items-center gap-2">

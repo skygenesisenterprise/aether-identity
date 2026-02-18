@@ -1625,7 +1625,7 @@ export default function IaCPage() {
                           <div className="font-medium text-sm font-mono">
                             {deployment.id}
                           </div>
-                          <div className="text-xs text-muted-foreground truncate max-w-[200px]">
+                          <div className="text-xs text-muted-foreground truncate max-w-50">
                             {deployment.commitMessage}
                           </div>
                         </div>
@@ -2014,7 +2014,7 @@ export default function IaCPage() {
                               check.severity.slice(1)}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-sm max-w-[300px] truncate">
+                        <TableCell className="text-sm max-w-75 truncate">
                           {check.message}
                         </TableCell>
                         <TableCell className="text-right">

@@ -1648,7 +1648,7 @@ export default function ServicesPage() {
                 setSelectedEnvironment(value as EnvironmentType)
               }
             >
-              <SelectTrigger className="w-[140px] h-8 text-xs">
+              <SelectTrigger className="w-35 h-8 text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

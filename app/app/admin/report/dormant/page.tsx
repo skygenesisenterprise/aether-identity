@@ -786,7 +786,7 @@ function TypeDistributionChart() {
   }));
 
   return (
-    <div className="h-[300px]">
+    <div className="h-75">
       <PieChart width={600} height={300}>
         <Pie
           data={data}
@@ -835,7 +835,7 @@ function TypeDistributionChart() {
 
 function TrendChart() {
   return (
-    <ChartContainer config={{}} className="h-[300px]">
+    <ChartContainer config={{}} className="h-75">
       <LineChart data={DORMANT_SUMMARY.trend}>
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis
@@ -901,7 +901,7 @@ function CategoryDistributionChart() {
   ];
 
   return (
-    <ChartContainer config={{}} className="h-[250px]">
+    <ChartContainer config={{}} className="h-62.5">
       <BarChart data={data} layout="vertical">
         <CartesianGrid
           strokeDasharray="3 3"
@@ -1369,7 +1369,7 @@ export default function DormantReportPage() {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-6 lg:w-[800px]">
+        <TabsList className="grid w-full grid-cols-6 lg:w-200">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="entities">Entities</TabsTrigger>
           <TabsTrigger value="classification">Classification</TabsTrigger>
@@ -2106,7 +2106,7 @@ export default function DormantReportPage() {
 
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Critical Entities</h3>
-              <div className="space-y-2 max-h-[600px] overflow-y-auto">
+              <div className="space-y-2 max-h-200 overflow-y-auto">
                 {DORMANT_ENTITIES.filter((e) => e.category === "critical")
                   .sort((a, b) => b.riskScore - a.riskScore)
                   .map((entity) => (

@@ -637,7 +637,7 @@ function ProfileDetailPanel({
       {/* Header */}
       <div className="flex items-start justify-between px-5 py-5 border-b bg-muted/30">
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-sm font-bold text-primary border border-primary/20">
+          <div className="h-12 w-12 rounded-full bg-linear-to-br from-primary/20 to-primary/5 flex items-center justify-center text-sm font-bold text-primary border border-primary/20">
             {initials}
           </div>
           <div className="min-w-0">

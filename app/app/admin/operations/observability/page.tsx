@@ -1028,7 +1028,7 @@ export default function ObservabilityPage() {
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="w-[200px]">Service</TableHead>
+                  <TableHead className="w-50">Service</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-center">Metrics</TableHead>
                   <TableHead className="text-center">Logs</TableHead>

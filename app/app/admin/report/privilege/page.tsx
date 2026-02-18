@@ -9,12 +9,7 @@ import {
   CardTitle,
 } from "@/components/dashboard/ui/card";
 import { MetricCard } from "@/components/dashboard/metric-card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/dashboard/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/dashboard/ui/tabs";
 import { Badge } from "@/components/dashboard/ui/badge";
 import { Button } from "@/components/dashboard/ui/button";
 import { Input } from "@/components/dashboard/ui/input";
@@ -33,11 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/dashboard/ui/table";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/dashboard/ui/chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/dashboard/ui/chart";
 import {
   BarChart,
   Bar,
@@ -83,12 +74,7 @@ import Link from "next/link";
 
 // ==================== TYPES & INTERFACES ====================
 
-export type PrivilegeType =
-  | "explicit"
-  | "inherited"
-  | "delegated"
-  | "temporary"
-  | "implicit";
+export type PrivilegeType = "explicit" | "inherited" | "delegated" | "temporary" | "implicit";
 
 export type PrivilegeLevel = "informational" | "elevated" | "critical";
 
@@ -550,11 +536,7 @@ const MOCK_PRIVILEGES: EffectivePrivilege[] = [
       scope: "global",
     },
     actions: ["admin", "root", "emergency"],
-    conditions: [
-      "Emergency only",
-      "Dual authorization required",
-      "Auto-revoke after 4h",
-    ],
+    conditions: ["Emergency only", "Dual authorization required", "Auto-revoke after 4h"],
     source: {
       type: "break_glass",
     },
@@ -684,13 +666,11 @@ const MOCK_ACCUMULATIONS: PrivilegeAccumulation[] = [
     identityId: "user-004",
     identityName: "diana.oncall@company.com",
     type: "accumulation",
-    description:
-      "Identity has accumulated 15 privileges over 3 years without review",
+    description: "Identity has accumulated 15 privileges over 3 years without review",
     severity: "high",
     detectedAt: "2025-02-09T00:00:00Z",
     affectedPrivileges: ["priv-005", "priv-006", "priv-007"],
-    recommendedAction:
-      "Conduct comprehensive access review and remove unnecessary privileges",
+    recommendedAction: "Conduct comprehensive access review and remove unnecessary privileges",
   },
   {
     id: "acc-002",
@@ -728,8 +708,7 @@ const MOCK_RISKS: PrivilegeRisk[] = [
     affectedPrivileges: ["priv-001", "priv-008"],
     detectedAt: "2025-02-09T10:00:00Z",
     evidence: ["priv-001", "priv-008", "cross-resource-analysis"],
-    recommendation:
-      "Implement separation of duties - split deployment and database admin roles",
+    recommendation: "Implement separation of duties - split deployment and database admin roles",
     remediationPriority: 1,
   },
   {
@@ -737,8 +716,7 @@ const MOCK_RISKS: PrivilegeRisk[] = [
     type: "dormant_high_privilege",
     severity: "warning",
     title: "Dormant High-Privilege Account",
-    description:
-      "Break glass access has not been reviewed in 60+ days despite high risk score",
+    description: "Break glass access has not been reviewed in 60+ days despite high risk score",
     affectedIdentities: ["user-004"],
     affectedPrivileges: ["priv-005"],
     detectedAt: "2025-02-08T00:00:00Z",
@@ -751,14 +729,12 @@ const MOCK_RISKS: PrivilegeRisk[] = [
     type: "shadow_admin",
     severity: "critical",
     title: "Shadow Admin Path Detected",
-    description:
-      "Service account can escalate privileges through inherited trust chain",
+    description: "Service account can escalate privileges through inherited trust chain",
     affectedIdentities: ["svc-deploy"],
     affectedPrivileges: ["priv-002", "priv-009"],
     detectedAt: "2025-02-09T09:30:00Z",
     evidence: ["trust-001", "role-k8s-admin", "path-analysis"],
-    recommendation:
-      "Review trust inheritance chain and implement privilege boundaries",
+    recommendation: "Review trust inheritance chain and implement privilege boundaries",
     remediationPriority: 1,
   },
   {
@@ -766,14 +742,12 @@ const MOCK_RISKS: PrivilegeRisk[] = [
     type: "unjustified_access",
     severity: "informational",
     title: "Privileges Missing Business Justification",
-    description:
-      "12% of effective privileges lack documented business justification",
+    description: "12% of effective privileges lack documented business justification",
     affectedIdentities: ["user-003"],
     affectedPrivileges: ["priv-004"],
     detectedAt: "2025-02-01T00:00:00Z",
     evidence: ["justification-audit"],
-    recommendation:
-      "Enforce justification requirements for all privilege grants",
+    recommendation: "Enforce justification requirements for all privilege grants",
     remediationPriority: 5,
   },
 ];
@@ -918,10 +892,7 @@ function RiskLevelBadge({ level }: { level: PrivilegeLevel | "warning" }) {
   const config = RISK_COLORS[mappedLevel];
   const Icon = config.icon;
   return (
-    <Badge
-      variant="outline"
-      className={cn("gap-1", config.bg, config.text, config.border)}
-    >
+    <Badge variant="outline" className={cn("gap-1", config.bg, config.text, config.border)}>
       <Icon className="h-3 w-3" />
       {level.charAt(0).toUpperCase() + level.slice(1)}
     </Badge>
@@ -945,10 +916,7 @@ function SeverityBadge({ severity }: { severity: string }) {
   };
 
   return (
-    <Badge
-      variant="outline"
-      className={cn("capitalize", colors[severity as keyof typeof colors])}
-    >
+    <Badge variant="outline" className={cn("capitalize", colors[severity as keyof typeof colors])}>
       {severity}
     </Badge>
   );
@@ -991,15 +959,10 @@ function AccumulationTypeBadge({ type }: { type: string }) {
 
 function PrivilegeTrendChart({ data }: { data: PrivilegeSummary["trend"] }) {
   return (
-    <ChartContainer config={{}} className="h-[300px]">
+    <ChartContainer config={{}} className="h-75">
       <LineChart data={data}>
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-        <XAxis
-          dataKey="date"
-          className="text-xs"
-          tickLine={false}
-          axisLine={false}
-        />
+        <XAxis dataKey="date" className="text-xs" tickLine={false} axisLine={false} />
         <YAxis className="text-xs" tickLine={false} axisLine={false} />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Legend />
@@ -1040,25 +1003,12 @@ function PrivilegeTrendChart({ data }: { data: PrivilegeSummary["trend"] }) {
   );
 }
 
-function PrivilegeSourceChart({
-  data,
-}: {
-  data: PrivilegeSummary["bySource"];
-}) {
+function PrivilegeSourceChart({ data }: { data: PrivilegeSummary["bySource"] }) {
   return (
-    <ChartContainer config={{}} className="h-[250px]">
+    <ChartContainer config={{}} className="h-62.5">
       <BarChart data={data} layout="vertical">
-        <CartesianGrid
-          strokeDasharray="3 3"
-          className="stroke-muted"
-          horizontal={false}
-        />
-        <XAxis
-          type="number"
-          className="text-xs"
-          tickLine={false}
-          axisLine={false}
-        />
+        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
+        <XAxis type="number" className="text-xs" tickLine={false} axisLine={false} />
         <YAxis
           dataKey="source"
           type="category"
@@ -1066,9 +1016,7 @@ function PrivilegeSourceChart({
           tickLine={false}
           axisLine={false}
           width={120}
-          tickFormatter={(value) =>
-            SOURCE_TYPE_LABELS[value as PrivilegeSource]
-          }
+          tickFormatter={(value) => SOURCE_TYPE_LABELS[value as PrivilegeSource]}
         />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Bar dataKey="count" fill="currentColor" radius={[0, 4, 4, 0]} />
@@ -1077,15 +1025,11 @@ function PrivilegeSourceChart({
   );
 }
 
-function RiskDistributionChart({
-  data,
-}: {
-  data: PrivilegeSummary["byRiskLevel"];
-}) {
+function RiskDistributionChart({ data }: { data: PrivilegeSummary["byRiskLevel"] }) {
   const COLORS = ["#3b82f6", "#f59e0b", "#ef4444"];
 
   return (
-    <ChartContainer config={{}} className="h-[250px]">
+    <ChartContainer config={{}} className="h-62.5">
       <PieChart>
         <Pie
           data={data}
@@ -1096,7 +1040,10 @@ function RiskDistributionChart({
           paddingAngle={5}
           dataKey="count"
           nameKey="level"
-          label={({ level, count }) => `${level}: ${count}`}
+          label={(props) => {
+            const data = props as unknown as { level: string; count: number };
+            return `${data.level}: ${data.count}`;
+          }}
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -1108,13 +1055,9 @@ function RiskDistributionChart({
   );
 }
 
-function IdentityTypeDistributionChart({
-  data,
-}: {
-  data: PrivilegeSummary["byIdentityType"];
-}) {
+function IdentityTypeDistributionChart({ data }: { data: PrivilegeSummary["byIdentityType"] }) {
   return (
-    <ChartContainer config={{}} className="h-[250px]">
+    <ChartContainer config={{}} className="h-62.5">
       <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis
@@ -1122,9 +1065,7 @@ function IdentityTypeDistributionChart({
           className="text-xs"
           tickLine={false}
           axisLine={false}
-          tickFormatter={(value) =>
-            value.charAt(0).toUpperCase() + value.slice(1)
-          }
+          tickFormatter={(value) => value.charAt(0).toUpperCase() + value.slice(1)}
         />
         <YAxis className="text-xs" tickLine={false} axisLine={false} />
         <ChartTooltip content={<ChartTooltipContent />} />
@@ -1153,9 +1094,7 @@ function PrivilegeMatrixTable({
             <TableHead>Organization</TableHead>
             <TableHead className="text-right">Total</TableHead>
             <TableHead className="text-right text-red-600">Critical</TableHead>
-            <TableHead className="text-right text-yellow-600">
-              Elevated
-            </TableHead>
+            <TableHead className="text-right text-yellow-600">Elevated</TableHead>
             <TableHead className="text-right">Inherited</TableHead>
             <TableHead className="text-right">Unused</TableHead>
             <TableHead>Risk Score</TableHead>
@@ -1171,53 +1110,36 @@ function PrivilegeMatrixTable({
                   <div className="flex items-center gap-2">
                     <IdentityIcon className="h-4 w-4 text-muted-foreground" />
                     <div>
-                      <div className="font-medium text-sm">
-                        {entry.identityName}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {entry.identityId}
-                      </div>
+                      <div className="font-medium text-sm">{entry.identityName}</div>
+                      <div className="text-xs text-muted-foreground">{entry.identityId}</div>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="capitalize text-sm">
-                    {entry.identityType}
-                  </span>
+                  <span className="capitalize text-sm">{entry.identityType}</span>
                 </TableCell>
                 <TableCell className="text-sm">{entry.organization}</TableCell>
-                <TableCell className="text-right font-medium">
-                  {entry.totalPrivileges}
-                </TableCell>
+                <TableCell className="text-right font-medium">{entry.totalPrivileges}</TableCell>
                 <TableCell className="text-right">
                   {entry.criticalPrivileges > 0 ? (
-                    <span className="text-red-600 font-medium">
-                      {entry.criticalPrivileges}
-                    </span>
+                    <span className="text-red-600 font-medium">{entry.criticalPrivileges}</span>
                   ) : (
                     <span className="text-muted-foreground">-</span>
                   )}
                 </TableCell>
                 <TableCell className="text-right">
                   {entry.elevatedPrivileges > 0 ? (
-                    <span className="text-yellow-600 font-medium">
-                      {entry.elevatedPrivileges}
-                    </span>
+                    <span className="text-yellow-600 font-medium">{entry.elevatedPrivileges}</span>
                   ) : (
                     <span className="text-muted-foreground">-</span>
                   )}
                 </TableCell>
                 <TableCell className="text-right text-muted-foreground">
-                  {entry.inheritedPrivileges > 0
-                    ? entry.inheritedPrivileges
-                    : "-"}
+                  {entry.inheritedPrivileges > 0 ? entry.inheritedPrivileges : "-"}
                 </TableCell>
                 <TableCell className="text-right">
                   {entry.unusedPrivileges > 0 ? (
-                    <Badge
-                      variant="outline"
-                      className="text-xs text-orange-600"
-                    >
+                    <Badge variant="outline" className="text-xs text-orange-600">
                       {entry.unusedPrivileges}
                     </Badge>
                   ) : (
@@ -1234,7 +1156,7 @@ function PrivilegeMatrixTable({
                             ? "bg-red-500"
                             : entry.riskScore >= 40
                               ? "bg-yellow-500"
-                              : "bg-green-500",
+                              : "bg-green-500"
                         )}
                         style={{ width: `${entry.riskScore}%` }}
                       />
@@ -1243,11 +1165,7 @@ function PrivilegeMatrixTable({
                   </div>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onViewDetail(entry)}
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => onViewDetail(entry)}>
                     <Eye className="h-4 w-4" />
                   </Button>
                 </TableCell>
@@ -1300,9 +1218,7 @@ function PrivilegeDetailTable({
               <TableCell>
                 <div>
                   <div className="text-sm">{priv.resource.name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {priv.resource.type}
-                  </div>
+                  <div className="text-xs text-muted-foreground">{priv.resource.type}</div>
                 </div>
               </TableCell>
               <TableCell>
@@ -1334,11 +1250,7 @@ function PrivilegeDetailTable({
                 )}
               </TableCell>
               <TableCell className="text-right">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onViewPath(priv)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => onViewPath(priv)}>
                   <GitBranch className="h-4 w-4" />
                 </Button>
               </TableCell>
@@ -1350,11 +1262,7 @@ function PrivilegeDetailTable({
   );
 }
 
-function AccumulationTable({
-  accumulations,
-}: {
-  accumulations: PrivilegeAccumulation[];
-}) {
+function AccumulationTable({ accumulations }: { accumulations: PrivilegeAccumulation[] }) {
   return (
     <div className="rounded-md border">
       <Table>
@@ -1374,9 +1282,7 @@ function AccumulationTable({
               <TableCell>
                 <div>
                   <div className="font-medium text-sm">{acc.identityName}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {acc.identityId}
-                  </div>
+                  <div className="text-xs text-muted-foreground">{acc.identityId}</div>
                 </div>
               </TableCell>
               <TableCell>
@@ -1385,15 +1291,11 @@ function AccumulationTable({
               <TableCell>
                 <SeverityBadge severity={acc.severity} />
               </TableCell>
-              <TableCell className="text-sm max-w-[300px]">
-                {acc.description}
-              </TableCell>
+              <TableCell className="text-sm max-w-75">{acc.description}</TableCell>
               <TableCell className="text-sm">
                 {new Date(acc.detectedAt).toLocaleDateString()}
               </TableCell>
-              <TableCell className="text-sm max-w-[250px]">
-                {acc.recommendedAction}
-              </TableCell>
+              <TableCell className="text-sm max-w-62.5">{acc.recommendedAction}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -1422,7 +1324,7 @@ function RiskTable({ risks }: { risks: PrivilegeRisk[] }) {
               <TableCell>
                 <div>
                   <div className="font-medium text-sm">{risk.title}</div>
-                  <div className="text-xs text-muted-foreground max-w-[300px] truncate">
+                  <div className="text-xs text-muted-foreground max-w-75 truncate">
                     {risk.description}
                   </div>
                 </div>
@@ -1460,7 +1362,7 @@ function RiskTable({ risks }: { risks: PrivilegeRisk[] }) {
                           ? "bg-red-500"
                           : risk.remediationPriority <= 4
                             ? "bg-yellow-500"
-                            : "bg-blue-500",
+                            : "bg-blue-500"
                       )}
                       style={{
                         width: `${(6 - risk.remediationPriority) * 20}%`,
@@ -1491,7 +1393,7 @@ function PrivilegePathVisualization({ path }: { path: PrivilegePathNode[] }) {
                 "w-8 h-8 rounded-full flex items-center justify-center border-2",
                 node.effective
                   ? "bg-primary/10 border-primary text-primary"
-                  : "bg-muted border-muted-foreground/30 text-muted-foreground",
+                  : "bg-muted border-muted-foreground/30 text-muted-foreground"
               )}
             >
               {node.type === "identity" && <Fingerprint className="h-4 w-4" />}
@@ -1509,18 +1411,13 @@ function PrivilegePathVisualization({ path }: { path: PrivilegePathNode[] }) {
                 {node.type}
               </Badge>
               {!node.effective && (
-                <Badge
-                  variant="outline"
-                  className="text-xs text-muted-foreground"
-                >
+                <Badge variant="outline" className="text-xs text-muted-foreground">
                   Inactive
                 </Badge>
               )}
             </div>
             {node.description && (
-              <p className="text-xs text-muted-foreground mt-1">
-                {node.description}
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">{node.description}</p>
             )}
           </div>
         </div>
@@ -1543,15 +1440,13 @@ function FilterBar({
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div className="flex flex-1 gap-2 flex-wrap">
-        <div className="relative flex-1 min-w-[200px] max-w-[300px]">
+        <div className="relative flex-1 min-w-50 max-w-75">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search identities, privileges..."
             className="pl-9"
             value={filters.search || ""}
-            onChange={(e) =>
-              onFiltersChange({ ...filters, search: e.target.value })
-            }
+            onChange={(e) => onFiltersChange({ ...filters, search: e.target.value })}
           />
         </div>
         <Select
@@ -1563,7 +1458,7 @@ function FilterBar({
             })
           }
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-35">
             <SelectValue placeholder="Privilege Type" />
           </SelectTrigger>
           <SelectContent>
@@ -1584,7 +1479,7 @@ function FilterBar({
             })
           }
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-35">
             <SelectValue placeholder="Risk Level" />
           </SelectTrigger>
           <SelectContent>
@@ -1603,7 +1498,7 @@ function FilterBar({
             })
           }
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-35">
             <SelectValue placeholder="Identity Type" />
           </SelectTrigger>
           <SelectContent>
@@ -1623,7 +1518,7 @@ function FilterBar({
             })
           }
         >
-          <SelectTrigger className="w-[130px]">
+          <SelectTrigger className="w-32.5">
             <SelectValue placeholder="Usage" />
           </SelectTrigger>
           <SelectContent>
@@ -1641,7 +1536,7 @@ function FilterBar({
             })
           }
         >
-          <SelectTrigger className="w-[150px]">
+          <SelectTrigger className="w-37.5">
             <SelectValue placeholder="Justification" />
           </SelectTrigger>
           <SelectContent>
@@ -1655,10 +1550,8 @@ function FilterBar({
         <Button variant="outline" size="sm">
           <RefreshCw className="h-4 w-4 mr-2" /> Refresh
         </Button>
-        <Select
-          onValueChange={(value) => onExport(value as "csv" | "json" | "pdf")}
-        >
-          <SelectTrigger className="w-[140px]">
+        <Select onValueChange={(value) => onExport(value as "csv" | "json" | "pdf")}>
+          <SelectTrigger className="w-35">
             <SelectValue placeholder="Export" />
           </SelectTrigger>
           <SelectContent>
@@ -1731,35 +1624,25 @@ function IdentityDetailDialog({
           <div className="grid grid-cols-4 gap-4">
             <Card>
               <CardContent className="p-4">
-                <div className="text-2xl font-bold">
-                  {entry.totalPrivileges}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Total Privileges
-                </p>
+                <div className="text-2xl font-bold">{entry.totalPrivileges}</div>
+                <p className="text-xs text-muted-foreground">Total Privileges</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
-                <div className="text-2xl font-bold text-red-600">
-                  {entry.criticalPrivileges}
-                </div>
+                <div className="text-2xl font-bold text-red-600">{entry.criticalPrivileges}</div>
                 <p className="text-xs text-muted-foreground">Critical</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
-                <div className="text-2xl font-bold text-yellow-600">
-                  {entry.elevatedPrivileges}
-                </div>
+                <div className="text-2xl font-bold text-yellow-600">{entry.elevatedPrivileges}</div>
                 <p className="text-xs text-muted-foreground">Elevated</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
-                <div className="text-2xl font-bold text-orange-600">
-                  {entry.unusedPrivileges}
-                </div>
+                <div className="text-2xl font-bold text-orange-600">{entry.unusedPrivileges}</div>
                 <p className="text-xs text-muted-foreground">Unused</p>
               </CardContent>
             </Card>
@@ -1767,10 +1650,7 @@ function IdentityDetailDialog({
 
           <div>
             <h4 className="font-semibold mb-4">Effective Privileges</h4>
-            <PrivilegeDetailTable
-              privileges={entry.privileges}
-              onViewPath={onViewPath}
-            />
+            <PrivilegeDetailTable privileges={entry.privileges} onViewPath={onViewPath} />
           </div>
 
           <div className="flex justify-end gap-2 pt-4 border-t">
@@ -1806,9 +1686,7 @@ function PrivilegePathDialog({
                 <GitBranch className="h-5 w-5" />
               </div>
               <div>
-                <CardTitle className="text-lg">
-                  Privilege Attribution Path
-                </CardTitle>
+                <CardTitle className="text-lg">Privilege Attribution Path</CardTitle>
                 <CardDescription>{privilege.name}</CardDescription>
               </div>
             </div>
@@ -1858,8 +1736,9 @@ function PrivilegePathDialog({
 export default function PrivilegeReportPage() {
   const [filters, setFilters] = React.useState<PrivilegeFilters>({});
   const [activeTab, setActiveTab] = React.useState("overview");
-  const [selectedIdentity, setSelectedIdentity] =
-    React.useState<IdentityPrivilegeEntry | null>(null);
+  const [selectedIdentity, setSelectedIdentity] = React.useState<IdentityPrivilegeEntry | null>(
+    null
+  );
   const [selectedPrivilegePath, setSelectedPrivilegePath] =
     React.useState<EffectivePrivilege | null>(null);
 
@@ -1872,19 +1751,14 @@ export default function PrivilegeReportPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Privilege Report
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Privilege Report</h1>
           <p className="text-muted-foreground mt-1">
-            Visualize, analyze, and evaluate effective privileges across your
-            identity ecosystem
+            Visualize, analyze, and evaluate effective privileges across your identity ecosystem
           </p>
         </div>
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <div className="text-sm text-muted-foreground">
-              Report Generated
-            </div>
+            <div className="text-sm text-muted-foreground">Report Generated</div>
             <div className="text-sm font-medium">
               <TimeDisplay />
             </div>
@@ -1951,7 +1825,7 @@ export default function PrivilegeReportPage() {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-6 lg:w-[800px]">
+        <TabsList className="grid w-full grid-cols-6 lg:w-200">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="matrix">Identity Matrix</TabsTrigger>
           <TabsTrigger value="paths">Paths</TabsTrigger>
@@ -2007,21 +1881,15 @@ export default function PrivilegeReportPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Inherited</span>
-                    <span className="font-medium">
-                      {PRIVILEGE_SUMMARY.inheritedPercentage}%
-                    </span>
+                    <span className="font-medium">{PRIVILEGE_SUMMARY.inheritedPercentage}%</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Delegated</span>
-                    <span className="font-medium">
-                      {PRIVILEGE_SUMMARY.delegatedPercentage}%
-                    </span>
+                    <span className="font-medium">{PRIVILEGE_SUMMARY.delegatedPercentage}%</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Temporary</span>
-                    <span className="font-medium">
-                      {PRIVILEGE_SUMMARY.temporaryPercentage}%
-                    </span>
+                    <span className="font-medium">{PRIVILEGE_SUMMARY.temporaryPercentage}%</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Unused (90d+)</span>
@@ -2042,21 +1910,14 @@ export default function PrivilegeReportPage() {
               <CardContent>
                 <div className="space-y-3">
                   {PRIVILEGE_SUMMARY.topRiskIdentities.map((identity) => (
-                    <div
-                      key={identity.identityId}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="text-sm truncate max-w-[150px]">
-                        {identity.identityName}
-                      </div>
+                    <div key={identity.identityId} className="flex items-center justify-between">
+                      <div className="text-sm truncate max-w-37.5">{identity.identityName}</div>
                       <div className="flex items-center gap-2">
                         <div className="w-12 h-2 bg-muted rounded-full overflow-hidden">
                           <div
                             className={cn(
                               "h-full rounded-full",
-                              identity.riskScore >= 70
-                                ? "bg-red-500"
-                                : "bg-yellow-500",
+                              identity.riskScore >= 70 ? "bg-red-500" : "bg-yellow-500"
                             )}
                             style={{ width: `${identity.riskScore}%` }}
                           />
@@ -2078,11 +1939,8 @@ export default function PrivilegeReportPage() {
               <CardContent>
                 <div className="space-y-2">
                   {PRIVILEGE_SUMMARY.bySource.slice(0, 4).map((source) => (
-                    <div
-                      key={source.source}
-                      className="flex justify-between text-sm items-center"
-                    >
-                      <span className="text-muted-foreground truncate max-w-[150px]">
+                    <div key={source.source} className="flex justify-between text-sm items-center">
+                      <span className="text-muted-foreground truncate max-w-37.5">
                         {SOURCE_TYPE_LABELS[source.source]}
                       </span>
                       <span className="font-medium">{source.count}</span>
@@ -2098,9 +1956,7 @@ export default function PrivilegeReportPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Privilege Trend</CardTitle>
-                <CardDescription>
-                  Evolution of privileges and risks over time
-                </CardDescription>
+                <CardDescription>Evolution of privileges and risks over time</CardDescription>
               </CardHeader>
               <CardContent>
                 <PrivilegeTrendChart data={PRIVILEGE_SUMMARY.trend} />
@@ -2121,9 +1977,7 @@ export default function PrivilegeReportPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Privilege Sources</CardTitle>
-                <CardDescription>
-                  Distribution by attribution source
-                </CardDescription>
+                <CardDescription>Distribution by attribution source</CardDescription>
               </CardHeader>
               <CardContent>
                 <PrivilegeSourceChart data={PRIVILEGE_SUMMARY.bySource} />
@@ -2132,14 +1986,10 @@ export default function PrivilegeReportPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Identity Type Distribution</CardTitle>
-                <CardDescription>
-                  Privileges by identity category
-                </CardDescription>
+                <CardDescription>Privileges by identity category</CardDescription>
               </CardHeader>
               <CardContent>
-                <IdentityTypeDistributionChart
-                  data={PRIVILEGE_SUMMARY.byIdentityType}
-                />
+                <IdentityTypeDistributionChart data={PRIVILEGE_SUMMARY.byIdentityType} />
               </CardContent>
             </Card>
           </div>
@@ -2147,11 +1997,7 @@ export default function PrivilegeReportPage() {
 
         {/* IDENTITY MATRIX TAB */}
         <TabsContent value="matrix" className="space-y-6 mt-6">
-          <FilterBar
-            filters={filters}
-            onFiltersChange={setFilters}
-            onExport={handleExport}
-          />
+          <FilterBar filters={filters} onFiltersChange={setFilters} onExport={handleExport} />
           <Card>
             <CardHeader>
               <CardTitle>Identity Privilege Matrix</CardTitle>
@@ -2174,26 +2020,19 @@ export default function PrivilegeReportPage() {
             <CardHeader>
               <CardTitle>Privilege Attribution Paths</CardTitle>
               <CardDescription>
-                Visualize how privileges flow from sources to identities through
-                roles, policies, and trusts
+                Visualize how privileges flow from sources to identities through roles, policies,
+                and trusts
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
                 {MOCK_PRIVILEGES.slice(0, 3).map((privilege) => (
-                  <Card
-                    key={privilege.id}
-                    className="border-l-4 border-l-primary"
-                  >
+                  <Card key={privilege.id} className="border-l-4 border-l-primary">
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div>
-                          <CardTitle className="text-base">
-                            {privilege.name}
-                          </CardTitle>
-                          <CardDescription>
-                            {privilege.description}
-                          </CardDescription>
+                          <CardTitle className="text-base">{privilege.name}</CardTitle>
+                          <CardDescription>{privilege.description}</CardDescription>
                         </div>
                         <div className="flex gap-2">
                           <PrivilegeTypeBadge type={privilege.type} />
@@ -2204,45 +2043,29 @@ export default function PrivilegeReportPage() {
                     <CardContent className="pt-0">
                       <div className="grid grid-cols-2 gap-6">
                         <div>
-                          <div className="text-xs text-muted-foreground mb-2">
-                            Attribution Path
-                          </div>
+                          <div className="text-xs text-muted-foreground mb-2">Attribution Path</div>
                           <PrivilegePathVisualization path={privilege.path} />
                         </div>
                         <div className="space-y-4">
                           <div>
-                            <div className="text-xs text-muted-foreground mb-1">
-                              Identity
-                            </div>
-                            <div className="text-sm font-medium">
-                              {privilege.identity.name}
-                            </div>
+                            <div className="text-xs text-muted-foreground mb-1">Identity</div>
+                            <div className="text-sm font-medium">{privilege.identity.name}</div>
                             <div className="text-xs text-muted-foreground">
                               {privilege.identity.type}
                             </div>
                           </div>
                           <div>
-                            <div className="text-xs text-muted-foreground mb-1">
-                              Resource
-                            </div>
-                            <div className="text-sm font-medium">
-                              {privilege.resource.name}
-                            </div>
+                            <div className="text-xs text-muted-foreground mb-1">Resource</div>
+                            <div className="text-sm font-medium">{privilege.resource.name}</div>
                             <div className="text-xs text-muted-foreground">
                               {privilege.resource.type}
                             </div>
                           </div>
                           <div>
-                            <div className="text-xs text-muted-foreground mb-1">
-                              Actions
-                            </div>
+                            <div className="text-xs text-muted-foreground mb-1">Actions</div>
                             <div className="flex flex-wrap gap-1">
                               {privilege.actions.map((action) => (
-                                <Badge
-                                  key={action}
-                                  variant="outline"
-                                  className="text-xs"
-                                >
+                                <Badge key={action} variant="outline" className="text-xs">
                                   {action}
                                 </Badge>
                               ))}
@@ -2287,8 +2110,8 @@ export default function PrivilegeReportPage() {
             <CardHeader>
               <CardTitle>Privilege Accumulation & Drift</CardTitle>
               <CardDescription>
-                Identities with excessive privileges, drift from baseline, or
-                expired temporary access
+                Identities with excessive privileges, drift from baseline, or expired temporary
+                access
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -2310,9 +2133,7 @@ export default function PrivilegeReportPage() {
                 <div className="text-3xl font-bold text-red-600">
                   {PRIVILEGE_SUMMARY.criticalRisks}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Require immediate attention
-                </p>
+                <p className="text-xs text-muted-foreground">Require immediate attention</p>
               </CardContent>
             </Card>
             <Card className="border-l-4 border-l-yellow-500">
@@ -2323,12 +2144,9 @@ export default function PrivilegeReportPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-yellow-600">
-                  {PRIVILEGE_SUMMARY.activeRisks -
-                    PRIVILEGE_SUMMARY.criticalRisks}
+                  {PRIVILEGE_SUMMARY.activeRisks - PRIVILEGE_SUMMARY.criticalRisks}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Should be reviewed soon
-                </p>
+                <p className="text-xs text-muted-foreground">Should be reviewed soon</p>
               </CardContent>
             </Card>
             <Card className="border-l-4 border-l-blue-500">
@@ -2339,9 +2157,7 @@ export default function PrivilegeReportPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-blue-600">8</div>
-                <p className="text-xs text-muted-foreground">
-                  Best practice improvements
-                </p>
+                <p className="text-xs text-muted-foreground">Best practice improvements</p>
               </CardContent>
             </Card>
           </div>
@@ -2364,8 +2180,7 @@ export default function PrivilegeReportPage() {
             <CardHeader>
               <CardTitle>Evidence & Export</CardTitle>
               <CardDescription>
-                Technical evidence and audit trail for compliance and
-                investigation
+                Technical evidence and audit trail for compliance and investigation
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -2415,21 +2230,15 @@ export default function PrivilegeReportPage() {
                   <CardContent>
                     <div className="space-y-3 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">
-                          Last Full Scan
-                        </span>
+                        <span className="text-muted-foreground">Last Full Scan</span>
                         <span>2025-02-09 02:00 UTC</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">
-                          Last Incremental
-                        </span>
+                        <span className="text-muted-foreground">Last Incremental</span>
                         <span>2025-02-09 10:00 UTC</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">
-                          Data Source
-                        </span>
+                        <span className="text-muted-foreground">Data Source</span>
                         <span>Identity Engine v2.4</span>
                       </div>
                       <div className="flex justify-between">
@@ -2443,9 +2252,7 @@ export default function PrivilegeReportPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">
-                    Technical Evidence
-                  </CardTitle>
+                  <CardTitle className="text-base">Technical Evidence</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -2454,23 +2261,18 @@ export default function PrivilegeReportPage() {
                         Privilege Calculation Methodology
                       </h4>
                       <p className="text-sm text-muted-foreground">
-                        Effective privileges are calculated through transitive
-                        closure of role assignments, policy grants, trust
-                        inheritances, and delegations. The calculation considers
-                        temporal constraints, conditional policies, and
+                        Effective privileges are calculated through transitive closure of role
+                        assignments, policy grants, trust inheritances, and delegations. The
+                        calculation considers temporal constraints, conditional policies, and
                         organizational boundaries.
                       </p>
                     </div>
                     <div>
-                      <h4 className="text-sm font-medium mb-2">
-                        Risk Scoring Algorithm
-                      </h4>
+                      <h4 className="text-sm font-medium mb-2">Risk Scoring Algorithm</h4>
                       <p className="text-sm text-muted-foreground">
-                        Risk scores (0-100) are derived from: privilege level
-                        (40%), access patterns (25%), identity type (15%),
-                        justification status (10%), and inheritance depth (10%).
-                        Scores ≥70 indicate critical risk requiring immediate
-                        review.
+                        Risk scores (0-100) are derived from: privilege level (40%), access patterns
+                        (25%), identity type (15%), justification status (10%), and inheritance
+                        depth (10%). Scores ≥70 indicate critical risk requiring immediate review.
                       </p>
                     </div>
                     <div className="flex gap-2 pt-4 border-t">

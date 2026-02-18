@@ -11,12 +11,7 @@ import {
 import { Badge } from "@/components/dashboard/ui/badge";
 import { Button } from "@/components/dashboard/ui/button";
 import { Progress } from "@/components/dashboard/ui/progress";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/dashboard/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/dashboard/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -74,24 +69,9 @@ import { MetricCard } from "@/components/dashboard/metric-card";
 // TYPES - Enterprise Database Management
 // ============================================================================
 
-type DatabaseStatus =
-  | "healthy"
-  | "degraded"
-  | "critical"
-  | "unreachable"
-  | "maintenance";
-type DatabaseRole =
-  | "primary"
-  | "replica"
-  | "read-replica"
-  | "standby"
-  | "analytics";
-type DatabaseEngine =
-  | "postgresql"
-  | "mysql"
-  | "redis"
-  | "elasticsearch"
-  | "mongodb";
+type DatabaseStatus = "healthy" | "degraded" | "critical" | "unreachable" | "maintenance";
+type DatabaseRole = "primary" | "replica" | "read-replica" | "standby" | "analytics";
+type DatabaseEngine = "postgresql" | "mysql" | "redis" | "elasticsearch" | "mongodb";
 type EnvironmentType = "production" | "staging" | "development";
 type ComplianceLevel = "soc2" | "iso27001" | "gdpr" | "hipaa";
 type PlanTier = "free" | "pro" | "enterprise";
@@ -544,8 +524,7 @@ const databases: Database[] = [
         id: "alert_analytics_001",
         severity: "high",
         type: "performance",
-        message:
-          "Elevated query latency detected - potential resource contention",
+        message: "Elevated query latency detected - potential resource contention",
         timestamp: "2026-02-12T09:15:00Z",
         acknowledged: false,
         correlationId: "corr_analytics_perf_001",
@@ -610,8 +589,7 @@ const databases: Database[] = [
         id: "alert_dev_001",
         severity: "low",
         type: "security",
-        message:
-          "Development database lacks encryption - acceptable for local use",
+        message: "Development database lacks encryption - acceptable for local use",
         timestamp: "2026-02-12T00:00:00Z",
         acknowledged: true,
         correlationId: "corr_dev_security_001",
@@ -826,10 +804,7 @@ const engineConfig: Record<
   mongodb: { label: "MongoDB", icon: Database, color: "text-green-500" },
 };
 
-const severityConfig: Record<
-  string,
-  { color: string; bgColor: string; label: string }
-> = {
+const severityConfig: Record<string, { color: string; bgColor: string; label: string }> = {
   critical: {
     label: "Critical",
     color: "text-destructive",
@@ -868,13 +843,13 @@ function StatusBadge({
         config.color,
         size === "sm" && "h-5 px-1.5 text-[10px]",
         size === "default" && "h-6 px-2 text-xs",
-        size === "lg" && "h-7 px-3 text-sm",
+        size === "lg" && "h-7 px-3 text-sm"
       )}
     >
       <Icon
         className={cn(
           "mr-1",
-          size === "sm" ? "h-3 w-3" : size === "lg" ? "h-4 w-4" : "h-3.5 w-3.5",
+          size === "sm" ? "h-3 w-3" : size === "lg" ? "h-4 w-4" : "h-3.5 w-3.5"
         )}
       />
       {showLabel && config.label}
@@ -890,11 +865,7 @@ function RoleBadge({ role }: { role: DatabaseRole }) {
         <TooltipTrigger asChild>
           <Badge
             variant="outline"
-            className={cn(
-              "text-xs font-medium cursor-help",
-              config.color,
-              config.bgColor,
-            )}
+            className={cn("text-xs font-medium cursor-help", config.color, config.bgColor)}
           >
             {config.label}
           </Badge>
@@ -907,13 +878,7 @@ function RoleBadge({ role }: { role: DatabaseRole }) {
   );
 }
 
-function EngineBadge({
-  engine,
-  version,
-}: {
-  engine: DatabaseEngine;
-  version: string;
-}) {
+function EngineBadge({ engine, version }: { engine: DatabaseEngine; version: string }) {
   const config = engineConfig[engine];
   const Icon = config.icon;
   return (
@@ -950,18 +915,13 @@ function ComplianceBadge({ standards }: { standards: ComplianceLevel[] }) {
           <TooltipProvider key={standard}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Badge
-                  variant="outline"
-                  className="h-5 px-1.5 text-[10px] uppercase"
-                >
+                <Badge variant="outline" className="h-5 px-1.5 text-[10px] uppercase">
                   <Icon className="h-3 w-3 mr-1" />
                   {standard}
                 </Badge>
               </TooltipTrigger>
               <TooltipContent>
-                <p className="text-xs">
-                  Compliant with {standard.toUpperCase()}
-                </p>
+                <p className="text-xs">Compliant with {standard.toUpperCase()}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -1018,10 +978,7 @@ function StorageBar({
           {used} GB / {total} GB
         </span>
         <span
-          className={cn(
-            "font-medium",
-            percentage >= 75 ? "text-amber-500" : "text-foreground",
-          )}
+          className={cn("font-medium", percentage >= 75 ? "text-amber-500" : "text-foreground")}
         >
           {percentage.toFixed(1)}%
         </span>
@@ -1032,9 +989,7 @@ function StorageBar({
           style={{ width: `${percentage}%` }}
         />
       </div>
-      <p className="text-[10px] text-muted-foreground">
-        +{growthRate}% growth / month
-      </p>
+      <p className="text-[10px] text-muted-foreground">+{growthRate}% growth / month</p>
     </div>
   );
 }
@@ -1058,9 +1013,7 @@ function OrganizationSelector({ currentOrg }: { currentOrg: Organization }) {
             <Badge variant="outline" className="text-[10px] h-5 capitalize">
               {currentOrg.plan}
             </Badge>
-            <span className="text-xs text-muted-foreground">
-              {currentOrg.region}
-            </span>
+            <span className="text-xs text-muted-foreground">{currentOrg.region}</span>
           </div>
         </div>
       </div>
@@ -1071,7 +1024,7 @@ function OrganizationSelector({ currentOrg }: { currentOrg: Organization }) {
             <span
               className={cn(
                 "font-medium",
-                usagePercent >= 80 ? "text-amber-500" : "text-foreground",
+                usagePercent >= 80 ? "text-amber-500" : "text-foreground"
               )}
             >
               {usagePercent.toFixed(1)}%
@@ -1099,24 +1052,15 @@ function OrganizationSelector({ currentOrg }: { currentOrg: Organization }) {
 function DatabaseOverviewSection({ databases }: { databases: Database[] }) {
   const degradedCount = databases.filter((d) => d.status === "degraded").length;
   const criticalCount = databases.filter(
-    (d) => d.status === "critical" || d.status === "unreachable",
+    (d) => d.status === "critical" || d.status === "unreachable"
   ).length;
-  const maintenanceCount = databases.filter(
-    (d) => d.status === "maintenance",
-  ).length;
+  const maintenanceCount = databases.filter((d) => d.status === "maintenance").length;
 
-  const totalStorage = databases.reduce(
-    (acc, d) => acc + d.metrics.storage.used,
-    0,
-  );
-  const totalConnections = databases.reduce(
-    (acc, d) => acc + d.metrics.connections.active,
-    0,
-  );
+  const totalStorage = databases.reduce((acc, d) => acc + d.metrics.storage.used, 0);
+  const totalConnections = databases.reduce((acc, d) => acc + d.metrics.connections.active, 0);
   const avgLatency =
     databases.length > 0
-      ? databases.reduce((acc, d) => acc + d.metrics.performance.latency, 0) /
-        databases.length
+      ? databases.reduce((acc, d) => acc + d.metrics.performance.latency, 0) / databases.length
       : 0;
 
   const unacknowledgedAlerts = databases
@@ -1185,17 +1129,14 @@ function DatabaseStatusSummary({ databases }: { databases: Database[] }) {
   const byStatus = {
     healthy: databases.filter((d) => d.status === "healthy").length,
     degraded: databases.filter((d) => d.status === "degraded").length,
-    critical: databases.filter(
-      (d) => d.status === "critical" || d.status === "unreachable",
-    ).length,
+    critical: databases.filter((d) => d.status === "critical" || d.status === "unreachable").length,
     maintenance: databases.filter((d) => d.status === "maintenance").length,
   };
 
   const byEnvironment = {
     production: databases.filter((d) => d.environment === "production").length,
     staging: databases.filter((d) => d.environment === "staging").length,
-    development: databases.filter((d) => d.environment === "development")
-      .length,
+    development: databases.filter((d) => d.environment === "development").length,
   };
 
   return (
@@ -1210,36 +1151,20 @@ function DatabaseStatusSummary({ databases }: { databases: Database[] }) {
         <CardContent>
           <div className="grid grid-cols-4 gap-2">
             <div className="text-center p-3 rounded-lg bg-emerald-500/10">
-              <p className="text-2xl font-semibold text-emerald-500">
-                {byStatus.healthy}
-              </p>
-              <p className="text-[10px] uppercase tracking-wide text-emerald-600">
-                Healthy
-              </p>
+              <p className="text-2xl font-semibold text-emerald-500">{byStatus.healthy}</p>
+              <p className="text-[10px] uppercase tracking-wide text-emerald-600">Healthy</p>
             </div>
             <div className="text-center p-3 rounded-lg bg-amber-500/10">
-              <p className="text-2xl font-semibold text-amber-500">
-                {byStatus.degraded}
-              </p>
-              <p className="text-[10px] uppercase tracking-wide text-amber-600">
-                Degraded
-              </p>
+              <p className="text-2xl font-semibold text-amber-500">{byStatus.degraded}</p>
+              <p className="text-[10px] uppercase tracking-wide text-amber-600">Degraded</p>
             </div>
             <div className="text-center p-3 rounded-lg bg-red-500/10">
-              <p className="text-2xl font-semibold text-red-500">
-                {byStatus.critical}
-              </p>
-              <p className="text-[10px] uppercase tracking-wide text-red-600">
-                Critical
-              </p>
+              <p className="text-2xl font-semibold text-red-500">{byStatus.critical}</p>
+              <p className="text-[10px] uppercase tracking-wide text-red-600">Critical</p>
             </div>
             <div className="text-center p-3 rounded-lg bg-blue-500/10">
-              <p className="text-2xl font-semibold text-blue-500">
-                {byStatus.maintenance}
-              </p>
-              <p className="text-[10px] uppercase tracking-wide text-blue-600">
-                Maintenance
-              </p>
+              <p className="text-2xl font-semibold text-blue-500">{byStatus.maintenance}</p>
+              <p className="text-[10px] uppercase tracking-wide text-blue-600">Maintenance</p>
             </div>
           </div>
         </CardContent>
@@ -1257,9 +1182,7 @@ function DatabaseStatusSummary({ databases }: { databases: Database[] }) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-rose-500" />
-                <span className="text-sm text-muted-foreground">
-                  Production
-                </span>
+                <span className="text-sm text-muted-foreground">Production</span>
               </div>
               <Badge variant="outline" className="text-xs">
                 {byEnvironment.production}
@@ -1277,9 +1200,7 @@ function DatabaseStatusSummary({ databases }: { databases: Database[] }) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-slate-500" />
-                <span className="text-sm text-muted-foreground">
-                  Development
-                </span>
+                <span className="text-sm text-muted-foreground">Development</span>
               </div>
               <Badge variant="outline" className="text-xs">
                 {byEnvironment.development}
@@ -1297,7 +1218,7 @@ function DatabaseCard({ database }: { database: Database }) {
   const roleCfg = roleConfig[database.role];
   const hasAlerts = database.alerts.some((a) => !a.acknowledged);
   const criticalAlerts = database.alerts.filter(
-    (a) => a.severity === "critical" && !a.acknowledged,
+    (a) => a.severity === "critical" && !a.acknowledged
   ).length;
 
   return (
@@ -1308,7 +1229,7 @@ function DatabaseCard({ database }: { database: Database }) {
           ? "border-destructive/50"
           : database.status === "degraded"
             ? "border-amber-500/50"
-            : "border-border",
+            : "border-border"
       )}
     >
       <CardContent className="p-4 space-y-4">
@@ -1320,9 +1241,7 @@ function DatabaseCard({ database }: { database: Database }) {
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="font-medium text-foreground truncate">
-                  {database.displayName}
-                </h3>
+                <h3 className="font-medium text-foreground truncate">{database.displayName}</h3>
                 {hasAlerts && (
                   <Badge
                     variant="outline"
@@ -1330,7 +1249,7 @@ function DatabaseCard({ database }: { database: Database }) {
                       "h-5 px-1.5 text-[10px]",
                       criticalAlerts > 0
                         ? "border-destructive/30 text-destructive"
-                        : "border-amber-500/30 text-amber-500",
+                        : "border-amber-500/30 text-amber-500"
                     )}
                   >
                     <AlertCircle className="h-3 w-3 mr-1" />
@@ -1339,10 +1258,7 @@ function DatabaseCard({ database }: { database: Database }) {
                 )}
               </div>
               <div className="flex items-center gap-2 mt-0.5">
-                <EngineBadge
-                  engine={database.engine}
-                  version={database.version}
-                />
+                <EngineBadge engine={database.engine} version={database.version} />
               </div>
             </div>
           </div>
@@ -1367,17 +1283,12 @@ function DatabaseCard({ database }: { database: Database }) {
               Connections
             </p>
             <p className="font-medium">
-              {database.metrics.connections.active} /{" "}
-              {database.metrics.connections.max}
+              {database.metrics.connections.active} / {database.metrics.connections.max}
             </p>
           </div>
           <div className="space-y-0.5">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              Latency
-            </p>
-            <p className="font-medium">
-              {database.metrics.performance.latency}ms
-            </p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Latency</p>
+            <p className="font-medium">{database.metrics.performance.latency}ms</p>
           </div>
         </div>
 
@@ -1424,9 +1335,7 @@ function DatabasesGridSection({ databases }: { databases: Database[] }) {
               {production.length}
             </Badge>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Enterprise SLA: 99.99% uptime
-          </p>
+          <p className="text-xs text-muted-foreground">Enterprise SLA: 99.99% uptime</p>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {production.map((db) => (
@@ -1486,12 +1395,10 @@ function AlertsSection({ databases }: { databases: Database[] }) {
       ...a,
       databaseName: d.displayName,
       databaseId: d.id,
-    })),
+    }))
   );
   const unacknowledged = allAlerts.filter((a) => !a.acknowledged);
-  const criticalCount = unacknowledged.filter(
-    (a) => a.severity === "critical",
-  ).length;
+  const criticalCount = unacknowledged.filter((a) => a.severity === "critical").length;
 
   return (
     <Card>
@@ -1531,25 +1438,22 @@ function AlertsSection({ databases }: { databases: Database[] }) {
                   ? "border-destructive/30 bg-destructive/5"
                   : alert.severity === "high"
                     ? "border-amber-500/30 bg-amber-500/5"
-                    : "border-border",
+                    : "border-border"
               )}
             >
               <div
                 className={cn(
                   "h-2 w-2 rounded-full mt-1.5",
-                  severityConfig[alert.severity].bgColor.replace("/10", ""),
+                  severityConfig[alert.severity].bgColor.replace("/10", "")
                 )}
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium truncate">
-                    {alert.message}
-                  </p>
+                  <p className="text-sm font-medium truncate">{alert.message}</p>
                   <CorrelationId id={alert.correlationId} />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {alert.databaseName} •{" "}
-                  {new Date(alert.timestamp).toLocaleTimeString()}
+                  {alert.databaseName} • {new Date(alert.timestamp).toLocaleTimeString()}
                 </p>
               </div>
               <Badge variant="outline" className="text-[10px] h-5">
@@ -1565,15 +1469,11 @@ function AlertsSection({ databases }: { databases: Database[] }) {
 
 function BackupStatusSection({ databases }: { databases: Database[] }) {
   const backupEnabled = databases.filter((d) => d.backup.enabled).length;
-  const totalWithBackup = databases.filter(
-    (d) => d.backup.strategy !== "manual",
-  ).length;
+  const totalWithBackup = databases.filter((d) => d.backup.strategy !== "manual").length;
   const recentBackups = databases
     .filter((d) => d.backup.enabled && d.backup.lastBackup !== "N/A")
     .sort(
-      (a, b) =>
-        new Date(b.backup.lastBackup).getTime() -
-        new Date(a.backup.lastBackup).getTime(),
+      (a, b) => new Date(b.backup.lastBackup).getTime() - new Date(a.backup.lastBackup).getTime()
     )
     .slice(0, 3);
 
@@ -1602,9 +1502,7 @@ function BackupStatusSection({ databases }: { databases: Database[] }) {
                 <div
                   className={cn(
                     "h-8 w-8 rounded-full flex items-center justify-center",
-                    db.backup.integrity === "verified"
-                      ? "bg-emerald-500/10"
-                      : "bg-amber-500/10",
+                    db.backup.integrity === "verified" ? "bg-emerald-500/10" : "bg-amber-500/10"
                   )}
                 >
                   {db.backup.integrity === "verified" ? (
@@ -1616,16 +1514,13 @@ function BackupStatusSection({ databases }: { databases: Database[] }) {
                 <div>
                   <p className="text-sm font-medium">{db.displayName}</p>
                   <p className="text-xs text-muted-foreground">
-                    Last backup:{" "}
-                    {new Date(db.backup.lastBackup).toLocaleString()}
+                    Last backup: {new Date(db.backup.lastBackup).toLocaleString()}
                   </p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-xs text-muted-foreground">Retention</p>
-                <p className="text-sm font-medium">
-                  {db.backup.retentionDays} days
-                </p>
+                <p className="text-sm font-medium">{db.backup.retentionDays} days</p>
               </div>
             </div>
           ))}
@@ -1642,17 +1537,10 @@ function BackupStatusSection({ databases }: { databases: Database[] }) {
 }
 
 function SecurityPostureSection({ databases }: { databases: Database[] }) {
-  const withEncryption = databases.filter(
-    (d) => d.security.encryptionAtRest,
-  ).length;
-  const withTLS13 = databases.filter(
-    (d) => d.security.tlsVersion === "TLS 1.3",
-  ).length;
+  const withEncryption = databases.filter((d) => d.security.encryptionAtRest).length;
+  const withTLS13 = databases.filter((d) => d.security.tlsVersion === "TLS 1.3").length;
   const withAudit = databases.filter((d) => d.security.auditLogging).length;
-  const totalVulnerabilities = databases.reduce(
-    (acc, d) => acc + d.security.vulnerabilities,
-    0,
-  );
+  const totalVulnerabilities = databases.reduce((acc, d) => acc + d.security.vulnerabilities, 0);
 
   return (
     <Card>
@@ -1660,9 +1548,7 @@ function SecurityPostureSection({ databases }: { databases: Database[] }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-violet-500" />
-            <CardTitle className="text-sm font-medium">
-              Security Posture
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Security Posture</CardTitle>
           </div>
           {totalVulnerabilities > 0 && (
             <Badge variant="destructive" className="text-xs">
@@ -1680,9 +1566,7 @@ function SecurityPostureSection({ databases }: { databases: Database[] }) {
               <span>Encryption at Rest</span>
             </div>
             <Badge
-              variant={
-                withEncryption === databases.length ? "default" : "outline"
-              }
+              variant={withEncryption === databases.length ? "default" : "outline"}
               className="text-xs"
             >
               {withEncryption}/{databases.length}
@@ -1724,20 +1608,14 @@ function SecurityPostureSection({ databases }: { databases: Database[] }) {
   );
 }
 
-function CapacityPlanningSection({
-  forecasts,
-}: {
-  forecasts: CapacityForecast[];
-}) {
+function CapacityPlanningSection({ forecasts }: { forecasts: CapacityForecast[] }) {
   return (
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4 text-emerald-500" />
-            <CardTitle className="text-sm font-medium">
-              Capacity Forecast
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Capacity Forecast</CardTitle>
           </div>
         </div>
         <CardDescription>Predicted resource utilization</CardDescription>
@@ -1745,17 +1623,13 @@ function CapacityPlanningSection({
       <CardContent className="space-y-4">
         <div className="space-y-4">
           {forecasts.map((forecast) => {
-            const currentPercent =
-              (forecast.current / forecast.threshold) * 100;
-            const predictedPercent =
-              (forecast.predicted / forecast.threshold) * 100;
+            const currentPercent = (forecast.current / forecast.threshold) * 100;
+            const predictedPercent = (forecast.predicted / forecast.threshold) * 100;
 
             return (
               <div key={forecast.metric} className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">
-                    {forecast.metric}
-                  </span>
+                  <span className="text-muted-foreground">{forecast.metric}</span>
                   <span className="text-xs text-amber-500">
                     {forecast.timeToThreshold} to threshold
                   </span>
@@ -1810,9 +1684,7 @@ function AuditLogSection({ events }: { events: AuditEvent[] }) {
               <div
                 className={cn(
                   "h-8 w-8 rounded-full flex items-center justify-center",
-                  event.result === "success"
-                    ? "bg-emerald-500/10"
-                    : "bg-destructive/10",
+                  event.result === "success" ? "bg-emerald-500/10" : "bg-destructive/10"
                 )}
               >
                 {event.result === "success" ? (
@@ -1859,13 +1731,9 @@ function ComplianceOverviewSection({ databases }: { databases: Database[] }) {
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
           <ShieldCheck className="h-4 w-4 text-emerald-500" />
-          <CardTitle className="text-sm font-medium">
-            Compliance Status
-          </CardTitle>
+          <CardTitle className="text-sm font-medium">Compliance Status</CardTitle>
         </div>
-        <CardDescription>
-          Regulatory compliance across databases
-        </CardDescription>
+        <CardDescription>Regulatory compliance across databases</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {Object.entries(complianceStats).map(([standard, count]) => (
@@ -1876,10 +1744,7 @@ function ComplianceOverviewSection({ databases }: { databases: Database[] }) {
               </Badge>
             </div>
             <div className="flex items-center gap-2">
-              <Progress
-                value={(count / databases.length) * 100}
-                className="w-24 h-1.5"
-              />
+              <Progress value={(count / databases.length) * 100} className="w-24 h-1.5" />
               <span className="text-xs text-muted-foreground">
                 {count}/{databases.length}
               </span>
@@ -1903,9 +1768,9 @@ function ComplianceOverviewSection({ databases }: { databases: Database[] }) {
 
 export default function DatabaseOperationsPage() {
   const [activeTab, setActiveTab] = React.useState("overview");
-  const [selectedEnvironment, setSelectedEnvironment] = React.useState<
-    EnvironmentType | "all"
-  >("all");
+  const [selectedEnvironment, setSelectedEnvironment] = React.useState<EnvironmentType | "all">(
+    "all"
+  );
 
   const filteredDatabases =
     selectedEnvironment === "all"
@@ -1923,8 +1788,7 @@ export default function DatabaseOperationsPage() {
             Identity Database Operations
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Enterprise database infrastructure management, monitoring, and
-            governance
+            Enterprise database infrastructure management, monitoring, and governance
           </p>
         </div>
 
@@ -1941,14 +1805,11 @@ export default function DatabaseOperationsPage() {
               <div
                 className={cn(
                   "h-2 w-2 rounded-full animate-pulse",
-                  databases.some(
-                    (d) =>
-                      d.status === "critical" || d.status === "unreachable",
-                  )
+                  databases.some((d) => d.status === "critical" || d.status === "unreachable")
                     ? "bg-red-500"
                     : databases.some((d) => d.status === "degraded")
                       ? "bg-amber-500"
-                      : "bg-emerald-500",
+                      : "bg-emerald-500"
                 )}
               />
               <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
@@ -1957,11 +1818,9 @@ export default function DatabaseOperationsPage() {
             </div>
             <Select
               value={selectedEnvironment}
-              onValueChange={(value) =>
-                setSelectedEnvironment(value as EnvironmentType | "all")
-              }
+              onValueChange={(value) => setSelectedEnvironment(value as EnvironmentType | "all")}
             >
-              <SelectTrigger className="w-[160px] h-8 text-xs">
+              <SelectTrigger className="w-40 h-8 text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -1982,11 +1841,7 @@ export default function DatabaseOperationsPage() {
             Primary functionality - Database instances and monitoring
             ========================================================================= */}
         <section className="space-y-4">
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="space-y-4"
-          >
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
                 Database Management
@@ -2095,40 +1950,28 @@ export default function DatabaseOperationsPage() {
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">
-                          Admin Level
-                        </span>
+                        <span className="text-muted-foreground">Admin Level</span>
+                        <Badge variant="outline" className="text-xs">
+                          {filteredDatabases.filter((d) => d.rbac.minPermission === "admin").length}{" "}
+                          databases
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Operator Level</span>
                         <Badge variant="outline" className="text-xs">
                           {
-                            filteredDatabases.filter(
-                              (d) => d.rbac.minPermission === "admin",
-                            ).length
+                            filteredDatabases.filter((d) => d.rbac.minPermission === "operator")
+                              .length
                           }{" "}
                           databases
                         </Badge>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">
-                          Operator Level
-                        </span>
+                        <span className="text-muted-foreground">Viewer Level</span>
                         <Badge variant="outline" className="text-xs">
                           {
-                            filteredDatabases.filter(
-                              (d) => d.rbac.minPermission === "operator",
-                            ).length
-                          }{" "}
-                          databases
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">
-                          Viewer Level
-                        </span>
-                        <Badge variant="outline" className="text-xs">
-                          {
-                            filteredDatabases.filter(
-                              (d) => d.rbac.minPermission === "viewer",
-                            ).length
+                            filteredDatabases.filter((d) => d.rbac.minPermission === "viewer")
+                              .length
                           }{" "}
                           databases
                         </Badge>
@@ -2157,13 +2000,10 @@ export default function DatabaseOperationsPage() {
                   <ShieldCheck className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium">
-                    Enterprise Database Governance
-                  </h3>
+                  <h3 className="text-sm font-medium">Enterprise Database Governance</h3>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Your database infrastructure is managed according to
-                    enterprise-grade standards with automated compliance
-                    monitoring, audit logging, and security scanning.
+                    Your database infrastructure is managed according to enterprise-grade standards
+                    with automated compliance monitoring, audit logging, and security scanning.
                   </p>
                 </div>
               </div>

@@ -314,7 +314,7 @@ function StatusBadge({
         "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border",
         config.bgColor,
         config.color,
-        config.borderColor,
+        config.borderColor
       )}
       title={config.description}
     >
@@ -324,13 +324,7 @@ function StatusBadge({
   );
 }
 
-function MfaBadge({
-  enabled,
-  required,
-}: {
-  enabled: boolean;
-  required: boolean;
-}) {
+function MfaBadge({ enabled, required }: { enabled: boolean; required: boolean }) {
   if (enabled) {
     return (
       <span
@@ -366,9 +360,7 @@ function MfaBadge({
 
 function EnvironmentBadges({ environments }: { environments: string[] }) {
   if (environments.length === 0) {
-    return (
-      <span className="text-xs text-muted-foreground italic">No access</span>
-    );
+    return <span className="text-xs text-muted-foreground italic">No access</span>;
   }
   return (
     <div className="flex flex-wrap gap-1">
@@ -381,7 +373,7 @@ function EnvironmentBadges({ environments }: { environments: string[] }) {
               ? "bg-red-100 text-red-700 border border-red-200"
               : env === "staging"
                 ? "bg-amber-100 text-amber-700 border border-amber-200"
-                : "bg-blue-100 text-blue-700 border border-blue-200",
+                : "bg-blue-100 text-blue-700 border border-blue-200"
           )}
           title={`Access to ${env} environment`}
         >
@@ -416,10 +408,7 @@ function RoleBadges({ roles }: { roles: string[] }) {
         </span>
       ))}
       {remainingCount > 0 && (
-        <span
-          className="text-xs text-muted-foreground"
-          title={`${remainingCount} more roles`}
-        >
+        <span className="text-xs text-muted-foreground" title={`${remainingCount} more roles`}>
           +{remainingCount}
         </span>
       )}
@@ -517,37 +506,23 @@ function KpiCard({
                 </Badge>
               )}
             </div>
-            <p
-              className={cn(
-                "text-3xl font-bold tabular-nums",
-                styles.valueColor,
-              )}
-            >
-              {value}
-            </p>
-            {subtitle && (
-              <p className="text-xs text-muted-foreground">{subtitle}</p>
-            )}
+            <p className={cn("text-3xl font-bold tabular-nums", styles.valueColor)}>{value}</p>
+            {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
             {trend && (
               <div className="flex items-center gap-1">
                 <TrendIcon
-                  className={cn(
-                    "h-3 w-3",
-                    trend.isPositive ? "text-emerald-600" : "text-red-600",
-                  )}
+                  className={cn("h-3 w-3", trend.isPositive ? "text-emerald-600" : "text-red-600")}
                 />
                 <span
                   className={cn(
                     "text-xs font-medium",
-                    trend.isPositive ? "text-emerald-600" : "text-red-600",
+                    trend.isPositive ? "text-emerald-600" : "text-red-600"
                   )}
                 >
                   {trend.isPositive ? "+" : "-"}
                   {trend.value}%
                 </span>
-                <span className="text-xs text-muted-foreground">
-                  {trend.label}
-                </span>
+                <span className="text-xs text-muted-foreground">{trend.label}</span>
               </div>
             )}
           </div>
@@ -575,21 +550,14 @@ interface SectionHeaderProps {
   };
 }
 
-function SectionHeader({
-  title,
-  description,
-  icon: Icon,
-  action,
-}: SectionHeaderProps) {
+function SectionHeader({ title, description, icon: Icon, action }: SectionHeaderProps) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
         <div>
           <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-          {description && (
-            <p className="text-xs text-muted-foreground">{description}</p>
-          )}
+          {description && <p className="text-xs text-muted-foreground">{description}</p>}
         </div>
       </div>
       {action && (
@@ -658,9 +626,7 @@ function AlertBanner({ type, title, message, action }: AlertBannerProps) {
   const { icon: Icon, bg, border, text, subtext, iconColor } = config[type];
 
   return (
-    <div
-      className={cn("flex items-start gap-3 p-4 rounded-lg border", bg, border)}
-    >
+    <div className={cn("flex items-start gap-3 p-4 rounded-lg border", bg, border)}>
       <Icon className={cn("h-5 w-5 shrink-0 mt-0.5", iconColor)} />
       <div className="flex-1 min-w-0">
         <p className={cn("text-sm font-medium", text)}>{title}</p>
@@ -673,7 +639,7 @@ function AlertBanner({ type, title, message, action }: AlertBannerProps) {
             "text-sm font-medium px-3 py-1.5 rounded-md transition-colors",
             "bg-white hover:bg-opacity-90 border",
             border,
-            text,
+            text
           )}
         >
           {action.label}
@@ -705,8 +671,7 @@ function UserTable({
   onToggleSelectAll,
 }: UserTableProps) {
   const allSelected = users.length > 0 && selectedUsers.size === users.length;
-  const someSelected =
-    selectedUsers.size > 0 && selectedUsers.size < users.length;
+  const someSelected = selectedUsers.size > 0 && selectedUsers.size < users.length;
 
   return (
     <Card className="border-border overflow-hidden">
@@ -725,27 +690,15 @@ function UserTable({
                   onChange={onToggleSelectAll}
                 />
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                User
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                Status
-              </th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">User</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                 Organization
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                Roles
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                Security
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                Last Login
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                Access
-              </th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Roles</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Security</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Last Login</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Access</th>
               <th className="px-4 py-3 text-right w-10">
                 <span className="sr-only">Actions</span>
               </th>
@@ -757,7 +710,7 @@ function UserTable({
                 key={user.id}
                 className={cn(
                   "transition-colors cursor-pointer hover:bg-muted/50",
-                  selectedUser?.id === user.id && "bg-muted",
+                  selectedUser?.id === user.id && "bg-muted"
                 )}
                 onClick={() => onSelectUser(user)}
               >
@@ -771,7 +724,7 @@ function UserTable({
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center text-xs font-semibold text-muted-foreground border border-border">
+                    <div className="h-9 w-9 rounded-full bg-linear-to-br from-muted to-muted/50 flex items-center justify-center text-xs font-semibold text-muted-foreground border border-border">
                       {user.displayName
                         .split(" ")
                         .map((n) => n[0])
@@ -779,12 +732,8 @@ function UserTable({
                         .toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">
-                        {user.displayName}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {user.email}
-                      </p>
+                      <p className="font-medium text-foreground">{user.displayName}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
                     </div>
                   </div>
                 </td>
@@ -801,19 +750,12 @@ function UserTable({
                   <RoleBadges roles={user.roles} />
                 </td>
                 <td className="px-4 py-3">
-                  <MfaBadge
-                    enabled={user.mfaEnabled}
-                    required={user.mfaRequired}
-                  />
+                  <MfaBadge enabled={user.mfaEnabled} required={user.mfaRequired} />
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1.5 text-sm">
                     <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span
-                      className={cn(
-                        !user.lastLoginAt && "text-muted-foreground italic",
-                      )}
-                    >
+                    <span className={cn(!user.lastLoginAt && "text-muted-foreground italic")}>
                       {formatRelativeTime(user.lastLoginAt)}
                     </span>
                   </div>
@@ -841,12 +783,9 @@ function UserTable({
           <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
             <Users className="h-8 w-8 text-muted-foreground/50" />
           </div>
-          <h3 className="text-lg font-medium text-foreground mb-1">
-            No users found
-          </h3>
+          <h3 className="text-lg font-medium text-foreground mb-1">No users found</h3>
           <p className="text-sm text-muted-foreground max-w-sm">
-            Try adjusting your filters or search query to find what you&apos;re
-            looking for.
+            Try adjusting your filters or search query to find what you&apos;re looking for.
           </p>
         </div>
       )}
@@ -854,9 +793,7 @@ function UserTable({
       <div className="flex items-center justify-between px-4 py-3 border-t bg-muted/30">
         <div className="text-sm text-muted-foreground">
           {selectedUsers.size > 0 ? (
-            <span className="font-medium text-foreground">
-              {selectedUsers.size} selected
-            </span>
+            <span className="font-medium text-foreground">{selectedUsers.size} selected</span>
           ) : (
             <span>
               Showing {users.length} of {mockUsers.length} users
@@ -886,9 +823,7 @@ interface UserDetailPanelProps {
 }
 
 function UserDetailPanel({ user, onClose }: UserDetailPanelProps) {
-  const [activeTab, setActiveTab] = useState<
-    "overview" | "security" | "activity"
-  >("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "security" | "activity">("overview");
 
   if (!user) {
     return (
@@ -913,7 +848,7 @@ function UserDetailPanel({ user, onClose }: UserDetailPanelProps) {
       {/* Header */}
       <div className="flex items-start justify-between px-5 py-5 border-b bg-muted/30">
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-sm font-bold text-primary border border-primary/20">
+          <div className="h-12 w-12 rounded-full bg-linear-to-br from-primary/20 to-primary/5 flex items-center justify-center text-sm font-bold text-primary border border-primary/20">
             {user.displayName
               .split(" ")
               .map((n) => n[0])
@@ -921,18 +856,11 @@ function UserDetailPanel({ user, onClose }: UserDetailPanelProps) {
               .toUpperCase()}
           </div>
           <div className="min-w-0">
-            <h3 className="font-semibold text-foreground truncate">
-              {user.displayName}
-            </h3>
-            <p className="text-xs text-muted-foreground truncate">
-              {user.email}
-            </p>
+            <h3 className="font-semibold text-foreground truncate">{user.displayName}</h3>
+            <p className="text-xs text-muted-foreground truncate">{user.email}</p>
           </div>
         </div>
-        <button
-          onClick={onClose}
-          className="p-1.5 hover:bg-muted rounded-md transition-colors"
-        >
+        <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-md transition-colors">
           <X className="h-4 w-4 text-muted-foreground" />
         </button>
       </div>
@@ -941,13 +869,9 @@ function UserDetailPanel({ user, onClose }: UserDetailPanelProps) {
       <div className="px-5 py-3 border-b space-y-2">
         <div className="flex items-center justify-between">
           <StatusBadge status={user.status} />
-          <span className="text-xs text-muted-foreground font-mono">
-            {user.id}
-          </span>
+          <span className="text-xs text-muted-foreground font-mono">{user.id}</span>
         </div>
-        <p className="text-xs text-muted-foreground">
-          {statusConf.description}
-        </p>
+        <p className="text-xs text-muted-foreground">{statusConf.description}</p>
       </div>
 
       {/* Quick Actions */}
@@ -1006,7 +930,7 @@ function UserDetailPanel({ user, onClose }: UserDetailPanelProps) {
               "flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-medium border-b-2 transition-colors",
               activeTab === tab.id
                 ? "border-primary text-primary bg-primary/5"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50",
+                : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
             )}
           >
             <tab.icon className="h-4 w-4" />
@@ -1038,16 +962,13 @@ function UserDetailPanel({ user, onClose }: UserDetailPanelProps) {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Created</span>
-                  <span className="text-xs">
-                    {new Date(user.createdAt).toLocaleDateString()}
-                  </span>
+                  <span className="text-xs">{new Date(user.createdAt).toLocaleDateString()}</span>
                 </div>
                 {user.externalIdentity && (
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">External ID</span>
                     <span className="font-mono text-xs">
-                      {user.externalIdentity.provider}:{" "}
-                      {user.externalIdentity.externalId}
+                      {user.externalIdentity.provider}: {user.externalIdentity.externalId}
                     </span>
                   </div>
                 )}
@@ -1105,10 +1026,7 @@ function UserDetailPanel({ user, onClose }: UserDetailPanelProps) {
                     <Shield className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm">MFA Status</span>
                   </div>
-                  <MfaBadge
-                    enabled={user.mfaEnabled}
-                    required={user.mfaRequired}
-                  />
+                  <MfaBadge enabled={user.mfaEnabled} required={user.mfaRequired} />
                 </div>
                 <div className="flex justify-between items-center p-3 rounded-lg border bg-card">
                   <div className="flex items-center gap-2">
@@ -1116,9 +1034,7 @@ function UserDetailPanel({ user, onClose }: UserDetailPanelProps) {
                     <span className="text-sm">Last Login</span>
                   </div>
                   <span className="text-sm">
-                    {user.lastLoginAt
-                      ? formatRelativeTime(user.lastLoginAt)
-                      : "Never"}
+                    {user.lastLoginAt ? formatRelativeTime(user.lastLoginAt) : "Never"}
                   </span>
                 </div>
               </div>
@@ -1158,12 +1074,8 @@ function UserDetailPanel({ user, onClose }: UserDetailPanelProps) {
                       <Activity className="h-4 w-4 text-blue-600" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">
-                        {user.lastActivity.action}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {user.lastActivity.details}
-                      </p>
+                      <p className="text-sm font-medium">{user.lastActivity.action}</p>
+                      <p className="text-xs text-muted-foreground">{user.lastActivity.details}</p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {formatRelativeTime(user.lastActivity.timestamp)}
                       </p>
@@ -1171,9 +1083,7 @@ function UserDetailPanel({ user, onClose }: UserDetailPanelProps) {
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">
-                  No recent activity recorded
-                </p>
+                <p className="text-sm text-muted-foreground">No recent activity recorded</p>
               )}
             </section>
 
@@ -1213,9 +1123,7 @@ function SecurityDashboard() {
           <Shield className="h-5 w-5 text-primary" />
           Security Overview
         </CardTitle>
-        <CardDescription>
-          Identity security metrics and compliance status
-        </CardDescription>
+        <CardDescription>Identity security metrics and compliance status</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* MFA Adoption */}
@@ -1232,7 +1140,7 @@ function SecurityDashboard() {
                   ? "bg-emerald-500"
                   : securityMetrics.mfaAdoption >= 50
                     ? "bg-amber-500"
-                    : "bg-red-500",
+                    : "bg-red-500"
               )}
               style={{ width: `${securityMetrics.mfaAdoption}%` }}
             />
@@ -1243,9 +1151,7 @@ function SecurityDashboard() {
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Password Policy</span>
-            <span className="font-medium">
-              {securityMetrics.passwordCompliance}%
-            </span>
+            <span className="font-medium">{securityMetrics.passwordCompliance}%</span>
           </div>
           <div className="h-2 rounded-full bg-muted overflow-hidden">
             <div
@@ -1258,18 +1164,14 @@ function SecurityDashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3 pt-2">
           <div className="p-3 rounded-lg bg-muted/50 border">
-            <p className="text-2xl font-bold">
-              {securityMetrics.activeSessions}
-            </p>
+            <p className="text-2xl font-bold">{securityMetrics.activeSessions}</p>
             <p className="text-xs text-muted-foreground">Active Sessions</p>
           </div>
           <div className="p-3 rounded-lg bg-muted/50 border">
             <p
               className={cn(
                 "text-2xl font-bold",
-                securityMetrics.riskScore > 50
-                  ? "text-red-600"
-                  : "text-emerald-600",
+                securityMetrics.riskScore > 50 ? "text-red-600" : "text-emerald-600"
               )}
             >
               {securityMetrics.riskScore}
@@ -1289,9 +1191,7 @@ function SecurityDashboard() {
 export default function PeoplePage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<User["status"] | "all">(
-    "all",
-  );
+  const [statusFilter, setStatusFilter] = useState<User["status"] | "all">("all");
   const [orgUnitFilter, setOrgUnitFilter] = useState<string>("all");
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
@@ -1305,10 +1205,8 @@ export default function PeoplePage() {
         user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.username.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesStatus =
-        statusFilter === "all" || user.status === statusFilter;
-      const matchesOrgUnit =
-        orgUnitFilter === "all" || user.primaryOrgUnit === orgUnitFilter;
+      const matchesStatus = statusFilter === "all" || user.status === statusFilter;
+      const matchesOrgUnit = orgUnitFilter === "all" || user.primaryOrgUnit === orgUnitFilter;
 
       return matchesSearch && matchesStatus && matchesOrgUnit;
     });
@@ -1328,8 +1226,7 @@ export default function PeoplePage() {
       suspended,
       archived,
       mfaEnabled: mockUsers.filter((u) => u.mfaEnabled).length,
-      mfaRequired: mockUsers.filter((u) => u.mfaRequired && !u.mfaEnabled)
-        .length,
+      mfaRequired: mockUsers.filter((u) => u.mfaRequired && !u.mfaEnabled).length,
     };
   }, []);
 
@@ -1377,9 +1274,8 @@ export default function PeoplePage() {
               </Badge>
             </div>
             <p className="text-muted-foreground max-w-2xl">
-              Manage human identities, access permissions, and security
-              policies. Monitor user activity, enforce MFA requirements, and
-              maintain compliance across your organization.
+              Manage human identities, access permissions, and security policies. Monitor user
+              activity, enforce MFA requirements, and maintain compliance across your organization.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -1486,9 +1382,7 @@ export default function PeoplePage() {
             subtitle="Pending configuration"
             icon={ShieldAlert}
             badge={
-              stats.mfaRequired > 0
-                ? { label: "Action needed", variant: "warning" }
-                : undefined
+              stats.mfaRequired > 0 ? { label: "Action needed", variant: "warning" } : undefined
             }
             variant={stats.mfaRequired > 0 ? "warning" : "default"}
             tooltip="Users required to have MFA but haven't configured it yet"
@@ -1529,9 +1423,7 @@ export default function PeoplePage() {
             <div className="flex items-center gap-2 w-full lg:w-auto">
               <select
                 value={statusFilter}
-                onChange={(e) =>
-                  setStatusFilter(e.target.value as User["status"] | "all")
-                }
+                onChange={(e) => setStatusFilter(e.target.value as User["status"] | "all")}
                 className="px-3 py-2.5 text-sm border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                 title="Filter users by their account status"
               >
@@ -1558,7 +1450,7 @@ export default function PeoplePage() {
                 onClick={() => setIsFiltersOpen(!isFiltersOpen)}
                 className={cn(
                   "flex items-center gap-2 px-3 py-2.5 text-sm font-medium border rounded-lg transition-colors",
-                  isFiltersOpen ? "bg-muted border-primary" : "hover:bg-muted",
+                  isFiltersOpen ? "bg-muted border-primary" : "hover:bg-muted"
                 )}
                 title="Toggle advanced filters"
               >
@@ -1576,9 +1468,7 @@ export default function PeoplePage() {
           {/* Bulk Actions Bar */}
           {selectedUsers.size > 0 && (
             <div className="flex items-center justify-between p-3 bg-muted/50 border rounded-lg">
-              <span className="text-sm font-medium">
-                {selectedUsers.size} user(s) selected
-              </span>
+              <span className="text-sm font-medium">{selectedUsers.size} user(s) selected</span>
               <div className="flex items-center gap-2">
                 <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium border rounded-md hover:bg-background transition-colors">
                   <Shield className="h-4 w-4" />
@@ -1685,10 +1575,7 @@ export default function PeoplePage() {
           {/* Side Panel - Réorganisé : Security en premier, toujours visible */}
           <div className="xl:col-span-1 space-y-6">
             <SecurityDashboard />
-            <UserDetailPanel
-              user={selectedUser}
-              onClose={() => setSelectedUser(null)}
-            />
+            <UserDetailPanel user={selectedUser} onClose={() => setSelectedUser(null)} />
           </div>
         </div>
       </section>

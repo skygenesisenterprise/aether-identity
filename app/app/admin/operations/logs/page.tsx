@@ -996,7 +996,7 @@ function LogStreamSection() {
 
           {/* Filters */}
           <div className="flex flex-wrap items-center gap-2">
-            <div className="relative flex-1 min-w-[200px]">
+            <div className="relative flex-1 min-w-50">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search logs..."
@@ -1019,7 +1019,7 @@ function LogStreamSection() {
                 }))
               }
             >
-              <SelectTrigger className="w-[130px] h-8 text-xs">
+              <SelectTrigger className="w-32.5 h-8 text-xs">
                 <Filter className="h-3.5 w-3.5 mr-1.5" />
                 <SelectValue placeholder="Severity" />
               </SelectTrigger>
@@ -1040,7 +1040,7 @@ function LogStreamSection() {
                 }))
               }
             >
-              <SelectTrigger className="w-[130px] h-8 text-xs">
+              <SelectTrigger className="w-32.5 h-8 text-xs">
                 <SelectValue placeholder="Source" />
               </SelectTrigger>
               <SelectContent>
@@ -1061,7 +1061,7 @@ function LogStreamSection() {
                 }))
               }
             >
-              <SelectTrigger className="w-[130px] h-8 text-xs">
+              <SelectTrigger className="w-32.5 h-8 text-xs">
                 <SelectValue placeholder="Environment" />
               </SelectTrigger>
               <SelectContent>
@@ -1079,7 +1079,7 @@ function LogStreamSection() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="w-[180px]">Timestamp</TableHead>
+                <TableHead className="w-45">Timestamp</TableHead>
                 <TableHead>Severity</TableHead>
                 <TableHead>Source</TableHead>
                 <TableHead>User / Service</TableHead>

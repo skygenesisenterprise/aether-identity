@@ -662,7 +662,7 @@ function FrameworkCard({
 
 function ComplianceTrendChart({ data }: { data: ComplianceTrend[] }) {
   return (
-    <ChartContainer config={{}} className="h-[300px]">
+    <ChartContainer config={{}} className="h-75">
       <LineChart data={data}>
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis
@@ -704,7 +704,7 @@ function FrameworkDistributionChart({
   }));
 
   return (
-    <ChartContainer config={{}} className="h-[250px]">
+    <ChartContainer config={{}} className="h-62.5">
       <BarChart data={data} layout="vertical">
         <CartesianGrid
           strokeDasharray="3 3"
@@ -808,7 +808,7 @@ function ControlsTable({ controls }: { controls: ComplianceControl[] }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
-        <div className="relative flex-1 min-w-[200px] max-w-[300px]">
+        <div className="relative flex-1 min-w-50 max-w-75">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search controls..."
@@ -818,7 +818,7 @@ function ControlsTable({ controls }: { controls: ComplianceControl[] }) {
           />
         </div>
         <Select value={filterFramework} onValueChange={setFilterFramework}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-45">
             <Filter className="h-4 w-4 mr-2" />
             <SelectValue placeholder="Framework" />
           </SelectTrigger>
@@ -831,7 +831,7 @@ function ControlsTable({ controls }: { controls: ComplianceControl[] }) {
           </SelectContent>
         </Select>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-[150px]">
+          <SelectTrigger className="w-37.5">
             <Shield className="h-4 w-4 mr-2" />
             <SelectValue placeholder="Status" />
           </SelectTrigger>
@@ -968,7 +968,7 @@ function IdentityComplianceTable({
                 <TableCell>
                   <SeverityBadge severity={item.severity} />
                 </TableCell>
-                <TableCell className="text-sm max-w-[300px] truncate">
+                <TableCell className="text-sm max-w-75 truncate">
                   {item.description}
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
@@ -1110,7 +1110,7 @@ function GapsTable({ gaps }: { gaps: ComplianceGap[] }) {
               <TableCell>
                 <SeverityBadge severity={gap.severity} />
               </TableCell>
-              <TableCell className="text-sm max-w-[250px]">
+              <TableCell className="text-sm max-w-62.5">
                 {gap.description}
               </TableCell>
               <TableCell>
@@ -1397,7 +1397,7 @@ export default function ComplianceReportPage() {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-6 lg:w-[800px]">
+        <TabsList className="grid w-full grid-cols-6 lg:w-200">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="controls">Controls</TabsTrigger>
           <TabsTrigger value="identity">Identity</TabsTrigger>

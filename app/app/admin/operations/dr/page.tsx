@@ -41,12 +41,7 @@ import { Switch } from "@/components/dashboard/ui/switch";
 import { Input } from "@/components/dashboard/ui/input";
 import { Label } from "@/components/dashboard/ui/label";
 import { Slider } from "@/components/dashboard/ui/slider";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/dashboard/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/dashboard/ui/tabs";
 import {
   Tooltip,
   TooltipContent,
@@ -365,8 +360,7 @@ const riskIndicators: RiskIndicator[] = [
     severity: "high",
     category: "Replication Lag",
     message: "Replication lag exceeded 30 seconds",
-    details:
-      "Current lag: 45 seconds. Check network connectivity to eu-west-1.",
+    details: "Current lag: 45 seconds. Check network connectivity to eu-west-1.",
     detectedAt: "2026-02-12T14:45:00Z",
     acknowledged: false,
   },
@@ -606,7 +600,7 @@ function StatusBadge({
         "font-medium border-0 flex items-center gap-1.5",
         config.bgColor,
         config.color,
-        sizeClasses[size],
+        sizeClasses[size]
       )}
     >
       <Icon className={cn(size === "lg" ? "h-5 w-5" : "h-4 w-4")} />
@@ -622,11 +616,7 @@ function AlertSeverityBadge({ severity }: { severity: AlertSeverity }) {
   return (
     <Badge
       variant="outline"
-      className={cn(
-        "font-medium border-0 flex items-center gap-1",
-        config.bgColor,
-        config.color,
-      )}
+      className={cn("font-medium border-0 flex items-center gap-1", config.bgColor, config.color)}
     >
       <Icon className="h-3 w-3" />
       {config.label}
@@ -640,9 +630,7 @@ function RegionStatusIndicator({ status }: { status: RegionStatus }) {
   return (
     <div className="flex items-center gap-2">
       <div className={cn("h-2 w-2 rounded-full", config.bgColor)} />
-      <span className={cn("text-sm font-medium", config.color)}>
-        {config.label}
-      </span>
+      <span className={cn("text-sm font-medium", config.color)}>{config.label}</span>
     </div>
   );
 }
@@ -651,10 +639,7 @@ function BackupTypeBadge({ type }: { type: BackupType }) {
   const config = backupTypeConfig[type];
 
   return (
-    <Badge
-      variant="outline"
-      className={cn("text-xs", config.bgColor, config.color)}
-    >
+    <Badge variant="outline" className={cn("text-xs", config.bgColor, config.color)}>
       {config.label}
     </Badge>
   );
@@ -712,9 +697,7 @@ export default function DisasterRecoveryPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [showFailoverDialog, setShowFailoverDialog] = useState(false);
   const [showTestDialog, setShowTestDialog] = useState(false);
-  const [selectedBackup, setSelectedBackup] = useState<BackupPoint | null>(
-    null,
-  );
+  const [selectedBackup, setSelectedBackup] = useState<BackupPoint | null>(null);
   const [showRestoreDialog, setShowRestoreDialog] = useState(false);
   const [showPolicyDialog, setShowPolicyDialog] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -737,8 +720,7 @@ export default function DisasterRecoveryPage() {
   const lastTest = drTests[0];
   const daysSinceTest = lastTest?.completedAt
     ? Math.floor(
-        (new Date().getTime() - new Date(lastTest.completedAt).getTime()) /
-          (1000 * 60 * 60 * 24),
+        (new Date().getTime() - new Date(lastTest.completedAt).getTime()) / (1000 * 60 * 60 * 24)
       )
     : null;
 
@@ -882,20 +864,15 @@ export default function DisasterRecoveryPage() {
             Identity Disaster Recovery
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Ensure business continuity through replication policies, recovery
-            objectives and failover orchestration.
+            Ensure business continuity through replication policies, recovery objectives and
+            failover orchestration.
           </p>
         </div>
       </div>
 
       {/* Action Buttons */}
       <div className="flex flex-wrap items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleExportReport}
-          disabled={isExporting}
-        >
+        <Button variant="outline" size="sm" onClick={handleExportReport} disabled={isExporting}>
           {isExporting ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
           ) : (
@@ -903,11 +880,7 @@ export default function DisasterRecoveryPage() {
           )}
           {isExporting ? "Exporting..." : "Export DR Report"}
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setActiveTab("policy")}
-        >
+        <Button variant="outline" size="sm" onClick={() => setActiveTab("policy")}>
           <Settings className="h-4 w-4 mr-2" />
           Configure Policies
         </Button>
@@ -948,14 +921,11 @@ export default function DisasterRecoveryPage() {
               "bg-emerald-500/10 border-emerald-500/20 text-emerald-500",
             notification.type === "error" &&
               "bg-destructive/10 border-destructive/20 text-destructive",
-            notification.type === "info" &&
-              "bg-blue-500/10 border-blue-500/20 text-blue-500",
+            notification.type === "info" && "bg-blue-500/10 border-blue-500/20 text-blue-500"
           )}
         >
           <div className="flex items-center gap-2">
-            {notification.type === "success" && (
-              <CheckCircle2 className="h-4 w-4" />
-            )}
+            {notification.type === "success" && <CheckCircle2 className="h-4 w-4" />}
             {notification.type === "error" && <XCircle className="h-4 w-4" />}
             {notification.type === "info" && <Info className="h-4 w-4" />}
             <span className="text-sm font-medium">{notification.message}</span>
@@ -978,9 +948,7 @@ export default function DisasterRecoveryPage() {
                   <h2 className="text-lg font-semibold">DR Status</h2>
                   <StatusBadge status={status} />
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {statusInfo.description}
-                </p>
+                <p className="text-sm text-muted-foreground">{statusInfo.description}</p>
               </div>
             </div>
             <div className="flex items-center gap-6 text-sm">
@@ -988,9 +956,7 @@ export default function DisasterRecoveryPage() {
                 <p
                   className={cn(
                     "text-2xl font-semibold",
-                    activeAlerts.length > 0
-                      ? "text-amber-500"
-                      : "text-emerald-500",
+                    activeAlerts.length > 0 ? "text-amber-500" : "text-emerald-500"
                   )}
                 >
                   {activeAlerts.length}
@@ -998,15 +964,11 @@ export default function DisasterRecoveryPage() {
                 <p className="text-muted-foreground">Active Risks</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-semibold">
-                  {recoveryObjectives.rpo}m
-                </p>
+                <p className="text-2xl font-semibold">{recoveryObjectives.rpo}m</p>
                 <p className="text-muted-foreground">Current RPO</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-semibold">
-                  {recoveryObjectives.rto}m
-                </p>
+                <p className="text-2xl font-semibold">{recoveryObjectives.rto}m</p>
                 <p className="text-muted-foreground">Current RTO</p>
               </div>
             </div>
@@ -1023,11 +985,7 @@ export default function DisasterRecoveryPage() {
           value={`${recoveryObjectives.rpo} minutes`}
           subtitle={`Target: ${recoveryObjectives.targetRpo}m`}
           icon={Clock}
-          variant={
-            recoveryObjectives.rpo <= recoveryObjectives.targetRpo
-              ? "accent"
-              : "warning"
-          }
+          variant={recoveryObjectives.rpo <= recoveryObjectives.targetRpo ? "accent" : "warning"}
           trend={
             recoveryObjectives.rpo <= recoveryObjectives.targetRpo
               ? { value: 0, isPositive: true }
@@ -1039,20 +997,12 @@ export default function DisasterRecoveryPage() {
           value={`${recoveryObjectives.rto} minutes`}
           subtitle={`Target: ${recoveryObjectives.targetRto}m`}
           icon={Timer}
-          variant={
-            recoveryObjectives.rto <= recoveryObjectives.targetRto
-              ? "accent"
-              : "warning"
-          }
+          variant={recoveryObjectives.rto <= recoveryObjectives.targetRto ? "accent" : "warning"}
         />
         <MetricCard
           title="Last Backup"
           value={lastBackup ? formatRelativeTime(lastBackup.timestamp) : "N/A"}
-          subtitle={
-            lastBackup
-              ? `${lastBackup.size} GB ${lastBackup.type}`
-              : "No backups"
-          }
+          subtitle={lastBackup ? `${lastBackup.size} GB ${lastBackup.type}` : "No backups"}
           icon={Database}
           variant="accent"
         />
@@ -1071,13 +1021,9 @@ export default function DisasterRecoveryPage() {
         <MetricCard
           title="Last DR Test"
           value={daysSinceTest !== null ? `${daysSinceTest} days ago` : "Never"}
-          subtitle={
-            lastTest?.status === "passed" ? "Test passed" : "Test required"
-          }
+          subtitle={lastTest?.status === "passed" ? "Test passed" : "Test required"}
           icon={CheckCircle2}
-          variant={
-            daysSinceTest !== null && daysSinceTest <= 30 ? "accent" : "warning"
-          }
+          variant={daysSinceTest !== null && daysSinceTest <= 30 ? "accent" : "warning"}
         />
         <MetricCard
           title="Multi-Region Status"
@@ -1091,11 +1037,7 @@ export default function DisasterRecoveryPage() {
       {/* ============================================================================
           MAIN CONTENT TABS
           ============================================================================ */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-4"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="bg-muted">
           <TabsTrigger value="overview" className="text-xs">
             <LayoutGrid className="h-3.5 w-3.5 mr-1.5" />
@@ -1144,19 +1086,14 @@ export default function DisasterRecoveryPage() {
                       <MapPin className="h-4 w-4 text-emerald-500" />
                       Primary Region
                     </CardTitle>
-                    <Badge
-                      variant="outline"
-                      className="text-xs bg-emerald-500/10 text-emerald-500"
-                    >
+                    <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-500">
                       Primary
                     </Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <p className="text-lg font-semibold">
-                      {replicationPolicy.primaryRegion.name}
-                    </p>
+                    <p className="text-lg font-semibold">{replicationPolicy.primaryRegion.name}</p>
                     <p className="text-sm text-muted-foreground">
                       {replicationPolicy.primaryRegion.location}
                     </p>
@@ -1164,9 +1101,7 @@ export default function DisasterRecoveryPage() {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Status</span>
-                      <RegionStatusIndicator
-                        status={replicationPolicy.primaryRegion.status}
-                      />
+                      <RegionStatusIndicator status={replicationPolicy.primaryRegion.status} />
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Latency</span>
@@ -1177,9 +1112,7 @@ export default function DisasterRecoveryPage() {
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Last Check</span>
                       <span className="font-medium">
-                        {formatRelativeTime(
-                          replicationPolicy.primaryRegion.lastHealthCheck,
-                        )}
+                        {formatRelativeTime(replicationPolicy.primaryRegion.lastHealthCheck)}
                       </span>
                     </div>
                   </div>
@@ -1203,9 +1136,7 @@ export default function DisasterRecoveryPage() {
                   <CardContent className="space-y-4">
                     <div>
                       <p className="text-lg font-semibold">{region.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {region.location}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{region.location}</p>
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
@@ -1221,9 +1152,7 @@ export default function DisasterRecoveryPage() {
                         <span
                           className={cn(
                             "font-medium",
-                            replicationPolicy.lag > 30
-                              ? "text-amber-500"
-                              : "text-emerald-500",
+                            replicationPolicy.lag > 30 ? "text-amber-500" : "text-emerald-500"
                           )}
                         >
                           {replicationPolicy.lag}s
@@ -1245,11 +1174,7 @@ export default function DisasterRecoveryPage() {
                   Recent Backup Points
                 </h2>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setActiveTab("backups")}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setActiveTab("backups")}>
                 View All
                 <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
@@ -1271,9 +1196,7 @@ export default function DisasterRecoveryPage() {
                   <TableBody>
                     {backupPoints.slice(0, 5).map((backup) => (
                       <TableRow key={backup.id}>
-                        <TableCell className="font-mono text-xs">
-                          {backup.id}
-                        </TableCell>
+                        <TableCell className="font-mono text-xs">{backup.id}</TableCell>
                         <TableCell suppressHydrationWarning>
                           {formatDate(backup.timestamp)}
                         </TableCell>
@@ -1285,9 +1208,7 @@ export default function DisasterRecoveryPage() {
                             {backup.region}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {backup.size} GB
-                        </TableCell>
+                        <TableCell className="text-right tabular-nums">{backup.size} GB</TableCell>
                         <TableCell>
                           <IntegrityBadge integrity={backup.integrity} />
                         </TableCell>
@@ -1328,7 +1249,7 @@ export default function DisasterRecoveryPage() {
                     className={cn(
                       "border-l-4 transition-colors",
                       alertSeverityConfig[risk.severity].borderColor,
-                      "bg-amber-500/5",
+                      "bg-amber-500/5"
                     )}
                   >
                     <CardContent className="p-3 flex items-center justify-between">
@@ -1337,8 +1258,7 @@ export default function DisasterRecoveryPage() {
                         <div>
                           <p className="text-sm font-medium">{risk.message}</p>
                           <p className="text-xs text-muted-foreground">
-                            {risk.category} • Detected{" "}
-                            {formatRelativeTime(risk.detectedAt)}
+                            {risk.category} • Detected {formatRelativeTime(risk.detectedAt)}
                           </p>
                         </div>
                       </div>
@@ -1361,9 +1281,7 @@ export default function DisasterRecoveryPage() {
             {/* Replication Mode */}
             <Card className="border-border">
               <CardHeader>
-                <CardTitle className="text-base font-medium">
-                  Replication Configuration
-                </CardTitle>
+                <CardTitle className="text-base font-medium">Replication Configuration</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
@@ -1373,53 +1291,39 @@ export default function DisasterRecoveryPage() {
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">
-                    Sync Interval
-                  </span>
-                  <span className="font-medium">
-                    {replicationPolicy.syncInterval / 60} minutes
-                  </span>
+                  <span className="text-sm text-muted-foreground">Sync Interval</span>
+                  <span className="font-medium">{replicationPolicy.syncInterval / 60} minutes</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">
-                    Compression
-                  </span>
+                  <span className="text-sm text-muted-foreground">Compression</span>
                   <Badge
                     variant="outline"
                     className={cn(
                       "text-xs",
                       replicationPolicy.compressionEnabled
                         ? "text-emerald-500"
-                        : "text-muted-foreground",
+                        : "text-muted-foreground"
                     )}
                   >
-                    {replicationPolicy.compressionEnabled
-                      ? "Enabled"
-                      : "Disabled"}
+                    {replicationPolicy.compressionEnabled ? "Enabled" : "Disabled"}
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">
-                    Encryption
-                  </span>
+                  <span className="text-sm text-muted-foreground">Encryption</span>
                   <Badge
                     variant="outline"
                     className={cn(
                       "text-xs",
                       replicationPolicy.encryptionEnabled
                         ? "text-emerald-500"
-                        : "text-muted-foreground",
+                        : "text-muted-foreground"
                     )}
                   >
-                    {replicationPolicy.encryptionEnabled
-                      ? "Enabled"
-                      : "Disabled"}
+                    {replicationPolicy.encryptionEnabled ? "Enabled" : "Disabled"}
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">
-                    Last Sync
-                  </span>
+                  <span className="text-sm text-muted-foreground">Last Sync</span>
                   <span className="font-medium">
                     {replicationPolicy.lastSyncAt
                       ? formatRelativeTime(replicationPolicy.lastSyncAt)
@@ -1432,9 +1336,7 @@ export default function DisasterRecoveryPage() {
             {/* Sync Status */}
             <Card className="border-border">
               <CardHeader>
-                <CardTitle className="text-base font-medium">
-                  Synchronization Status
-                </CardTitle>
+                <CardTitle className="text-base font-medium">Synchronization Status</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -1443,9 +1345,7 @@ export default function DisasterRecoveryPage() {
                     <span
                       className={cn(
                         "font-medium",
-                        replicationPolicy.lag > 30
-                          ? "text-amber-500"
-                          : "text-emerald-500",
+                        replicationPolicy.lag > 30 ? "text-amber-500" : "text-emerald-500"
                       )}
                     >
                       {replicationPolicy.lag} seconds
@@ -1458,10 +1358,7 @@ export default function DisasterRecoveryPage() {
                 </div>
                 <div className="pt-4 border-t border-border space-y-3">
                   {replicationPolicy.secondaryRegions.map((region) => (
-                    <div
-                      key={region.id}
-                      className="flex items-center justify-between"
-                    >
+                    <div key={region.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <div
                           className={cn(
@@ -1470,14 +1367,12 @@ export default function DisasterRecoveryPage() {
                               ? "bg-emerald-500"
                               : region.status === "degraded"
                                 ? "bg-amber-500"
-                                : "bg-destructive",
+                                : "bg-destructive"
                           )}
                         />
                         <span className="text-sm">{region.name}</span>
                       </div>
-                      <span className="text-sm text-muted-foreground">
-                        {region.latency}ms
-                      </span>
+                      <span className="text-sm text-muted-foreground">{region.latency}ms</span>
                     </div>
                   ))}
                 </div>
@@ -1487,9 +1382,7 @@ export default function DisasterRecoveryPage() {
             {/* Failover Actions */}
             <Card className="border-border">
               <CardHeader>
-                <CardTitle className="text-base font-medium">
-                  Failover Operations
-                </CardTitle>
+                <CardTitle className="text-base font-medium">Failover Operations</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="p-4 bg-muted/50 rounded-lg space-y-3">
@@ -1498,8 +1391,7 @@ export default function DisasterRecoveryPage() {
                     <span className="font-medium">Test Failover</span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Simulate a failover to validate DR procedures without
-                    affecting production.
+                    Simulate a failover to validate DR procedures without affecting production.
                   </p>
                   <Button
                     variant="outline"
@@ -1512,13 +1404,10 @@ export default function DisasterRecoveryPage() {
                 <div className="p-4 bg-destructive/5 rounded-lg border border-destructive/20 space-y-3">
                   <div className="flex items-center gap-2">
                     <Siren className="h-4 w-4 text-destructive" />
-                    <span className="font-medium text-destructive">
-                      Production Failover
-                    </span>
+                    <span className="font-medium text-destructive">Production Failover</span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Initiate an actual failover to a secondary region. Use only
-                    during emergencies.
+                    Initiate an actual failover to a secondary region. Use only during emergencies.
                   </p>
                   <Button
                     variant="destructive"
@@ -1535,9 +1424,7 @@ export default function DisasterRecoveryPage() {
           {/* Region Details Table */}
           <Card className="border-border">
             <CardHeader>
-              <CardTitle className="text-base font-medium">
-                Region Health Details
-              </CardTitle>
+              <CardTitle className="text-base font-medium">Region Health Details</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
@@ -1556,9 +1443,7 @@ export default function DisasterRecoveryPage() {
                     <TableCell className="font-medium">
                       {replicationPolicy.primaryRegion.name}
                     </TableCell>
-                    <TableCell>
-                      {replicationPolicy.primaryRegion.location}
-                    </TableCell>
+                    <TableCell>{replicationPolicy.primaryRegion.location}</TableCell>
                     <TableCell>
                       <Badge
                         variant="outline"
@@ -1568,24 +1453,18 @@ export default function DisasterRecoveryPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <RegionStatusIndicator
-                        status={replicationPolicy.primaryRegion.status}
-                      />
+                      <RegionStatusIndicator status={replicationPolicy.primaryRegion.status} />
                     </TableCell>
                     <TableCell className="text-right">
                       {replicationPolicy.primaryRegion.latency}ms
                     </TableCell>
                     <TableCell suppressHydrationWarning>
-                      {formatRelativeTime(
-                        replicationPolicy.primaryRegion.lastHealthCheck,
-                      )}
+                      {formatRelativeTime(replicationPolicy.primaryRegion.lastHealthCheck)}
                     </TableCell>
                   </TableRow>
                   {replicationPolicy.secondaryRegions.map((region) => (
                     <TableRow key={region.id}>
-                      <TableCell className="font-medium">
-                        {region.name}
-                      </TableCell>
+                      <TableCell className="font-medium">{region.name}</TableCell>
                       <TableCell>{region.location}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className="text-xs">
@@ -1595,9 +1474,7 @@ export default function DisasterRecoveryPage() {
                       <TableCell>
                         <RegionStatusIndicator status={region.status} />
                       </TableCell>
-                      <TableCell className="text-right">
-                        {region.latency}ms
-                      </TableCell>
+                      <TableCell className="text-right">{region.latency}ms</TableCell>
                       <TableCell suppressHydrationWarning>
                         {formatRelativeTime(region.lastHealthCheck)}
                       </TableCell>
@@ -1618,12 +1495,8 @@ export default function DisasterRecoveryPage() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">
-                      Total Backups
-                    </p>
-                    <p className="text-2xl font-semibold">
-                      {backupPoints.length}
-                    </p>
+                    <p className="text-sm text-muted-foreground">Total Backups</p>
+                    <p className="text-2xl font-semibold">{backupPoints.length}</p>
                   </div>
                   <div className="p-2 bg-purple-500/10 rounded-lg">
                     <Database className="h-5 w-5 text-purple-500" />
@@ -1637,10 +1510,7 @@ export default function DisasterRecoveryPage() {
                   <div>
                     <p className="text-sm text-muted-foreground">Total Size</p>
                     <p className="text-2xl font-semibold">
-                      {backupPoints
-                        .reduce((acc, b) => acc + b.size, 0)
-                        .toFixed(1)}{" "}
-                      GB
+                      {backupPoints.reduce((acc, b) => acc + b.size, 0).toFixed(1)} GB
                     </p>
                   </div>
                   <div className="p-2 bg-cyan-500/10 rounded-lg">
@@ -1654,9 +1524,7 @@ export default function DisasterRecoveryPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Retention</p>
-                    <p className="text-2xl font-semibold">
-                      {drPolicy.backupRetentionDays} days
-                    </p>
+                    <p className="text-2xl font-semibold">{drPolicy.backupRetentionDays} days</p>
                   </div>
                   <div className="p-2 bg-amber-500/10 rounded-lg">
                     <Calendar className="h-5 w-5 text-amber-500" />
@@ -1669,12 +1537,10 @@ export default function DisasterRecoveryPage() {
           <Card className="border-border">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-medium">
-                  Backup History
-                </CardTitle>
+                <CardTitle className="text-base font-medium">Backup History</CardTitle>
                 <div className="flex items-center gap-2">
                   <Select defaultValue="all">
-                    <SelectTrigger className="w-[140px] h-8 text-xs">
+                    <SelectTrigger className="w-35 h-8 text-xs">
                       <SelectValue placeholder="Filter by type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1704,12 +1570,8 @@ export default function DisasterRecoveryPage() {
                 <TableBody>
                   {backupPoints.map((backup) => (
                     <TableRow key={backup.id}>
-                      <TableCell className="font-mono text-xs">
-                        {backup.id}
-                      </TableCell>
-                      <TableCell suppressHydrationWarning>
-                        {formatDate(backup.timestamp)}
-                      </TableCell>
+                      <TableCell className="font-mono text-xs">{backup.id}</TableCell>
+                      <TableCell suppressHydrationWarning>{formatDate(backup.timestamp)}</TableCell>
                       <TableCell>
                         <BackupTypeBadge type={backup.type} />
                       </TableCell>
@@ -1718,15 +1580,11 @@ export default function DisasterRecoveryPage() {
                           {backup.region}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {backup.size} GB
-                      </TableCell>
+                      <TableCell className="text-right tabular-nums">{backup.size} GB</TableCell>
                       <TableCell>
                         <IntegrityBadge integrity={backup.integrity} />
                       </TableCell>
-                      <TableCell className="text-right">
-                        {backup.restorePoints}
-                      </TableCell>
+                      <TableCell className="text-right">{backup.restorePoints}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Button variant="ghost" size="sm">
@@ -1756,12 +1614,10 @@ export default function DisasterRecoveryPage() {
           {/* Restore Simulation */}
           <Card className="border-border">
             <CardHeader>
-              <CardTitle className="text-base font-medium">
-                Restore Simulation
-              </CardTitle>
+              <CardTitle className="text-base font-medium">Restore Simulation</CardTitle>
               <CardDescription>
-                Simulate a restore operation to validate backup integrity and
-                estimate recovery time.
+                Simulate a restore operation to validate backup integrity and estimate recovery
+                time.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -1789,15 +1645,9 @@ export default function DisasterRecoveryPage() {
                         <SelectValue placeholder="Select region" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="us-east-1">
-                          US East (N. Virginia)
-                        </SelectItem>
-                        <SelectItem value="eu-west-1">
-                          EU West (Ireland)
-                        </SelectItem>
-                        <SelectItem value="ap-southeast-1">
-                          Asia Pacific (Singapore)
-                        </SelectItem>
+                        <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
+                        <SelectItem value="eu-west-1">EU West (Ireland)</SelectItem>
+                        <SelectItem value="ap-southeast-1">Asia Pacific (Singapore)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -1806,22 +1656,16 @@ export default function DisasterRecoveryPage() {
                   <h4 className="font-medium">Estimated Recovery</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">
-                        Estimated Time
-                      </span>
+                      <span className="text-muted-foreground">Estimated Time</span>
                       <span className="font-medium">~12 minutes</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Data Loss</span>
-                      <span className="font-medium text-emerald-500">
-                        0 minutes (full backup)
-                      </span>
+                      <span className="font-medium text-emerald-500">0 minutes (full backup)</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Integrity</span>
-                      <span className="font-medium text-emerald-500">
-                        Verified
-                      </span>
+                      <span className="font-medium text-emerald-500">Verified</span>
                     </div>
                   </div>
                   <Button className="w-full">
@@ -1842,9 +1686,7 @@ export default function DisasterRecoveryPage() {
             {/* Last Test Summary */}
             <Card className="border-border">
               <CardHeader>
-                <CardTitle className="text-base font-medium">
-                  Last DR Test
-                </CardTitle>
+                <CardTitle className="text-base font-medium">Last DR Test</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {lastTest ? (
@@ -1853,9 +1695,7 @@ export default function DisasterRecoveryPage() {
                       <div
                         className={cn(
                           "p-2 rounded-lg",
-                          lastTest.status === "passed"
-                            ? "bg-emerald-500/10"
-                            : "bg-destructive/10",
+                          lastTest.status === "passed" ? "bg-emerald-500/10" : "bg-destructive/10"
                         )}
                       >
                         {lastTest.status === "passed" ? (
@@ -1870,9 +1710,7 @@ export default function DisasterRecoveryPage() {
                           variant="outline"
                           className={cn(
                             "text-xs mt-1",
-                            lastTest.status === "passed"
-                              ? "text-emerald-500"
-                              : "text-destructive",
+                            lastTest.status === "passed" ? "text-emerald-500" : "text-destructive"
                           )}
                         >
                           {lastTest.status.toUpperCase()}
@@ -1881,34 +1719,20 @@ export default function DisasterRecoveryPage() {
                     </div>
                     <div className="space-y-2 pt-4 border-t border-border">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">
-                          Recovery Time
-                        </span>
-                        <span className="font-medium">
-                          {lastTest.recoveryTime} minutes
-                        </span>
+                        <span className="text-muted-foreground">Recovery Time</span>
+                        <span className="font-medium">{lastTest.recoveryTime} minutes</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">
-                          Data Loss (RPO)
-                        </span>
-                        <span className="font-medium">
-                          {lastTest.dataLoss} minutes
-                        </span>
+                        <span className="text-muted-foreground">Data Loss (RPO)</span>
+                        <span className="font-medium">{lastTest.dataLoss} minutes</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">
-                          Test Duration
-                        </span>
-                        <span className="font-medium">
-                          {lastTest.duration} minutes
-                        </span>
+                        <span className="text-muted-foreground">Test Duration</span>
+                        <span className="font-medium">{lastTest.duration} minutes</span>
                       </div>
                     </div>
                     {lastTest.notes && (
-                      <p className="text-sm text-muted-foreground pt-2">
-                        {lastTest.notes}
-                      </p>
+                      <p className="text-sm text-muted-foreground pt-2">{lastTest.notes}</p>
                     )}
                   </>
                 ) : (
@@ -1922,25 +1746,17 @@ export default function DisasterRecoveryPage() {
             {/* RTO/RPO Compliance */}
             <Card className="border-border">
               <CardHeader>
-                <CardTitle className="text-base font-medium">
-                  Recovery Objectives
-                </CardTitle>
+                <CardTitle className="text-base font-medium">Recovery Objectives</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-muted-foreground">RTO Target</span>
-                      <span className="font-medium">
-                        {recoveryObjectives.targetRto} minutes
-                      </span>
+                      <span className="font-medium">{recoveryObjectives.targetRto} minutes</span>
                     </div>
                     <Progress
-                      value={
-                        (recoveryObjectives.rto /
-                          recoveryObjectives.targetRto) *
-                        100
-                      }
+                      value={(recoveryObjectives.rto / recoveryObjectives.targetRto) * 100}
                       className="h-2"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
@@ -1950,16 +1766,10 @@ export default function DisasterRecoveryPage() {
                   <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-muted-foreground">RPO Target</span>
-                      <span className="font-medium">
-                        {recoveryObjectives.targetRpo} minutes
-                      </span>
+                      <span className="font-medium">{recoveryObjectives.targetRpo} minutes</span>
                     </div>
                     <Progress
-                      value={
-                        (recoveryObjectives.rpo /
-                          recoveryObjectives.targetRpo) *
-                        100
-                      }
+                      value={(recoveryObjectives.rpo / recoveryObjectives.targetRpo) * 100}
                       className="h-2"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
@@ -1972,9 +1782,7 @@ export default function DisasterRecoveryPage() {
                     {recoveryObjectives.complianceStatus === "compliant" ? (
                       <>
                         <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                        <span className="text-sm text-emerald-500 font-medium">
-                          Objectives Met
-                        </span>
+                        <span className="text-sm text-emerald-500 font-medium">Objectives Met</span>
                       </>
                     ) : (
                       <>
@@ -1987,8 +1795,7 @@ export default function DisasterRecoveryPage() {
                   </div>
                   {recoveryObjectives.lastVerifiedAt && (
                     <p className="text-xs text-muted-foreground mt-1">
-                      Last verified:{" "}
-                      {formatDate(recoveryObjectives.lastVerifiedAt)}
+                      Last verified: {formatDate(recoveryObjectives.lastVerifiedAt)}
                     </p>
                   )}
                 </div>
@@ -1998,14 +1805,12 @@ export default function DisasterRecoveryPage() {
             {/* Schedule Test */}
             <Card className="border-border">
               <CardHeader>
-                <CardTitle className="text-base font-medium">
-                  Schedule DR Test
-                </CardTitle>
+                <CardTitle className="text-base font-medium">Schedule DR Test</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Regular DR testing ensures your recovery procedures work when
-                  needed. Recommended frequency: Monthly.
+                  Regular DR testing ensures your recovery procedures work when needed. Recommended
+                  frequency: Monthly.
                 </p>
                 <div className="space-y-3">
                   <div>
@@ -2015,15 +1820,9 @@ export default function DisasterRecoveryPage() {
                         <SelectValue placeholder="Select test type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="partial">
-                          Partial Failover (Read-only)
-                        </SelectItem>
-                        <SelectItem value="full">
-                          Full Failover (Production)
-                        </SelectItem>
-                        <SelectItem value="validation">
-                          Backup Validation Only
-                        </SelectItem>
+                        <SelectItem value="partial">Partial Failover (Read-only)</SelectItem>
+                        <SelectItem value="full">Full Failover (Production)</SelectItem>
+                        <SelectItem value="validation">Backup Validation Only</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -2039,9 +1838,7 @@ export default function DisasterRecoveryPage() {
           {/* Test History */}
           <Card className="border-border">
             <CardHeader>
-              <CardTitle className="text-base font-medium">
-                DR Test History
-              </CardTitle>
+              <CardTitle className="text-base font-medium">DR Test History</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
@@ -2059,9 +1856,7 @@ export default function DisasterRecoveryPage() {
                 <TableBody>
                   {drTests.map((test) => (
                     <TableRow key={test.id}>
-                      <TableCell className="font-mono text-xs">
-                        {test.id}
-                      </TableCell>
+                      <TableCell className="font-mono text-xs">{test.id}</TableCell>
                       <TableCell className="font-medium">{test.name}</TableCell>
                       <TableCell>
                         <Badge
@@ -2074,7 +1869,7 @@ export default function DisasterRecoveryPage() {
                                 ? "text-destructive"
                                 : test.status === "in_progress"
                                   ? "text-blue-500"
-                                  : "text-amber-500",
+                                  : "text-amber-500"
                           )}
                         >
                           {test.status.replace("_", " ").toUpperCase()}
@@ -2108,9 +1903,7 @@ export default function DisasterRecoveryPage() {
             {/* DR Policy Configuration */}
             <Card className="border-border">
               <CardHeader>
-                <CardTitle className="text-base font-medium">
-                  Recovery Objectives
-                </CardTitle>
+                <CardTitle className="text-base font-medium">Recovery Objectives</CardTitle>
                 <CardDescription>
                   Define your target recovery time and point objectives.
                 </CardDescription>
@@ -2160,12 +1953,8 @@ export default function DisasterRecoveryPage() {
             {/* Failover Settings */}
             <Card className="border-border">
               <CardHeader>
-                <CardTitle className="text-base font-medium">
-                  Failover Configuration
-                </CardTitle>
-                <CardDescription>
-                  Configure automatic failover behavior and delays.
-                </CardDescription>
+                <CardTitle className="text-base font-medium">Failover Configuration</CardTitle>
+                <CardDescription>Configure automatic failover behavior and delays.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center justify-between">
@@ -2180,9 +1969,7 @@ export default function DisasterRecoveryPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <Label className="text-sm">Failover Delay</Label>
-                    <span className="text-sm font-medium">
-                      {drPolicy.failoverDelay} minutes
-                    </span>
+                    <span className="text-sm font-medium">{drPolicy.failoverDelay} minutes</span>
                   </div>
                   <Slider
                     defaultValue={[drPolicy.failoverDelay]}
@@ -2210,20 +1997,14 @@ export default function DisasterRecoveryPage() {
             {/* Backup Policy */}
             <Card className="border-border">
               <CardHeader>
-                <CardTitle className="text-base font-medium">
-                  Backup Policy
-                </CardTitle>
-                <CardDescription>
-                  Configure backup retention and scheduling.
-                </CardDescription>
+                <CardTitle className="text-base font-medium">Backup Policy</CardTitle>
+                <CardDescription>Configure backup retention and scheduling.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <Label className="text-sm">Retention Period</Label>
-                    <span className="text-sm font-medium">
-                      {drPolicy.backupRetentionDays} days
-                    </span>
+                    <span className="text-sm font-medium">{drPolicy.backupRetentionDays} days</span>
                   </div>
                   <Slider
                     defaultValue={[drPolicy.backupRetentionDays]}
@@ -2266,9 +2047,7 @@ export default function DisasterRecoveryPage() {
             {/* Security Settings */}
             <Card className="border-border">
               <CardHeader>
-                <CardTitle className="text-base font-medium">
-                  Security & Encryption
-                </CardTitle>
+                <CardTitle className="text-base font-medium">Security & Encryption</CardTitle>
                 <CardDescription>
                   Configure encryption settings for backups and replication.
                 </CardDescription>
@@ -2277,18 +2056,14 @@ export default function DisasterRecoveryPage() {
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label className="text-sm">Encryption at Rest</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Encrypt all backup data
-                    </p>
+                    <p className="text-xs text-muted-foreground">Encrypt all backup data</p>
                   </div>
                   <Switch checked={true} />
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label className="text-sm">Encryption in Transit</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Encrypt replication traffic
-                    </p>
+                    <p className="text-xs text-muted-foreground">Encrypt replication traffic</p>
                   </div>
                   <Switch checked={replicationPolicy.encryptionEnabled} />
                 </div>
@@ -2323,9 +2098,8 @@ export default function DisasterRecoveryPage() {
                     <p className="text-sm text-muted-foreground">Critical</p>
                     <p className="text-2xl font-semibold text-destructive">
                       {
-                        riskIndicators.filter(
-                          (r) => r.severity === "critical" && !r.acknowledged,
-                        ).length
+                        riskIndicators.filter((r) => r.severity === "critical" && !r.acknowledged)
+                          .length
                       }
                     </p>
                   </div>
@@ -2342,9 +2116,8 @@ export default function DisasterRecoveryPage() {
                     <p className="text-sm text-muted-foreground">High</p>
                     <p className="text-2xl font-semibold text-red-500">
                       {
-                        riskIndicators.filter(
-                          (r) => r.severity === "high" && !r.acknowledged,
-                        ).length
+                        riskIndicators.filter((r) => r.severity === "high" && !r.acknowledged)
+                          .length
                       }
                     </p>
                   </div>
@@ -2361,9 +2134,8 @@ export default function DisasterRecoveryPage() {
                     <p className="text-sm text-muted-foreground">Medium</p>
                     <p className="text-2xl font-semibold text-amber-500">
                       {
-                        riskIndicators.filter(
-                          (r) => r.severity === "medium" && !r.acknowledged,
-                        ).length
+                        riskIndicators.filter((r) => r.severity === "medium" && !r.acknowledged)
+                          .length
                       }
                     </p>
                   </div>
@@ -2379,11 +2151,7 @@ export default function DisasterRecoveryPage() {
                   <div>
                     <p className="text-sm text-muted-foreground">Low</p>
                     <p className="text-2xl font-semibold text-blue-500">
-                      {
-                        riskIndicators.filter(
-                          (r) => r.severity === "low" && !r.acknowledged,
-                        ).length
-                      }
+                      {riskIndicators.filter((r) => r.severity === "low" && !r.acknowledged).length}
                     </p>
                   </div>
                   <div className="p-2 bg-blue-500/10 rounded-lg">
@@ -2409,7 +2177,7 @@ export default function DisasterRecoveryPage() {
                   className={cn(
                     "border-l-4 transition-colors",
                     alertSeverityConfig[risk.severity].borderColor,
-                    !risk.acknowledged && "bg-amber-500/5",
+                    !risk.acknowledged && "bg-amber-500/5"
                   )}
                 >
                   <CardContent className="p-4">
@@ -2418,12 +2186,9 @@ export default function DisasterRecoveryPage() {
                         <AlertSeverityBadge severity={risk.severity} />
                         <div>
                           <p className="text-sm font-medium">{risk.message}</p>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {risk.details}
-                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">{risk.details}</p>
                           <p className="text-xs text-muted-foreground mt-2">
-                            {risk.category} • Detected{" "}
-                            {formatRelativeTime(risk.detectedAt)}
+                            {risk.category} • Detected {formatRelativeTime(risk.detectedAt)}
                           </p>
                         </div>
                       </div>
@@ -2446,21 +2211,15 @@ export default function DisasterRecoveryPage() {
           {/* Compliance Checklist */}
           <Card className="border-border">
             <CardHeader>
-              <CardTitle className="text-base font-medium">
-                DR Compliance Checklist
-              </CardTitle>
-              <CardDescription>
-                Key indicators for maintaining DR readiness.
-              </CardDescription>
+              <CardTitle className="text-base font-medium">DR Compliance Checklist</CardTitle>
+              <CardDescription>Key indicators for maintaining DR readiness.</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <div className="flex items-center gap-3">
                     <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                    <span className="text-sm">
-                      Backup completed in last 24 hours
-                    </span>
+                    <span className="text-sm">Backup completed in last 24 hours</span>
                   </div>
                   <Badge variant="outline" className="text-xs text-emerald-500">
                     PASS
@@ -2469,9 +2228,7 @@ export default function DisasterRecoveryPage() {
                 <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <div className="flex items-center gap-3">
                     <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                    <span className="text-sm">
-                      Replication lag under 1 minute
-                    </span>
+                    <span className="text-sm">Replication lag under 1 minute</span>
                   </div>
                   <Badge variant="outline" className="text-xs text-emerald-500">
                     PASS
@@ -2480,9 +2237,7 @@ export default function DisasterRecoveryPage() {
                 <div className="flex items-center justify-between p-3 rounded-lg bg-amber-500/5 border border-amber-500/20">
                   <div className="flex items-center gap-3">
                     <AlertTriangle className="h-5 w-5 text-amber-500" />
-                    <span className="text-sm">
-                      DR test performed in last 30 days
-                    </span>
+                    <span className="text-sm">DR test performed in last 30 days</span>
                   </div>
                   <Badge variant="outline" className="text-xs text-amber-500">
                     WARNING
@@ -2491,9 +2246,7 @@ export default function DisasterRecoveryPage() {
                 <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <div className="flex items-center gap-3">
                     <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                    <span className="text-sm">
-                      Multi-region replication enabled
-                    </span>
+                    <span className="text-sm">Multi-region replication enabled</span>
                   </div>
                   <Badge variant="outline" className="text-xs text-emerald-500">
                     PASS
@@ -2527,15 +2280,13 @@ export default function DisasterRecoveryPage() {
               Initiate Failover
             </DialogTitle>
             <DialogDescription>
-              This will initiate a production failover to a secondary region.
-              Only proceed during actual emergencies.
+              This will initiate a production failover to a secondary region. Only proceed during
+              actual emergencies.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
-              <h4 className="font-medium text-destructive mb-2">
-                Emergency Failover Checklist
-              </h4>
+              <h4 className="font-medium text-destructive mb-2">Emergency Failover Checklist</h4>
               <ul className="text-sm space-y-1 text-muted-foreground">
                 <li>• Primary region is confirmed unavailable</li>
                 <li>• Secondary regions are healthy</li>
@@ -2560,10 +2311,7 @@ export default function DisasterRecoveryPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowFailoverDialog(false)}
-            >
+            <Button variant="outline" onClick={() => setShowFailoverDialog(false)}>
               Cancel
             </Button>
             <Button variant="destructive">Confirm Failover</Button>
@@ -2580,8 +2328,8 @@ export default function DisasterRecoveryPage() {
               Test Failover
             </DialogTitle>
             <DialogDescription>
-              Run a DR test to validate your recovery procedures without
-              affecting production traffic.
+              Run a DR test to validate your recovery procedures without affecting production
+              traffic.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -2592,12 +2340,8 @@ export default function DisasterRecoveryPage() {
                   <SelectValue placeholder="Select test type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="partial">
-                    Partial Failover (Read-only validation)
-                  </SelectItem>
-                  <SelectItem value="full">
-                    Full Failover (Complete validation)
-                  </SelectItem>
+                  <SelectItem value="partial">Partial Failover (Read-only validation)</SelectItem>
+                  <SelectItem value="full">Full Failover (Complete validation)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -2634,24 +2378,18 @@ export default function DisasterRecoveryPage() {
               <RotateCcw className="h-5 w-5 text-blue-500" />
               Restore from Backup
             </DialogTitle>
-            <DialogDescription>
-              Restore your system to a previous backup point.
-            </DialogDescription>
+            <DialogDescription>Restore your system to a previous backup point.</DialogDescription>
           </DialogHeader>
           {selectedBackup && (
             <div className="space-y-4 py-4">
               <div className="p-4 bg-muted/50 rounded-lg space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Backup ID</span>
-                  <span className="font-medium font-mono">
-                    {selectedBackup.id}
-                  </span>
+                  <span className="font-medium font-mono">{selectedBackup.id}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Timestamp</span>
-                  <span className="font-medium">
-                    {formatDate(selectedBackup.timestamp)}
-                  </span>
+                  <span className="font-medium">{formatDate(selectedBackup.timestamp)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Size</span>
@@ -2665,17 +2403,14 @@ export default function DisasterRecoveryPage() {
               <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-lg">
                 <h4 className="font-medium text-amber-500 mb-2">Warning</h4>
                 <p className="text-sm text-muted-foreground">
-                  This will replace current data with the backup. Any changes
-                  made after the backup timestamp will be lost.
+                  This will replace current data with the backup. Any changes made after the backup
+                  timestamp will be lost.
                 </p>
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowRestoreDialog(false)}
-            >
+            <Button variant="outline" onClick={() => setShowRestoreDialog(false)}>
               Cancel
             </Button>
             <Button variant="destructive">Confirm Restore</Button>

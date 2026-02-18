@@ -1972,7 +1972,7 @@ export default function EnvironmentsPage() {
                   {activeFiltersCount > 0 && (
                     <Badge
                       variant="secondary"
-                      className="ml-2 text-[10px] h-5 min-w-[18px] flex items-center justify-center"
+                      className="ml-2 text-[10px] h-5 min-w-4.5 flex items-center justify-center"
                     >
                       {activeFiltersCount}
                     </Badge>

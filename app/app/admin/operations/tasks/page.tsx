@@ -1855,7 +1855,7 @@ export default function TasksPage() {
           <Card>
             <CardContent className="p-4">
               <div className="flex flex-wrap items-center gap-3">
-                <div className="relative flex-1 min-w-[200px]">
+                <div className="relative flex-1 min-w-50">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
                     type="text"
@@ -1870,7 +1870,7 @@ export default function TasksPage() {
                   value={filterType}
                   onValueChange={(v) => setFilterType(v as TaskType | "all")}
                 >
-                  <SelectTrigger className="w-[140px] text-xs">
+                  <SelectTrigger className="w-35 text-xs">
                     <Filter className="h-3.5 w-3.5 mr-1.5" />
                     <SelectValue placeholder="Type" />
                   </SelectTrigger>
@@ -1895,7 +1895,7 @@ export default function TasksPage() {
                     setFilterStatus(v as TaskStatus | "all")
                   }
                 >
-                  <SelectTrigger className="w-[140px] text-xs">
+                  <SelectTrigger className="w-35 text-xs">
                     <Activity className="h-3.5 w-3.5 mr-1.5" />
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
@@ -1922,7 +1922,7 @@ export default function TasksPage() {
                     setFilterInitiator(v as TaskInitiator | "all")
                   }
                 >
-                  <SelectTrigger className="w-[140px] text-xs">
+                  <SelectTrigger className="w-35 text-xs">
                     <User className="h-3.5 w-3.5 mr-1.5" />
                     <SelectValue placeholder="Initiator" />
                   </SelectTrigger>

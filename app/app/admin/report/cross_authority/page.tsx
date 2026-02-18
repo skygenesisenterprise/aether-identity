@@ -815,7 +815,7 @@ function TrustGraph() {
         <div className="relative overflow-auto">
           <svg
             viewBox={`0 0 ${width} ${height}`}
-            className="w-full h-auto min-h-[400px]"
+            className="w-full h-auto min-h-100"
           >
             {/* Draw trust lines */}
             {TRUST_RELATIONSHIPS.map((trust) => {
@@ -1335,7 +1335,7 @@ function RiskCard({ risk }: { risk: CrossAuthorityRisk }) {
 
 function TrendChart({ data }: { data: CrossAuthoritySummary["trend"] }) {
   return (
-    <ChartContainer config={{}} className="h-[300px]">
+    <ChartContainer config={{}} className="h-75">
       <LineChart data={data}>
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis
@@ -1451,7 +1451,7 @@ export default function CrossAuthorityReportPage() {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-6 lg:w-[800px]">
+        <TabsList className="grid w-full grid-cols-6 lg:w-200">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="trusts">Trust Map</TabsTrigger>
           <TabsTrigger value="access">Access Flow</TabsTrigger>

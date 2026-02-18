@@ -2,6 +2,12 @@ import { Card, CardContent } from "@/components/dashboard/ui/card";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
+// Consistent number formatter to avoid hydration mismatches
+// Uses comma as thousands separator consistently across server/client
+function formatNumber(value: number): string {
+  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 interface MetricCardProps {
   title: string;
   value: string | number;
@@ -44,28 +50,13 @@ export function MetricCard({
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               {title}
             </p>
-            <p
-              className={cn(
-                "text-2xl font-semibold tabular-nums",
-                valueColorClass,
-              )}
-            >
-              {typeof value === "number"
-                ? value.toLocaleString("en-US")
-                : value}
+            <p className={cn("text-2xl font-semibold tabular-nums", valueColorClass)}>
+              {typeof value === "number" ? formatNumber(value) : value}
             </p>
-            {subtitle && (
-              <p className="text-xs text-muted-foreground">{subtitle}</p>
-            )}
+            {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
             {trend && (
-              <p
-                className={cn(
-                  "text-xs font-medium",
-                  trend.isPositive ? "text-accent" : "text-destructive",
-                )}
-              >
-                {trend.isPositive ? "+" : ""}
-                {trend.value}% from last period
+              <p className={cn("text-2xl font-semibold tabular-nums", valueColorClass)}>
+                {typeof value === "number" ? formatNumber(value) : value}
               </p>
             )}
           </div>
