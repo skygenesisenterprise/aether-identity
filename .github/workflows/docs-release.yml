@@ -2,16 +2,12 @@ name: Aether Identity Docs Release
 
 on:
   push:
-    branches: ["main"]
     paths:
       - "docs/**"
       - ".github/workflows/docs-release.yml"
     tags:
       - "v*.*.*-docs"
-  pull_request:
-    branches: ["main"]
-    paths:
-      - "docs/**"
+
   workflow_dispatch:
     inputs:
       version:

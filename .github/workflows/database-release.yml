@@ -1,712 +1,138 @@
-name: Database Release
+name: Aether Identity Database Release
 
 on:
   push:
-    tags:
-      - "v*.*.*-prisma"
-      - "v*.*.*-db"
+    tags: ["v*.*.*-prisma"]
   workflow_dispatch:
     inputs:
       version:
-        description: "Version to release (e.g., 1.0.0)"
+        description: "Version to build (e.g., 1.0.0)"
         required: true
-        default: "1.0.0"
-      environment:
-        description: "Environment to deploy to"
-        required: true
-        default: "staging"
-        type: choice
-        options:
-          - staging
-          - production
+        type: string
 
 env:
-  NODE_VERSION: "20"
-  PACKAGE_DIR: "prisma"
   REGISTRY: ghcr.io
-  IMAGE_NAME: aether-identity/prisma
+  IMAGE_NAME: skygenesisenterprise/aether-identity/prisma
 
 jobs:
-  debug:
-    name: Debug Trigger Information
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print trigger information
-        run: |
-          echo "Event name: ${{ github.event_name }}"
-          echo "Ref: ${{ github.ref }}"
-          echo "Ref name: ${{ github.ref_name }}"
-          echo "Repository: ${{ github.repository }}"
-
-  validate:
-    name: Validate Prisma Schema
-    runs-on: ubuntu-latest
-    needs: debug
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Install dependencies
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: pnpm install --frozen-lockfile
-
-      - name: Validate Prisma schema
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: pnpm prisma validate
-
-      - name: Format check
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: pnpm prisma format --check
-
-      - name: Generate Prisma client
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: pnpm prisma generate
-
-  test-migrations:
-    name: Test Database Migrations
-    runs-on: ubuntu-latest
-    needs: validate
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: aether_identity_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Install dependencies
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: pnpm install --frozen-lockfile
-
-      - name: Generate Prisma client
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: pnpm prisma generate
-
-      - name: Run migrations (dry-run)
-        working-directory: ${{ env.PACKAGE_DIR }}
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/aether_identity_test?schema=public
-        run: |
-          echo "Testing migrations against PostgreSQL..."
-          pnpm prisma migrate deploy
-
   build:
-    name: Build Package
     runs-on: ubuntu-latest
-    needs: validate
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Install dependencies
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: pnpm install --frozen-lockfile
-
-      - name: Generate Prisma client
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: pnpm prisma generate
-
-      - name: Build package
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: pnpm build
-
-      - name: Lint code
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: pnpm lint
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: prisma-package
-          path: |
-            ${{ env.PACKAGE_DIR }}/dist
-            ${{ env.PACKAGE_DIR }}/schema.prisma
-            ${{ env.PACKAGE_DIR }}/README.md
-            ${{ env.PACKAGE_DIR }}/package.json
-          retention-days: 30
-
-  extract-version:
-    name: Extract Version
-    runs-on: ubuntu-latest
-    needs: build
     outputs:
       version: ${{ steps.version.outputs.version }}
-      package_version: ${{ steps.package_version.outputs.version }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Extract version from tag or input
-        id: version
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-          else
-            TAG="${{ github.ref_name }}"
-            VERSION="${TAG#v}"
-            VERSION="${VERSION%-prisma}"
-            VERSION="${VERSION%-db}"
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Extract version from package.json
-        id: package_version
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: |
-          VERSION=$(jq -r '.version' package.json)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Package.json version: $VERSION"
-
-  build-docker-image:
-    name: Build Docker Image
-    runs-on: ubuntu-latest
-    needs: [build, extract-version]
+      package_version: ${{ steps.version.outputs.package_version }}
     permissions:
       contents: read
       packages: write
+      id-token: write
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: prisma-package
-          path: ${{ env.PACKAGE_DIR }}/
+      - name: Extract version from tag
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            INPUT_VERSION="${{ github.event.inputs.version }}"
+            CLEAN_VERSION="${INPUT_VERSION%-prisma}"
+            VERSION="v${CLEAN_VERSION#v}"
+            PACKAGE_VERSION="${VERSION#v}"
+          else
+            TAG="${{ github.ref_name }}"
+            CLEAN_VERSION="${TAG%-prisma}"
+            VERSION="${CLEAN_VERSION}"
+            PACKAGE_VERSION="${CLEAN_VERSION#v}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "package_version=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      - name: Verify Dockerfile exists
+        run: |
+          if [ -f "prisma/infra/Dockerfile" ]; then
+            echo "✅ Dockerfile found at prisma/infra/Dockerfile"
+          else
+            echo "❌ No Dockerfile found at prisma/infra/Dockerfile"
+            exit 1
+          fi
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
       - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Dockerfile
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: |
-          cat > Dockerfile << 'EOF'
-          FROM node:20-alpine
-
-          WORKDIR /app
-
-          # Copy package files
-          COPY package.json ./
-          COPY schema.prisma ./
-
-          # Install dependencies
-          RUN npm install --production
-
-          # Copy built files
-          COPY dist/ ./dist/
-
-          # Generate Prisma client
-          RUN npx prisma generate
-
-          # Expose port (optional, for future use)
-          EXPOSE 3000
-
-          # Default command
-          CMD ["node", "dist/index.js"]
-          EOF
-
       - name: Extract Docker metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=${{ needs.extract-version.outputs.version }}
-            type=raw,value=${{ needs.extract-version.outputs.package_version }}
-            type=raw,value=latest
+            type=raw,value=${{ steps.version.outputs.version }}
+            type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6
+        id: build-and-push
+        uses: docker/build-push-action@64c9b141502b80dbbd71e008a0130ad330f480f8 # v6.18.0
         with:
-          context: ${{ env.PACKAGE_DIR }}
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.extract-version.outputs.version }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.extract-version.outputs.package_version }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          context: ./prisma
+          file: ./prisma/infra/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          provenance: false
 
-  publish-npm:
-    name: Publish to npm
-    runs-on: ubuntu-latest
-    needs: [build, build-docker-image, test-migrations]
-    if: github.event_name == 'push' || github.event.inputs.environment == 'production'
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          registry-url: https://registry.npmjs.org/
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: prisma-package
-          path: ${{ env.PACKAGE_DIR }}/
-
-      - name: Install dependencies
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: pnpm install --frozen-lockfile
-
-      - name: Extract version
-        id: version
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-          else
-            TAG="${{ github.ref_name }}"
-            VERSION="${TAG#v}"
-            VERSION="${VERSION%-prisma}"
-            VERSION="${VERSION%-db}"
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Update package.json version
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: |
-          jq '.version = "${{ steps.version.outputs.version }}"' package.json > package.tmp.json
-          mv package.tmp.json package.json
-
-      - name: Configure npm authentication
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
-          echo "registry=https://registry.npmjs.org/" >> ~/.npmrc
+      - name: Sign the published Docker image
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish to npm
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: pnpm publish --access public --no-git-checks --registry https://registry.npmjs.org/
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  publish-gpr:
-    name: Publish to GitHub Packages
-    runs-on: ubuntu-latest
-    needs: [build, build-docker-image, test-migrations]
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          registry-url: https://npm.pkg.github.com/
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: prisma-package
-          path: ${{ env.PACKAGE_DIR }}/
-
-      - name: Install dependencies
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: pnpm install --frozen-lockfile
-
-      - name: Extract version
-        id: version
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-          else
-            TAG="${{ github.ref_name }}"
-            VERSION="${TAG#v}"
-            VERSION="${VERSION%-prisma}"
-            VERSION="${VERSION%-db}"
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Update package.json for GitHub Packages
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: |
-          jq '.name = "@skygenesisenterprise/aether-identity-prisma" | .version = "${{ steps.version.outputs.version }}"' package.json > package.tmp.json
-          mv package.tmp.json package.json
-
-      - name: Configure GitHub Packages authentication
-        run: |
-          echo "@skygenesisenterprise:registry=https://npm.pkg.github.com/" > ~/.npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> ~/.npmrc
-
-      - name: Publish to GitHub Packages
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: pnpm publish --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
   release:
     name: Create GitHub Release
+    needs: build
     runs-on: ubuntu-latest
-    needs: [publish-npm, publish-gpr, build-docker-image]
-    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
       packages: write
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Extract version
-        id: version
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-            TAG="v${VERSION}-prisma"
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "tag=$TAG" >> $GITHUB_OUTPUT
-          else
-            TAG="${{ github.ref_name }}"
-            VERSION="${TAG#v}"
-            VERSION="${VERSION%-prisma}"
-            VERSION="${VERSION%-db}"
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "tag=$TAG" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: prisma-package
-          path: prisma-dist/
-
-      - name: Generate Release Notes
-        id: release_notes
-        run: |
-          VERSION=${{ steps.version.outputs.version }}
-          cat > release_notes.md << 'EOF'
-          # Aether Identity Prisma Database Package v${{ steps.version.outputs.version }}
-
-          ## Package Information
-          - Package Name (npm): `@aether-identity/prisma`
-          - Package Name (GitHub): `@skygenesisenterprise/aether-identity-prisma`
-          - Docker Image: `ghcr.io/aether-identity/prisma:${{ steps.version.outputs.version }}`
-          - Version: ${{ steps.version.outputs.version }}
-          - Schema Version: ${{ steps.version.outputs.version }}
-
-          ## Docker Image
-
-          Pull the database package as a Docker image:
-
-          ```bash
-          docker pull ghcr.io/aether-identity/prisma:${{ steps.version.outputs.version }}
-          ```
-
-          Or use the version from package.json:
-          ```bash
-          docker pull ghcr.io/aether-identity/prisma:$(jq -r '.version' prisma/package.json)
-          ```
-
-          ### Running the container
-          ```bash
-          docker run -e DATABASE_URL="postgresql://user:pass@host/db" ghcr.io/aether-identity/prisma:${{ steps.version.outputs.version }}
-          ```
-
-          ## Installation
-
-          ### From npm
-          ```bash
-          npm install @aether-identity/prisma
-          # or
-          yarn add @aether-identity/prisma
-          # or
-          pnpm add @aether-identity/prisma
-          ```
-
-          ### From GitHub Packages
-          ```bash
-          npm install @skygenesisenterprise/aether-identity-prisma
-          # or
-          yarn add @skygenesisenterprise/aether-identity-prisma
-          # or
-          pnpm add @skygenesisenterprise/aether-identity-prisma
-          ```
-
-          ## Quick Start
-
-          ```typescript
-          import { PrismaClient } from '@aether-identity/prisma';
-
-          const prisma = new PrismaClient();
-
-          // Example: Create a new user
-          const user = await prisma.user.create({
-            data: {
-              email: 'user@example.com',
-              name: 'John Doe',
-            },
-          });
-          ```
-
-          ## Database Schema
-
-          This package includes the complete Prisma schema for the Aether Identity platform:
-
-          ### Core Models
-          - **User**: Identity management with support for multiple authentication methods
-          - **Profile**: User profile information
-          - **Account**: OAuth account linking
-          - **Session**: Session management
-
-          ### Security Models
-          - **Role** & **Permission**: RBAC (Role-Based Access Control)
-          - **UserRole**: User role assignments
-          - **RolePermission**: Role permission mappings
-          - **ApiKey**: API key management with scopes
-
-          ### Authentication Models
-          - **PasswordResetToken**: Password reset flow
-          - **EmailVerificationToken**: Email verification
-          - **ExternalAccount**: Social login accounts
-          - **OAuthState**: OAuth state management
-
-          ### OAuth2/OIDC Models
-          - **OAuthClient**: OAuth client applications
-          - **OAuthAuthorizationCode**: Authorization code flow
-          - **OAuthAccessToken**: Access token management
-          - **OAuthRefreshToken**: Refresh token management
-          - **OAuthConsent**: User consent records
-
-          ### Service & Organization Models
-          - **ServiceKey**: Service-to-service authentication
-          - **ServiceKeyUsage**: Service key usage tracking
-          - **Organization**: Multi-tenant organizations
-          - **Domain**: Domain management for organizations
-          - **UserDomain**: User-domain relationships
-          - **Membership**: Organization memberships
-
-          ### Database Management Models
-          - **DatabaseBackup**: Backup tracking
-          - **DatabaseConnectionLog**: Connection logging
-          - **DatabaseHealthCheck**: Health monitoring
-
-          ## Features
-
-          - **Type-Safe Database Access**: Full TypeScript support with generated types
-          - **Multi-Tenant Support**: Organization and domain-based isolation
-          - **OAuth2/OIDC Ready**: Complete OAuth2 implementation models
-          - **Audit Logging**: Built-in connection and usage logging
-          - **Health Monitoring**: Database health check models
-          - **Migration Support**: Automated migration deployment
-          - **Client Delegation**: Clients can update their database package independently
-
-          ## Available Scripts
-
-          After installation, clients can use the following Prisma commands:
-
-          ```bash
-          # Generate Prisma client
-          npx prisma generate
-
-          # Deploy migrations
-          npx prisma migrate deploy
-
-          # Open Prisma Studio
-          npx prisma studio
-
-          # Validate schema
-          npx prisma validate
-
-          # Format schema
-          npx prisma format
-          ```
-
-          ## Database Migrations
-
-          To apply migrations in your environment:
-
-          ```bash
-          # Set your database URL
-          export DATABASE_URL="postgresql://user:password@localhost:5432/aether_identity?schema=public"
-
-          # Deploy migrations
-          npx prisma migrate deploy
-
-          # Or for development
-          npx prisma migrate dev
-          ```
-
-          ## Client-Side Updates
-
-          Clients can update their database package independently without waiting for server updates:
-
-          ```bash
-          # Check for updates
-          npm outdated @aether-identity/prisma
-
-          # Update to latest version
-          npm update @aether-identity/prisma
-
-          # Or install specific version
-          npm install @aether-identity/prisma@${{ steps.version.outputs.version }}
-          ```
-
-          ## Environment Variables
-
-          Required environment variables:
-
-          ```bash
-          # Database connection URL
-          DATABASE_URL="postgresql://user:password@host:port/database?schema=public"
-
-          # Optional: Direct URL for specific operations
-          DIRECT_URL="postgresql://user:password@host:port/database"
-          ```
-
-          ## Documentation
-
-          - [Prisma Documentation](https://www.prisma.io/docs)
-          - [Repository README](https://github.com/skygenesisenterprise/aether-identity/blob/main/prisma/README.md)
-          - [Database Schema](https://github.com/skygenesisenterprise/aether-identity/blob/main/prisma/schema.prisma)
-
-          ## Bug Reports & Feature Requests
-
-          Please report issues on GitHub Issues: https://github.com/skygenesisenterprise/aether-identity/issues
-
-          ---
-          **Note**: Automated release. Clients can delegate database updates independently.
-          EOF
-
-          echo "release_notes<<EOF" >> $GITHUB_OUTPUT
-          cat release_notes.md >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.version.outputs.tag }}
-          name: Database Package v${{ steps.version.outputs.version }}
-          body: ${{ steps.release_notes.outputs.release_notes }}
+          tag_name: ${{ github.ref_name }}
+          name: Aether Identity Prisma v${{ needs.build.outputs.package_version }}
+          body: |
+            ## Aether Identity Prisma v${{ needs.build.outputs.package_version }}
+
+            🐳 **Docker Image**:
+            ```
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build.outputs.version }}
+            ```
+
+            ### Usage
+
+            ```bash
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build.outputs.version }}
+            ```
+
+            This image contains:
+            - Prisma CLI with pnpm
+            - Generated Prisma Client
+            - Required dependencies for database operations
+
+            ---
+            📦 **Made with ❤️ by [Sky Genesis Enterprise](https://skygenesisenterprise.com)**
           draft: false
           prerelease: false
-          files: |
-            prisma-dist/dist/**
-            prisma-dist/schema.prisma
-            prisma-dist/README.md
-
-  deploy-staging:
-    name: Deploy to Staging
-    runs-on: ubuntu-latest
-    needs: [publish-npm, publish-gpr, build-docker-image]
-    if: github.event.inputs.environment == 'staging' || (github.event_name == 'push' && contains(github.ref_name, '-prisma'))
-    environment:
-      name: staging
-      url: https://staging.aether-identity.io
-    steps:
-      - name: Deploy to staging
-        run: |
-          echo "Deploying database package version ${{ steps.version.outputs.version }} to staging..."
-          # Add staging deployment steps here
-          echo "Staging deployment complete"
-
-  deploy-production:
-    name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: [publish-npm, publish-gpr, build-docker-image, deploy-staging]
-    if: github.event.inputs.environment == 'production'
-    environment:
-      name: production
-      url: https://api.aether-identity.io
-    steps:
-      - name: Deploy to production
-        run: |
-          echo "Deploying database package version ${{ steps.version.outputs.version }} to production..."
-          # Add production deployment steps here
-          echo "Production deployment complete"
-
-  notify:
-    name: Notify Release
-    runs-on: ubuntu-latest
-    needs: [release]
-    if: always()
-    steps:
-      - name: Notify success
-        if: needs.release.result == 'success'
-        run: |
-          echo "Database package v${{ steps.version.outputs.version }} released successfully!"
-          echo "npm: @aether-identity/prisma"
-          echo "GitHub Packages: @skygenesisenterprise/aether-identity-prisma"
-          echo "Docker Image: ghcr.io/aether-identity/prisma:${{ steps.version.outputs.version }}"
-
-      - name: Notify failure
-        if: needs.release.result == 'failure'
-        run: |
-          echo "Database package release failed!"
