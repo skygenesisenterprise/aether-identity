@@ -33,3 +33,7 @@ Thumbs.db
 # Build outputs
 bin/
 dist/
+
+# Nextjs build output
+.next/
+out/

@@ -18,7 +18,7 @@ RUN npm install -g next
 WORKDIR /app
 
 # Copy package files first (for better caching)
-COPY package.json pnpm-lock.yaml ./
+COPY package.json ./
 
 # Install dependencies during build
 # This ensures node_modules is populated in the image
