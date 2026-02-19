@@ -51,7 +51,7 @@ function getIdentityClient(): IdentityClient {
   return identityClient;
 }
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+/* export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -134,7 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const verifyTotp = async (code: string) => {
+  /* const verifyTotp = async (code: string) => {
     setIsLoading(true);
     try {
       const identity = identityRef.current;
@@ -166,7 +166,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
+} */
 
 export function useAuth() {
   const context = useContext(AuthContext);

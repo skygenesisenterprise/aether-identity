@@ -62,7 +62,7 @@ export function ActivityFeed({ events }: ActivityFeedProps) {
       <CardContent>
         <div className="relative space-y-0">
           {/* Timeline line */}
-          <div className="absolute left-[11px] top-2 bottom-2 w-px bg-border" />
+          <div className="absolute left-2.75 top-2 bottom-2 w-px bg-border" />
           
           {events.map((event, index) => {
             const Icon = eventIcons[event.type]

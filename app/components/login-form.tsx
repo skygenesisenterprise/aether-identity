@@ -26,7 +26,7 @@ export function LoginForm() {
         <CardHeader className="space-y-6 pb-4">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-600 to-sky-500 rounded-lg">
+            <div className="flex items-center justify-center w-10 h-10 bg-linear-to-br from-blue-600 to-sky-500 rounded-lg">
               <div className="grid grid-cols-2 gap-0.5 w-6 h-6">
                 <div className="bg-white rounded-sm" />
                 <div className="bg-white rounded-sm" />

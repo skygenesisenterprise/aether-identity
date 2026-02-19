@@ -375,7 +375,7 @@ function renderChildMenuItem(
           >
             <span className="flex items-center gap-2">
               {item.icon && <item.icon className="h-3 w-3 shrink-0" />}
-              <span className="text-left truncate max-w-[120px]">
+              <span className="text-left truncate max-w-30">
                 {item.title}
               </span>
             </span>
@@ -424,7 +424,7 @@ function renderChildMenuItem(
               )}
             />
           )}
-          <span className="truncate max-w-[140px]">{item.title}</span>
+          <span className="truncate max-w-35">{item.title}</span>
         </span>
       </Link>
     </Button>
@@ -469,7 +469,7 @@ function MenuItem({ item, level = 0, pathname }: MenuItemProps) {
                   )}
                 />
               )}
-              <span className="text-left truncate max-w-[120px]">
+              <span className="text-left truncate max-w-30">
                 {item.title}
               </span>
             </span>
@@ -506,7 +506,7 @@ function MenuItem({ item, level = 0, pathname }: MenuItemProps) {
             )}
           />
         )}
-        <span className="truncate max-w-[100px]">{item.title}</span>
+        <span className="truncate max-w-25">{item.title}</span>
       </Link>
     </Button>
   );

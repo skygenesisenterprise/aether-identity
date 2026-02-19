@@ -208,7 +208,7 @@ export default function RegisterPage() {
         <div
           className={`bg-white rounded-sm shadow-lg p-11 mb-4 transition-all duration-300 ${
             isTransitioning
-              ? "opacity-0 translate-x-[-20px]"
+              ? "opacity-0 translate-x-5"
               : "opacity-100 translate-x-0"
           }`}
         >
@@ -245,7 +245,7 @@ export default function RegisterPage() {
                       <motion.button
                         type="button"
                         onClick={handleDomainToggle}
-                        className="h-full px-3 py-2 border border-[#8a8886] bg-white text-[15px] text-[#1b1b1b] hover:border-[#323130] transition-colors flex items-center justify-between min-w-[140px] max-w-[180px]"
+                        className="h-full px-3 py-2 border border-[#8a8886] bg-white text-[15px] text-[#1b1b1b] hover:border-[#323130] transition-colors flex items-center justify-between min-w-35 max-w-45"
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
                       >

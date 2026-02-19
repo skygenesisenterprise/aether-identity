@@ -73,7 +73,7 @@ export default function TotpPage() {
         <div
           className={`bg-white rounded-sm shadow-lg p-11 mb-4 transition-all duration-300 ${
             isTransitioning
-              ? "opacity-0 translate-x-[-20px]"
+              ? "opacity-0 translate-x-5"
               : "opacity-100 translate-x-0"
           }`}
         >

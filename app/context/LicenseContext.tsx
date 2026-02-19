@@ -187,7 +187,7 @@ export function LicenseProvider({ children }: { children: React.ReactNode }) {
   };
 
   const getFeatureStatus = (feature: keyof LicenseFeatures): boolean => {
-    return features[feature];
+    return !!features[feature];
   };
 
   // Vérifier si la licence est expirée
