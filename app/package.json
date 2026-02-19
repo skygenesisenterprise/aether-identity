@@ -74,7 +74,7 @@
   },
   "devDependencies": {
     "@capacitor/core": "^8.1.0",
-    "@tailwindcss/postcss": "^4.1.13",
+    "@tailwindcss/postcss": "^4.2.0",
     "@types/node": "^25",
     "@types/react": "^19",
     "@types/react-dom": "^19",
