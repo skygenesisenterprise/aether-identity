@@ -223,7 +223,7 @@ jobs:
         if: steps.check_package.outputs.has_package == 'true'
         run: |
           cd docs
-          pnpm install --frozen-lockfile
+          pnpm install --no-frozen-lockfile
 
       - name: Build documentation
         if: steps.check_package.outputs.has_package == 'true'
