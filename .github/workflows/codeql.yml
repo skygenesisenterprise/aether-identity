@@ -1,12 +1,14 @@
 name: "CodeQL Advanced"
 
 on:
-  push:
-    branches: ["main", "master", "develop"]
   pull_request:
     branches: ["main", "master", "develop"]
   schedule:
     - cron: "0 9 * * 1" # Tous les lundis à 9h
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   analyze:
