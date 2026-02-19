@@ -92,7 +92,7 @@
     "test": "jest"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.268",
+    "@types/chrome": "^0.1.36",
     "@types/node": "^25.2.3",
     "@types/react": "^18.2.79",
     "@types/react-dom": "^18.2.25",
