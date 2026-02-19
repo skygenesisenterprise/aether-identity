@@ -63,7 +63,7 @@
     "format:check": "prettier --check \"**/*.{js,ts,tsx,json,md,yml,yaml}\""
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
+    "@types/node": "^25.3.0",
     "prettier": "^3.0.0",
     "typescript": "^5.0.0"
   },
