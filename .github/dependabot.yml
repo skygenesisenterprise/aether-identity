@@ -5,12 +5,19 @@
 
 version: 2
 updates:
-  # Frontend (racine)
+  # ============================================================================
+  # JavaScript / TypeScript - npm
+  # ============================================================================
+
+  # Frontend racine
   - package-ecosystem: "npm"
-    directory: "/" # racine du projet (frontend)
+    directory: "/"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
 
   # Backend (api)
   - package-ecosystem: "npm"
@@ -18,9 +25,254 @@ updates:
     schedule:
       interval: "daily"
     open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
 
+  # App
+  - package-ecosystem: "npm"
+    directory: "/app"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+
+  # Prisma
+  - package-ecosystem: "npm"
+    directory: "/prisma"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+
+  # Messages
+  - package-ecosystem: "npm"
+    directory: "/messages"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+
+  # Package racine
+  - package-ecosystem: "npm"
+    directory: "/package"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+
+  # Package Node
+  - package-ecosystem: "npm"
+    directory: "/package/node"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+
+  # Package Extension
+  - package-ecosystem: "npm"
+    directory: "/package/extension"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+
+  # Package VSCode
+  - package-ecosystem: "npm"
+    directory: "/package/vscode"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+
+  # Infrastructure
+  - package-ecosystem: "npm"
+    directory: "/infrastructure"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+
+  # ============================================================================
+  # Rust - Cargo
+  # ============================================================================
+
+  - package-ecosystem: "cargo"
+    directory: "/package/rust"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "cargo"
+    directory: "/package/drivers"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "rust"
+
+  # ============================================================================
+  # Python - pip
+  # ============================================================================
+
+  - package-ecosystem: "pip"
+    directory: "/package/python"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+
+  # ============================================================================
+  # Java - Maven
+  # ============================================================================
+
+  - package-ecosystem: "maven"
+    directory: "/package/java"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "java"
+
+  # ============================================================================
+  # Go - gomod
+  # ============================================================================
+
+  - package-ecosystem: "gomod"
+    directory: "/cmd"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "go"
+
+  - package-ecosystem: "gomod"
+    directory: "/server"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "go"
+
+  - package-ecosystem: "gomod"
+    directory: "/package/golang"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "go"
+
+  - package-ecosystem: "gomod"
+    directory: "/package/github"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "go"
+
+  - package-ecosystem: "gomod"
+    directory: "/package/docker"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "go"
+
+  - package-ecosystem: "gomod"
+    directory: "/package/k8s"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "go"
+
+  - package-ecosystem: "gomod"
+    directory: "/package/cli"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "go"
+
+  - package-ecosystem: "gomod"
+    directory: "/options"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "go"
+
+  - package-ecosystem: "gomod"
+    directory: "/routers"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "go"
+
+  - package-ecosystem: "gomod"
+    directory: "/services"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "go"
+
+  # ============================================================================
+  # Docker
+  # ============================================================================
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "docker"
+
+  # ============================================================================
   # GitHub Actions
+  # ============================================================================
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "github-actions"
