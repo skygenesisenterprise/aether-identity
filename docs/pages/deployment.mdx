@@ -1,0 +1,205 @@
+# Deployment Guide
+
+This guide covers the deployment options for Aether Identity.
+
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Docker Deployment](#docker-deployment)
+- [Kubernetes Deployment](#kubernetes-deployment)
+- [Environment Variables](#environment-variables)
+
+## Quick Start
+
+The quickest way to get started with Aether Identity is using Docker Compose:
+
+```bash
+# Clone the repository
+git clone https://github.com/skygenesisenterprise/aether-identity.git
+cd aether-identity
+
+# Start with Docker Compose
+docker-compose up -d
+```
+
+## Docker Deployment
+
+### Prerequisites
+
+- Docker 20.10+
+- Docker Compose 2.0+
+
+### Using Docker Compose
+
+```yaml
+version: "3.8"
+services:
+  aether-identity:
+    image: ghcr.io/skygenesisenterprise/aether-identity:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://user:pass@db:5432/aether
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=aether
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+```
+
+### Using Docker Run
+
+```bash
+docker run -d \
+  --name aether-identity \
+  -p 3000:3000 \
+  -e NODE_ENV=production \
+  -e DATABASE_URL=postgresql://user:pass@localhost:5432/aether \
+  ghcr.io/skygenesisenterprise/aether-identity:latest
+```
+
+## Kubernetes Deployment
+
+### Using Helm (Recommended)
+
+```bash
+# Add the Helm repository
+helm repo add aether https://charts.skygenesisenterprise.io
+helm repo update
+
+# Install Aether Identity
+helm install aether-identity aether/aether-identity \
+  --set database.host=postgresql \
+  --set database.password=secretpassword
+```
+
+### Using kubectl
+
+```bash
+# Apply the Kubernetes manifests
+kubectl apply -f k8s/
+```
+
+Sample deployment manifest:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aether-identity
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: aether-identity
+  template:
+    metadata:
+      labels:
+        app: aether-identity
+    spec:
+      containers:
+        - name: aether-identity
+          image: ghcr.io/skygenesisenterprise/aether-identity:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: aether-secrets
+                  key: database-url
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aether-identity
+spec:
+  selector:
+    app: aether-identity
+  ports:
+    - port: 80
+      targetPort: 3000
+```
+
+## Environment Variables
+
+### Required Variables
+
+| Variable         | Description                  | Default       |
+| ---------------- | ---------------------------- | ------------- |
+| `NODE_ENV`       | Environment mode             | `development` |
+| `DATABASE_URL`   | PostgreSQL connection string | -             |
+| `JWT_SECRET`     | Secret key for JWT signing   | -             |
+| `ENCRYPTION_KEY` | Key for data encryption      | -             |
+
+### Optional Variables
+
+| Variable    | Description                    | Default |
+| ----------- | ------------------------------ | ------- |
+| `PORT`      | HTTP server port               | `3000`  |
+| `LOG_LEVEL` | Logging level                  | `info`  |
+| `REDIS_URL` | Redis connection (for caching) | -       |
+| `SMTP_HOST` | SMTP server for emails         | -       |
+| `SMTP_PORT` | SMTP port                      | `587`   |
+
+### OAuth Configuration
+
+| Variable                     | Description                |
+| ---------------------------- | -------------------------- |
+| `OAUTH_GOOGLE_CLIENT_ID`     | Google OAuth client ID     |
+| `OAUTH_GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+| `OAUTH_GITHUB_CLIENT_ID`     | GitHub OAuth client ID     |
+| `OAUTH_GITHUB_CLIENT_SECRET` | GitHub OAuth client secret |
+
+## Production Checklist
+
+Before deploying to production, ensure:
+
+- [ ] All secrets are properly configured
+- [ ] SSL/TLS certificates are installed
+- [ ] Database migrations are run
+- [ ] Backup strategy is in place
+- [ ] Monitoring and logging are configured
+- [ ] Rate limiting is enabled
+- [ ] Security headers are configured
+
+## Troubleshooting
+
+### Common Issues
+
+**Database Connection Failed**
+
+```
+Error: connect ECONNREFUSED
+```
+
+- Verify DATABASE_URL is correct
+- Ensure database is running and accessible
+- Check firewall rules
+
+**Port Already in Use**
+
+```
+Error: listen EADDRINUSE: address already in use :::3000
+```
+
+- Change PORT environment variable
+- Stop other services using port 3000
+
+## Next Steps
+
+- [Configure OAuth Providers](/oauth)
+- [Set up MFA](/mfa)
+- [API Integration](/api)

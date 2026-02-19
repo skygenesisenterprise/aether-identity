@@ -1,9 +1,13 @@
-name: Aether Vault Docs Release
+name: Aether Identity Docs Release
 
 on:
   push:
-    # Publish Docs release only for tags ending with -docs
-    tags: ["v*.*.*-docs"]
+    branches: ["main"]
+    paths:
+      - "docs/**"
+      - ".github/workflows/docs-release.yml"
+    tags:
+      - "v*.*.*-docs"
   pull_request:
     branches: ["main"]
     paths:
@@ -16,6 +20,109 @@ on:
         type: string
 
 jobs:
+  sync-to-wiki:
+    name: Sync Documentation to Wiki
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync docs to Wiki
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Clone the wiki repository
+          git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.wiki.git" wiki
+
+          # Create Home page from README if it exists and has content
+          if [ -s docs/README.md ]; then
+            cp docs/README.md wiki/Home.md
+            echo "" >> wiki/Home.md
+            echo "---" >> wiki/Home.md
+            echo "_Last updated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')_" >> wiki/Home.md
+          fi
+
+          # Copy all markdown files from docs to wiki
+          for file in docs/*.md; do
+            if [ -f "$file" ] && [ -s "$file" ]; then
+              filename=$(basename "$file")
+              if [ "$filename" != "README.md" ]; then
+                # Convert filename to wiki page name (replace hyphens with spaces, capitalize)
+                pagename="${filename%.md}"
+                cp "$file" "wiki/${pagename}.md"
+                echo "" >> "wiki/${pagename}.md"
+                echo "---" >> "wiki/${pagename}.md"
+                echo "_Last updated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')_" >> "wiki/${pagename}.md"
+              fi
+            fi
+          done
+
+          # Create Deployment section if deployment.md doesn't exist
+          if [ ! -f docs/deployment.md ]; then
+            cat > wiki/Deployment.md << 'EOF'
+          # Deployment Guide
+
+          This section provides deployment instructions for Aether Identity.
+
+          ## Table of Contents
+
+          - [Quick Start](#quick-start)
+          - [Docker Deployment](#docker-deployment)
+          - [Kubernetes Deployment](#kubernetes-deployment)
+          - [Environment Variables](#environment-variables)
+
+          ## Quick Start
+
+          TODO: Add quick start deployment instructions.
+
+          ## Docker Deployment
+
+          TODO: Add Docker deployment instructions.
+
+          ## Kubernetes Deployment
+
+          TODO: Add Kubernetes deployment instructions.
+
+          ## Environment Variables
+
+          TODO: Document required environment variables.
+
+          ---
+          _Last updated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')_
+          EOF
+          fi
+
+          # Create a sidebar navigation for the wiki
+          cat > wiki/_Sidebar.md << 'EOF'
+          ## Navigation
+
+          - [[Home]]
+          - [[Deployment]]
+          - [[Admin Dashboard Redesign|admin-dashboard-redesign]]
+
+          ## External Links
+
+          - [Repository](https://github.com/${{ github.repository }})
+          - [Issues](https://github.com/${{ github.repository }}/issues)
+          EOF
+
+          # Commit and push changes
+          cd wiki
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to sync to wiki"
+          else
+            git commit -m "Sync documentation from main branch - $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            git push
+            echo "Documentation synced to wiki successfully"
+          fi
+
   build-docs:
     name: Build Documentation
     runs-on: ubuntu-latest
@@ -32,18 +139,30 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: "20"
-          cache: "npm"
-          cache-dependency-path: docs/package-lock.json
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Check for package.json
+        id: check_package
+        run: |
+          if [ -f docs/package.json ]; then
+            echo "has_package=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_package=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Install dependencies
+        if: steps.check_package.outputs.has_package == 'true'
         run: |
           cd docs
-          npm ci
+          pnpm install --frozen-lockfile
 
       - name: Build documentation
+        if: steps.check_package.outputs.has_package == 'true'
         run: |
           cd docs
-          npm run build
+          pnpm build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
