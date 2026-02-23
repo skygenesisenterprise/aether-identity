@@ -114,7 +114,7 @@
     "@typescript-eslint/eslint-plugin": "^8.56.0",
     "@typescript-eslint/parser": "^8.56.0",
     "@vscode/test-web": "^0.0.79",
-    "eslint": "^10.0.0",
+    "eslint": "^10.0.1",
     "typescript": "^5.9.3"
   },
   "dependencies": {
