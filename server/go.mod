@@ -4,7 +4,7 @@ go 1.25.5
 
 require (
 	github.com/boombuler/barcode v1.1.0
-	github.com/gin-contrib/sessions v1.0.4
+	github.com/gin-contrib/sessions v1.1.0
 	github.com/gin-gonic/gin v1.12.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/pquerna/otp v1.5.0
