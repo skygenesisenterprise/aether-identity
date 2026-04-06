@@ -82,7 +82,7 @@
     "eslint": "^10",
     "eslint-config-next": "16.2.2",
     "postcss": "^8.5.8",
-    "prisma": "7.5.0",
+    "prisma": "7.6.0",
     "tailwindcss": "^4.2.2",
     "typescript": "6.0.2"
   }
