@@ -18,11 +18,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | The Etheria Times",
-    default: "The Etheria Times - Actualités en direct et info en continu",
+    template: "%s | Sky Genesis Enterprise",
+    default: "Aether Identity - Sky Genesis Enterprise",
   },
   description:
-    "Toute l'actualité en direct, les news et infos en continu : politique, économie, société, culture, sport et international sur The Etheria Times.",
+    "An Enterprise OAuth2/OIDC support, multi-factor authentication, and secure account management for applications and services.",
   icons: {
     icon: [
       {

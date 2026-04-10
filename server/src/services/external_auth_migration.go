@@ -3,7 +3,7 @@ package services
 import (
 	"fmt"
 
-	"github.com/skygenesisenterprise/aether-identity/server/src/model"
+	"github.com/skygenesisenterprise/aether-identity/server/src/models"
 )
 
 // MigrateDiscordAccounts migre les anciens comptes Discord vers le nouveau système ExternalAccount

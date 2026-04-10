@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/skygenesisenterprise/aether-identity/server/src/model"
+	"github.com/skygenesisenterprise/aether-identity/server/src/models"
 	"github.com/skygenesisenterprise/aether-identity/server/src/services"
 )
 

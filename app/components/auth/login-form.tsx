@@ -52,7 +52,7 @@ export function LoginForm() {
           <Input
             id="email"
             type="email"
-            placeholder="votre.identifiant@skygenesis.gov"
+            placeholder="john.doe@aethermail.me"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="h-11 pl-10 bg-background border-border focus:border-primary focus:ring-primary"

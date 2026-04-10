@@ -1,6 +1,6 @@
 package interfaces
 
-import "github.com/skygenesisenterprise/aether-identity/server/src/model"
+import "github.com/skygenesisenterprise/aether-identity/server/src/models"
 
 // UserRepository définit l'interface pour les opérations sur les utilisateurs
 type UserRepository interface {

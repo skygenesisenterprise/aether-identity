@@ -2,7 +2,7 @@ package interfaces
 
 import (
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/skygenesisenterprise/aether-identity/server/src/model"
+	"github.com/skygenesisenterprise/aether-identity/server/src/models"
 )
 
 // JWTService définit l'interface pour les opérations JWT

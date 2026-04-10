@@ -10,7 +10,6 @@ export default function RegisterPage() {
           <div className="flex items-center gap-3 mb-16">
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Sky Genesis Enterprise</h1>
-              <p className="text-primary-foreground/70 text-sm">Portail Institutionnel Sécurisé</p>
             </div>
           </div>
 
@@ -20,7 +19,7 @@ export default function RegisterPage() {
                 Rejoindre le Portail Officiel de Sky Genesis Enterprise
               </h2>
               <p className="mt-4 text-primary-foreground/80 leading-relaxed">
-                Créez votre compte pour accéder à l&apos;ensemble des services institutionnels.
+                Créez votre compte pour accéder à l&apos;ensemble des services enterprise.
                 Votre inscription sera vérifiée par nos équipes de sécurité.
               </p>
             </div>
@@ -60,8 +59,8 @@ export default function RegisterPage() {
         </div>
 
         <div className="text-sm text-primary-foreground/60">
-          <p>&copy; 2024 Sky Genesis Enterprise. Tous droits réservés.</p>
-          <p className="mt-1">Version 2.4.1 | Dernière mise à jour : Janvier 2024</p>
+          <p>&copy; 2026 Sky Genesis Enterprise. Tous droits réservés.</p>
+          <p className="mt-1">Version 1.0.0 | Dernière mise à jour : Avril 2026</p>
         </div>
       </div>
 
