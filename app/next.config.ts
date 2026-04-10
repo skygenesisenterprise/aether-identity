@@ -1,4 +1,7 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -8,18 +11,31 @@ const nextConfig: NextConfig = {
 
   ...(isProduction && {
     output: "standalone",
+    ...(process.env.ASSET_PREFIX && { assetPrefix: process.env.ASSET_PREFIX }),
   }),
+
+  basePath: process.env.BASE_PATH || "",
 
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "sso.skygenesisenterprise.com",
+        hostname: "identity.skygenesisenterprise.com",
         pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "sso.skygenesisenterprise.net",
+        hostname: "api.dicebear.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
         pathname: "/**",
       },
       { protocol: "http", hostname: "127.0.0.1", pathname: "/**" },
@@ -28,14 +44,12 @@ const nextConfig: NextConfig = {
   },
 
   async headers() {
-    const headers = [
-      { key: "Referrer-Policy", value: "origin-when-cross-origin" },
-    ];
+    const headers = [{ key: "Referrer-Policy", value: "origin-when-cross-origin" }];
 
     if (isProduction) {
       headers.push(
         { key: "X-Content-Type-Options", value: "nosniff" },
-        { key: "X-Frame-Options", value: "DENY" },
+        { key: "X-Frame-Options", value: "DENY" }
       );
     }
 
@@ -43,4 +57,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);
