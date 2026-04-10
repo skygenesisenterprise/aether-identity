@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Source_Serif_4, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { Providers } from "@/context/Providers";
-import "../styles/globals.css";
+import "@/styles/globals.css";
 
 const sourceSerif = Source_Serif_4({
   subsets: ["latin"],
