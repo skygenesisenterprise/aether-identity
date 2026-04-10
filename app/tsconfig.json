@@ -26,7 +26,8 @@
       "@/lib/*": ["./lib/*"],
       "@/styles/*": ["./styles/*"],
       "@/hooks/*": ["./hooks/*"],
-      "@/services/*": ["./services"]
+      "@/services/*": ["./services"],
+      "@/types/*": ["./types/*"]
     },
     "baseUrl": ".",
     "types": ["next", "node"],
