@@ -216,7 +216,7 @@ export function AdminSidebar() {
                 {item.items && item.items.length > 0 ? (
                   <CollapsibleMenuItem item={item} pathname={pathname} />
                 ) : (
-                  <SidebarMenuButton asChild isActive={isActive(pathname, item.href)}>
+                  <SidebarMenuButton asChild isActive={isActiveGroup(pathname, item.href)}>
                     <Link href={item.href} className="flex items-center justify-between w-full">
                       <div className="flex items-center gap-2">
                         <item.icon
@@ -248,7 +248,7 @@ export function AdminSidebar() {
 }
 
 function CollapsibleMenuItem({ item, pathname }: { item: NavItem; pathname: string }) {
-  const isGroupActive = isActive(pathname, item.href);
+  const isGroupActive = isActiveGroup(pathname, item.href);
   const [isOpen, setIsOpen] = React.useState(false);
 
   const hasActiveChild = React.useMemo(() => {
@@ -331,5 +331,9 @@ function CollapsibleMenuItem({ item, pathname }: { item: NavItem; pathname: stri
 }
 
 function isActive(pathname: string, href: string): boolean {
+  return pathname === href;
+}
+
+function isActiveGroup(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
