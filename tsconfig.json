@@ -2,11 +2,7 @@
   "files": [],
   "references": [
     { "path": "./app" },
-    { "path": "./tools" },
-    { "path": "./options" },
-    { "path": "./snap" },
-    { "path": "./tests" },
-    { "path": "./prisma"},
+    { "path": "./server/prisma"},
     { "path": "./infrastructure"}
   ],
   "compilerOptions": {

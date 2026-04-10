@@ -18,26 +18,10 @@ const nextConfig: NextConfig = {
 
   images: {
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "identity.skygenesisenterprise.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "api.dicebear.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "avatars.githubusercontent.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-        pathname: "/**",
-      },
+      { protocol: "https", hostname: "identity.skygenesisenterprise.com", pathname: "/**" },
+      { protocol: "https", hostname: "api.dicebear.com", pathname: "/**" },
+      { protocol: "https", hostname: "avatars.githubusercontent.com", pathname: "/**" },
+      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
       { protocol: "http", hostname: "127.0.0.1", pathname: "/**" },
       { protocol: "http", hostname: "localhost", pathname: "/**" },
     ],
@@ -54,6 +38,15 @@ const nextConfig: NextConfig = {
     }
 
     return [{ source: "/(.*)", headers }];
+  },
+
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "http://localhost:8080/api/:path*",
+      },
+    ];
   },
 };
 

@@ -1,0 +1,44 @@
+{
+  "Navigation": {
+    "home": "Accueil",
+    "news": "Actualités",
+    "categories": "Catégories",
+    "about": "À propos",
+    "contact": "Contact",
+    "search": "Rechercher",
+    "signIn": "Connexion",
+    "signUp": "S'inscrire",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "logout": "Déconnexion"
+  },
+  "Common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "retry": "Réessayer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "submit": "Soumettre",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "Home": {
+    "hero": {
+      "title": "The Etheria Times",
+      "subtitle": "Actualités en direct et analyses approfondies"
+    },
+    "latestNews": "Dernières actualités",
+    "trending": "Tendances",
+    "readMore": "Lire la suite"
+  },
+  "Meta": {
+    "title": "The Etheria Times - Actualités en direct et info en continu",
+    "description": "Toute l'actualité en direct, les news et infos en continu : politique, économie, société, culture, sport et international sur The Etheria Times."
+  }
+}

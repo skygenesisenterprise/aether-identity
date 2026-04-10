@@ -1,0 +1,44 @@
+{
+  "Navigation": {
+    "home": "Startseite",
+    "news": "Nachrichten",
+    "categories": "Kategorien",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "search": "Suchen",
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "profile": "Profil",
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  },
+  "Common": {
+    "loading": "Wird geladen...",
+    "error": "Ein Fehler ist aufgetreten",
+    "retry": "Erneut versuchen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "close": "Schließen",
+    "submit": "Absenden",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Vorherige",
+    "yes": "Ja",
+    "no": "Nein"
+  },
+  "Home": {
+    "hero": {
+      "title": "The Etheria Times",
+      "subtitle": "Aktuelle Nachrichten und tiefgehende Berichterstattung"
+    },
+    "latestNews": "Neueste Nachrichten",
+    "trending": "Trends",
+    "readMore": "Weiterlesen"
+  },
+  "Meta": {
+    "title": "The Etheria Times - Live-Nachrichten und kontinuierliche Informationen",
+    "description": "Alle Nachrichten live, Nachrichten und Informationen kontinuierlich: Politik, Wirtschaft, Gesellschaft, Kultur, Sport und International auf The Etheria Times."
+  }
+}

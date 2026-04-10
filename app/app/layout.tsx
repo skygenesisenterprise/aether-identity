@@ -19,7 +19,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: {
     template: "%s | Sky Genesis Enterprise",
-    default: "Aether Identity - Sky Genesis Enterprise",
+    default: "Aether Identity | Sky Genesis Enterprise",
   },
   description:
     "An Enterprise OAuth2/OIDC support, multi-factor authentication, and secure account management for applications and services.",

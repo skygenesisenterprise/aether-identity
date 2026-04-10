@@ -2,7 +2,7 @@
 set -e
 
 # =============================================================================
-# The Etheria Times - Service Entry Point
+# Aether Identity - Service Entry Point
 # =============================================================================
 
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/go/bin:/go/bin:/root/go/bin:/root/.local/share/corepack"
@@ -49,7 +49,7 @@ log_error() {
 display_header() {
     echo ""
     echo "╔══════════════════════════════════════════════════════════════════════╗"
-    echo "║                    The Etheria Times                                 ║"
+    echo "║                    Aether Identity                                   ║"
     echo "║               Enterprise Account Management                          ║"
     echo "║                   Version 1.0.0-alpha                                ║"
     echo "╚══════════════════════════════════════════════════════════════════════╝"
@@ -57,6 +57,7 @@ display_header() {
     log_info "Frontend: http://localhost:${FRONTEND_PORT}"
     log_info "API:      http://localhost:${API_PORT}"
     log_info "Database: ${DB_HOST}:${DB_PORT}/${DB_NAME}"
+    log_info "Admin:    admin@skygenesisenterprise.com / Admin123!"
     echo ""
 }
 

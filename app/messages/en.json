@@ -1,0 +1,44 @@
+{
+  "Navigation": {
+    "home": "Home",
+    "news": "News",
+    "categories": "Categories",
+    "about": "About",
+    "contact": "Contact",
+    "search": "Search",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "Common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "Home": {
+    "hero": {
+      "title": "The Etheria Times",
+      "subtitle": "Breaking news and in-depth coverage"
+    },
+    "latestNews": "Latest News",
+    "trending": "Trending",
+    "readMore": "Read More"
+  },
+  "Meta": {
+    "title": "The Etheria Times - Live news and continuous information",
+    "description": "All the news live, news and information in continuous: politics, economy, society, culture, sports and international on The Etheria Times."
+  }
+}
