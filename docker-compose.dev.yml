@@ -1,0 +1,79 @@
+services:
+  aetheridentity:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: aetheridentity:latest
+    container_name: aetheridentity
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "8080:8080"
+    environment:
+      NODE_ENV: development
+      ENVIRONMENT: local
+      DB_PASSWORD: ${DB_PASSWORD:-password}
+      DATABASE_URL: postgresql://aether:${DB_PASSWORD:-password}@db:5432/etheria_account
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      SERVER_PORT: 8080
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+      NEXT_PUBLIC_ENVIRONMENT: local
+      CORS_ALLOWED_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+      SKIP_PRISMA_SETUP: "true"
+    volumes:
+      - ./server:/app/server
+      - ./.air.toml:/app/.air.toml
+      - ./app:/app/app
+      - ./messages:/app/messages
+      - ./scripts:/app/scripts
+      - /app/app/node_modules
+      - ./logs:/app/logs
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /app
+    entrypoint: ["/app/scripts/wait-for-db.sh"]
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health 2>/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    mem_limit: 4g
+    mem_reservation: 1g
+
+  db:
+    image: postgres:16-alpine
+    container_name: aetheridentity-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: aether
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: etheria_account
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -p 5432 -U aether -d etheria_account"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+volumes:
+  postgres_data:
