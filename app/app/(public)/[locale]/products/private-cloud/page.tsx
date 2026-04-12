@@ -1,0 +1,468 @@
+import Link from "next/link";
+import { Header } from "@/components/public/Header";
+import { Footer } from "@/components/public/Footer";
+import { Button } from "@/components/ui/button";
+import { FaqAccordion } from "@/components/public/FaqAccordion";
+import {
+  Server,
+  Database,
+  Lock,
+  Shield,
+  ArrowRight,
+  CheckCircle2,
+  Globe,
+  Zap,
+  HardDrive,
+  Network,
+  Clock,
+  HeadphonesIcon,
+  RefreshCw,
+  Scale,
+  Activity,
+} from "lucide-react";
+
+const features = [
+  {
+    icon: Server,
+    title: "Dedicated Infrastructure",
+    description:
+      "Your own dedicated servers, storage, and network resources isolated from other customers.",
+  },
+  {
+    icon: Lock,
+    title: "Enhanced Security",
+    description:
+      "Military-grade encryption, network isolation, and advanced threat protection for your data.",
+  },
+  {
+    icon: Shield,
+    title: "Compliance Ready",
+    description:
+      "Meet regulatory requirements with dedicated environments and custom compliance certifications.",
+  },
+  {
+    icon: Database,
+    title: "Full Data Sovereignty",
+    description:
+      "Your data stays in your chosen jurisdiction with complete control over storage and access.",
+  },
+  {
+    icon: Network,
+    title: "Private Networking",
+    description:
+      "Dedicated network connections, VPN support, and private API endpoints for secure connectivity.",
+  },
+  {
+    icon: HardDrive,
+    title: "Custom Storage",
+    description:
+      "Configure storage capacity, redundancy, and backup strategies to match your requirements.",
+  },
+];
+
+const metrics = [
+  { value: "99.99%", label: "Uptime SLA" },
+  { value: "< 10ms", label: "Network latency" },
+  { value: "24/7", label: "Support coverage" },
+  { value: "Zero", label: "Shared resources" },
+];
+
+const benefits = [
+  {
+    icon: Scale,
+    title: "Elastic Scaling",
+    description: "Scale your resources up or down based on demand without over-provisioning.",
+  },
+  {
+    icon: RefreshCw,
+    title: "Predictable Costs",
+    description: "Fixed monthly pricing with transparent billing and no surprise charges.",
+  },
+  {
+    icon: HeadphonesIcon,
+    title: "Premium Support",
+    description: "Dedicated account manager and priority support with guaranteed response times.",
+  },
+  {
+    icon: Zap,
+    title: "High Performance",
+    description: "Enterprise-grade hardware with optimized networking for maximum throughput.",
+  },
+];
+
+const services = [
+  {
+    name: "Standard",
+    description: "Perfect for growing organizations",
+    price: "Custom pricing",
+    features: [
+      "Dedicated virtual servers",
+      "500GB storage",
+      "24/7 monitoring",
+      "Email support",
+      "99.9% uptime",
+      "Basic security",
+    ],
+  },
+  {
+    name: "Professional",
+    description: "For demanding workloads",
+    price: "Custom pricing",
+    features: [
+      "Dedicated physical servers",
+      "2TB storage",
+      "Priority support",
+      "99.99% uptime",
+      "Advanced security",
+      "Custom networking",
+    ],
+    popular: true,
+  },
+  {
+    name: "Enterprise",
+    description: "Maximum performance & control",
+    price: "Custom pricing",
+    features: [
+      "Full rack deployment",
+      "Unlimited storage",
+      "Dedicated account manager",
+      "99.999% uptime",
+      "Custom compliance",
+      "On-premise options",
+    ],
+  },
+];
+
+const faqs = [
+  {
+    question: "What is the difference between private cloud and public cloud?",
+    answer:
+      "Private cloud provides dedicated infrastructure for a single organization, offering enhanced security, customization, and performance. Public cloud shares resources across multiple tenants.",
+  },
+  {
+    question: "Can I choose my data center location?",
+    answer:
+      "Yes, we offer multiple data center locations across Europe, North America, and Asia. You can select the region that best meets your compliance and latency requirements.",
+  },
+  {
+    question: "What migration support do you offer?",
+    answer:
+      "Our team provides comprehensive migration assistance including planning, execution, and validation. We ensure minimal downtime during the transition.",
+  },
+  {
+    question: "How does billing work?",
+    answer:
+      "We offer flexible billing options including monthly and annual plans. Pricing is based on your selected configuration with no hidden fees.",
+  },
+  {
+    question: "Is there a minimum commitment?",
+    answer:
+      "We offer both short-term and long-term contracts to match your needs. Contact us to discuss the best option for your organization.",
+  },
+];
+
+const recentUpdates = [
+  {
+    version: "Q1 2026",
+    date: "April 2026",
+    description: "New data center in Frankfurt with enhanced compliance options",
+  },
+  {
+    version: "Q4 2025",
+    date: "December 2025",
+    description: "Added GPU instance types for AI/ML workloads",
+  },
+  {
+    version: "Q3 2025",
+    date: "September 2025",
+    description: "Expanded storage options with NVMe performance tier",
+  },
+];
+
+export default async function PrivateCloudPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <Header />
+
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="relative py-24 lg:py-32 border-b border-border">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+                <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />
+                Private Cloud Solutions
+              </div>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
+                Dedicated Cloud Infrastructure for Enterprise
+              </h1>
+              <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
+                Deploy your workloads on fully dedicated infrastructure with complete isolation,
+                enhanced security, and full data sovereignty.
+              </p>
+              <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
+                <Link href="#contact">
+                  <Button size="lg" className="gap-2 h-12 px-6 text-base">
+                    Request a Quote
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href="#features">
+                  <Button variant="outline" size="lg" className="h-12 px-6 text-base">
+                    Explore Features
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Metrics Section */}
+        <section className="py-16 border-b border-border bg-muted/30">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+              {metrics.map((metric) => (
+                <div key={metric.label}>
+                  <div className="text-3xl sm:text-4xl font-semibold text-foreground">
+                    {metric.value}
+                  </div>
+                  <div className="mt-1 text-sm text-muted-foreground">{metric.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section id="features" className="py-20 lg:py-28">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mb-16">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                Enterprise-Grade Features
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                Everything you need to run your most demanding workloads with confidence.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {features.map((feature) => (
+                <div key={feature.title} className="group">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-foreground/5 group-hover:bg-foreground/10 transition-colors">
+                      <feature.icon className="h-5 w-5 text-foreground" />
+                    </div>
+                    <h3 className="text-base font-semibold text-foreground">{feature.title}</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed pl-13">
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Benefits Section */}
+        <section className="py-20 lg:py-28 border-b border-border bg-muted/30">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mb-16">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                Why Choose Private Cloud
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                Get the best of both worlds: the flexibility of cloud with the security of dedicated
+                infrastructure.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {benefits.map((benefit) => (
+                <div
+                  key={benefit.title}
+                  className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
+                >
+                  <benefit.icon className="h-8 w-8 text-foreground mb-4" />
+                  <h3 className="text-lg font-semibold text-foreground mb-2">{benefit.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {benefit.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section className="py-20 lg:py-28 border-b border-border">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mb-16">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Flexible Plans</h2>
+              <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                Choose the configuration that best fits your needs. All plans include enterprise
+                support.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {services.map((service) => (
+                <div
+                  key={service.name}
+                  className={`relative p-6 rounded-lg border bg-card ${
+                    service.popular
+                      ? "border-blue-500 ring-1 ring-blue-500"
+                      : "border-border hover:border-foreground/20"
+                  } transition-colors`}
+                >
+                  {service.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-blue-500 text-white text-xs font-medium rounded-full">
+                      Most Popular
+                    </div>
+                  )}
+                  <h3 className="text-xl font-semibold text-foreground mb-2">{service.name}</h3>
+                  <p className="text-sm text-muted-foreground mb-4">{service.description}</p>
+                  <div className="text-2xl font-semibold text-foreground mb-6">{service.price}</div>
+                  <ul className="space-y-3 mb-6">
+                    {service.features.map((feature) => (
+                      <li key={feature} className="flex items-center gap-2 text-sm">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                        <span className="text-muted-foreground">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="#contact">
+                    <Button className="w-full" variant={service.popular ? "default" : "outline"}>
+                      Get Started
+                    </Button>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Compliance Section */}
+        <section className="py-20 lg:py-28 border-b border-border">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+              <div>
+                <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                  Built for Compliance
+                </h2>
+                <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                  Our private cloud infrastructure is designed to meet the most stringent regulatory
+                  requirements across industries.
+                </p>
+                <div className="mt-8 grid grid-cols-2 gap-3">
+                  {["SOC 2", "GDPR", "ISO 27001", "HIPAA", "PCI DSS", "FedRAMP"].map((standard) => (
+                    <div key={standard} className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                      <span className="text-sm text-foreground">{standard}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-6 rounded-lg bg-muted/50 border border-border">
+                  <Shield className="h-8 w-8 text-foreground mb-3" />
+                  <div className="text-2xl font-semibold text-foreground">AES-256</div>
+                  <div className="text-sm text-muted-foreground">Data encryption</div>
+                </div>
+                <div className="p-6 rounded-lg bg-muted/50 border border-border">
+                  <Lock className="h-8 w-8 text-foreground mb-3" />
+                  <div className="text-2xl font-semibold text-foreground">Zero</div>
+                  <div className="text-sm text-muted-foreground">Tenant isolation</div>
+                </div>
+                <div className="p-6 rounded-lg bg-muted/50 border border-border">
+                  <Globe className="h-8 w-8 text-foreground mb-3" />
+                  <div className="text-2xl font-semibold text-foreground">10+</div>
+                  <div className="text-sm text-muted-foreground">Regions available</div>
+                </div>
+                <div className="p-6 rounded-lg bg-muted/50 border border-border">
+                  <Activity className="h-8 w-8 text-foreground mb-3" />
+                  <div className="text-2xl font-semibold text-foreground">24/7</div>
+                  <div className="text-sm text-muted-foreground">Security monitoring</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-20 lg:py-28 border-b border-border">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mx-auto text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                Frequently Asked Questions
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                Common questions about our private cloud solutions.
+              </p>
+            </div>
+            <FaqAccordion faqs={faqs} />
+          </div>
+        </section>
+
+        {/* Recent Updates */}
+        <section className="py-20 lg:py-28 border-b border-border">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mb-16">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Latest Updates</h2>
+              <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                Stay up to date with the latest improvements to our private cloud platform.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {recentUpdates.map((update) => (
+                <div
+                  key={update.version}
+                  className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">{update.date}</span>
+                  </div>
+                  <div className="text-lg font-semibold text-foreground mb-2">{update.version}</div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {update.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section id="contact" className="py-20 lg:py-28">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mx-auto text-center">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                Ready to Deploy?
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Contact our team to discuss your private cloud requirements and get a customized
+                quote.
+              </p>
+              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Button size="lg" className="gap-2 h-12 px-8 text-base">
+                  Request a Quote
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+                <Link href="/contact">
+                  <Button variant="outline" size="lg" className="h-12 px-8 text-base">
+                    Contact Sales
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Footer locale={locale as "fr" | "be_fr" | "be_nl" | "ch_fr"} />
+    </div>
+  );
+}
