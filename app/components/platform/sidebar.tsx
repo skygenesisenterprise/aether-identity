@@ -90,7 +90,11 @@ const navItems: NavItem[] = [
     items: [
       { title: "Applications", href: "/dashboard/applications", icon: Layout },
       { title: "APIs", href: "/dashboard/applications/apis", icon: Code2 },
-      { title: "SSO Integrations", href: "/dashboard/applications/externalapps", icon: ExternalLink },
+      {
+        title: "SSO Integrations",
+        href: "/dashboard/applications/externalapps",
+        icon: ExternalLink,
+      },
     ],
   },
   {
@@ -262,28 +266,53 @@ function CollapsibleMenuItem({ item, pathname }: { item: NavItem; pathname: stri
     }
   }, [isGroupActive, hasActiveChild]);
 
+  const hasSubItems = item.items && item.items.length > 0;
+
   return (
     <>
-      <SidebarMenuButton asChild isActive={isGroupActive}>
-        <Link href={item.href} className="flex w-full items-center justify-between">
-          <div className="flex items-center gap-2">
-            <item.icon className={cn("h-4 w-4", isGroupActive && "text-primary")} />
-            <span className={cn(isGroupActive && "font-medium text-primary")}>{item.title}</span>
-          </div>
-          <motion.div
-            animate={{ rotate: isOpen ? 90 : 0 }}
-            transition={{ duration: 0.2 }}
-            className="h-4 w-4"
+      {hasSubItems ? (
+        <SidebarMenuButton asChild isActive={isGroupActive}>
+          <button
+            type="button"
+            className="flex w-full items-center justify-between"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               setIsOpen(!isOpen);
             }}
           >
-            <ChevronRight className="h-4 w-4" />
-          </motion.div>
-        </Link>
-      </SidebarMenuButton>
+            <div className="flex items-center gap-2">
+              <item.icon className={cn("h-4 w-4", isGroupActive && "text-primary")} />
+              <span className={cn(isGroupActive && "font-medium text-primary")}>{item.title}</span>
+            </div>
+            <motion.div
+              animate={{ rotate: isOpen ? 90 : 0 }}
+              transition={{ duration: 0.2 }}
+              className="h-4 w-4"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </motion.div>
+          </button>
+        </SidebarMenuButton>
+      ) : (
+        <SidebarMenuButton asChild isActive={isGroupActive}>
+          <Link href={item.href} className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2">
+              <item.icon
+                className={cn("h-4 w-4", isActive(pathname, item.href) && "text-primary")}
+              />
+              <span className={cn(isActive(pathname, item.href) && "font-medium text-primary")}>
+                {item.title}
+              </span>
+            </div>
+            {item.badge && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">
+                {item.badge}
+              </span>
+            )}
+          </Link>
+        </SidebarMenuButton>
+      )}
       <AnimatePresence>
         {isOpen && item.items && (
           <motion.div

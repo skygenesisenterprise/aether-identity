@@ -1,10 +1,21 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
-import { Plus, MoreHorizontal, ArrowUpRight, Copy, Key, Shield, Zap } from "lucide-react";
+import Link from "next/link";
+import {
+  Plus,
+  MoreHorizontal,
+  Copy,
+  Key,
+  Shield,
+  Zap,
+  ArrowRight,
+  ExternalLink,
+  Cpu,
+} from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -30,8 +41,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
-const apis = [
+interface Api {
+  id: string;
+  name: string;
+  description: string;
+  identifier: string;
+  scopes: number;
+  isSystem: boolean;
+  isEarlyAccess: boolean;
+}
+
+const apis: Api[] = [
   {
     id: "api_1",
     name: "My Account API",
@@ -75,7 +97,7 @@ export default function ApisPage() {
   const handleCreate = () => {
     if (!apiName || !apiIdentifier) return;
 
-    const newApi = {
+    const newApi: Api = {
       id: `api_${Date.now()}`,
       name: apiName,
       description: "",
@@ -95,15 +117,19 @@ export default function ApisPage() {
   };
 
   return (
-    <div className="p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight mb-3">APIs</h1>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            Define APIs that you can consume from your authorized applications.
-          </p>
+    <div className="min-h-screen bg-muted/30">
+      <div className="border-b bg-background">
+        <div className="px-6 py-6">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-2xl font-semibold tracking-tight">APIs</h1>
+            <p className="text-muted-foreground">
+              Define APIs that you can consume from your authorized applications.
+            </p>
+          </div>
         </div>
+      </div>
 
+      <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
             {createdApis.length} API{createdApis.length !== 1 ? "s" : ""}
@@ -114,16 +140,17 @@ export default function ApisPage() {
           </Button>
         </div>
 
-        <div className="space-y-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {createdApis.map((api) => (
             <Card key={api.id} className="hover:border-primary/30 transition-colors cursor-pointer">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                      className={cn(
+                        "flex h-10 w-10 items-center justify-center rounded-lg",
                         api.isSystem ? "bg-amber-500/10" : "bg-primary/10"
-                      }`}
+                      )}
                     >
                       {api.isSystem ? (
                         <Zap className="h-5 w-5 text-amber-600" />
@@ -203,14 +230,64 @@ export default function ApisPage() {
           ))}
         </div>
 
-        <div className="pt-4 border-t">
-          <Button variant="outline" asChild>
-            <Link href="/docs/apis">
-              View Documentation
-              <ArrowUpRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-base font-semibold">Quick Links</CardTitle>
+                <CardDescription>Resources and settings for API management</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card className="group cursor-pointer transition-all hover:shadow-md">
+                <Link href="/docs/apis">
+                  <CardContent className="flex items-center gap-4 p-6">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
+                      <ExternalLink className="h-6 w-6 text-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">API Documentation</p>
+                      <p className="text-sm text-muted-foreground">Explore API references</p>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                  </CardContent>
+                </Link>
+              </Card>
+
+              <Card className="group cursor-pointer transition-all hover:shadow-md">
+                <Link href="/dashboard/applications">
+                  <CardContent className="flex items-center gap-4 p-6">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
+                      <Key className="h-6 w-6 text-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">Applications</p>
+                      <p className="text-sm text-muted-foreground">Manage client applications</p>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                  </CardContent>
+                </Link>
+              </Card>
+
+              <Card className="group cursor-pointer transition-all hover:shadow-md">
+                <Link href="/dashboard/settings">
+                  <CardContent className="flex items-center gap-4 p-6">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
+                      <Cpu className="h-6 w-6 text-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">Tenant Settings</p>
+                      <p className="text-sm text-muted-foreground">Configure your environment</p>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                  </CardContent>
+                </Link>
+              </Card>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

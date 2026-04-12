@@ -2,9 +2,19 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Network, Key, Shield, ArrowUpRight, Globe, LogIn } from "lucide-react";
+import {
+  Network,
+  Key,
+  Shield,
+  ArrowRight,
+  Globe,
+  LogIn,
+  ArrowUpRight,
+  ExternalLink,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 
 const features = [
   {
@@ -67,26 +78,30 @@ export default function SocialPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   return (
-    <div className="p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-              <Network className="h-4 w-4 text-primary" />
+    <div className="min-h-screen bg-muted/30">
+      <div className="border-b bg-background">
+        <div className="px-6 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <Network className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <h1 className="text-2xl font-semibold tracking-tight">Social Connections</h1>
+                <p className="text-muted-foreground">
+                  Configure social connections so that you can let your users login with them.
+                </p>
+              </div>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight">Social Connections</h1>
+            <Button onClick={() => setDialogOpen(true)}>
+              <LogIn className="mr-2 h-4 w-4" />
+              New Social Connection
+            </Button>
           </div>
-          <Button onClick={() => setDialogOpen(true)}>
-            <LogIn className="mr-2 h-4 w-4" />
-            New Social Connection
-          </Button>
         </div>
+      </div>
 
-        <p className="text-lg text-muted-foreground leading-relaxed">
-          Configure social connections like Facebook, Twitter, Github and others so that you can let
-          your users login with them.
-        </p>
-
+      <div className="p-6 space-y-6">
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
@@ -94,7 +109,12 @@ export default function SocialPage() {
                 <Key className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
-                <h2 className="text-lg font-semibold mb-1">google-oauth2</h2>
+                <div className="flex items-center gap-2 mb-1">
+                  <h2 className="text-lg font-semibold">google-oauth2</h2>
+                  <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
+                    Recommended
+                  </Badge>
+                </div>
                 <p className="text-muted-foreground">
                   Google / Gmail - Enable users to sign in with their Google account.
                 </p>
@@ -113,6 +133,7 @@ export default function SocialPage() {
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
                       <feature.icon className="h-5 w-5 text-primary" />
                     </div>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
                   </div>
                   <CardTitle className="text-base mt-3">{feature.title}</CardTitle>
                 </CardHeader>
@@ -145,17 +166,19 @@ export default function SocialPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 pt-4 border-t">
+        <Separator />
+
+        <div className="flex items-center gap-3">
           <Button variant="outline" asChild>
-            <Link href="/docs/social">
+            <Link href="/docs/social" target="_blank">
+              <ExternalLink className="mr-2 h-4 w-4" />
               View Documentation
-              <ArrowUpRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
           <Button asChild>
             <Link href="/dashboard/connection/social/configure">
               Configure Social
-              <ArrowUpRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </div>

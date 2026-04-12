@@ -2,9 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Database, Key, Shield, ArrowUpRight, Lock, UserCheck, LogIn } from "lucide-react";
+import {
+  Database,
+  Key,
+  Shield,
+  ArrowRight,
+  Lock,
+  UserCheck,
+  LogIn,
+  ArrowUpRight,
+  ExternalLink,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +27,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 
 const features = [
   {
@@ -84,7 +96,6 @@ export default function DatabasePage() {
   const [identifiers, setIdentifiers] = useState<string[]>(["email"]);
   const [authMethodsEnabled, setAuthMethodsEnabled] = useState<string[]>(["password"]);
   const [allowNonUniqueEmail, setAllowNonUniqueEmail] = useState(false);
-  const [useCustomDatabase, setUseCustomDatabase] = useState(false);
   const [disableSignUps, setDisableSignUps] = useState(false);
   const [promoteToDomain, setPromoteToDomain] = useState(false);
 
@@ -104,7 +115,6 @@ export default function DatabasePage() {
       identifiers,
       authMethods: authMethodsEnabled,
       allowNonUniqueEmail,
-      useCustomDatabase,
       disableSignUps,
       promoteToDomain,
     });
@@ -112,27 +122,30 @@ export default function DatabasePage() {
   };
 
   return (
-    <div className="p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-              <Database className="h-4 w-4 text-primary" />
+    <div className="min-h-screen bg-muted/30">
+      <div className="border-b bg-background">
+        <div className="px-6 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <Database className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <h1 className="text-2xl font-semibold tracking-tight">Database Connections</h1>
+                <p className="text-muted-foreground">
+                  Securely store and manage your customer&apos;s authorization credentials.
+                </p>
+              </div>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight">Database Connections</h1>
+            <Button onClick={() => setDialogOpen(true)}>
+              <LogIn className="mr-2 h-4 w-4" />
+              New Database Connection
+            </Button>
           </div>
-          <Button onClick={() => setDialogOpen(true)}>
-            <LogIn className="mr-2 h-4 w-4" />
-            New Database Connection
-          </Button>
         </div>
+      </div>
 
-        <p className="text-lg text-muted-foreground leading-relaxed">
-          Securely store and manage your customer&apos;s authorization credentials in an Identity
-          Database or in your own store. We provide passkey authorization, or more traditional
-          methods such as username / password.
-        </p>
-
+      <div className="p-6 space-y-6">
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
@@ -140,7 +153,12 @@ export default function DatabasePage() {
                 <Key className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
-                <h2 className="text-lg font-semibold mb-1">Username-Password-Authentication</h2>
+                <div className="flex items-center gap-2 mb-1">
+                  <h2 className="text-lg font-semibold">Username-Password-Authentication</h2>
+                  <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
+                    Recommended
+                  </Badge>
+                </div>
                 <p className="text-muted-foreground">
                   Securely store and manage your customer&apos;s authorization credentials in an
                   Identity Database or in your own store.
@@ -160,6 +178,7 @@ export default function DatabasePage() {
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
                       <feature.icon className="h-5 w-5 text-primary" />
                     </div>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
                   </div>
                   <CardTitle className="text-base mt-3">{feature.title}</CardTitle>
                 </CardHeader>
@@ -192,17 +211,19 @@ export default function DatabasePage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 pt-4 border-t">
+        <Separator />
+
+        <div className="flex items-center gap-3">
           <Button variant="outline" asChild>
-            <Link href="/docs/database">
+            <Link href="/docs/database" target="_blank">
+              <ExternalLink className="mr-2 h-4 w-4" />
               View Documentation
-              <ArrowUpRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
           <Button asChild>
             <Link href="/dashboard/connection/database/configure">
               Configure Database
-              <ArrowUpRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </div>

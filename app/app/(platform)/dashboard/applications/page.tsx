@@ -12,9 +12,12 @@ import {
   Globe,
   Cpu,
   Check,
+  TrendingUp,
+  LogIn,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +36,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 const applications = [
   {
@@ -42,6 +47,7 @@ const applications = [
     clientId: "P31f0AMfZNKU086N4CjbEnVPmIANmk5Z",
     status: "active",
     isDefault: true,
+    logins: 1234,
   },
   {
     id: "app_2",
@@ -50,6 +56,16 @@ const applications = [
     clientId: "EAC2A3r64I15SuyR5Qy6xtNf9HgfAcfK",
     status: "active",
     isDefault: false,
+    logins: 567,
+  },
+  {
+    id: "app_3",
+    name: "Legacy Backend",
+    type: "Machine to Machine",
+    clientId: "LEGACY1234567890ABCDEF",
+    status: "inactive",
+    isDefault: false,
+    logins: 0,
   },
 ];
 
@@ -89,24 +105,13 @@ export default function ApplicationsPage() {
   const [appName, setAppName] = useState("");
   const [appDescription, setAppDescription] = useState("");
   const [selectedType, setSelectedType] = useState<string | null>(null);
-  const [createdApps, setCreatedApps] = useState(applications);
+  const [createdApps] = useState(applications);
+
+  const activeApps = createdApps.filter((app) => app.status === "active").length;
+  const totalLogins = createdApps.reduce((acc, app) => acc + app.logins, 0);
 
   const handleCreate = () => {
     if (!appName || !selectedType) return;
-
-    const type = applicationTypes.find((t) => t.id === selectedType);
-    const newApp = {
-      id: `app_${Date.now()}`,
-      name: appName,
-      type: type?.name || "",
-      clientId: `${Math.random().toString(36).substring(2, 10)}${Math.random()
-        .toString(36)
-        .substring(2, 10)}`.toUpperCase(),
-      status: "active",
-      isDefault: false,
-    };
-
-    setCreatedApps([...createdApps, newApp]);
     setDialogOpen(false);
     setAppName("");
     setAppDescription("");
@@ -114,100 +119,198 @@ export default function ApplicationsPage() {
   };
 
   return (
-    <div className="p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight mb-3">Applications</h1>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            Setup a mobile, web or IoT application to use Aether Identity for authentication.
-          </p>
+    <div className="min-h-screen bg-muted/30">
+      <div className="border-b bg-background">
+        <div className="px-6 py-6">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-2xl font-semibold tracking-tight">Applications</h1>
+            <p className="text-muted-foreground">
+              Manage your client applications and API credentials.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-6 space-y-6">
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">Total Applications</p>
+                  <p className="text-3xl font-bold tracking-tight">{createdApps.length}</p>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                  <AppWindow className="h-6 w-6 text-foreground" />
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-sm">
+                <div className="flex items-center gap-1 text-green-600">
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="font-medium">+2</span>
+                </div>
+                <span className="text-muted-foreground">this month</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">Active Applications</p>
+                  <p className="text-3xl font-bold tracking-tight">{activeApps}</p>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                  <LogIn className="h-6 w-6 text-foreground" />
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">
+                  {Math.round((activeApps / createdApps.length) * 100)}% of total
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">Logins Today</p>
+                  <p className="text-3xl font-bold tracking-tight">
+                    {totalLogins.toLocaleString()}
+                  </p>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                  <TrendingUp className="h-6 w-6 text-foreground" />
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-sm">
+                <div className="flex items-center gap-1 text-green-600">
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="font-medium">+18.3%</span>
+                </div>
+                <span className="text-muted-foreground">from average</span>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            {createdApps.length} application{createdApps.length !== 1 ? "s" : ""}
-          </p>
-          <Button onClick={() => setDialogOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Create Application
-          </Button>
-        </div>
-
-        <div className="space-y-3">
-          {createdApps.map((app) => (
-            <Card key={app.id} className="hover:border-primary/30 transition-colors cursor-pointer">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                      <AppWindow className="h-5 w-5 text-primary" />
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-base font-semibold">Registered Applications</CardTitle>
+                <CardDescription>Your client applications and their credentials</CardDescription>
+              </div>
+              <Button onClick={() => setDialogOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Application
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {createdApps.map((app) => (
+                <div
+                  key={app.id}
+                  className="group flex flex-col gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                      <AppWindow className="h-5 w-5 text-foreground" />
                     </div>
-                    <div>
-                      <CardTitle className="text-base flex items-center gap-2">
-                        {app.name}
-                        {app.isDefault && (
-                          <Badge variant="secondary" className="text-xs">
-                            Default
-                          </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant={app.status === "active" ? "outline" : "secondary"}
+                        className={cn(
+                          "text-xs",
+                          app.status === "active" && "border-green-200 bg-green-50 text-green-700"
                         )}
-                      </CardTitle>
-                      <p className="text-sm text-muted-foreground">{app.type}</p>
+                      >
+                        {app.status}
+                      </Badge>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link href={`/dashboard/applications/${app.id}`}>View Details</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link href={`/dashboard/applications/${app.id}/settings`}>
+                              Settings
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                  <div>
+                    <p className="text-sm font-medium">{app.name}</p>
+                    <p className="text-xs text-muted-foreground">{app.type}</p>
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <span className="text-muted-foreground">Client ID:</span>
+                      <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono">
+                        {app.clientId.slice(0, 8)}...
+                      </code>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8"
-                        onClick={(e) => e.stopPropagation()}
+                        className="h-6 w-6"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText(app.clientId);
+                        }}
                       >
-                        <MoreHorizontal className="h-4 w-4" />
+                        <Copy className="h-3.5 w-3.5" />
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/dashboard/applications/${app.id}`}>View Details</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/dashboard/applications/${app.id}/settings`}>Settings</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <LogIn className="h-3 w-3" />
+                    <span>{app.logins.toLocaleString()} logins today</span>
+                  </div>
+                  {app.isDefault && (
+                    <Badge variant="secondary" className="w-fit text-xs">
+                      Default
+                    </Badge>
+                  )}
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-muted-foreground">Client ID:</span>
-                  <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
-                    {app.clientId}
-                  </code>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigator.clipboard.writeText(app.clientId);
-                    }}
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="pt-4 border-t">
-          <Button variant="outline" asChild>
-            <Link href="/docs/applications">
-              View Documentation
-              <ArrowUpRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
+        <Card className="group cursor-pointer transition-all hover:shadow-md">
+          <Link href="/docs/applications">
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
+                <ArrowUpRight className="h-6 w-6 text-foreground" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium">Documentation</p>
+                <p className="text-sm text-muted-foreground">
+                  Learn how to configure applications for different platform types
+                </p>
+              </div>
+              <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
+            </CardContent>
+          </Link>
+        </Card>
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

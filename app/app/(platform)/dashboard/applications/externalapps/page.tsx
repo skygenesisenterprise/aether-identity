@@ -1,38 +1,91 @@
 "use client";
 
 import Link from "next/link";
-import { Key, Shield, ArrowUpRight, Globe, Lock } from "lucide-react";
+import {
+  Key,
+  Shield,
+  Globe,
+  Lock,
+  ExternalLink,
+  CheckCircle2,
+  LogIn,
+  Users,
+  ArrowUpRight,
+  Settings,
+  Trash2,
+  MoreHorizontal,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
+
+const ssoIntegrations = [
+  {
+    id: "sso_1",
+    name: "Office 365",
+    type: "SAML",
+    status: "active",
+    users: 456,
+    lastSync: "2 min ago",
+  },
+  {
+    id: "sso_2",
+    name: "Salesforce",
+    type: "OIDC",
+    status: "active",
+    users: 234,
+    lastSync: "5 min ago",
+  },
+  {
+    id: "sso_3",
+    name: "Google Workspace",
+    type: "SAML",
+    status: "active",
+    users: 892,
+    lastSync: "1 min ago",
+  },
+  {
+    id: "sso_4",
+    name: "Slack",
+    type: "OIDC",
+    status: "inactive",
+    users: 0,
+    lastSync: "Never",
+  },
+];
 
 const features = [
   {
     icon: Globe,
     title: "SaaS Applications",
-    description:
-      "Enable single sign-on for purchased applications and SaaS services such as Office 365, Salesforce, and others.",
-    href: "/docs",
+    description: "Enable single sign-on for purchased applications and SaaS services.",
+    enabled: true,
   },
   {
     icon: Lock,
     title: "Centralized Authentication",
-    description:
-      "SSO enables users to authenticate at Auth0 with one set of credentials to access any number of service provider applications.",
-    href: "/docs",
+    description: "SSO enables users to authenticate with one set of credentials.",
+    enabled: true,
   },
   {
     icon: Shield,
     title: "Enterprise Security",
-    description:
-      "Maintain security and compliance while simplifying user access across all your organization's applications.",
-    href: "/docs",
+    description: "Maintain security and compliance while simplifying user access.",
+    enabled: true,
   },
   {
     icon: Key,
     title: "Identity Providers",
-    description:
-      "Integrate with popular identity providers like Okta, Azure AD, and Google Workspace for seamless authentication.",
-    href: "/docs",
+    description: "Integrate with popular identity providers like Okta, Azure AD.",
+    enabled: false,
   },
 ];
 
@@ -55,20 +108,242 @@ const quickLinks = [
 ];
 
 export default function ExternalAppsPage() {
+  const activeIntegrations = ssoIntegrations.filter((i) => i.status === "active").length;
+  const totalUsers = ssoIntegrations.reduce((acc, i) => acc + i.users, 0);
+
   return (
-    <div className="p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-              <Key className="h-4 w-4 text-primary" />
-            </div>
+    <div className="min-h-screen bg-muted/30">
+      <div className="border-b bg-background">
+        <div className="px-6 py-6">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-2xl font-semibold tracking-tight">SSO Integrations</h1>
+            <p className="text-muted-foreground">
+              Enable single sign-on for your SaaS applications and external services.
+            </p>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight mb-3">SSO Integrations</h1>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            Enable single sign-on for purchased applications and SaaS services such as Office 365,
-            Salesforce, and others.
-          </p>
+        </div>
+      </div>
+
+      <div className="p-6 space-y-6">
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">Total Integrations</p>
+                  <p className="text-3xl font-bold tracking-tight">{ssoIntegrations.length}</p>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                  <Globe className="h-6 w-6 text-foreground" />
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">Configured SSO apps</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">Active Connections</p>
+                  <p className="text-3xl font-bold tracking-tight">{activeIntegrations}</p>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                  <CheckCircle2 className="h-6 w-6 text-foreground" />
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">
+                  {Math.round((activeIntegrations / ssoIntegrations.length) * 100)}% of total
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">SSO Users</p>
+                  <p className="text-3xl font-bold tracking-tight">{totalUsers.toLocaleString()}</p>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                  <Users className="h-6 w-6 text-foreground" />
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-sm">
+                <div className="flex items-center gap-1 text-green-600">
+                  <LogIn className="h-4 w-4" />
+                  <span className="font-medium">+12.5%</span>
+                </div>
+                <span className="text-muted-foreground">this month</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-base font-semibold">Active Integrations</CardTitle>
+                <CardDescription>Your configured SSO connections</CardDescription>
+              </div>
+              <Button asChild>
+                <Link href="/dashboard/applications/externalapps/configure">
+                  <Key className="h-4 w-4 mr-2" />
+                  Add Integration
+                </Link>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {ssoIntegrations.map((integration) => (
+                <div
+                  key={integration.id}
+                  className="group flex flex-col gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                      <Globe className="h-5 w-5 text-foreground" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant={integration.status === "active" ? "outline" : "secondary"}
+                        className={cn(
+                          "text-xs",
+                          integration.status === "active" &&
+                            "border-green-200 bg-green-50 text-green-700"
+                        )}
+                      >
+                        {integration.status}
+                      </Badge>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link href={`/dashboard/applications/externalapps/${integration.id}`}>
+                              View Details
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link
+                              href={`/dashboard/applications/externalapps/${integration.id}/settings`}
+                            >
+                              Settings
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive">
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">{integration.name}</p>
+                    <p className="text-xs text-muted-foreground">{integration.type}</p>
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Users className="h-3 w-3" />
+                      <span>{integration.users} users</span>
+                    </div>
+                    <span>Synced {integration.lastSync}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base font-semibold">SSO Features</CardTitle>
+                  <CardDescription>Available single sign-on capabilities</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="divide-y">
+                {features.map((feature) => (
+                  <div
+                    key={feature.title}
+                    className="flex items-start gap-4 px-6 py-4 transition-colors hover:bg-muted/50"
+                  >
+                    <div
+                      className={cn(
+                        "flex h-10 w-10 items-center justify-center rounded-lg",
+                        feature.enabled ? "bg-green-100" : "bg-muted"
+                      )}
+                    >
+                      {feature.enabled ? (
+                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <feature.icon className="h-5 w-5 text-muted-foreground" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium">{feature.title}</p>
+                        {feature.enabled && (
+                          <Badge variant="outline" className="text-xs font-normal">
+                            Enabled
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{feature.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base font-semibold">Resources</CardTitle>
+                  <CardDescription>Documentation and guides</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="divide-y">
+                {quickLinks.map((link) => (
+                  <Link
+                    key={link.title}
+                    href={link.href}
+                    className="flex items-center justify-between px-6 py-4 transition-colors hover:bg-muted/50"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">{link.title}</p>
+                      <p className="text-xs text-muted-foreground">{link.description}</p>
+                    </div>
+                    <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <Card className="border-primary/20 bg-primary/5">
@@ -80,70 +355,27 @@ export default function ExternalAppsPage() {
               <div className="flex-1">
                 <h2 className="text-lg font-semibold mb-1">Single Sign-On</h2>
                 <p className="text-muted-foreground">
-                  SSO enables users to authenticate at Auth0 with one set of credentials to access
-                  any number of service provider applications.
+                  SSO enables users to authenticate with one set of credentials to access any number
+                  of service provider applications.
                 </p>
+                <div className="mt-4 flex gap-3">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href="/docs/sso">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Documentation
+                    </Link>
+                  </Button>
+                  <Button size="sm" asChild>
+                    <Link href="/dashboard/applications/externalapps/configure">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Configure SSO
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
-
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Use Cases</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            {features.map((feature) => (
-              <Card key={feature.title} className="group hover:border-primary/30 transition-colors">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                      <feature.icon className="h-5 w-5 text-primary" />
-                    </div>
-                  </div>
-                  <CardTitle className="text-base mt-3">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-sm">{feature.description}</CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Resources</h2>
-          <div className="grid gap-4 md:grid-cols-3">
-            {quickLinks.map((link) => (
-              <Link key={link.title} href={link.href} className="group block">
-                <Card className="h-full hover:border-primary/30 transition-colors">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium flex items-center justify-between">
-                      {link.title}
-                      <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-xs text-muted-foreground">{link.description}</p>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 pt-4 border-t">
-          <Button variant="outline" asChild>
-            <Link href="/docs/sso">
-              View Documentation
-              <ArrowUpRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href="/dashboard/applications/externalapps/configure">
-              Configure SSO
-              <ArrowUpRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
       </div>
     </div>
   );
