@@ -13,26 +13,6 @@ interface FooterLinkGroup {
 function getDefaultFooterLinks(locale: string): Record<string, FooterLinkGroup> {
   const prefix = `/${locale}`;
   return {
-    products: {
-      title: "Products",
-      links: [
-        { name: "Identity Management", href: `${prefix}/products/identity` },
-        { name: "Access Control", href: `${prefix}/products/access-control` },
-        { name: "Multi-Factor Auth", href: `${prefix}/products/mfa` },
-        { name: "Single Sign-On", href: `${prefix}/products/sso` },
-        { name: "API Security", href: `${prefix}/products/api-security` },
-      ],
-    },
-    solutions: {
-      title: "Solutions",
-      links: [
-        { name: "B2C Applications", href: `${prefix}/solutions/b2c` },
-        { name: "B2B SaaS", href: `${prefix}/solutions/b2b-saas` },
-        { name: "Enterprise", href: `${prefix}/solutions/enterprise` },
-        { name: "Healthcare", href: `${prefix}/solutions/healthcare` },
-        { name: "Financial Services", href: `${prefix}/solutions/financial` },
-      ],
-    },
     developers: {
       title: "Developers",
       links: [
@@ -50,7 +30,7 @@ function getDefaultFooterLinks(locale: string): Record<string, FooterLinkGroup> 
         { name: "Case Studies", href: `${prefix}/case-studies` },
         { name: "Whitepapers", href: `${prefix}/resources/whitepapers` },
         { name: "Webinars", href: `${prefix}/resources/webinars` },
-        { name: "Community", href: "https://community.skygenesis.com" },
+        { name: "Community", href: "/discord" },
       ],
     },
     company: {
@@ -199,11 +179,11 @@ export async function Footer({ locale = "fr" }: FooterProps) {
   ];
 
   const legalLinks = [
-    { name: "Privacy Policy", href: "/privacy" },
-    { name: "Terms of Service", href: "/terms" },
-    { name: "Cookie Policy", href: "/cookies" },
-    { name: "GDPR", href: "/gdpr" },
-    { name: "Security", href: "/security" },
+    { name: "Privacy Policy", href: `${prefix}/privacy` },
+    { name: "Terms of Service", href: `${prefix}/terms` },
+    { name: "Cookie Policy", href: `${prefix}/cookies` },
+    { name: "GDPR", href: `${prefix}/gdpr` },
+    { name: "Security", href: `${prefix}/security` },
   ];
 
   const socialLinks = [
@@ -220,16 +200,8 @@ export async function Footer({ locale = "fr" }: FooterProps) {
   return (
     <footer className="bg-footer text-footer-link border-t border-footer-border">
       {/* Main link columns */}
-      <div className="mx-auto max-w-7xl px-6 pt-16 pb-10">
+      <div className="mx-auto max-w-7xl px-6 pt-16 pb-10 border-b border-footer-border">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-12">
-          <LinkColumn
-            title={footerLinks.products?.title || "Products"}
-            links={footerLinks.products?.links || []}
-          />
-          <LinkColumn
-            title={footerLinks.solutions?.title || "Solutions"}
-            links={footerLinks.solutions?.links || []}
-          />
           <LinkColumn
             title={footerLinks.developers?.title || "Developers"}
             links={footerLinks.developers?.links || []}
@@ -242,81 +214,57 @@ export async function Footer({ locale = "fr" }: FooterProps) {
             title={footerLinks.company?.title || "Company"}
             links={footerLinks.company?.links || []}
           />
+          <LinkColumn title="Legal" links={legalLinks} />
+          <LinkColumn title="Get Started" links={subscriptionLinks} />
         </div>
       </div>
 
-      {/* Brand + secondary columns */}
-      <div className="border-t border-footer-border">
+      {/* Brand block */}
+      <div>
         <div className="mx-auto max-w-7xl px-6 py-10">
-          <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-10">
-            {/* Brand block */}
-            <div className="max-w-xs">
-              <Link href="/" className="inline-flex items-center gap-2.5 group">
-                <div className="w-7 h-7 rounded bg-footer-accent flex items-center justify-center shrink-0">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                    <path d="M7 1L13 4V10L7 13L1 10V4L7 1Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" className="text-footer" />
-                  </svg>
-                </div>
-                <span className="text-base font-semibold text-footer-heading tracking-tight group-hover:text-footer-link-hover transition-colors">
-                  Aether Identity
-                </span>
-              </Link>
-              <p className="mt-4 text-sm text-footer-link leading-relaxed">
-                Secure identity and access management for the modern enterprise. Self-hosted, open-source, and built for scale.
-              </p>
-              {/* Social icons */}
-              <div className="flex items-center gap-3 mt-6">
-                {socialLinks.map((social) => (
-                  <Link
-                    key={social.name}
-                    href={social.href}
-                    className="text-footer-link hover:text-footer-link-hover transition-colors duration-150"
-                    aria-label={social.name}
-                  >
-                    <SocialIcon name={social.name} />
-                  </Link>
-                ))}
+          <div className="max-w-xs">
+            <Link href="/" className="inline-flex items-center gap-2.5 group">
+              <div className="w-7 h-7 rounded bg-footer-accent flex items-center justify-center shrink-0">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path
+                    d="M7 1L13 4V10L7 13L1 10V4L7 1Z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinejoin="round"
+                    className="text-footer"
+                  />
+                </svg>
               </div>
+              <span className="text-base font-semibold text-footer-heading tracking-tight group-hover:text-footer-link-hover transition-colors">
+                Aether Identity
+              </span>
+            </Link>
+            <p className="mt-4 text-sm text-footer-link leading-relaxed">
+              Secure identity and access management for the modern enterprise. Self-hosted,
+              open-source, and built for scale.
+            </p>
+            <div className="flex items-center gap-3 mt-6">
+              {socialLinks.map((social) => (
+                <Link
+                  key={social.name}
+                  href={social.href}
+                  className="text-footer-link hover:text-footer-link-hover transition-colors duration-150"
+                  aria-label={social.name}
+                >
+                  <SocialIcon name={social.name} />
+                </Link>
+              ))}
             </div>
-
-            {/* Get Started + Legal */}
-            <div className="flex flex-col sm:flex-row gap-10 sm:gap-16">
-              <div>
-                <h4 className="text-xs font-semibold text-footer-heading mb-5 uppercase tracking-widest">
-                  Get Started
-                </h4>
-                <ul className="space-y-3">
-                  {subscriptionLinks.map((link) => (
-                    <li key={link.name}>
-                      <Link
-                        href={link.href}
-                        className="text-sm text-footer-link hover:text-footer-link-hover transition-colors duration-150"
-                      >
-                        {link.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="text-xs font-semibold text-footer-heading mb-5 uppercase tracking-widest">
-                  Legal
-                </h4>
-                <ul className="space-y-3">
-                  {legalLinks.map((link) => (
-                    <li key={link.name}>
-                      <Link
-                        href={link.href}
-                        className="text-sm text-footer-link hover:text-footer-link-hover transition-colors duration-150"
-                      >
-                        {link.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            <Link
+              href="https://status.skygenesisenterprise.com"
+              className="text-sm text-footer-link hover:text-footer-link-hover transition-colors duration-150 mt-4 inline-flex items-center gap-2"
+            >
+              <span className="relativeflexh-2w-2">
+                <span className="animate-pingabsoluteinline-flexh-2w-2rounded-fullbg-green-400opacity-75"></span>
+                <span className="relativeinline-flexrounded-fullh-2w-2bg-green-500"></span>
+              </span>
+              All systems operational
+            </Link>
           </div>
         </div>
       </div>
@@ -338,7 +286,10 @@ export async function Footer({ locale = "fr" }: FooterProps) {
               </Link>
             </p>
             <p className="text-xs text-footer-muted">
-              <Link href="/pgp" className="hover:text-footer-link-hover transition-colors duration-150">
+              <Link
+                href="/pgp"
+                className="hover:text-footer-link-hover transition-colors duration-150"
+              >
                 Verify our PGP public key to ensure site authenticity
               </Link>
             </p>

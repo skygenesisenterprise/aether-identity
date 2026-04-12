@@ -96,8 +96,8 @@ kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7
               <p>
                 Pour toute question concernant notre clé PGP ou pour nous envoyer un message
                 chiffré, contactez-nous à :{" "}
-                <a href="mailto:pgp@etheriatimes.com" className="text-primary hover:underline">
-                  security@etheriatimes.com
+                <a href="mailto:pgp@skygenesisenterprise.com" className="text-primary hover:underline">
+                  security@skygenesisenterprise.com
                 </a>
               </p>
             </section>
