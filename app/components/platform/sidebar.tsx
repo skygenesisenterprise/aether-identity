@@ -88,9 +88,9 @@ const navItems: NavItem[] = [
     href: "/dashboard/applications",
     icon: AppWindow,
     items: [
-      { title: "All Applications", href: "/dashboard/applications", icon: Layout },
+      { title: "Applications", href: "/dashboard/applications", icon: Layout },
       { title: "APIs", href: "/dashboard/applications/apis", icon: Code2 },
-      { title: "External Apps", href: "/dashboard/applications/externalapps", icon: ExternalLink },
+      { title: "SSO Integrations", href: "/dashboard/applications/externalapps", icon: ExternalLink },
     ],
   },
   {

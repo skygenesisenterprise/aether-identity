@@ -1,10 +1,150 @@
-"use client"; 
+"use client";
 
-export default function DashboardPage() {
+import Link from "next/link";
+import { Key, Shield, ArrowUpRight, Globe, Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+const features = [
+  {
+    icon: Globe,
+    title: "SaaS Applications",
+    description:
+      "Enable single sign-on for purchased applications and SaaS services such as Office 365, Salesforce, and others.",
+    href: "/docs",
+  },
+  {
+    icon: Lock,
+    title: "Centralized Authentication",
+    description:
+      "SSO enables users to authenticate at Auth0 with one set of credentials to access any number of service provider applications.",
+    href: "/docs",
+  },
+  {
+    icon: Shield,
+    title: "Enterprise Security",
+    description:
+      "Maintain security and compliance while simplifying user access across all your organization's applications.",
+    href: "/docs",
+  },
+  {
+    icon: Key,
+    title: "Identity Providers",
+    description:
+      "Integrate with popular identity providers like Okta, Azure AD, and Google Workspace for seamless authentication.",
+    href: "/docs",
+  },
+];
+
+const quickLinks = [
+  {
+    title: "SSO Documentation",
+    description: "Complete guide to setting up single sign-on",
+    href: "/docs/sso",
+  },
+  {
+    title: "SAML Configuration",
+    description: "Configure SAML-based SSO for your applications",
+    href: "/docs/sso/saml",
+  },
+  {
+    title: "OIDC Setup",
+    description: "Set up OpenID Connect integration",
+    href: "/docs/sso/oidc",
+  },
+];
+
+export default function ExternalAppsPage() {
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <p>Welcome to your dashboard!</p>
+    <div className="p-6">
+      <div className="max-w-4xl mx-auto space-y-8">
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+              <Key className="h-4 w-4 text-primary" />
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight mb-3">SSO Integrations</h1>
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            Enable single sign-on for purchased applications and SaaS services such as Office 365,
+            Salesforce, and others.
+          </p>
+        </div>
+
+        <Card className="border-primary/20 bg-primary/5">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                <Shield className="h-6 w-6 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-lg font-semibold mb-1">Single Sign-On</h2>
+                <p className="text-muted-foreground">
+                  SSO enables users to authenticate at Auth0 with one set of credentials to access
+                  any number of service provider applications.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Use Cases</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {features.map((feature) => (
+              <Card key={feature.title} className="group hover:border-primary/30 transition-colors">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                      <feature.icon className="h-5 w-5 text-primary" />
+                    </div>
+                  </div>
+                  <CardTitle className="text-base mt-3">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-sm">{feature.description}</CardDescription>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Resources</h2>
+          <div className="grid gap-4 md:grid-cols-3">
+            {quickLinks.map((link) => (
+              <Link key={link.title} href={link.href} className="group block">
+                <Card className="h-full hover:border-primary/30 transition-colors">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium flex items-center justify-between">
+                      {link.title}
+                      <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xs text-muted-foreground">{link.description}</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 pt-4 border-t">
+          <Button variant="outline" asChild>
+            <Link href="/docs/sso">
+              View Documentation
+              <ArrowUpRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href="/dashboard/applications/externalapps/configure">
+              Configure SSO
+              <ArrowUpRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
