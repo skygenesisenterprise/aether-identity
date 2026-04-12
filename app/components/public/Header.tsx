@@ -1,71 +1,323 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Shield, Menu, X, LogIn, UserPlus } from "lucide-react";
+import { Menu, X, ChevronDown, ArrowRight, Shield, Users, Key, Lock, Layers, Code, BookOpen, FileText, Zap, Building2, Smartphone, Globe, Server, Database, Settings, LifeBuoy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useLocale } from "@/context/locale-context";
+import { cn } from "@/lib/utils";
 
-const navLinks = [
-  { name: "Products", href: "/products" },
-  { name: "Solutions", href: "/solutions" },
-  { name: "Developers", href: "/developers" },
-  { name: "Documentation", href: "/docs" },
-  { name: "Pricing", href: "/pricing" },
-  { name: "Blog", href: "/blog" },
-  { name: "Company", href: "/company" },
-];
+interface NavItem {
+  name: string;
+  href?: string;
+  description?: string;
+  icon?: React.ReactNode;
+}
 
-export function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
+interface MegaMenu {
+  sections: NavSection[];
+  featured?: {
+    title: string;
+    description: string;
+    href: string;
+    badge?: string;
+  };
+}
+
+const productMenu: MegaMenu = {
+  sections: [
+    {
+      title: "Core Platform",
+      items: [
+        { name: "Universal Login", href: "/products/universal-login", description: "Customizable, secure authentication", icon: <Lock className="h-5 w-5" /> },
+        { name: "Single Sign-On", href: "/products/sso", description: "One login for all applications", icon: <Key className="h-5 w-5" /> },
+        { name: "Multi-Factor Auth", href: "/products/mfa", description: "Adaptive, risk-based MFA", icon: <Shield className="h-5 w-5" /> },
+        { name: "User Management", href: "/products/user-management", description: "Complete identity lifecycle", icon: <Users className="h-5 w-5" /> },
+      ],
+    },
+    {
+      title: "Enterprise",
+      items: [
+        { name: "Enterprise Connections", href: "/products/enterprise", description: "SAML, LDAP, Active Directory", icon: <Building2 className="h-5 w-5" /> },
+        { name: "Organizations", href: "/products/organizations", description: "Multi-tenant B2B solutions", icon: <Layers className="h-5 w-5" /> },
+        { name: "Fine-Grained Authorization", href: "/products/fga", description: "Relationship-based access control", icon: <Settings className="h-5 w-5" /> },
+        { name: "Private Cloud", href: "/products/private-cloud", description: "Dedicated infrastructure", icon: <Server className="h-5 w-5" /> },
+      ],
+    },
+  ],
+  featured: {
+    title: "Aether Identity for AI Agents",
+    description: "Secure authentication and authorization for AI-powered applications and autonomous agents.",
+    href: "/products/ai-agents",
+    badge: "New",
+  },
+};
+
+const developersMenu: MegaMenu = {
+  sections: [
+    {
+      title: "Resources",
+      items: [
+        { name: "Documentation", href: "/docs", description: "Guides and API references", icon: <BookOpen className="h-5 w-5" /> },
+        { name: "Quickstarts", href: "/docs/quickstarts", description: "Get started in minutes", icon: <Zap className="h-5 w-5" /> },
+        { name: "API Reference", href: "/docs/api", description: "Complete API documentation", icon: <Code className="h-5 w-5" /> },
+        { name: "SDKs & Libraries", href: "/docs/sdks", description: "Official client libraries", icon: <Layers className="h-5 w-5" /> },
+      ],
+    },
+    {
+      title: "Tools",
+      items: [
+        { name: "CLI", href: "/docs/cli", description: "Command-line interface", icon: <FileText className="h-5 w-5" /> },
+        { name: "Postman Collections", href: "/docs/postman", description: "API testing collections", icon: <Database className="h-5 w-5" /> },
+        { name: "Extensions", href: "/docs/extensions", description: "Extend functionality", icon: <Settings className="h-5 w-5" /> },
+        { name: "Community", href: "/community", description: "Join the discussion", icon: <Users className="h-5 w-5" /> },
+      ],
+    },
+  ],
+};
+
+const solutionsMenu: MegaMenu = {
+  sections: [
+    {
+      title: "By Use Case",
+      items: [
+        { name: "B2C Identity", href: "/solutions/b2c", description: "Consumer-facing applications", icon: <Smartphone className="h-5 w-5" /> },
+        { name: "B2B SaaS", href: "/solutions/b2b", description: "Multi-tenant enterprise apps", icon: <Building2 className="h-5 w-5" /> },
+        { name: "Machine-to-Machine", href: "/solutions/m2m", description: "API & service authentication", icon: <Server className="h-5 w-5" /> },
+        { name: "Passwordless", href: "/solutions/passwordless", description: "Friction-free authentication", icon: <Key className="h-5 w-5" /> },
+      ],
+    },
+    {
+      title: "By Industry",
+      items: [
+        { name: "Financial Services", href: "/solutions/financial", description: "Banking & fintech solutions", icon: <Shield className="h-5 w-5" /> },
+        { name: "Healthcare", href: "/solutions/healthcare", description: "HIPAA-compliant identity", icon: <LifeBuoy className="h-5 w-5" /> },
+        { name: "Retail & E-commerce", href: "/solutions/retail", description: "Customer identity at scale", icon: <Globe className="h-5 w-5" /> },
+        { name: "Public Sector", href: "/solutions/government", description: "Secure government services", icon: <Building2 className="h-5 w-5" /> },
+      ],
+    },
+  ],
+};
+
+function MegaMenuDropdown({ menu, isOpen }: { menu: MegaMenu; isOpen: boolean }) {
   const { locale } = useLocale();
-  const { isAuthenticated } = useAuth();
-
+  
   const getLocaleHref = (href: string) => {
     if (href === "/") return `/${locale}`;
     return `/${locale}${href}`;
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background border-b border-border">
-      <div className="mx-auto max-w-7xl px-4">
+    <div
+      className={cn(
+        "absolute left-1/2 -translate-x-1/2 top-full pt-4 transition-all duration-200",
+        isOpen ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-2"
+      )}
+    >
+      <div className="bg-background border border-border rounded-xl shadow-xl overflow-hidden min-w-170">
+        <div className="flex">
+          <div className="flex-1 p-6">
+            <div className="grid grid-cols-2 gap-8">
+              {menu.sections.map((section) => (
+                <div key={section.title}>
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+                    {section.title}
+                  </h3>
+                  <ul className="space-y-1">
+                    {section.items.map((item) => (
+                      <li key={item.name}>
+                        <Link
+                          href={getLocaleHref(item.href || "/")}
+                          className="group flex items-start gap-3 p-2 -mx-2 rounded-lg hover:bg-muted transition-colors"
+                        >
+                          <span className="shrink-0 mt-0.5 text-muted-foreground group-hover:text-foreground transition-colors">
+                            {item.icon}
+                          </span>
+                          <div>
+                            <span className="block text-sm font-medium text-foreground group-hover:text-foreground">
+                              {item.name}
+                            </span>
+                            <span className="block text-xs text-muted-foreground mt-0.5">
+                              {item.description}
+                            </span>
+                          </div>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {menu.featured && (
+            <div className="w-72 bg-muted/50 p-6 border-l border-border">
+              <div className="flex items-center gap-2 mb-3">
+                {menu.featured.badge && (
+                  <span className="text-[10px] font-semibold uppercase tracking-wider bg-foreground text-background px-2 py-0.5 rounded-full">
+                    {menu.featured.badge}
+                  </span>
+                )}
+              </div>
+              <h4 className="text-sm font-semibold text-foreground mb-2">
+                {menu.featured.title}
+              </h4>
+              <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+                {menu.featured.description}
+              </p>
+              <Link
+                href={getLocaleHref(menu.featured.href)}
+                className="inline-flex items-center gap-1 text-xs font-medium text-foreground hover:underline"
+              >
+                Learn more
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function Header() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+  const { locale } = useLocale();
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const getLocaleHref = (href: string) => {
+    if (href === "/") return `/${locale}`;
+    return `/${locale}${href}`;
+  };
+
+  const navItems = [
+    { name: "Product", menu: productMenu },
+    { name: "Solutions", menu: solutionsMenu },
+    { name: "Developers", menu: developersMenu },
+    { name: "Pricing", href: "/pricing" },
+    { name: "Blog", href: "/blog" },
+  ];
+
+  return (
+    <header
+      className={cn(
+        "sticky top-0 z-50 transition-all duration-200",
+        scrolled
+          ? "bg-background/95 backdrop-blur-md border-b border-border shadow-sm"
+          : "bg-background border-b border-transparent"
+      )}
+    >
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-3">
-            <Link href={`/${locale}`} className="flex items-center gap-2">
-              <Shield className="h-8 w-8 text-primary" />
-              <span className="font-bold text-xl text-foreground">Sky Genesis Enterprise</span>
+          {/* Logo */}
+          <div className="flex items-center gap-8">
+            <Link href={`/${locale}`} className="flex items-center gap-2.5 group">
+              <div className="relative">
+                <Shield className="h-7 w-7 text-foreground transition-transform group-hover:scale-105" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold text-base text-foreground leading-tight">
+                  Aether Identity
+                </span>
+                <span className="text-[10px] text-muted-foreground leading-tight tracking-wide">
+                  by Sky Genesis Enterprise
+                </span>
+              </div>
             </Link>
           </div>
 
-          <nav className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={getLocaleHref(link.href)}
-                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {link.name}
-              </Link>
-            ))}
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center">
+            <ul className="flex items-center gap-1">
+              {navItems.map((item) => (
+                <li
+                  key={item.name}
+                  className="relative"
+                  onMouseEnter={() => item.menu && setActiveMenu(item.name)}
+                  onMouseLeave={() => setActiveMenu(null)}
+                >
+                  {item.href ? (
+                    <Link
+                      href={getLocaleHref(item.href)}
+                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {item.name}
+                    </Link>
+                  ) : (
+                    <button
+                      className={cn(
+                        "flex items-center gap-1 px-3 py-2 text-sm font-medium transition-colors",
+                        activeMenu === item.name
+                          ? "text-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      {item.name}
+                      <ChevronDown
+                        className={cn(
+                          "h-3.5 w-3.5 transition-transform duration-200",
+                          activeMenu === item.name && "rotate-180"
+                        )}
+                      />
+                    </button>
+                  )}
+                  {item.menu && (
+                    <MegaMenuDropdown menu={item.menu} isOpen={activeMenu === item.name} />
+                  )}
+                </li>
+              ))}
+            </ul>
           </nav>
 
-          <div className="flex items-center gap-2">
-            <Link href="/login">
-              <Button variant="ghost" size="sm" className="hidden sm:flex gap-1.5">
-                <LogIn className="h-4 w-4" />
-                Login
-              </Button>
+          {/* Right Side Actions */}
+          <div className="flex items-center gap-3">
+            <Link
+              href={getLocaleHref("/contact")}
+              className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Contact Sales
             </Link>
-            <Link href="/register">
-              <Button size="sm" className="gap-1.5">
-                <UserPlus className="h-4 w-4" />
-                Register
-              </Button>
-            </Link>
+            
+            {isAuthenticated ? (
+              <Link href="/dashboard">
+                <Button size="sm" className="h-9 px-4 font-medium">
+                  Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" className="hidden sm:block">
+                  <Button variant="ghost" size="sm" className="h-9 px-4 font-medium text-muted-foreground hover:text-foreground">
+                    Log In
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button size="sm" className="h-9 px-4 font-medium">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
 
+            {/* Mobile Menu Button */}
             <button
-              className="lg:hidden p-2"
+              className="lg:hidden p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -75,34 +327,76 @@ export function Header() {
         </div>
       </div>
 
+      {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <nav className="lg:hidden border-t border-border bg-background">
-          <ul className="px-4 py-2">
-            {navLinks.map((link) => (
-              <li key={link.name}>
-                <Link
-                  href={getLocaleHref(link.href)}
-                  className="block px-2 py-3 text-sm font-medium text-foreground hover:text-primary transition-colors border-b border-border last:border-b-0"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {link.name}
-                </Link>
-              </li>
+        <div className="lg:hidden border-t border-border bg-background">
+          <nav className="px-4 py-4 space-y-4">
+            {navItems.map((item) => (
+              <div key={item.name}>
+                {item.href ? (
+                  <Link
+                    href={getLocaleHref(item.href)}
+                    className="block py-2 text-base font-medium text-foreground"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                ) : (
+                  <div>
+                    <span className="block py-2 text-base font-medium text-foreground">
+                      {item.name}
+                    </span>
+                    <div className="pl-4 space-y-1 mt-1">
+                      {item.menu?.sections.map((section) => (
+                        <div key={section.title} className="py-2">
+                          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            {section.title}
+                          </span>
+                          <div className="mt-2 space-y-1">
+                            {section.items.map((subItem) => (
+                              <Link
+                                key={subItem.name}
+                                href={getLocaleHref(subItem.href || "/")}
+                                className="block py-1.5 text-sm text-muted-foreground hover:text-foreground"
+                                onClick={() => setMobileMenuOpen(false)}
+                              >
+                                {subItem.name}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
-            {!isAuthenticated && (
-              <li className="pt-4 flex gap-2">
-                <Link href="/login" className="flex-1">
-                  <Button variant="outline" className="w-full">
-                    Login
-                  </Button>
-                </Link>
-                <Link href="/register" className="flex-1">
-                  <Button className="w-full">Register</Button>
-                </Link>
-              </li>
-            )}
-          </ul>
-        </nav>
+            
+            <div className="pt-4 border-t border-border space-y-3">
+              <Link
+                href={getLocaleHref("/contact")}
+                className="block text-sm font-medium text-muted-foreground"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Contact Sales
+              </Link>
+              {!isAuthenticated && (
+                <div className="flex gap-3">
+                  <Link href="/login" className="flex-1">
+                    <Button variant="outline" className="w-full">
+                      Log In
+                    </Button>
+                  </Link>
+                  <Link href="/register" className="flex-1">
+                    <Button className="w-full">
+                      Sign Up
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </nav>
+        </div>
       )}
     </header>
   );

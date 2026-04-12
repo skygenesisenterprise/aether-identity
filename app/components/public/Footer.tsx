@@ -74,15 +74,15 @@ interface LinkColumnProps {
 function LinkColumn({ title, links }: LinkColumnProps) {
   return (
     <div className="flex flex-col">
-      <h3 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wide">
+      <h3 className="text-xs font-semibold text-footer-heading mb-5 uppercase tracking-widest">
         {title}
       </h3>
-      <ul className="space-y-2">
+      <ul className="space-y-3">
         {links.map((link) => (
           <li key={link.name}>
             <Link
               href={link.href}
-              className="text-sm text-foreground/70 hover:text-foreground transition-colors block"
+              className="text-sm text-footer-link hover:text-footer-link-hover transition-colors duration-150 block"
             >
               {link.name}
             </Link>
@@ -218,9 +218,10 @@ export async function Footer({ locale = "fr" }: FooterProps) {
   ];
 
   return (
-    <footer className="bg-background text-foreground border-t border-border">
-      <div className="mx-auto max-w-7xl px-4 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-10">
+    <footer className="bg-footer text-footer-link border-t border-footer-border">
+      {/* Main link columns */}
+      <div className="mx-auto max-w-7xl px-6 pt-16 pb-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-12">
           <LinkColumn
             title={footerLinks.products?.title || "Products"}
             links={footerLinks.products?.links || []}
@@ -242,32 +243,54 @@ export async function Footer({ locale = "fr" }: FooterProps) {
             links={footerLinks.company?.links || []}
           />
         </div>
+      </div>
 
-        <div className="mt-12 pt-8 border-t border-border">
-          <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-8">
-            <div>
-              <Link href="/" className="inline-block">
-                <h2 className="font-serif text-xl font-bold text-foreground">
-                  Sky Genesis Enterprise
-                </h2>
+      {/* Brand + secondary columns */}
+      <div className="border-t border-footer-border">
+        <div className="mx-auto max-w-7xl px-6 py-10">
+          <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-10">
+            {/* Brand block */}
+            <div className="max-w-xs">
+              <Link href="/" className="inline-flex items-center gap-2.5 group">
+                <div className="w-7 h-7 rounded bg-footer-accent flex items-center justify-center flex-shrink-0">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                    <path d="M7 1L13 4V10L7 13L1 10V4L7 1Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" className="text-footer" />
+                  </svg>
+                </div>
+                <span className="text-base font-semibold text-footer-heading tracking-tight group-hover:text-footer-link-hover transition-colors">
+                  Aether Identity
+                </span>
               </Link>
-              <p className="mt-4 text-sm text-foreground/70 max-w-md">
-                Secure identity and access management for the modern enterprise. Protecting what
-                matters most with enterprise-grade security solutions.
+              <p className="mt-4 text-sm text-footer-link leading-relaxed">
+                Secure identity and access management for the modern enterprise. Self-hosted, open-source, and built for scale.
               </p>
+              {/* Social icons */}
+              <div className="flex items-center gap-3 mt-6">
+                {socialLinks.map((social) => (
+                  <Link
+                    key={social.name}
+                    href={social.href}
+                    className="text-footer-link hover:text-footer-link-hover transition-colors duration-150"
+                    aria-label={social.name}
+                  >
+                    <SocialIcon name={social.name} />
+                  </Link>
+                ))}
+              </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
+            {/* Get Started + Legal */}
+            <div className="flex flex-col sm:flex-row gap-10 sm:gap-16">
               <div>
-                <h4 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wide">
+                <h4 className="text-xs font-semibold text-footer-heading mb-5 uppercase tracking-widest">
                   Get Started
                 </h4>
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   {subscriptionLinks.map((link) => (
                     <li key={link.name}>
                       <Link
                         href={link.href}
-                        className="text-sm text-foreground/70 hover:text-foreground transition-colors"
+                        className="text-sm text-footer-link hover:text-footer-link-hover transition-colors duration-150"
                       >
                         {link.name}
                       </Link>
@@ -277,15 +300,15 @@ export async function Footer({ locale = "fr" }: FooterProps) {
               </div>
 
               <div>
-                <h4 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wide">
+                <h4 className="text-xs font-semibold text-footer-heading mb-5 uppercase tracking-widest">
                   Legal
                 </h4>
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   {legalLinks.map((link) => (
                     <li key={link.name}>
                       <Link
                         href={link.href}
-                        className="text-sm text-foreground/70 hover:text-foreground transition-colors"
+                        className="text-sm text-footer-link hover:text-footer-link-hover transition-colors duration-150"
                       >
                         {link.name}
                       </Link>
@@ -293,47 +316,30 @@ export async function Footer({ locale = "fr" }: FooterProps) {
                   ))}
                 </ul>
               </div>
-
-              <div>
-                <h4 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wide">
-                  Follow Us
-                </h4>
-                <div className="flex gap-4">
-                  {socialLinks.map((social) => (
-                    <Link
-                      key={social.name}
-                      href={social.href}
-                      className="text-foreground/60 hover:text-foreground transition-colors"
-                      aria-label={social.name}
-                    >
-                      <SocialIcon name={social.name} />
-                    </Link>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="mt-12 pt-8 border-t border-border">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-foreground/60">
-              © 2026 Aether Identity. All rights reserved.{""}
-              <span className="hidden sm:inline"> · </span>
-              <span className="block sm:inline mt-1 sm:mt-0">
-                <Link
-                  href="https://skygenesisenterprise.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline"
-                >
-                  A Sky Genesis Enterprise Products
-                </Link>
-              </span>
+      {/* Bottom bar */}
+      <div className="border-t border-footer-border">
+        <div className="mx-auto max-w-7xl px-6 py-5">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-xs text-footer-muted">
+              &copy; 2026 Aether Identity. All rights reserved.
+              <span className="mx-2 opacity-40">|</span>
+              <Link
+                href="https://skygenesisenterprise.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-footer-link-hover transition-colors duration-150"
+              >
+                A Sky Genesis Enterprise Product
+              </Link>
             </p>
-            <p className="text-sm text-foreground/60">
-              <Link href="/pgp" className="hover:underline">
-                Vérifiez notre clé PGP publique pour vous assurer de l&apos;authenticité du site
+            <p className="text-xs text-footer-muted">
+              <Link href="/pgp" className="hover:text-footer-link-hover transition-colors duration-150">
+                Verify our PGP public key to ensure site authenticity
               </Link>
             </p>
           </div>

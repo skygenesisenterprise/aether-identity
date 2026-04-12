@@ -2,281 +2,361 @@ import Link from "next/link";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
-import { Shield, Lock, Users, Key, Fingerprint, Zap, CheckCircle, ArrowRight } from "lucide-react";
+import {
+  Shield,
+  Lock,
+  Users,
+  Key,
+  Fingerprint,
+  Zap,
+  ArrowRight,
+  Server,
+  Globe,
+  Code2,
+  Building2,
+  CheckCircle2,
+  Terminal,
+  GitBranch,
+  Database,
+  Cloud,
+} from "lucide-react";
 
-const features = [
-  {
-    icon: Shield,
-    title: "Enterprise-Grade Security",
-    description:
-      "Protect your users and data with industry-leading security measures and compliance standards.",
-  },
+const capabilities = [
   {
     icon: Lock,
-    title: "Single Sign-On (SSO)",
+    title: "OAuth 2.0 / OpenID Connect",
     description:
-      "Seamless authentication across all your applications with our unified login experience.",
-  },
-  {
-    icon: Users,
-    title: "User Management",
-    description: "Complete identity lifecycle management from onboarding to offboarding with ease.",
-  },
-  {
-    icon: Key,
-    title: "Multi-Factor Authentication",
-    description:
-      "Add an extra layer of security with MFA options including SMS, email, and biometrics.",
+      "Standards-compliant implementation with full support for authorization code, PKCE, client credentials, and refresh token flows.",
   },
   {
     icon: Fingerprint,
-    title: "Passwordless Authentication",
+    title: "Multi-Factor Authentication",
     description:
-      "Eliminate passwords and provide frictionless, secure access to your applications.",
+      "TOTP, WebAuthn, SMS, and email verification with adaptive risk-based authentication policies.",
   },
   {
-    icon: Zap,
-    title: "Fast Integration",
-    description: "Get up and running in minutes with our SDKs and comprehensive documentation.",
+    icon: Users,
+    title: "User Federation",
+    description:
+      "Connect existing LDAP, Active Directory, or external identity providers without migrating user credentials.",
+  },
+  {
+    icon: Key,
+    title: "Fine-Grained Authorization",
+    description:
+      "Role-based access control (RBAC) and attribute-based policies with real-time permission evaluation.",
+  },
+  {
+    icon: Server,
+    title: "Self-Hosted Infrastructure",
+    description:
+      "Deploy on your infrastructure with Docker, Kubernetes, or bare metal. Your data stays under your control.",
+  },
+  {
+    icon: Globe,
+    title: "Global Session Management",
+    description:
+      "Distributed session handling with single sign-on across applications and configurable token lifetimes.",
   },
 ];
 
-const stats = [
-  { value: "99.99%", label: "Uptime SLA" },
-  { value: "10B+", label: "Authentications/Month" },
-  { value: "3B+", label: "Attacks Blocked/Month" },
-  { value: "<50ms", label: "Average Response Time" },
+const metrics = [
+  { value: "< 15ms", label: "Token validation latency" },
+  { value: "99.99%", label: "SLA availability" },
+  { value: "10M+", label: "Authentications handled" },
+  { value: "Zero", label: "Vendor lock-in" },
 ];
 
-const useCases = [
+const deploymentOptions = [
   {
-    title: "B2C Applications",
-    description:
-      "Deliver seamless user experiences while protecting customer data and maintaining compliance.",
-    href: "/solutions/b2c",
+    icon: Database,
+    title: "On-Premise",
+    description: "Full control over your identity infrastructure with air-gapped deployment support.",
   },
   {
-    title: "B2B SaaS",
-    description: "Scale your multi-tenant application with enterprise-grade identity management.",
-    href: "/solutions/b2b-saas",
+    icon: Cloud,
+    title: "Cloud Native",
+    description: "Kubernetes-ready with Helm charts, horizontal scaling, and cloud provider integrations.",
   },
   {
-    title: "Enterprise",
-    description:
-      "Meet enterprise security requirements with SSO, MFA, and advanced access controls.",
-    href: "/solutions/enterprise",
-  },
-  {
-    title: "Healthcare",
-    description:
-      "HIPAA-compliant identity solutions for healthcare applications and patient portals.",
-    href: "/solutions/healthcare",
+    icon: GitBranch,
+    title: "Hybrid",
+    description: "Bridge on-premise directories with cloud applications through secure federation.",
   },
 ];
 
-const sdks = [
-  { name: "JavaScript", icon: "JS" },
-  { name: "React", icon: "React" },
-  { name: "Angular", icon: "Angular" },
-  { name: "Vue", icon: "Vue" },
-  { name: "Node.js", icon: "Node" },
-  { name: "Python", icon: "Python" },
-  { name: ".NET", icon: ".NET" },
-  { name: "iOS (Swift)", icon: "iOS" },
-  { name: "Android (Kotlin)", icon: "Android" },
-  { name: "Java", icon: "Java" },
+const sdkSupport = [
+  { name: "Node.js", category: "Backend" },
+  { name: "Go", category: "Backend" },
+  { name: "Python", category: "Backend" },
+  { name: "Java", category: "Backend" },
+  { name: ".NET", category: "Backend" },
+  { name: "React", category: "Frontend" },
+  { name: "Vue", category: "Frontend" },
+  { name: "Angular", category: "Frontend" },
+  { name: "iOS", category: "Mobile" },
+  { name: "Android", category: "Mobile" },
+];
+
+const complianceStandards = [
+  "SOC 2 Type II",
+  "GDPR",
+  "HIPAA",
+  "ISO 27001",
+  "PCI DSS",
+  "FedRAMP Ready",
 ];
 
 export default async function PublicPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
       <main className="flex-1">
-        <section className="relative bg-linear-to-b from-background to-background/80 py-20 lg:py-32">
+        {/* Hero Section */}
+        <section className="relative py-24 lg:py-32 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8">
-                <Shield className="h-4 w-4" />
-                Secure Identity Management
+            <div className="max-w-4xl">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+                Open Source Identity Platform
               </div>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
-                Identity & Access Management
-                <br />
-                <span className="text-primary">Built for the Enterprise</span>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
+                Enterprise Identity Infrastructure You Control
               </h1>
-              <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                Secure your applications with enterprise-grade authentication, authorization, and
-                user management. Protect your users and data with our scalable identity platform.
+              <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
+                A self-hosted OAuth 2.0 and OpenID Connect provider built for organizations that
+                require complete sovereignty over authentication, authorization, and user data.
+              </p>
+              <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
+                <Link href="/docs">
+                  <Button size="lg" className="gap-2 h-12 px-6 text-base">
+                    View Documentation
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href="https://github.com/skygenesisenterprise/aether-identity">
+                  <Button variant="outline" size="lg" className="gap-2 h-12 px-6 text-base">
+                    <Terminal className="h-4 w-4" />
+                    GitHub Repository
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Metrics Section */}
+        <section className="py-16 border-b border-border bg-muted/30">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+              {metrics.map((metric) => (
+                <div key={metric.label}>
+                  <div className="text-3xl sm:text-4xl font-semibold text-foreground">
+                    {metric.value}
+                  </div>
+                  <div className="mt-1 text-sm text-muted-foreground">{metric.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Core Capabilities */}
+        <section className="py-20 lg:py-28">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mb-16">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                Core Capabilities
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                Built on open standards with enterprise-grade reliability. Every component is
+                designed for extensibility and compliance requirements.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {capabilities.map((capability) => (
+                <div key={capability.title} className="group">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-foreground/5 group-hover:bg-foreground/10 transition-colors">
+                      <capability.icon className="h-5 w-5 text-foreground" />
+                    </div>
+                    <h3 className="text-base font-semibold text-foreground">{capability.title}</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed pl-13">
+                    {capability.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Code Example Section */}
+        <section className="py-20 lg:py-28 bg-foreground text-background">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+              <div>
+                <h2 className="text-3xl sm:text-4xl font-semibold text-balance">
+                  Integrate in Minutes, Not Weeks
+                </h2>
+                <p className="mt-4 text-lg text-background/70 leading-relaxed">
+                  Our SDKs abstract the complexity of OAuth flows while giving you full access to
+                  underlying primitives when needed.
+                </p>
+                <div className="mt-8 flex flex-wrap gap-2">
+                  {sdkSupport.map((sdk) => (
+                    <span
+                      key={sdk.name}
+                      className="px-3 py-1.5 text-sm bg-background/10 rounded-md text-background/80"
+                    >
+                      {sdk.name}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-8">
+                  <Link href="/docs/quickstarts">
+                    <Button variant="secondary" size="lg" className="gap-2">
+                      <Code2 className="h-4 w-4" />
+                      Quickstart Guides
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+              <div className="relative">
+                <div className="bg-background/5 rounded-lg border border-background/10 p-6 font-mono text-sm">
+                  <div className="flex items-center gap-2 text-background/50 mb-4">
+                    <span className="w-3 h-3 rounded-full bg-background/20" />
+                    <span className="w-3 h-3 rounded-full bg-background/20" />
+                    <span className="w-3 h-3 rounded-full bg-background/20" />
+                    <span className="ml-2">auth.ts</span>
+                  </div>
+                  <pre className="text-background/80 overflow-x-auto">
+                    <code>{`import { AetherClient } from '@aether-identity/node';
+
+const aether = new AetherClient({
+  domain: 'auth.yourcompany.com',
+  clientId: process.env.AETHER_CLIENT_ID,
+});
+
+// Verify access token
+const { user, permissions } = await aether.verify(
+  request.headers.authorization
+);
+
+// Check specific permission
+if (permissions.includes('read:documents')) {
+  // Authorized access
+}`}</code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Deployment Options */}
+        <section className="py-20 lg:py-28 border-b border-border">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mb-16">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                Deploy Your Way
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                Whether you need complete isolation, cloud scalability, or a hybrid approach,
+                Aether Identity adapts to your infrastructure requirements.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {deploymentOptions.map((option) => (
+                <div
+                  key={option.title}
+                  className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
+                >
+                  <option.icon className="h-8 w-8 text-foreground mb-4" />
+                  <h3 className="text-lg font-semibold text-foreground mb-2">{option.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {option.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Compliance Section */}
+        <section className="py-20 lg:py-28 border-b border-border">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+              <div>
+                <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                  Built for Regulated Industries
+                </h2>
+                <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                  Aether Identity is designed to meet the stringent security and compliance
+                  requirements of healthcare, finance, government, and enterprise organizations.
+                </p>
+                <div className="mt-8 grid grid-cols-2 gap-3">
+                  {complianceStandards.map((standard) => (
+                    <div key={standard} className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                      <span className="text-sm text-foreground">{standard}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-6 rounded-lg bg-muted/50 border border-border">
+                  <Shield className="h-8 w-8 text-foreground mb-3" />
+                  <div className="text-2xl font-semibold text-foreground">AES-256</div>
+                  <div className="text-sm text-muted-foreground">Encryption at rest</div>
+                </div>
+                <div className="p-6 rounded-lg bg-muted/50 border border-border">
+                  <Lock className="h-8 w-8 text-foreground mb-3" />
+                  <div className="text-2xl font-semibold text-foreground">TLS 1.3</div>
+                  <div className="text-sm text-muted-foreground">Encryption in transit</div>
+                </div>
+                <div className="p-6 rounded-lg bg-muted/50 border border-border">
+                  <Building2 className="h-8 w-8 text-foreground mb-3" />
+                  <div className="text-2xl font-semibold text-foreground">Air-Gap</div>
+                  <div className="text-sm text-muted-foreground">Deployment ready</div>
+                </div>
+                <div className="p-6 rounded-lg bg-muted/50 border border-border">
+                  <Zap className="h-8 w-8 text-foreground mb-3" />
+                  <div className="text-2xl font-semibold text-foreground">Audit Logs</div>
+                  <div className="text-sm text-muted-foreground">Complete trail</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 lg:py-28">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mx-auto text-center">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                Take Control of Your Identity Infrastructure
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Deploy Aether Identity today and eliminate dependency on third-party identity
+                providers. Open source, self-hosted, enterprise-ready.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/register">
-                  <Button size="lg" className="gap-2">
-                    Start Free Trial
+                <Link href="/docs">
+                  <Button size="lg" className="gap-2 h-12 px-8 text-base">
+                    Get Started
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="/contact">
-                  <Button variant="outline" size="lg">
+                  <Button variant="outline" size="lg" className="h-12 px-8 text-base">
                     Contact Sales
                   </Button>
                 </Link>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-16 bg-muted/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {stats.map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <div className="text-3xl sm:text-4xl font-bold text-primary">{stat.value}</div>
-                  <div className="mt-1 text-sm text-muted-foreground">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-                Everything You Need for Identity Management
-              </h2>
-              <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-                Our comprehensive platform provides all the tools you need to secure your
-                applications and manage user identities.
-              </p>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {features.map((feature) => (
-                <div
-                  key={feature.title}
-                  className="p-6 rounded-lg border bg-card text-card-foreground hover:shadow-lg transition-shadow"
-                >
-                  <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                    <feature.icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground text-sm">{feature.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20 bg-muted/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-                Integrate in Minutes
-              </h2>
-              <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-                Get started quickly with our SDKs and comprehensive documentation. We support all
-                major platforms and frameworks.
-              </p>
-            </div>
-            <div className="flex flex-wrap justify-center gap-4">
-              {sdks.map((sdk) => (
-                <div
-                  key={sdk.name}
-                  className="px-4 py-2 rounded-md bg-background border text-sm font-medium hover:border-primary hover:text-primary transition-colors cursor-pointer"
-                >
-                  {sdk.name}
-                </div>
-              ))}
-            </div>
-            <div className="mt-12 text-center">
-              <Link href="/docs/quickstarts">
-                <Button variant="outline" className="gap-2">
-                  View Quickstarts
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-                Built for What You&apos;re Building
-              </h2>
-              <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-                Whether you&apos;re building consumer apps, enterprise software, or anything in
-                between, we have you covered.
-              </p>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {useCases.map((useCase) => (
-                <Link
-                  key={useCase.title}
-                  href={useCase.href}
-                  className="group p-6 rounded-lg border bg-card text-card-foreground hover:shadow-lg hover:border-primary transition-all"
-                >
-                  <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
-                    {useCase.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm">{useCase.description}</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20 bg-primary text-primary-foreground">
-          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl sm:text-4xl font-bold">Ready to Get Started?</h2>
-            <p className="mt-4 text-lg opacity-90 max-w-2xl mx-auto">
-              Join thousands of companies who trust Sky Genesis Enterprise for their identity
-              management needs. Start your free trial today.
-            </p>
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/register">
-                <Button size="lg" variant="secondary" className="gap-2">
-                  Start Free Trial
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href="/contact">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-primary-foreground/20 hover:bg-primary-foreground/10"
-                >
-                  Talk to Sales
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-                Why Choose Aether Identity?
-              </h2>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[
-                "SOC 2 Type II Certified",
-                "GDPR Compliant",
-                "HIPAA Ready",
-                "99.99% Uptime SLA",
-                "24/7 Enterprise Support",
-                "Dedicated Success Manager",
-              ].map((item) => (
-                <div key={item} className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-primary shrink-0" />
-                  <span className="text-foreground">{item}</span>
-                </div>
-              ))}
             </div>
           </div>
         </section>
