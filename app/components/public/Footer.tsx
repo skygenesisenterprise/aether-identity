@@ -252,7 +252,7 @@ export async function Footer({ locale = "fr" }: FooterProps) {
             {/* Brand block */}
             <div className="max-w-xs">
               <Link href="/" className="inline-flex items-center gap-2.5 group">
-                <div className="w-7 h-7 rounded bg-footer-accent flex items-center justify-center flex-shrink-0">
+                <div className="w-7 h-7 rounded bg-footer-accent flex items-center justify-center shrink-0">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                     <path d="M7 1L13 4V10L7 13L1 10V4L7 1Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" className="text-footer" />
                   </svg>

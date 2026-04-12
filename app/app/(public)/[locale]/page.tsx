@@ -18,7 +18,6 @@ import {
   Code2,
   Building2,
   CheckCircle2,
-  Terminal,
   GitBranch,
   Database,
   Cloud,
