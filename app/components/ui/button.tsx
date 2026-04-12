@@ -39,7 +39,7 @@ function Button({
   variant,
   size,
   asChild = false,
-  suppressHydrationWarning,
+  suppressHydrationWarning = true,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
