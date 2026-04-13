@@ -163,14 +163,26 @@ if 'read:documents' in permissions:
   ];
 
   const comparison = [
-    { feature: "Self-hosted", aether: true, keycloak: true, auth0: false, okta: false },
-    { feature: "OAuth 2.0 / OIDC", aether: true, keycloak: true, auth0: true, okta: true },
-    { feature: "MFA support", aether: true, keycloak: true, auth0: true, okta: true },
-    { feature: "User federation", aether: true, keycloak: true, auth0: true, okta: true },
-    { feature: "RBAC/ABAC", aether: true, keycloak: true, auth0: true, okta: true },
-    { feature: "Audit logging", aether: true, keycloak: true, auth0: true, okta: true },
-    { feature: "No vendor lock-in", aether: true, keycloak: true, auth0: false, okta: false },
-    { feature: "SLA guarantee", aether: "99.99%", keycloak: "N/A", auth0: "99.9%", okta: "99.9%" },
+    {
+      feature: t("comparison.selfHosted"),
+      aether: true,
+      keycloak: true,
+      auth0: false,
+      okta: false,
+    },
+    { feature: t("comparison.oauth"), aether: true, keycloak: true, auth0: true, okta: true },
+    { feature: t("comparison.mfa"), aether: true, keycloak: true, auth0: true, okta: true },
+    { feature: t("comparison.federation"), aether: true, keycloak: true, auth0: true, okta: true },
+    { feature: t("comparison.rbac"), aether: true, keycloak: true, auth0: true, okta: true },
+    { feature: t("comparison.audit"), aether: true, keycloak: true, auth0: true, okta: true },
+    { feature: t("comparison.noLockin"), aether: true, keycloak: true, auth0: false, okta: false },
+    {
+      feature: t("comparison.sla"),
+      aether: "99.99%",
+      keycloak: "N/A",
+      auth0: "99.9%",
+      okta: "99.9%",
+    },
   ];
 
   const industries = [
@@ -198,78 +210,61 @@ if 'read:documents' in permissions:
 
   const faqs = [
     {
-      question: "How does Aether compare to Keycloak?",
-      answer:
-        "Aether offers a more modern architecture with better performance (<15ms token validation), easier setup, and enterprise support. Unlike Keycloak, Aether provides SLA guarantees and dedicated support.",
+      question: t("faq.keycloak.title"),
+      answer: t("faq.keycloak.answer"),
     },
     {
-      question: "Can I migrate from Auth0 or Okta?",
-      answer:
-        "Yes, we provide migration tools and assistance to import your users, applications, and configurations from Auth0, Okta, or any other OAuth provider. Contact our team for a customized migration plan.",
+      question: t("faq.migrate.title"),
+      answer: t("faq.migrate.answer"),
     },
     {
-      question: "What happens if I lose internet connectivity?",
-      answer:
-        "Aether supports air-gapped deployments and can operate fully offline. Your authentication services remain functional even without internet access.",
+      question: t("faq.offline.title"),
+      answer: t("faq.offline.answer"),
     },
     {
-      question: "Is there a free tier?",
-      answer:
-        "Yes, Aether Community Edition is free and open source. For enterprise features, SLA guarantees, and support, contact our sales team.",
+      question: t("faq.free.title"),
+      answer: t("faq.free.answer"),
     },
     {
-      question: "How often do you release updates?",
-      answer:
-        "We release monthly security updates and quarterly feature releases. All updates are thoroughly tested and documented.",
+      question: t("faq.updates.title"),
+      answer: t("faq.updates.answer"),
     },
   ];
 
   const resources = [
     {
       icon: FileText,
-      title: "Whitepaper",
-      description: "Enterprise Identity Architecture Guide",
+      title: t("resources.whitepaper"),
+      description: t("resources.whitepaperDesc"),
     },
     {
       icon: BookOpen,
-      title: "E-book",
-      description: "Zero Trust Security Implementation",
+      title: t("resources.ebook"),
+      description: t("resources.ebookDesc"),
     },
     {
       icon: Calendar,
-      title: "Webinar",
-      description: "Migrating from Legacy Identity Providers",
+      title: t("resources.webinar"),
+      description: t("resources.webinarDesc"),
     },
     {
       icon: BarChart3,
-      title: "Case Study",
-      description: "How TechFlow Reduced Auth Latency by 80%",
+      title: t("resources.caseStudy"),
+      description: t("resources.caseStudyDesc"),
     },
   ];
 
   const teamMembers = [
-    { name: "Alex Chen", role: "CEO & Founder", image: "AC" },
-    { name: "Sarah Miller", role: "CTO", image: "SM" },
-    { name: "James Wilson", role: "VP Engineering", image: "JW" },
-    { name: "Emily Davis", role: "Head of Security", image: "ED" },
+    { nameKey: "team.alex", roleKey: "team.alexRole", image: "AC" },
+    { nameKey: "team.sarah", roleKey: "team.sarahRole", image: "SM" },
+    { nameKey: "team.james", roleKey: "team.jamesRole", image: "JW" },
+    { nameKey: "team.emily", roleKey: "team.emilyRole", image: "ED" },
   ];
 
   const recentUpdates = [
-    {
-      version: "v2.4.0",
-      date: "March 2026",
-      description: "WebAuthn support and improved MFA flows",
-    },
-    {
-      version: "v2.3.0",
-      date: "February 2026",
-      description: "Enhanced audit logging and compliance reports",
-    },
-    {
-      version: "v2.2.0",
-      date: "January 2026",
-      description: "Kubernetes operator and Helm chart improvements",
-    },
+    { version: "v2.4.0", dateKey: "updates.v240", descKey: "updates.v240Desc" },
+    { version: "v2.3.0", dateKey: "updates.v230", descKey: "updates.v230Desc" },
+    { version: "v2.2.0", dateKey: "updates.v220", descKey: "updates.v220Desc" },
   ];
 
   return (
@@ -666,14 +661,14 @@ if 'read:documents' in permissions:
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {teamMembers.map((member) => (
                 <div
-                  key={member.name}
+                  key={member.nameKey}
                   className="p-6 rounded-lg border border-border bg-card text-center"
                 >
                   <div className="w-16 h-16 rounded-full bg-foreground/10 flex items-center justify-center mx-auto mb-4">
                     <span className="text-xl font-semibold text-foreground">{member.image}</span>
                   </div>
-                  <h3 className="text-base font-semibold text-foreground">{member.name}</h3>
-                  <p className="text-sm text-muted-foreground">{member.role}</p>
+                  <h3 className="text-base font-semibold text-foreground">{t(member.nameKey)}</h3>
+                  <p className="text-sm text-muted-foreground">{t(member.roleKey)}</p>
                 </div>
               ))}
             </div>
@@ -699,11 +694,11 @@ if 'read:documents' in permissions:
                 >
                   <div className="flex items-center gap-2 mb-3">
                     <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">{update.date}</span>
+                    <span className="text-sm text-muted-foreground">{t(update.dateKey)}</span>
                   </div>
                   <div className="text-lg font-semibold text-foreground mb-2">{update.version}</div>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {update.description}
+                    {t(update.descKey)}
                   </p>
                 </div>
               ))}

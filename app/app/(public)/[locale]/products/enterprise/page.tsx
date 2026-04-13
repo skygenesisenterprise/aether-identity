@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -30,227 +31,102 @@ import {
   Scale,
 } from "lucide-react";
 
-const enterpriseFeatures = [
-  {
-    icon: Shield,
-    title: "Enterprise Security",
-    description:
-      "Bank-grade encryption, SOC 2 Type II compliance, and advanced threat protection for your most sensitive applications.",
-  },
-  {
-    icon: HeadphonesIcon,
-    title: "Dedicated Support",
-    description:
-      "24/7 priority support with dedicated account managers and guaranteed response times for enterprise customers.",
-  },
-  {
-    icon: Scale,
-    title: "Unlimited Scaling",
-    description:
-      "Scale to millions of users with our distributed architecture. No arbitrary limits on users, applications, or API calls.",
-  },
-  {
-    icon: Clock,
-    title: "99.99% SLA",
-    description:
-      "Industry-leading uptime guarantee with financial reparations. Enterprise-grade reliability you can count on.",
-  },
-  {
-    icon: Key,
-    title: "Advanced MFA",
-    description:
-      "TOTP, WebAuthn, push notifications, SMS, and email verification with adaptive risk-based policies.",
-  },
-  {
-    icon: Users,
-    title: "User Federation",
-    description:
-      "Seamless integration with Active Directory, LDAP, and external identity providers.",
-  },
-];
-
-const plans = [
-  {
-    name: "Starter",
-    price: "Custom",
-    description: "For small teams getting started with identity",
-    features: [
-      "Up to 10,000 users",
-      "Basic MFA support",
-      "Community support",
-      "Standard documentation",
-      "Monthly releases",
-    ],
-    cta: "Contact Sales",
-    popular: false,
-  },
-  {
-    name: "Professional",
-    price: "Custom",
-    description: "For growing organizations with advanced needs",
-    features: [
-      "Up to 100,000 users",
-      "Advanced MFA (TOTP, WebAuthn)",
-      "Priority email support",
-      "Active Directory integration",
-      "Quarterly releases",
-      "Audit logging",
-    ],
-    cta: "Contact Sales",
-    popular: true,
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    description: "For large organizations at scale",
-    features: [
-      "Unlimited users",
-      "All MFA methods",
-      "24/7 dedicated support",
-      "SLA guarantee (99.99%)",
-      "Custom integrations",
-      "Security review",
-      "Dedicated account manager",
-      "Air-gapped deployment",
-    ],
-    cta: "Contact Sales",
-    popular: false,
-  },
-];
-
-const includedFeatures = [
-  {
-    icon: Globe,
-    title: "Global Infrastructure",
-    description: "Deploy across multiple regions with automatic failover",
-  },
-  {
-    icon: BarChart3,
-    title: "Advanced Analytics",
-    description: "Real-time dashboards with custom reporting and alerts",
-  },
-  {
-    icon: FileText,
-    title: "Compliance Reports",
-    description: "Automated SOC 2, HIPAA, and GDPR compliance reports",
-  },
-  {
-    icon: Zap,
-    title: "High Performance",
-    description: "< 15ms token validation with horizontal scaling",
-  },
-  {
-    icon: Server,
-    title: "Private Deployment",
-    description: "Dedicated infrastructure with network isolation",
-  },
-  {
-    icon: CreditCard,
-    title: "Flexible Billing",
-    description: "Annual or multi-year contracts with volume discounts",
-  },
-];
-
-const testimonials = [
-  {
-    quote:
-      "Aether Enterprise gave us complete control over our identity infrastructure while providing the reliability our financial services require.",
-    author: "Jean-Pierre Dubois",
-    role: "CISO",
-    company: "Banque Suisse",
-  },
-  {
-    quote:
-      "The migration from Okta was seamless. Their team handled everything, and we reduced our authentication costs by 60%.",
-    author: "Marie Lambert",
-    role: "VP Engineering",
-    company: "TechCorp Europe",
-  },
-  {
-    quote:
-      "The 99.99% SLA and dedicated support give us the confidence to handle millions of transactions daily.",
-    author: "Hans Mueller",
-    role: "CTO",
-    company: "GlobalPay",
-  },
-];
-
-const faqs = [
-  {
-    question: "What is included in the Enterprise plan?",
-    answer:
-      "The Enterprise plan includes unlimited users, all MFA methods, 24/7 dedicated support, SLA guarantee, custom integrations, security reviews, a dedicated account manager, and air-gapped deployment options.",
-  },
-  {
-    question: "Can we get a custom contract?",
-    answer:
-      "Yes, we offer flexible contract terms including annual and multi-year options. Contact our sales team to discuss your specific requirements.",
-  },
-  {
-    question: "Do you offer on-premise deployment?",
-    answer:
-      "Yes, we support fully on-premise, cloud, and hybrid deployments. Our enterprise plan includes air-gapped deployment for organizations with strict security requirements.",
-  },
-  {
-    question: "What kind of support do you provide?",
-    answer:
-      "Enterprise customers receive 24/7 priority support with dedicated account managers, guaranteed response times, and access to our security team for architecture reviews.",
-  },
-  {
-    question: "Can we migrate from our current provider?",
-    answer:
-      "Yes, we provide full migration assistance including user migration, application configuration transfer, and custom integration work at no additional cost.",
-  },
-];
-
-const industries = [
-  {
-    icon: Briefcase,
-    title: "Financial Services",
-    description: "Banking, insurance, and fintech with regulatory compliance",
-  },
-  {
-    icon: Shield,
-    title: "Healthcare",
-    description: "HIPAA-compliant identity for patient data protection",
-  },
-  {
-    icon: Globe2,
-    title: "Government",
-    description: "FedRAMP Ready solutions for citizen services",
-  },
-  {
-    icon: Award,
-    title: "Technology",
-    description: "SaaS platforms requiring enterprise-grade security",
-  },
-];
-
-const resources = [
-  {
-    icon: BookOpen,
-    title: "Enterprise Architecture Guide",
-    description: "Best practices for identity infrastructure",
-  },
-  {
-    icon: FileText,
-    title: "Security Whitepaper",
-    description: "Detailed security model and compliance information",
-  },
-  {
-    icon: Calendar,
-    title: "Demo Request",
-    description: "Schedule a personalized product walkthrough",
-  },
-  {
-    icon: MessageSquare,
-    title: "Contact Sales",
-    description: "Talk to our enterprise team about your needs",
-  },
-];
-
 export default async function EnterprisePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Enterprise" });
+
+  const enterpriseFeatures = [
+    { icon: Shield, titleKey: "features.security", descKey: "features.securityDesc" },
+    { icon: HeadphonesIcon, titleKey: "features.support", descKey: "features.supportDesc" },
+    { icon: Scale, titleKey: "features.scaling", descKey: "features.scalingDesc" },
+    { icon: Clock, titleKey: "features.sla", descKey: "features.slaDesc" },
+    { icon: Key, titleKey: "features.mfa", descKey: "features.mfaDesc" },
+    { icon: Users, titleKey: "features.federation", descKey: "features.federationDesc" },
+  ];
+
+  const includedFeatures = [
+    { icon: Globe, titleKey: "included.global", descKey: "included.globalDesc" },
+    { icon: BarChart3, titleKey: "included.analytics", descKey: "included.analyticsDesc" },
+    { icon: FileText, titleKey: "included.compliance", descKey: "included.complianceDesc" },
+    { icon: Zap, titleKey: "included.performance", descKey: "included.performanceDesc" },
+    { icon: Server, titleKey: "included.private", descKey: "included.privateDesc" },
+    { icon: CreditCard, titleKey: "included.billing", descKey: "included.billingDesc" },
+  ];
+
+  const plans = [
+    {
+      nameKey: "plans.starter",
+      priceKey: "plans.custom",
+      descKey: "plans.starterDesc",
+      featuresKey: "plans.starterFeatures",
+      ctaKey: "plans.cta",
+      popular: false,
+    },
+    {
+      nameKey: "plans.professional",
+      priceKey: "plans.custom",
+      descKey: "plans.professionalDesc",
+      featuresKey: "plans.professionalFeatures",
+      ctaKey: "plans.cta",
+      popular: true,
+    },
+    {
+      nameKey: "plans.enterprise",
+      priceKey: "plans.custom",
+      descKey: "plans.enterpriseDesc",
+      featuresKey: "plans.enterpriseFeatures",
+      ctaKey: "plans.cta",
+      popular: false,
+    },
+  ];
+
+  const testimonials = [
+    {
+      quoteKey: "testimonials.quote1",
+      authorKey: "testimonials.author1",
+      roleKey: "testimonials.role1",
+      companyKey: "testimonials.company1",
+    },
+    {
+      quoteKey: "testimonials.quote2",
+      authorKey: "testimonials.author2",
+      roleKey: "testimonials.role2",
+      companyKey: "testimonials.company2",
+    },
+    {
+      quoteKey: "testimonials.quote3",
+      authorKey: "testimonials.author3",
+      roleKey: "testimonials.role3",
+      companyKey: "testimonials.company3",
+    },
+  ];
+
+  const industries = [
+    { icon: Briefcase, titleKey: "industries.financial", descKey: "industries.financialDesc" },
+    { icon: Shield, titleKey: "industries.healthcare", descKey: "industries.healthcareDesc" },
+    { icon: Globe2, titleKey: "industries.government", descKey: "industries.governmentDesc" },
+    { icon: Award, titleKey: "industries.technology", descKey: "industries.technologyDesc" },
+  ];
+
+  const resources = [
+    { icon: BookOpen, titleKey: "resources.architecture", descKey: "resources.architectureDesc" },
+    { icon: FileText, titleKey: "resources.security", descKey: "resources.securityDesc" },
+    { icon: Calendar, titleKey: "resources.demo", descKey: "resources.demoDesc" },
+    { icon: MessageSquare, titleKey: "resources.contact", descKey: "resources.contactDesc" },
+  ];
+
+  const faqs = [
+    { questionKey: "faq.included.title", answerKey: "faq.included.answer" },
+    { questionKey: "faq.contract.title", answerKey: "faq.contract.answer" },
+    { questionKey: "faq.onpremise.title", answerKey: "faq.onpremise.answer" },
+    { questionKey: "faq.support.title", answerKey: "faq.support.answer" },
+    { questionKey: "faq.migration.title", answerKey: "faq.migration.answer" },
+  ];
+
+  const faqItems = faqs.map((faq) => ({
+    question: t(faq.questionKey),
+    answer: t(faq.answerKey),
+  }));
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -263,25 +139,24 @@ export default async function EnterprisePage({ params }: { params: Promise<{ loc
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                Enterprise Solutions
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                Enterprise Identity, Without Compromise
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Comprehensive identity management for large organizations. Dedicated support,
-                unlimited scaling, and the security certifications your industry demands.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
                 <Link href="#plans">
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    View Plans
+                    {t("hero.ctaPlans")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/contact">
+                <Link href={`/${locale}/contact`}>
                   <Button variant="outline" size="lg" className="gap-2 h-12 px-6 text-base">
-                    Contact Sales
+                    {t("hero.ctaContact")}
                   </Button>
                 </Link>
               </div>
@@ -294,23 +169,25 @@ export default async function EnterprisePage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Built for Enterprise
+                {t("features.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Everything your organization needs for comprehensive identity management at scale.
+                {t("features.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {enterpriseFeatures.map((feature) => (
-                <div key={feature.title} className="group">
+                <div key={feature.titleKey} className="group">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-foreground/5 group-hover:bg-foreground/10 transition-colors">
                       <feature.icon className="h-5 w-5 text-foreground" />
                     </div>
-                    <h3 className="text-base font-semibold text-foreground">{feature.title}</h3>
+                    <h3 className="text-base font-semibold text-foreground">
+                      {t(feature.titleKey)}
+                    </h3>
                   </div>
                   <p className="text-sm text-muted-foreground leading-relaxed pl-13">
-                    {feature.description}
+                    {t(feature.descKey)}
                   </p>
                 </div>
               ))}
@@ -323,22 +200,24 @@ export default async function EnterprisePage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Everything Included
+                {t("included.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                All plans include our core features with enterprise-grade reliability.
+                {t("included.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {includedFeatures.map((feature) => (
                 <div
-                  key={feature.title}
+                  key={feature.titleKey}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
                 >
                   <feature.icon className="h-8 w-8 text-foreground mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{feature.title}</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    {t(feature.titleKey)}
+                  </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {feature.description}
+                    {t(feature.descKey)}
                   </p>
                 </div>
               ))}
@@ -351,17 +230,16 @@ export default async function EnterprisePage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Enterprise Plans
+                {t("plans.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Choose the plan that fits your organization. All plans include our core identity
-                platform.
+                {t("plans.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
               {plans.map((plan) => (
                 <div
-                  key={plan.name}
+                  key={plan.nameKey}
                   className={`relative p-6 rounded-lg border bg-card transition-colors ${
                     plan.popular
                       ? "border-emerald-500 ring-1 ring-emerald-500"
@@ -371,30 +249,32 @@ export default async function EnterprisePage({ params }: { params: Promise<{ loc
                   {plan.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-500 text-white">
-                        Most Popular
+                        {t("plans.mostPopular")}
                       </span>
                     </div>
                   )}
                   <div className="text-center mb-6">
-                    <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
-                    <div className="mt-2 text-3xl font-semibold text-foreground">{plan.price}</div>
-                    <p className="mt-2 text-sm text-muted-foreground">{plan.description}</p>
+                    <h3 className="text-lg font-semibold text-foreground">{t(plan.nameKey)}</h3>
+                    <div className="mt-2 text-3xl font-semibold text-foreground">
+                      {t(plan.priceKey)}
+                    </div>
+                    <p className="mt-2 text-sm text-muted-foreground">{t(plan.descKey)}</p>
                   </div>
                   <ul className="space-y-3 mb-6">
-                    {plan.features.map((feature) => (
+                    {t.raw(plan.featuresKey).map((feature: string) => (
                       <li key={feature} className="flex items-start gap-2">
                         <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
                         <span className="text-sm text-foreground">{feature}</span>
                       </li>
                     ))}
                   </ul>
-                  <Link href="/contact" className="block">
+                  <Link href={`/${locale}/contact`} className="block">
                     <Button
                       className="w-full"
                       variant={plan.popular ? "default" : "outline"}
                       size="lg"
                     >
-                      {plan.cta}
+                      {t(plan.ctaKey)}
                     </Button>
                   </Link>
                 </div>
@@ -408,22 +288,24 @@ export default async function EnterprisePage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Industry Solutions
+                {t("industries.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Specialized identity management for regulated industries.
+                {t("industries.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {industries.map((industry) => (
                 <div
-                  key={industry.title}
+                  key={industry.titleKey}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
                 >
                   <industry.icon className="h-8 w-8 text-foreground mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{industry.title}</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    {t(industry.titleKey)}
+                  </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {industry.description}
+                    {t(industry.descKey)}
                   </p>
                 </div>
               ))}
@@ -436,16 +318,16 @@ export default async function EnterprisePage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Trusted by Industry Leaders
+                {t("testimonials.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                See why leading enterprises choose Aether for their identity needs.
+                {t("testimonials.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
               {testimonials.map((testimonial) => (
                 <div
-                  key={testimonial.author}
+                  key={testimonial.authorKey}
                   className="p-6 rounded-lg border border-border bg-card"
                 >
                   <div className="flex gap-1 mb-4">
@@ -454,12 +336,12 @@ export default async function EnterprisePage({ params }: { params: Promise<{ loc
                     ))}
                   </div>
                   <p className="text-sm text-foreground leading-relaxed mb-4">
-                    &ldquo;{testimonial.quote}&rdquo;
+                    &ldquo;{t(testimonial.quoteKey)}&rdquo;
                   </p>
                   <div>
-                    <div className="font-semibold text-foreground">{testimonial.author}</div>
+                    <div className="font-semibold text-foreground">{t(testimonial.authorKey)}</div>
                     <div className="text-sm text-muted-foreground">
-                      {testimonial.role}, {testimonial.company}
+                      {t(testimonial.roleKey)}, {t(testimonial.companyKey)}
                     </div>
                   </div>
                 </div>
@@ -474,36 +356,35 @@ export default async function EnterprisePage({ params }: { params: Promise<{ loc
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                  Enterprise Compliance
+                  {t("compliance.title")}
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                  Meet the most stringent security and compliance requirements with our
-                  enterprise-grade identity platform.
+                  {t("compliance.description")}
                 </p>
                 <div className="mt-8 grid grid-cols-2 gap-3">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span className="text-sm text-foreground">SOC 2 Type II</span>
+                    <span className="text-sm text-foreground">{t("compliance.soc2")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span className="text-sm text-foreground">GDPR Ready</span>
+                    <span className="text-sm text-foreground">{t("compliance.gdpr")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span className="text-sm text-foreground">HIPAA Compliant</span>
+                    <span className="text-sm text-foreground">{t("compliance.hipaa")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span className="text-sm text-foreground">ISO 27001</span>
+                    <span className="text-sm text-foreground">{t("compliance.iso")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span className="text-sm text-foreground">FedRAMP Ready</span>
+                    <span className="text-sm text-foreground">{t("compliance.fedramp")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span className="text-sm text-foreground">PCI DSS</span>
+                    <span className="text-sm text-foreground">{t("compliance.pci")}</span>
                   </div>
                 </div>
               </div>
@@ -511,22 +392,28 @@ export default async function EnterprisePage({ params }: { params: Promise<{ loc
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Shield className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">AES-256</div>
-                  <div className="text-sm text-muted-foreground">Encryption at rest</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("compliance.encryptionRest")}
+                  </div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Lock className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">TLS 1.3</div>
-                  <div className="text-sm text-muted-foreground">Encryption in transit</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("compliance.encryptionTransit")}
+                  </div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Building2 className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">Air-Gap</div>
-                  <div className="text-sm text-muted-foreground">Deployment ready</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("compliance.deploymentReady")}
+                  </div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Zap className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">Audit Logs</div>
-                  <div className="text-sm text-muted-foreground">Complete trail</div>
+                  <div className="text-sm text-muted-foreground">{t("compliance.auditTrails")}</div>
                 </div>
               </div>
             </div>
@@ -538,13 +425,13 @@ export default async function EnterprisePage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Frequently Asked Questions
+                {t("faq.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Common questions about our enterprise plans and services.
+                {t("faq.description")}
               </p>
             </div>
-            <FaqAccordion faqs={faqs} />
+            <FaqAccordion faqs={faqItems} />
           </div>
         </section>
 
@@ -553,23 +440,25 @@ export default async function EnterprisePage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Enterprise Resources
+                {t("resources.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Documentation, guides, and resources to help you get started.
+                {t("resources.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {resources.map((resource) => (
                 <Link
-                  key={resource.title}
-                  href="/contact"
+                  key={resource.titleKey}
+                  href={`/${locale}/contact`}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors group"
                 >
                   <resource.icon className="h-8 w-8 text-foreground mb-4 group-hover:text-emerald-600 transition-colors" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{resource.title}</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    {t(resource.titleKey)}
+                  </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {resource.description}
+                    {t(resource.descKey)}
                   </p>
                 </Link>
               ))}
@@ -582,15 +471,13 @@ export default async function EnterprisePage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Ready to Get Started?
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Contact our enterprise team to discuss your identity management needs.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/contact">
+                <Link href={`/${locale}/contact`}>
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                    Contact Sales
+                    {t("cta.cta")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>

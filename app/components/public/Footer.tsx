@@ -178,21 +178,21 @@ export async function Footer({ locale: initialLocale }: FooterProps) {
     developers: {
       title: t("developers"),
       links: [
-        { name: "Documentation", href: `/${locale}/docs` },
-        { name: "API Reference", href: `/${locale}/docs/api` },
-        { name: "SDKs", href: `/${locale}/docs/sdks` },
-        { name: "Quickstarts", href: `/${locale}/docs/quickstarts` },
-        { name: "Status Page", href: "https://status.skygenesisenterprise.com" },
+        { name: t("documentation"), href: `/${locale}/docs` },
+        { name: t("apiReference"), href: `/${locale}/docs/api` },
+        { name: t("sdks"), href: `/${locale}/docs/sdks` },
+        { name: t("quickstarts"), href: `/${locale}/docs/quickstarts` },
+        { name: t("statusPage"), href: "https://status.skygenesisenterprise.com" },
       ],
     },
     resources: {
-      title: "Resources",
+      title: t("resources"),
       links: [
-        { name: "Blog", href: `/${locale}/blog` },
-        { name: "Case Studies", href: `/${locale}/case-studies` },
-        { name: "Whitepapers", href: `/${locale}/resources/whitepapers` },
-        { name: "Webinars", href: `/${locale}/resources/webinars` },
-        { name: "Community", href: "/discord" },
+        { name: t("blog"), href: `/${locale}/blog` },
+        { name: t("caseStudies"), href: `/${locale}/case-studies` },
+        { name: t("whitepapers"), href: `/${locale}/resources/whitepapers` },
+        { name: t("webinars"), href: `/${locale}/resources/webinars` },
+        { name: t("community"), href: "/discord" },
       ],
     },
     company: {
@@ -200,8 +200,8 @@ export async function Footer({ locale: initialLocale }: FooterProps) {
       links: [
         { name: t("about"), href: `/${locale}/company/about` },
         { name: t("careers"), href: `/${locale}/company/careers` },
-        { name: "Press", href: `/${locale}/company/press` },
-        { name: "Partners", href: `/${locale}/company/partners` },
+        { name: t("press"), href: `/${locale}/company/press` },
+        { name: t("partners"), href: `/${locale}/company/partners` },
         { name: t("contact"), href: `/${locale}/contact` },
       ],
     },
@@ -210,15 +210,15 @@ export async function Footer({ locale: initialLocale }: FooterProps) {
   const prefix = `/${locale}`;
 
   const subscriptionLinks = [
-    { name: "Pricing Plans", href: `${prefix}/pricing` },
-    { name: "Free Trial", href: `${prefix}/trial` },
-    { name: "Enterprise", href: `${prefix}/enterprise` },
+    { name: t("pricingPlans"), href: `${prefix}/pricing` },
+    { name: t("freeTrial"), href: `${prefix}/trial` },
+    { name: t("enterprise"), href: `${prefix}/enterprise` },
   ];
 
   const legalLinks = [
     { name: t("privacy"), href: `${prefix}/privacy` },
     { name: t("terms"), href: `${prefix}/terms` },
-    { name: "Cookie Policy", href: `${prefix}/cookies` },
+    { name: t("cookiePolicy"), href: `${prefix}/cookies` },
     { name: "GDPR", href: `${prefix}/gdpr` },
     { name: t("security"), href: `${prefix}/security` },
   ];
@@ -239,20 +239,11 @@ export async function Footer({ locale: initialLocale }: FooterProps) {
       {/* Main link columns */}
       <div className="mx-auto max-w-7xl px-6 pt-16 pb-10 border-b border-footer-border">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-12">
-          <LinkColumn
-            title={footerLinks.developers?.title || "Developers"}
-            links={footerLinks.developers?.links || []}
-          />
-          <LinkColumn
-            title={footerLinks.resources?.title || "Resources"}
-            links={footerLinks.resources?.links || []}
-          />
-          <LinkColumn
-            title={footerLinks.company?.title || "Company"}
-            links={footerLinks.company?.links || []}
-          />
-          <LinkColumn title="Legal" links={legalLinks} />
-          <LinkColumn title="Get Started" links={subscriptionLinks} />
+          <LinkColumn title={t("developers")} links={footerLinks.developers?.links || []} />
+          <LinkColumn title={t("resources")} links={footerLinks.resources?.links || []} />
+          <LinkColumn title={t("company")} links={footerLinks.company?.links || []} />
+          <LinkColumn title={t("legal")} links={legalLinks} />
+          <LinkColumn title={t("getStarted")} links={subscriptionLinks} />
         </div>
       </div>
 
@@ -276,10 +267,7 @@ export async function Footer({ locale: initialLocale }: FooterProps) {
                 Aether Identity
               </span>
             </Link>
-            <p className="mt-4 text-sm text-footer-link leading-relaxed">
-              Secure identity and access management for the modern enterprise. Self-hosted,
-              open-source, and built for scale.
-            </p>
+            <p className="mt-4 text-sm text-footer-link leading-relaxed">{t("brandDescription")}</p>
             <div className="flex items-center gap-3 mt-6">
               {socialLinks.map((social) => (
                 <Link
@@ -300,7 +288,7 @@ export async function Footer({ locale: initialLocale }: FooterProps) {
                 <span className="animate-pingabsoluteinline-flexh-2w-2rounded-fullbg-green-400opacity-75"></span>
                 <span className="relativeinline-flexrounded-fullh-2w-2bg-green-500"></span>
               </span>
-              All systems operational
+              {t("statusOperational")}
             </Link>
           </div>
         </div>
@@ -311,7 +299,7 @@ export async function Footer({ locale: initialLocale }: FooterProps) {
         <div className="mx-auto max-w-7xl px-6 py-5">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-xs text-footer-muted">
-              &copy; 2026 Aether Identity. All rights reserved.
+              {t("copyright")}
               <span className="mx-2 opacity-40">|</span>
               <Link
                 href="https://skygenesisenterprise.com"
@@ -327,7 +315,7 @@ export async function Footer({ locale: initialLocale }: FooterProps) {
                 href="/pgp"
                 className="hover:text-footer-link-hover transition-colors duration-150"
               >
-                Verify our PGP public key to ensure site authenticity
+                {t("verifyKey")}
               </Link>
             </p>
           </div>

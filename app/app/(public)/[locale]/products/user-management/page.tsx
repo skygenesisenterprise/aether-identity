@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -35,88 +36,28 @@ import {
 } from "lucide-react";
 
 const capabilities = [
-  {
-    icon: UserPlus,
-    title: "User Lifecycle Management",
-    description:
-      "Complete user onboarding, profile management, and offboarding workflows with automated role assignment and deprovisioning.",
-  },
-  {
-    icon: Search,
-    title: "Advanced Directory Search",
-    description:
-      "Powerful search with filters, pagination, and real-time results across millions of user records with sub-millisecond performance.",
-  },
-  {
-    icon: Shield,
-    title: "Role-Based Access Control",
-    description:
-      "Granular permission management with hierarchical roles, custom attributes, and dynamic access policies based on user context.",
-  },
-  {
-    icon: Activity,
-    title: "Real-Time Activity Monitoring",
-    description:
-      "Live dashboard of user activities, session tracking, and behavioral analytics to detect anomalies and ensure compliance.",
-  },
-  {
-    icon: FileText,
-    title: "Comprehensive Audit Trails",
-    description:
-      "Complete history of all user actions, modifications, and system events with tamper-proof logging and export capabilities.",
-  },
-  {
-    icon: Settings,
-    title: "Workflow Automation",
-    description:
-      "Automated user provisioning, approval workflows, and scheduled tasks to reduce manual overhead and ensure consistency.",
-  },
+  { icon: UserPlus, titleKey: "lifecycle", descriptionKey: "lifecycleDesc" },
+  { icon: Search, titleKey: "search", descriptionKey: "searchDesc" },
+  { icon: Shield, titleKey: "rbac", descriptionKey: "rbacDesc" },
+  { icon: Activity, titleKey: "monitoring", descriptionKey: "monitoringDesc" },
+  { icon: FileText, titleKey: "audit", descriptionKey: "auditDesc" },
+  { icon: Settings, titleKey: "automation", descriptionKey: "automationDesc" },
 ];
 
 const metrics = [
-  { value: "10M+", label: "Users supported per instance" },
-  { value: "< 50ms", label: "Directory query latency" },
-  { value: "99.99%", label: "Service availability" },
-  { value: "Zero", label: "Data loss tolerance" },
+  { value: "10M+", labelKey: "usersSupported" },
+  { value: "< 50ms", labelKey: "queryLatency" },
+  { value: "99.99%", labelKey: "availability" },
+  { value: "Zero", labelKey: "dataLoss" },
 ];
 
 const features = [
-  {
-    title: "Bulk Operations",
-    description:
-      "Import, update, or delete thousands of users in a single operation with CSV or JSON upload.",
-    icon: Upload,
-  },
-  {
-    title: "Custom Attributes",
-    description:
-      "Extend user profiles with custom fields, schemas, and validation rules specific to your organization.",
-    icon: Layers,
-  },
-  {
-    title: "Delegated Administration",
-    description:
-      "Grant limited admin access to department managers without full system privileges.",
-    icon: UserCog,
-  },
-  {
-    title: "Password Policies",
-    description:
-      "Configurable password complexity, expiration, history, and multi-factor authentication requirements.",
-    icon: Shield,
-  },
-  {
-    title: "Account Lifecycle",
-    description:
-      "Automated triggers for onboarding, transfers, suspensions, and termination based on HR events.",
-    icon: Calendar,
-  },
-  {
-    title: "Reporting & Analytics",
-    description:
-      "Built-in reports on user activity, compliance status, and administrative actions with export options.",
-    icon: BarChart3,
-  },
+  { titleKey: "bulk", descriptionKey: "bulkDesc", icon: Upload },
+  { titleKey: "attributes", descriptionKey: "attributesDesc", icon: Layers },
+  { titleKey: "delegation", descriptionKey: "delegationDesc", icon: UserCog },
+  { titleKey: "password", descriptionKey: "passwordDesc", icon: Shield },
+  { titleKey: "lifecycle", descriptionKey: "lifecycleDesc", icon: Calendar },
+  { titleKey: "reporting", descriptionKey: "reportingDesc", icon: BarChart3 },
 ];
 
 const complianceStandards = [
@@ -233,26 +174,10 @@ const faqs = [
 ];
 
 const resources = [
-  {
-    icon: FileText,
-    title: "Documentation",
-    description: "Complete API reference and admin guides",
-  },
-  {
-    icon: Settings,
-    title: "Integration Guide",
-    description: "Connect with your existing systems",
-  },
-  {
-    icon: Calendar,
-    title: "Webinar",
-    description: "Advanced user management strategies",
-  },
-  {
-    icon: BarChart3,
-    title: "Case Study",
-    description: "How Enterprise Corp scaled to 500K users",
-  },
+  { icon: FileText, titleKey: "documentation", descriptionKey: "documentationDesc" },
+  { icon: Settings, titleKey: "integration", descriptionKey: "integrationDesc" },
+  { icon: Calendar, titleKey: "webinar", descriptionKey: "webinarDesc" },
+  { icon: BarChart3, titleKey: "caseStudy", descriptionKey: "caseStudyDesc" },
 ];
 
 export default async function UserManagementPage({
@@ -261,6 +186,30 @@ export default async function UserManagementPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "UserManagement" });
+
+  const faqs = [
+    {
+      question: t("faq.directory.title"),
+      answer: t("faq.directory.answer"),
+    },
+    {
+      question: t("faq.bulk.title"),
+      answer: t("faq.bulk.answer"),
+    },
+    {
+      question: t("faq.deprovisioning.title"),
+      answer: t("faq.deprovisioning.answer"),
+    },
+    {
+      question: t("faq.limits.title"),
+      answer: t("faq.limits.answer"),
+    },
+    {
+      question: t("faq.custom.title"),
+      answer: t("faq.custom.answer"),
+    },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -273,26 +222,24 @@ export default async function UserManagementPage({
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                Enterprise User Management
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                Complete Identity Lifecycle Management
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Centralize user provisioning, deprovisioning, and profile management across your
-                entire organization. Scale to millions of users with enterprise-grade performance
-                and security.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
-                <Link href="/docs">
+                <Link href={`/${locale}/docs`}>
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    View Documentation
+                    {t("hero.ctaDocs")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/contact">
+                <Link href={`/${locale}/contact`}>
                   <Button variant="outline" size="lg" className="h-12 px-6 text-base">
-                    Contact Sales
+                    {t("hero.ctaContact")}
                   </Button>
                 </Link>
               </div>
@@ -305,11 +252,13 @@ export default async function UserManagementPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
               {metrics.map((metric) => (
-                <div key={metric.label}>
+                <div key={metric.labelKey}>
                   <div className="text-3xl sm:text-4xl font-semibold text-foreground">
                     {metric.value}
                   </div>
-                  <div className="mt-1 text-sm text-muted-foreground">{metric.label}</div>
+                  <div className="mt-1 text-sm text-muted-foreground">
+                    {t(`metrics.${metric.labelKey}`)}
+                  </div>
                 </div>
               ))}
             </div>
@@ -321,24 +270,25 @@ export default async function UserManagementPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Enterprise-Grade User Management
+                {t("capabilities.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Built for organizations that need complete control over their user identity
-                lifecycle with advanced automation, compliance, and integration capabilities.
+                {t("capabilities.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {capabilities.map((capability) => (
-                <div key={capability.title} className="group">
+                <div key={capability.titleKey} className="group">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-foreground/5 group-hover:bg-foreground/10 transition-colors">
                       <capability.icon className="h-5 w-5 text-foreground" />
                     </div>
-                    <h3 className="text-base font-semibold text-foreground">{capability.title}</h3>
+                    <h3 className="text-base font-semibold text-foreground">
+                      {t(`capabilities.${capability.titleKey}`)}
+                    </h3>
                   </div>
                   <p className="text-sm text-muted-foreground leading-relaxed pl-13">
-                    {capability.description}
+                    {t(`capabilities.${capability.descriptionKey}`)}
                   </p>
                 </div>
               ))}
@@ -351,23 +301,24 @@ export default async function UserManagementPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Everything You Need to Manage Users
+                {t("features.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Comprehensive tools to handle user identity at any scale, from small teams to global
-                enterprises.
+                {t("features.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {features.map((feature) => (
                 <div
-                  key={feature.title}
+                  key={feature.titleKey}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
                 >
                   <feature.icon className="h-8 w-8 text-foreground mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{feature.title}</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    {t(`features.${feature.titleKey}`)}
+                  </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {feature.description}
+                    {t(`features.${feature.descriptionKey}`)}
                   </p>
                 </div>
               ))}
@@ -381,33 +332,15 @@ export default async function UserManagementPage({
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-balance">
-                  Programmatic User Management
+                  {t("code.title")}
                 </h2>
                 <p className="mt-4 text-lg text-background/70 leading-relaxed">
-                  Our REST API and SDKs give you full control over user lifecycle operations.
-                  Automate provisioning, build custom admin portals, or integrate with your existing
-                  tools.
+                  {t("code.description")}
                 </p>
                 <div className="mt-8">
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1.5 text-sm bg-background/10 rounded-md text-background/80">
-                      REST API
-                    </span>
-                    <span className="px-3 py-1.5 text-sm bg-background/10 rounded-md text-background/80">
-                      GraphQL
-                    </span>
-                    <span className="px-3 py-1.5 text-sm bg-background/10 rounded-md text-background/80">
-                      Webhooks
-                    </span>
-                    <span className="px-3 py-1.5 text-sm bg-background/10 rounded-md text-background/80">
-                      SCIM 2.0
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-8">
-                  <Link href="/docs">
+                  <Link href={`/${locale}/docs`}>
                     <Button variant="secondary" size="lg" className="gap-2">
-                      API Reference
+                      {t("code.cta")}
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </Link>
@@ -425,11 +358,10 @@ export default async function UserManagementPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Seamless Integrations
+                {t("integrations.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Connect with your existing enterprise systems for unified identity management across
-                your entire infrastructure.
+                {t("integrations.description")}
               </p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -452,11 +384,10 @@ export default async function UserManagementPage({
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                  Built for Regulated Industries
+                  {t("compliance.title")}
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                  User management designed to meet the stringent security and compliance
-                  requirements of healthcare, finance, government, and enterprise organizations.
+                  {t("compliance.description")}
                 </p>
                 <div className="mt-8 grid grid-cols-2 gap-3">
                   {complianceStandards.map((standard) => (
@@ -498,10 +429,10 @@ export default async function UserManagementPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Frequently Asked Questions
+                {t("faq.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Common questions about Aether User Management.
+                {t("faq.description")}
               </p>
             </div>
             <FaqAccordion faqs={faqs} />
@@ -512,21 +443,25 @@ export default async function UserManagementPage({
         <section className="py-20 lg:py-28 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Resources</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("resources.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Explore our documentation, guides, and best practices for user management.
+                {t("resources.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {resources.map((resource) => (
                 <div
-                  key={resource.title}
+                  key={resource.titleKey}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors cursor-pointer"
                 >
                   <resource.icon className="h-8 w-8 text-foreground mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{resource.title}</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    {t(`resources.${resource.titleKey}`)}
+                  </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {resource.description}
+                    {t(`resources.${resource.descriptionKey}`)}
                   </p>
                 </div>
               ))}
@@ -539,22 +474,19 @@ export default async function UserManagementPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Take Control of Your User Identity
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Start managing your users with enterprise-grade security, compliance, and automation
-                capabilities.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/docs">
+                <Link href={`/${locale}/docs`}>
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                    Get Started
+                    {t("cta.getStarted")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/contact">
+                <Link href={`/${locale}/contact`}>
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    Contact Sales
+                    {t("cta.contactSales")}
                   </Button>
                 </Link>
               </div>

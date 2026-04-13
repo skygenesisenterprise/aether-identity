@@ -86,7 +86,15 @@
     "comparison": {
       "title": "Comment Nous Comparons",
       "description": "Découvrez pourquoi les organisations leaders choose Aether plutôt que les fournisseurs d'identité traditionnels.",
-      "feature": "Fonctionnalité"
+      "feature": "Fonctionnalité",
+      "selfHosted": "Auto-hébergé",
+      "oauth": "OAuth 2.0 / OIDC",
+      "mfa": "Support MFA",
+      "federation": "Fédération utilisateurs",
+      "rbac": "RBAC/ABAC",
+      "audit": "Journalisation d'audit",
+      "noLockin": "Zéro vendor lock-in",
+      "sla": "Garantie SLA"
     },
     "code": {
       "title": "Intégrez en Minutes, Pas en Semaines",
@@ -127,11 +135,39 @@
     },
     "faq": {
       "title": "Questions Fréquentes",
-      "description": "Questions courantes sur Aether Identity et nos solutions entreprise."
+      "description": "Questions courantes sur Aether Identity et nos solutions entreprise.",
+      "keycloak": {
+        "title": "Comment Aether se compares-t-il à Keycloak?",
+        "answer": "Aether offre une architecture plus moderne avec de meilleures performances (<15ms validation de token), une configuration plus facile et un support entreprise. Contrairement à Keycloak, Aether fournit des garanties SLA et un support dédié."
+      },
+      "migrate": {
+        "title": "Puis-je migrer depuis Auth0 ou Okta?",
+        "answer": "Oui, nous fournissons des outils de migration et une assistance pour importer vos utilisateurs, applications et configurations depuis Auth0, Okta ou tout autre fournisseur OAuth. Contactez notre équipe pour un plan de migration personnalisé."
+      },
+      "offline": {
+        "title": "Que se passe-t-il si je perdu la connectivité internet?",
+        "answer": "Aether support les déploiements air-gapped et peut fonctionner entièrement hors ligne. Vos services d'authentification restent fonctionnels même sans accès internet."
+      },
+      "free": {
+        "title": "Y a-t-il un niveau gratuit?",
+        "answer": "Oui, Aether Community Edition est gratuit et open source. Pour les fonctionnalités entreprise, garanties SLA et support, contactez notre équipe commerciale."
+      },
+      "updates": {
+        "title": "À quelle fréquenceissez-vous des mises à jour?",
+        "answer": "Nous publions des mises à jour de sécurité mensuelles et des publications de fonctionnalités trimestrielles. Toutes les mises à jour sont soigneusement testées et documentées."
+      }
     },
     "resources": {
       "title": "Ressources",
-      "description": "Explorez notre documentation, guides et dernières recherches sur la sécurité d'identité."
+      "description": "Explorez notre documentation, guides et dernières recherches sur la sécurité d'identité.",
+      "whitepaper": "Livre Blanc",
+      "whitepaperDesc": "Guide d'Architecture d'Identité Enterprise",
+      "ebook": "E-book",
+      "ebookDesc": "Implémentation de la Sécurité Zero Trust",
+      "webinar": "Webinaire",
+      "webinarDesc": "Migration depuis les Fournisseurs d'Identité Hérités",
+      "caseStudy": "Étude de Cas",
+      "caseStudyDesc": "Comment TechFlow a Réduit la Latence d'Authentification de 80%"
     },
     "partners": {
       "title": "Partenaires Techniques",
@@ -139,11 +175,25 @@
     },
     "team": {
       "title": "Construit Par des Experts",
-      "description": "Notre équipe apporte des décennies d'expérience en identité, sécurité et infrastructure d'entreprise."
+      "description": "Notre équipe apporte des décennies d'expérience en identité, sécurité et infrastructure d'entreprise.",
+      "alex": "Alex Chen",
+      "alexRole": "PDG & Fondateur",
+      "sarah": "Sarah Miller",
+      "sarahRole": "CTO",
+      "james": "James Wilson",
+      "jamesRole": "VP Ingénierie",
+      "emily": "Emily Davis",
+      "emilyRole": "Responsable de la Sécurité"
     },
     "updates": {
       "title": "Mises à Jour Récentes",
-      "description": "Restez à jour avec les dernières fonctionnalités et améliorations."
+      "description": "Restez à jour avec les dernières fonctionnalités et améliorations.",
+      "v240": "Mars 2026",
+      "v240Desc": "Support WebAuthn et flux MFA améliorés",
+      "v230": "Février 2026",
+      "v230Desc": "Journalisation d'audit améliorée et rapports de conformité",
+      "v220": "Janvier 2026",
+      "v220Desc": "Améliorations de l'opérateur Kubernetes et des charts Helm"
     },
     "cta": {
       "title": "Prenez le Contrôle de Votre Infrastructure d'Identité",
@@ -155,6 +205,7 @@
       "product": "Produit",
       "solutions": "Solutions",
       "developers": "Développeurs",
+      "resources": "Ressources",
       "pricing": "Tarifs",
       "blog": "Blog",
       "company": "Entreprise",
@@ -165,7 +216,26 @@
       "privacy": "Politique de Confidentialité",
       "terms": "Conditions d'Utilisation",
       "security": "Sécurité",
-      "copyright": "© 2026 Sky Genesis Enterprise. Tous droits réservés."
+      "copyright": "© 2026 Sky Genesis Enterprise. Tous droits réservés.",
+      "documentation": "Documentation",
+      "apiReference": "Référence API",
+      "sdks": "SDKs",
+      "quickstarts": "Démarrages Rapides",
+      "statusPage": "Page de Statut",
+      "caseStudies": "Études de Cas",
+      "whitepapers": "Livres Blancs",
+      "webinars": "Webinaires",
+      "community": "Communauté",
+      "press": "Presse",
+      "partners": "Partenaires",
+      "pricingPlans": "Plans Tarifaires",
+      "freeTrial": "Essai Gratuit",
+      "enterprise": "Enterprise",
+      "cookiePolicy": "Politique des Cookies",
+      "getStarted": "Commencer",
+      "brandDescription": "Gestion d'identité et d'accès pour l'entreprise moderne. Auto-hébergement, open-source et conçu pour la mise à l'échelle.",
+      "statusOperational": "Tous les systèmes opérationnels",
+      "verifyKey": "Vérifiez notre clé publique PGP pour assurer l'authenticité du site"
     }
   },
   "Header": {
@@ -344,51 +414,213 @@
     },
     "cta": {
       "title": "Simplifiez Votre Authentification",
-      "description": "Offrez à vos utilisateurs une expérience de connexion transparente sur toutes les应用程序. Essayez Universal Login aujourd'hui.",
+      "description": "Offrez à vos utilisateurs une expérience de connexion transparente sur toutes les applications. Essayez Universal Login aujourd'hui.",
       "getStarted": "Commencer",
       "contactSales": "Contacter les Ventes"
     }
   },
+  "Enterprise": {
+    "hero": {
+      "badge": "Solutions Entreprise",
+      "title": "Identité d'Entreprise, Sans Compromis",
+      "description": "Gestion d'identité complète pour grandes organisations. Support dédié, mise à l'échelle illimitée et certifications de sécurité demanded par votre industrie.",
+      "ctaPlans": "Voir les Tarifs",
+      "ctaContact": "Contacter les Ventes"
+    },
+    "features": {
+      "title": "Conçu pour les Entreprises",
+      "description": "Tout ce dont votre organisation a besoin pour une gestion d'identité complète à grande échelle.",
+      "security": "Sécurité d'Entreprise",
+      "securityDesc": "Chiffrement de qualité bancaire, conformité SOC 2 Type II, et protection avancée contre les menaces pour vos applications les plus sensibles.",
+      "support": "Support Dédié",
+      "supportDesc": "Support prioritaire 24/7 avec responsables de compte dédiés et temps de réponse garantis pour les clients entreprise.",
+      "scaling": "Mise à l'Échelle Illimitée",
+      "scalingDesc": "Montechez à des millions d'utilisateurs avec notre architecture distribuée. Pas de limites arbitraires sur les utilisateurs, applications ou appels API.",
+      "sla": "SLA 99,99%",
+      "slaDesc": "Garantie de disponibilité leader de l'industrie avec responsabilités financières. Fiabilité de qualité entreprise sur laquelle vous pouvez compter.",
+      "mfa": "MFA Avancé",
+      "mfaDesc": "TOTP, WebAuthn, notifications push, SMS et vérification par email avec politiques adaptatives basées sur les risques.",
+      "federation": "Fédération d'Utilisateurs",
+      "federationDesc": "Intégration transparente avec Active Directory, LDAP et fournisseurs d'identité externes."
+    },
+    "included": {
+      "title": "Tout Inclus",
+      "description": "Tous les tarifs incluent nos fonctionnalités de base avec fiabilité de qualité entreprise.",
+      "global": "Infrastructure Globale",
+      "globalDesc": "Déployez sur plusieurs régions avec basculement automatique",
+      "analytics": "Analytique Avancée",
+      "analyticsDesc": "Tableaux de bord en temps réel avec rapports et alertes personnalisés",
+      "compliance": "Rapports de Conformité",
+      "complianceDesc": "Rapports de conformité SOC 2, HIPAA et GDPR automatisés",
+      "performance": "Haute Performance",
+      "performanceDesc": "Validation de token < 15ms avec mise à l'échelle horizontale",
+      "private": "Déploiement Privé",
+      "privateDesc": "Infrastructure dédiée avec isolation réseau",
+      "billing": "Facturation Flexible",
+      "billingDesc": "Contrats annuels ou pluriannuels avec remises de volume"
+    },
+    "plans": {
+      "title": "Tarifs Entreprise",
+      "description": "Choisissez le tarif qui correspond à votre organisation. Tous les tarifs incluent notre plateforme d'identité principale.",
+      "starter": "Starter",
+      "professional": "Professionnel",
+      "enterprise": "Entreprise",
+      "custom": "Sur Mesure",
+      "starterDesc": "Pour les petites équipes qui débutent avec l'identité",
+      "professionalDesc": "Pour les organisations en croissance avec besoins avancés",
+      "enterpriseDesc": "Pour les grandes organisations à grande échelle",
+      "mostPopular": "Plus Populaire",
+      "cta": "Contacter les Ventes",
+      "starterFeatures": [
+        "Hasta 10 000 utilisateurs",
+        "Support MFA basique",
+        "Support communautaire",
+        "Documentation standard",
+        "Mises à jour mensuelles"
+      ],
+      "professionalFeatures": [
+        "Hasta 100 000 utilisateurs",
+        "MFA avanzado (TOTP, WebAuthn)",
+        "Support email prioritaire",
+        "Intégration Active Directory",
+        "Mises à jour trimestrielles",
+        "Journalisation d'audit"
+      ],
+      "enterpriseFeatures": [
+        "Utilisateurs illimités",
+        "Toutes les méthodes MFA",
+        "Support dédié 24/7",
+        "Garantie SLA (99,99%)",
+        "Intégrations sur mesure",
+        "Revue de sécurité",
+        "Responsable de compte dédié",
+        "Déploiement air-gappé"
+      ]
+    },
+    "industries": {
+      "title": "Solutions par Industrie",
+      "description": "Gestion d'identité spécialisée pour industries réglementées.",
+      "financial": "Services Financiers",
+      "financialDesc": "Banque, assurance et fintech avec conformité réglementaire",
+      "healthcare": "Santé",
+      "healthcareDesc": "Identité conforme HIPAA pour protection des données patients",
+      "government": "Gouvernement",
+      "governmentDesc": "Solutions FedRAMP pour services aux citoyens",
+      "technology": "Technologie",
+      "technologyDesc": "Plateformes SaaS nécessitant sécurité de qualité entreprise"
+    },
+    "testimonials": {
+      "title": "Approuvé par les Leaders de l'Industrie",
+      "description": "Découvrez pourquoi les grandes entreprises choisissent Aether pour leurs besoins d'identité.",
+      "quote1": "Aether Enterprise nous a donné un contrôle complet sur notre infrastructure d'identité tout en fournit la fiabilité dont nos services financiers ont besoin.",
+      "author1": "Jean-Pierre Dubois",
+      "role1": "RSSI",
+      "company1": "Banque Suisse",
+      "quote2": "La migration depuis Okta a été transparente. Leur équipe a tout géré, et nous avons réduit nos coûts d'authentification de 60%.",
+      "author2": "Marie Lambert",
+      "role2": "VP Ingénierie",
+      "company2": "TechCorp Europe",
+      "quote3": "Le SLA 99,99% et le support dédié nous donnent la confiance pour gérer des millions de transactions quotidiennes.",
+      "author3": "Hans Mueller",
+      "role3": "CTO",
+      "company3": "GlobalPay"
+    },
+    "compliance": {
+      "title": "Conformité Entreprise",
+      "description": "Répondez aux exigences de sécurité et conformit�� les plus strictes avec notre plateforme d'identité de qualité entreprise.",
+      "soc2": "SOC 2 Type II",
+      "gdpr": "Conforme GDPR",
+      "hipaa": "Conforme HIPAA",
+      "iso": "ISO 27001",
+      "fedramp": "FedRAMP Prêt",
+      "pci": "PCI DSS",
+      "encryptionRest": "Chiffrement au repos",
+      "encryptionTransit": "Chiffrement en transit",
+      "deploymentReady": "Déploiement prêt",
+      "auditTrails": "Piste complète"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur nos tarifs entreprise et services.",
+      "included": {
+        "title": "Qu'est-ce qui est inclus dans le tarif Entreprise?",
+        "answer": "Le tarif Entreprise inclut des utilisateurs illimités, toutes les méthodes MFA, un support dédié 24/7, une garantie SLA, des intégrations sur mesure, des revues de sécurité, un responsable de compte dédié et des options de déploiement air-gappé."
+      },
+      "contract": {
+        "title": "Peut-on obtenir un contrat sur mesure?",
+        "answer": "Oui, nous offrons des termes de contrat flexibles incluant des options annuelles et pluriannuelles. Contactez notre équipe commerciale pour discuter de vos besoins spécifiques."
+      },
+      "onpremise": {
+        "title": "Proposez-vous un déploiement sur premise?",
+        "answer": "Oui, nous prenons en charge les déploiements entièrement sur premise, cloud et hybrides. Notre tarif entreprise inclut le déploiement air-gappé pour les organisations avec des exigences de sécurité strictes."
+      },
+      "support": {
+        "title": "Quel type de support fournissez-vous?",
+        "answer": "Les clients entreprise reçoivent un support prioritaire 24/7 avec responsables de compte dédiés, temps de réponse garantis et accès à notre équipe de sécurité pour les revues d'architecture."
+      },
+      "migration": {
+        "title": "Peut-on migrer depuis notre fournisseur actuel?",
+        "answer": "Oui, nous fournissons une assistance complète à la migration incluant la migration des utilisateurs, le transfert de configuration des applications et le travail d'intégration personnalisé sans coût supplémentaire."
+      }
+    },
+    "resources": {
+      "title": "Ressources Entreprise",
+      "description": "Documentation, guides et ressources pour vous aider à démarrer.",
+      "architecture": "Guide d'Architecture Entreprise",
+      "architectureDesc": "Bonnes pratiques pour l'infrastructure d'identité",
+      "security": "Livre Blanc de Sécurité",
+      "securityDesc": "Modèle de sécurité détaillé et informations de conformité",
+      "demo": "Demander une Démo",
+      "demoDesc": "Planifiez une présentation personnalisée du produit",
+      "contact": "Contacter les Ventes",
+      "contactDesc": "Parlez à notre équipe entreprise de vos besoins"
+    },
+    "cta": {
+      "title": "Prêt à Commencer?",
+      "description": "Contactez notre équipe entreprise pour discuter de vos besoins de gestion d'identité.",
+      "cta": "Contacter les Ventes"
+    }
+  },
   "SSO": {
     "hero": {
-      "badge": "SSO d'Entreprise",
-      "title": "Single Sign-On Universel pour Votre Infrastructure",
-      "description": "Connectez toutes vos applications via une passerelle d'authentification unifiée. SAML, OAuth et OpenID Connect avec support complet et zéro vendor lock-in.",
+      "badge": "SSO Enterprise",
+      "title": "Authentification Unique Universelle pour Votre Infrastructure",
+      "description": "Connectez toutes vos applications via une passerelle d'authentification unifiée. SAML, OAuth et OpenID Connect avec support complet des protocoles et zéro vendor lock-in.",
       "ctaDocs": "Voir la Documentation",
       "ctaGithub": "Dépôt GitHub"
     },
     "metrics": {
       "ssoLatency": "Latence de redirection SSO",
       "availability": "Disponibilité du service",
-      "integrations": "Intégrations applicatives",
-      "downtime": "Temps d'arrêt sur 24 mois"
+      "integrations": "Intégrations d'apps",
+      "downtime": "Temps d'arrêt en 24 mois"
     },
     "capabilities": {
-      "title": "Tout Ce Dont Vous Besoin pour le SSO d'Entreprise",
-      "description": "Fédération d'identité complète qui fonctionne avec votre infrastructure existante et s'adapte à votre organisation.",
-      "universalSso": "Single Sign-On Universel",
-      "universalSsoDesc": "Authentifiez-vous une fois, accédez à tout. SSO transparent sur web, mobile et applications bureau.",
-      "identityProtocols": "Protocoles d'Identité d'Entreprise",
-      "identityProtocolsDesc": "Support complet pour SAML 2.0, OAuth 2.0 et OpenID Connect. Intégrez avec tout fournisseur d'identité.",
+      "title": "Tout Ce Dont Vous Avez Besoin pour le SSO Enterprise",
+      "description": "Fédération d'identité complète qui fonctionne avec votre infrastructure existante et évolue avec votre organisation.",
+      "universalSso": "Authentification Unique Universelle",
+      "universalSsoDesc": "Authentifiez-vous une fois, accédez à tout. SSO transparent sur les applications web, mobile et bureau.",
+      "identityProtocols": "Protocoles d'Identité Enterprise",
+      "identityProtocolsDesc": "Support complet pour SAML 2.0, OAuth 2.0 et OpenID Connect. Intégrez avec tout fournisseur d'identité ou application.",
       "adaptiveMfa": "Authentification Multi-Facteurs Adaptive",
-      "adaptiveMfaDesc": "MFA basée sur les risques avec TOTP, WebAuthn, SMS, email et notifications push.",
-      "userManagement": "Gestion Centralisée des Utilisateurs",
-      "userManagementDesc": "Répertoire utilisateur unifié avec synchronisation de groupes, mappage d'attributs et contrôle d'accès basé sur les rôles.",
+      "adaptiveMfaDesc": "MFA basé sur les risques avec TOTP, WebAuthn, SMS, email et notifications push. Authentification progressive quand nécessaire.",
+      "userManagement": "Gestion Utilisateur Centralisée",
+      "userManagementDesc": "Répertoire utilisateur unifié avec synchronisation de groupes, mapping d'attributs et contrôle d'accès basé sur les rôles.",
       "appGateway": "Passerelle d'Application",
-      "appGatewayDesc": "Proxy inverse avec authentification intégrée pour applications legacy. Protégez les services internes sans modifications de code.",
-      "sessionFederation": "Fédération de Sessions",
-      "sessionFederationDesc": "État de session partagé entre applications. Une connexion se propage instantanément."
+      "appGatewayDesc": "Proxy inverse avec authentification intégrée pour les applications legacy. Protégez les services internes sans modification de code.",
+      "sessionFederation": "Fédération de Session",
+      "sessionFederationDesc": "État de session partagé entre les applications. Une connexion se propage instantanément partout."
     },
     "features": {
       "title": "Support des Protocoles",
-      "description": "Protocoles standard pour une compatibilité maximale avec vos applications et fournisseurs d'identité existants.",
+      "description": "Protocoles standard de l'industrie pour une compatibilité maximale avec vos applications et fournisseurs d'identité existants.",
       "samlSpIdp": "SAML SP & IdP",
-      "samlSpIdpDesc": "Agir en tant que Fournisseur de Services et Fournisseur d'Identité",
+      "samlSpIdpDesc": "Agissez en tant que Fournisseur de Services et Fournisseur d'Identité",
       "oauth": "OAuth 2.0 / OIDC",
-      "oauthDesc": "Autorisation moderne avec support complet des protocoles",
+      "oauthDesc": "Autorisation moderne avec support complet du protocole",
       "identityBrokering": "Intermédiation d'Identité",
-      "identityBrokeringDesc": "Connectez plusieurs IdPs externes via une passerelle unique",
-      "attributeMapping": "Mappage d'Attributs",
+      "identityBrokeringDesc": "Connectez plusieurs IdPs externes via une seule passerelle",
+      "attributeMapping": "Mapping d'Attributs",
       "attributeMappingDesc": "Transformez les données utilisateur entre systèmes d'identité",
       "trustChain": "Gestion de Chaîne de Confiance",
       "trustChainDesc": "Configurez et gérez les relations d'identité de confiance",
@@ -397,8 +629,15 @@
     },
     "comparison": {
       "title": "Comment Nous Comparons",
-      "description": "Voyez pourquoi les organisations choisissent Aether SSO plutôt que les alternatives cloud uniquement.",
-      "feature": "Fonctionnalité"
+      "description": "Découvrez pourquoi les organisations choisissent Aether SSO plutôt que les alternatives cloud uniquement.",
+      "feature": "Fonctionnalité",
+      "selfHosted": "SSO Auto-hébergé",
+      "saml": "Support SAML 2.0",
+      "oidc": "OIDC / OAuth 2.0",
+      "brokering": "Intermédiation d'Identité",
+      "gateway": "Passerelle d'Application",
+      "plugins": "Plugins IdP Personnalisés",
+      "pricing": "Pas de tarification par utilisateur"
     },
     "code": {
       "title": "Intégrez en Minutes",
@@ -409,47 +648,291 @@
       "title": "Cas d'Usage Courants",
       "description": "Architecture flexible gère même les scénarios d'identité les plus complexes.",
       "multiIdp": "Agrégation Multi-IdP",
-      "multiIdpDesc": "Agrégez plusieurs fournisseurs d'identité (Azure AD, Okta, IdPs personnalisés) en un point d'authentification unique.",
+      "multiIdpDesc": "Agrégez plusieurs fournisseurs d'identité (Azure AD, Okta, IdPs personnalisés) en un seul point d'authentification pour toutes vos applications.",
       "legacyApp": "Protection des Applications Legacy",
-      "legacyAppDesc": "Ajoutez authentication aux applications sans support des protocoles modernes via la passerelle proxy inverse intégrée.",
+      "legacyAppDesc": "Ajoutez de l'authentification aux applications qui ne supportent pas les protocoles modernes en utilisant la passerelle proxy inverse intégrée.",
       "b2bPartner": "Accès Partenaires B2B",
-      "b2bPartnerDesc": "Activez l'authentification sécurisée des partenaires via fédération SAML. Contrôlez l'accès partenaire sans gérer d'utilisateurs externes.",
-      "multiRegion": "Déploiement Multi-Région",
-      "multiRegionDesc": "Déployez des nœuds SSO à travers les régions avec état de session partagé pour un accès global avec faible latence."
-    },
-    "faq": {
-      "title": "Questions Fréquentes",
-      "description": "Questions courantes sur Aether SSO."
-    },
-    "cta": {
-      "title": "Prêt à Moderniser Votre SSO?",
-      "description": "Déployez Aether SSO et gagnez un contrôle complet sur votre infrastructure d'authentification. Open source, auto-hébergé, enterprise-ready.",
-      "getStarted": "Commencer",
-      "contactSales": "Contacter les Ventes"
+      "b2bPartnerDesc": "Permettez l'authentification partenaire sécurisée via fédération SAML. Contrôlez l'accès partenaire sans gérer des utilisateurs externes.",
+      "multiRegion": "Déploiement Multi-Régions",
+      "multiRegionDesc": "Authentification régionale avec synchronisation globale. Identité cohérente peu importe où vos utilisateurs se trouvent."
     },
     "faq": {
       "title": "Questions Fréquentes",
       "description": "Questions courantes sur Aether SSO.",
       "diff": {
-        "title": "Comment Aether SSO diffère-t-il d'Auth0 ou Okta?",
-        "answer": "Aether SSO est auto-hébergé, vous donnant un contrôle complet sur votre infrastructure d'identity. Contrairement aux services cloud, il n'y a pas de frais par utilisateur, et vos données ne quittent jamais votre réseau. C'ideal pour les organisations avec des exigences strictes de souveraineté des données."
+        "title": "En quoi Aether SSO diffère-t-il des solutions SSO traditionnelles?",
+        "answer": "Aether SSO offre une flexibilité supérieure avec un déploiement auto-hébergé qui vous donne le contrôle complet de vos données. Contrairement aux solutions cloud-only, il n'y a pas de limitation par utilisateur et vos données ne quittent jamais votre infrastructure."
       },
       "multiIdp": {
-        "title": "Aether peut-il fédérer avec plusieurs fournisseurs d'identité?",
-        "answer": "Oui, Aether supporte l'intermédiation d'identité - vous pouvez connecter plusieurs IdPs (Okta, Azure AD, Ping Identity, etc.) et présenter une interface d'authentification unifiée à vos applications."
+        "title": "Peut-on connecter plusieurs fournisseurs d'identité?",
+        "answer": "Oui, Aether SSO supporte la connexion simultanée de plusieurs IdPs (Azure AD, Okta, Google Workspace, etc.). Les utilisateurs peuvent s'authentifier avec leur fournisseur préféré tout en ayant accès à toutes les applications."
       },
       "legacy": {
-        "title": "Aether fonctionne-t-il avec les applications legacy?",
-        "answer": "Oui, la passerelle d'application intégrée peut protéger toute application HTTP sans nécessiter de modifications de code. Elle gère la gestion des sessions et peut même faire le pont entre SAML et OAuth."
+        "title": "Les applications legacy peuvent-elles utiliser Aether SSO?",
+        "answer": "Absolument. La passerelle d'application intégrée permet d'ajouter l'authentification SSO à n'importe quelle application sans modification de code, via un proxy reverse configuré."
       },
       "migration": {
-        "title": "Comment migrer depuis une solution SSO existante?",
-        "answer": "Nous fournissons des outils de migration pour Okta, Auth0 et Azure AD. Notre équipe peut assister avec le transfert de métadonnées, le mappage d'attributs et les tests pour assurer une transition en douceur."
+        "title": "La migration depuis Okta ou Auth0 est-elle complexe?",
+        "answer": "Non. Nous fournissons des outils de migration et une assistance pour importer votre configuration. La plupart des migrations prennent moins d'une semaine."
       },
       "limits": {
-        "title": "Y a-t-il une limite sur le nombre d'applications?",
-        "answer": "Non, Aether n'a pas de limites d'applications. Vous pouvez enregistrer autant de connexions SP ou IdP que nécessaire. Le facteur limitant est la capacité de votre infrastructure."
+        "title": "Y a-t-il des limites sur le nombre d'applications ou d'utilisateurs?",
+        "answer": "Non. Aether SSO est conçu pour évoluer horizontalement. Il n'y a pas de limites arbitraires sur les applications ou les utilisateurs."
       }
+    },
+    "cta": {
+      "title": "Sécurisez Vos Connexions Aujourd'hui",
+      "description": "Déployez Aether SSO et donnez à vos utilisateurs un accès transparent et sécurisé à toutes vos applications.",
+      "getStarted": "Commencer",
+      "contactSales": "Contacter les Ventes"
+    }
+  },
+  "UserManagement": {
+    "hero": {
+      "badge": "Gestion Utilisateurs Enterprise",
+      "title": "Gestion Complète du Cycle de Vie Identité",
+      "description": "Centralisez le provisionnement, le déprovisionnement et la gestion des profils dans toute votre organisation. Montez à des millions d'utilisateurs avec une performance et une sécurité de qualité entreprise.",
+      "ctaDocs": "Voir la Documentation",
+      "ctaContact": "Contacter les Ventes"
+    },
+    "metrics": {
+      "usersSupported": "Utilisateurs supportés par instance",
+      "queryLatency": "Latence de requête répertoire",
+      "availability": "Disponibilité du service",
+      "dataLoss": "Tolérance perte de données"
+    },
+    "capabilities": {
+      "title": "Gestion Utilisateurs de Qualité Enterprise",
+      "description": "Conçu pour les organisations qui ont besoin d'un contrôle complet sur leur cycle de vie identité utilisateur avec automatisation avancée, conformité et capacités d'intégration.",
+      "lifecycle": "Gestion du Cycle de Vie Utilisateur",
+      "lifecycleDesc": "Flux de travail complets d'onboarding, gestion de profil et offboarding avec attribution de rôle et déprovisionnement automatisés.",
+      "search": "Recherche Répertoire Avancée",
+      "searchDesc": "Recherche puissante avec filtres, pagination et résultats en temps réel sur des millions d'enregistrements utilisateur avec performance sous-milliseconde.",
+      "rbac": "Contrôle d'Accès Basé sur les Rôles",
+      "rbacDesc": "Gestion granulaire des permissions avec rôles hiérarchiques, attributs personnalisés et politiques d'accès dynamiques basées sur le contexte utilisateur.",
+      "monitoring": "Surveillance d'Activité en Temps Réel",
+      "monitoringDesc": "Tableau de bord en direct des activités utilisateur, suivi de session et analytique comportementale pour détecter les anomalies et assurer la conformité.",
+      "audit": "Pistes d'Audit Complètes",
+      "auditDesc": "Historique complet de toutes les actions utilisateur, modifications et événements système avec journalisation inviolable et capacités d'export.",
+      "automation": "Automatisation des Flux de Travail",
+      "automationDesc": "Provisionnement utilisateur automatisé, flux de travail d'approbation et tâches planifiées pour réduire la charge manuelle et assurer la cohérence."
+    },
+    "features": {
+      "title": "Tout Ce Dont Vous Avez Besoin pour Gérer les Utilisateurs",
+      "description": "Outils complets pour gérer l'identité utilisateur à qualquer échelle, des petites équipes aux entreprises mondiales.",
+      "bulk": "Opérations en Masse",
+      "bulkDesc": "Importez, mettez à jour ou supprimez des milliers d'utilisateurs en une seule opération avec upload CSV ou JSON.",
+      "attributes": "Attributs Personnalisés",
+      "attributesDesc": "Étendez les profils utilisateur avec des champs personnalisés, schémas et règles de validation spécifiques à votre organisation.",
+      "delegation": "Administration Déléguée",
+      "delegationDesc": "Accordez un accès admin limité aux managers de département sans privilèges système complets.",
+      "password": "Politiques de Mot de Passe",
+      "passwordDesc": "Complexité, expiration, historique et exigences MFA configurables.",
+      "lifecycle": "Cycle de Vie du Compte",
+      "lifecycleDesc": "Déclencheurs automatisés pour onboarding, transferts, suspensions et terminaison basés sur les événements RH.",
+      "reporting": "Rapports et Analytique",
+      "reportingDesc": "Rapports intégrés sur l'activité utilisateur, état de conformité et actions administratives avec options d'export."
+    },
+    "code": {
+      "title": "Gestion Utilisateur Programmatique",
+      "description": "Notre API REST et SDKs vous donnent un contrôle complet sur les opérations du cycle de vie utilisateur. Automatisez le provisionnement, construisez des portals admin personnalisés ou intégrez avec vos outils existants.",
+      "cta": "Référence API"
+    },
+    "integrations": {
+      "title": "Intégrations Transparentes",
+      "description": "Connectez-vous à vos systèmes enterprise existants pour une gestion d'identité unifiée sur toute votre infrastructure."
+    },
+    "compliance": {
+      "title": "Conçu pour les Industries Réglementées",
+      "description": "Gestion utilisateur conçue pour répondre aux exigences strictes de sécurité et conformité des organisations de santé, finance, gouvernement et entreprise."
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur la gestion utilisateur dans Aether Identity.",
+      "directory": {
+        "title": "Aether peut-il s'intégrer avec notre répertoire existant?",
+        "answer": "Oui, Aether s'intègre avec Active Directory, LDAP, et autres répertoires d'entreprise. Les utilisateurs peuvent être synchronisés bidirectionnellement ou federation peuvent être utilisées."
+      },
+      "bulk": {
+        "title": "Peut-on importer en masse les utilisateurs depuis notre système RH?",
+        "answer": "Oui, notre fonctionnalité d'import en masse supporte les formats CSV et JSON avec mapping de champs, règles de validation et rapports d'erreurs."
+      },
+      "deprovisioning": {
+        "title": "Comment gérez-vous la déprovision des utilisateurs?",
+        "answer": "Quand un utilisateur est terminé, Aether révoque automatiquement tous les accès, le retire des groupes, archive ses données et peut déclencher des flux de travail offboarding."
+      },
+      "limits": {
+        "title": "Y a-t-il une limite sur le nombre d'utilisateurs que nous pouvons gérer?",
+        "answer": "Aether User Management est conçu pour gérer des millions d'utilisateurs. Notre architecture distribuée assure des performances cohérentes."
+      },
+      "custom": {
+        "title": "Peut-on personaliser le modèle de données utilisateur?",
+        "answer": "Oui, vous pouvez définir des attributs personnalisés, schémas et règles de validation qui correspondent aux exigences de votre organisation."
+      },
+      "api": {
+        "title": "Y a-t-il une API pour la gestion programmatique?",
+        "answer": "Oui, notre API REST complète permet toutes les opérations de gestion utilisateur. Vous pouvez aussi utiliser nos SDKs pour les intégrations."
+      }
+    },
+    "resources": {
+      "title": "Ressources",
+      "description": "Explorez notre documentation, guides et bonnes pratiques pour la gestion des utilisateurs.",
+      "documentation": "Documentation",
+      "documentationDesc": "Référence API complète et guides admin",
+      "integration": "Guide d'Intégration",
+      "integrationDesc": "Connectez-vous à vos systèmes existants",
+      "webinar": "Webinaire",
+      "webinarDesc": "Stratégies avancées de gestion des utilisateurs",
+      "caseStudy": "Étude de Cas",
+      "caseStudyDesc": "Comment Enterprise Corp a géré 500K utilisateurs"
+    },
+    "cta": {
+      "title": "Prenez le Contrôle de Votre Identité Utilisateur",
+      "description": "Commencez à gérer vos utilisateurs avec sécurité, conformité et capacités d'automation de qualité entreprise.",
+      "getStarted": "Commencer",
+      "contactSales": "Contacter les Ventes"
+    }
+  },
+  "Organizations": {
+    "hero": {
+      "badge": "Fonctionnalité Enterprise",
+      "title": "Gestion des Organisations à Grande Échelle",
+      "description": "Gérez plusieurs organisations, équipes et hiérarchies depuis un seul panneau de contrôle. Conçu pour les entreprises avec filiales, franchises ou structures organisationnelles complexes.",
+      "ctaDocs": "Voir la Documentation",
+      "ctaContact": "Contacter les Ventes"
+    },
+    "metrics": {
+      "organizations": "Organisations",
+      "usersPerOrg": "Utilisateurs par org",
+      "permissionCheck": "Vérification permission",
+      "sla": "Disponibilité SLA"
+    },
+    "features": {
+      "title": "Contrôle Complet des Organisations",
+      "description": "Tout ce dont vous avez besoin pour gérer des structures organisationnelles complexes avec sécurité et conformité intégrées.",
+      "multiOrg": "Gestion Multi-Organisations",
+      "multiOrgDesc": "Créez et gérez plusieurs organisations depuis un seul tableau de bord. Parfait pour les entreprises avec filiales, franchises ou plusieurs unités commerciales.",
+      "teamHierarchy": "Hiérarchie d'Équipe",
+      "teamHierarchyDesc": "Définissez des structures hiérarchiques avec départements imbriqués, lignes de reporting et groupes interfonctionnels.",
+      "userLifecycle": "Gestion du Cycle de Vie Utilisateur",
+      "userLifecycleDesc": "Automatisez l'intégration et la désintégration des utilisateurs sur toutes les applications connectées avec des flux de travail personnalisables.",
+      "roles": "Gestion des Rôles et Permissions",
+      "rolesDesc": "Définissez des rôles et permissions granulaires avec héritage, délégation et contrôles d'accès basés sur des attributs personnalisés.",
+      "security": "Sécurité au Niveau Organisation",
+      "securityDesc": "Appliquez des politiques de sécurité, exigences MFA et contrôles d'accès au niveau de l'organisation.",
+      "settings": "Paramètres de l'Organisation",
+      "settingsDesc": "Configurez le branding, politiques de session, durées de vie des tokens et flux d'authentification par organisation."
+    },
+    "comparison": {
+      "title": "Comment Nous Comparons",
+      "description": "Support multi-organisation supérieur par rapport aux fournisseurs d'identité traditionnels.",
+      "feature": "Fonctionnalité",
+      "multiOrg": "Support multi-organisation",
+      "hierarchy": "Structure d'équipe hiérarchique",
+      "mfa": "MFA au niveau organisation",
+      "federation": "Fédération inter-org",
+      "delegated": "Rôles admin délégués",
+      "audit": "Journaux d'audit par org",
+      "branding": "Branding personnalisé par org",
+      "sla": "Garantie SLA"
+    },
+    "admin": {
+      "title": "Administration & Gouvernance",
+      "description": "Outils administratifs puissants pour gérer les organisations à grande échelle avec visibilité et contrôle complets.",
+      "dashboard": "Tableau de Bord Admin",
+      "dashboardDesc": "Vue unifiée de toutes les organisations, utilisateurs et activités de votre infrastructure.",
+      "audit": "Journaux d'Audit",
+      "auditDesc": "Journalisation complète de toutes les actions administratives avec recherche et export.",
+      "analytics": "Analytique d'Usage",
+      "analyticsDesc": "Suivez les métriques d'authentification, activité utilisateur et utilisation des ressources par organisation.",
+      "federation": "Fédération",
+      "federationDesc": "Connectez les organisations à différents fournisseurs d'identité et répertoires."
+    },
+    "useCases": {
+      "title": "Cas d'Usage",
+      "description": "Conçu pour les scénarios enterprise les plus exigeants.",
+      "fleet": {
+        "title": "Gestion de Flotte Enterprise",
+        "desc": "Gérez l'authentification sur des centaines de filiales avec gouvernance centralisée de l'identité."
+      },
+      "saas": {
+        "title": "Multi-Tenancy SaaS",
+        "desc": "Fournissez une isolation sécurisée entre les organisations locataires dans votre application multi-tenant."
+      },
+      "government": {
+        "title": "Agences Gouvernementales",
+        "desc": "Répondez aux exigences de conformité strictes avec isolation d'organisation dédiée et pistes d'audit."
+      },
+      "partner": {
+        "title": "Réseaux de Partenaires",
+        "desc": "Permettez un accès partenaire sécurisé à des ressources spécifiques avec permissions limitées à l'organisation."
+      }
+    },
+    "security": {
+      "title": "Sécurité de Qualité Enterprise",
+      "description": "Politiques de sécurité au niveau organisation assurant une isolation complète et conformité avec les réglementations industrielles.",
+      "mfa": {
+        "title": "MFA au Niveau Organisation",
+        "description": "Appliquez les exigences MFA par organisation"
+      },
+      "access": {
+        "title": "Certification d'Accès",
+        "description": "Révisions d'accès périodiques pour la conformité"
+      },
+      "audit": {
+        "title": "Piste d'Audit",
+        "description": "Journalisation complète avec politiques de rétention"
+      },
+      "workflows": {
+        "title": "Flux de Travail d'Approbation",
+        "description": "Approbation multi-niveaux pour les actions sensibles"
+      },
+      "isolated": {
+        "title": "Isolé",
+        "description": "Répertoires utilisateurs"
+      },
+      "scoped": {
+        "title": "Délimité",
+        "description": "Validation de token"
+      },
+      "custom": {
+        "title": "Personnalisé",
+        "description": "Politiques par org"
+      },
+      "audited": {
+        "title": "Audité",
+        "description": "Traçabilité complète"
+      }
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur la gestion des organisations dans Aether Identity.",
+      "multi": {
+        "title": "Comment fonctionne le support multi-organisation?",
+        "answer": "Aether vous permet de créer plusieurs organisations sous un seul déploiement. Chaque organisation a ses propres utilisateurs, applications et politiques de sécurité tout en partageant la même infrastructure."
+      },
+      "partition": {
+        "title": "Peut-on partitionner les utilisateurs entre organisations?",
+        "answer": "Oui, les utilisateurs peuvent appartenir à plusieurs organisations avec différents rôles et permissions dans chacune. Cela permet une collaboration inter-organisations tout en maintenant l'isolation."
+      },
+      "limit": {
+        "title": "Y a-t-il une limite sur le nombre d'organisations?",
+        "answer": "Aucune limite stricte. Aether supporte un nombre illimité d'organisations avec une utilisation efficace des ressources. Les performances évoluent horizontalement."
+      },
+      "branding": {
+        "title": "Peut-on personnaliser le branding par organisation?",
+        "answer": "Oui, chaque organisation peut avoir des logos, couleurs et thèmes de page de connexion personnalisés. Idéal pour les fournisseurs SaaS offrant des solutions white-label."
+      },
+      "permissions": {
+        "title": "Comment fonctionnent les permissions inter-organisations?",
+        "answer": "Vous pouvez définir des permissions qui s'appliquent à toutes les organisations ou limitées à des spécifiques. Cela permet une collaboration flexible tout en maintenant les limites de sécurité."
+      }
+    },
+    "cta": {
+      "title": "Montez en Puissance Votre Gestion des Organisations",
+      "description": "Commencez avec le support multi-organisation aujourd'hui. Contactez notre équipe pour une démonstration personnalisée.",
+      "getStarted": "Commencer",
+      "contactSales": "Contacter les Ventes"
     }
   },
   "MFA": {
@@ -547,6 +1030,375 @@
     "cta": {
       "title": "Sécurisez Votre Authentification Aujourd'hui",
       "description": "Déployez Aether MFA et gagnez un contrôle complet sur votre sécurité d'authentification. Open source, auto-hébergé, enterprise-ready.",
+      "getStarted": "Commencer",
+      "contactSales": "Contacter les Ventes"
+    }
+  },
+  "FGA": {
+    "hero": {
+      "badge": "Produit: Autorisation Fine",
+      "title": "Une Autorisation Qui S'adapte à Vos Exigences Complexes",
+      "description": "Implémentez des politiques d'autorisation RBAC, ABAC ou hybrides avec évaluation en temps réel, latence sous-milliseconde et pistes d'audit complètes.",
+      "ctaDocs": "Voir la Documentation",
+      "ctaGithub": "Dépôt GitHub"
+    },
+    "metrics": {
+      "authorizationLatency": "Latence d'autorisation",
+      "policyEvaluations": "Évaluations de politique/sec",
+      "slaAvailability": "Disponibilité SLA",
+      "vendorLockin": "Dépendance fournisseur"
+    },
+    "features": {
+      "title": "Autorisation Fine",
+      "description": "Des attributions de rôles simples aux politiques complexes basées sur les attributs. Aether FGA vous donne la flexibilité d'exprimer n'importe quel modèle d'autorisation.",
+      "rbac": "Contrôle d'Accès Basé sur les Rôles",
+      "rbacDesc": "Définissez des rôles et des hiérarchies avec héritage, facilitant la gestion des permissions sur de grandes organisations.",
+      "abac": "Politiques Basées sur les Attributs",
+      "abacDesc": "Créez des politiques dynamiques basées sur les attributs utilisateur, les métadonnées de ressource et les données contextuelles comme le temps, la localisation et l'appareil.",
+      "hierarchical": "Scopes Hiérarchiques",
+      "hierarchicalDesc": "Support pour les groupes imbriqués, les unités organisationnelles et les hiérarchies de ressources avec propagation automatique des permissions.",
+      "deny": "Deny Override",
+      "denyDesc": "Implémentez des règles deny explicites qui priment, assurant que les permissions critiques pour la sécurité peuvent être verrouillées.",
+      "conditions": "Conditions de Politique",
+      "conditionsDesc": "Exprimez une logique d'autorisation complexe avec conditions, expressions et fonctions personnalisées qui s'évaluent en temps réel.",
+      "realtime": "Évaluation en Temps Réel",
+      "realtimeDesc": "Vérifications de permissions sous-milliseconde avec politiques mises en cache et moteur d'évaluation optimisé pour les API à haut débit."
+    },
+    "code": {
+      "title": "Autorisation en Code",
+      "description": "Définissez des politiques en code ou JSON, testez-les localement et déployez en toute confiance. Nos SDK facilitent l'intégration de l'autorisation dans vos applications.",
+      "quickstart": "Guides de Démarrage"
+    },
+    "deployment": {
+      "title": "Déployez Comme Vous Voulez",
+      "description": "Que vous ayez besoin d'une isolation complète, d'évolutivité cloud ou d'une approche hybride, Aether FGA s'adapte à vos exigences d'infrastructure.",
+      "onPremise": "Sur Premise",
+      "onPremiseDesc": "Contrôle total avec support de déploiement air-gappé. Vos données d'autorisation ne quittent jamais votre infrastructure.",
+      "cloudNative": "Cloud Natif",
+      "cloudNativeDesc": "Opérateur Kubernetes avec mise à l'échelle horizontale, réplication multi-régions et networking zero-trust.",
+      "hybrid": "Hybride",
+      "hybridDesc": "Reliez les répertoires sur premise avec les API cloud par fédération sécurisé et synchronisation des politiques."
+    },
+    "industries": {
+      "title": "Conçu pour les Industries Réglementées",
+      "description": "Solutions d'autorisation spécialisées adaptées aux exigences uniques de sécurité et de conformité de votre secteur.",
+      "healthcare": "Santé",
+      "healthcareDesc": "Autorisation conforme HIPAA pour les dossiers patients, avec accès basé sur les rôles aux PHI et pistes d'audit.",
+      "finance": "Finance",
+      "financeDesc": "Contrôles conformes SOX avec séparation des fonctions, limites de transaction et rapports réglementaires.",
+      "government": "Gouvernement",
+      "governmentDesc": "Solutions FedRAMP Prêt avec accès basé sur la classification, application du need-to-know et niveaux de habilitation.",
+      "ecommerce": "E-commerce",
+      "ecommerceDesc": "Autorisation dynamique basée sur le tier utilisateur, la valeur de commande et les scores de risque de fraude avec mises à jour de politique en temps réel."
+    },
+    "compliance": {
+      "title": "Sécurité de Qualité Entreprise",
+      "description": "Aether FGA est conçu pour répondre aux exigences strictes de sécurité et de conformité des organisations de santé, finance, gouvernement et entreprise.",
+      "soc2": "SOC 2 Type II",
+      "gdpr": "GDPR",
+      "hipaa": "HIPAA",
+      "iso": "ISO 27001",
+      "pci": "PCI DSS",
+      "fedramp": "FedRAMP Prêt",
+      "policyEncryption": "Chiffrement des politiques",
+      "apiEncryption": "Chiffrement API",
+      "auditTrail": "Piste complète",
+      "preDeployment": "Pré-déploiement"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur Aether FGA et l'autorisation.",
+      "rbacVsAbac": {
+        "title": "Quelle est la différence entre RBAC et ABAC?",
+        "answer": "RBAC (Contrôle d'Accès Basé sur les Rôles) attribue des permissions aux rôles qui sont ensuite attribués aux utilisateurs. ABAC (Contrôle d'Accès Basé sur les Attributs) utilise les attributs du sujet, de la ressource et de l'environnement pour prendre des décisions d'autorisation. Aether prend en charge les deux modèles et vous permet de les combiner pour des politiques hybrides."
+      },
+      "policyUpdates": {
+        "title": "Comment Aether gère-t-il les mises à jour des politiques?",
+        "answer": "Aether utilise un système de versioning des politiques avec mises à jour atomiques. Les changements sont validés avant le déploiement, et vous pouvez revenir aux versions précédentes. La propagation en temps réel aux nœuds d'autorisation assure des mises à jour de politique sous-seconde sur votre infrastructure."
+      },
+      "integration": {
+        "title": "Aether peut-il s'intégrer avec mon fournisseur d'identité existant?",
+        "answer": "Oui, Aether s'intègre avec tout fournisseur d'identité OIDC ou SAML. Il peut synchroniser les groupes et attributs depuis Active Directory, LDAP ou les fournisseurs d'identité cloud. Le moteur d'autorisation utilise ces attributs pour l'évaluation des politiques sans duplication des données utilisateur."
+      },
+      "freeTier": {
+        "title": "Y a-t-il un tarif gratuit pour Aether FGA?",
+        "answer": "Oui, Aether FGA Community Edition est gratuit et open source. Pour les exigences de haut débit, les SLAs entreprise et le support dédié, contactez notre équipe commerciale."
+      },
+      "performance": {
+        "title": "Comment garantissez-vous la performance de l'autorisation?",
+        "answer": "Aether utilise un moteur d'évaluation des politiques optimisé avec politiques pré-compilées, mise en cache des attributs et indexation intelligente. Notre architecture supporte la mise à l'échelle horizontale avec distribution des politiques sur plusieurs nœuds, offrant une latence sous-milliseconde à des millions de requêtes par seconde."
+      }
+    },
+    "resources": {
+      "title": "Ressources",
+      "description": "Explorez notre documentation, guides et dernières recherches sur l'autorisation.",
+      "whitepaper": "Livre Blanc",
+      "whitepaperDesc": "Guide d'Architecture d'Autorisation Moderne",
+      "ebook": "E-book",
+      "ebookDesc": "Implémentation de l'Autorisation Zero Trust",
+      "webinar": "Webinaire",
+      "webinarDesc": "RBAC vers ABAC: Stratégies de Migration",
+      "caseStudy": "Étude de Cas",
+      "caseStudyDesc": "Comment TechFlow a Sécurisé l'Accès API à Grande Échelle"
+    },
+    "updates": {
+      "title": "Mises à Jour Récentes",
+      "description": "Restez à jour avec les dernières fonctionnalités et améliorations."
+    },
+    "cta": {
+      "title": "Prenez le Contrôle de Votre Autorisation",
+      "description": "Implémentez une autorisation fine qui évolue avec votre organisation. Open source, auto-hébergé, enterprise-ready.",
+      "getStarted": "Commencer",
+      "contactSales": "Contacter les Ventes"
+    }
+  },
+  "PrivateCloud": {
+    "hero": {
+      "badge": "Solutions Cloud Privé",
+      "title": "Infrastructure Cloud Dédiée pour Entreprise",
+      "description": "Déployez vos charges de travail sur une infrastructure entièrement dédiée avec isolation complète, sécurité renforcée et souveraineté données complète.",
+      "ctaQuote": "Demander un Devis",
+      "ctaFeatures": "Explorer les Fonctionnalités"
+    },
+    "metrics": {
+      "uptimeSla": "SLA de disponibilité",
+      "networkLatency": "Latence réseau",
+      "supportCoverage": "Couverture support",
+      "sharedResources": "Ressources partagées"
+    },
+    "features": {
+      "title": "Fonctionnalités de Qualité Entreprise",
+      "description": "Tout ce dont vous avez besoin pour exécuter vos charges de travail les plus exigeantes en toute confiance.",
+      "dedicated": "Infrastructure Dédiée",
+      "dedicatedDesc": "Vos propres serveurs, stockage et ressources réseau dédiés isolés des autres clients.",
+      "security": "Sécurité Renforcée",
+      "securityDesc": "Chiffrement de qualité militaire, isolation réseau et protection avancée contre les menaces pour vos données.",
+      "compliance": "Conforme",
+      "complianceDesc": "Répondez aux exigences réglementaires avec des environnements dédiés et certifications de conformité personnalisées.",
+      "sovereignty": "Souveraineté Données Complète",
+      "sovereigntyDesc": "Vos données restent dans la juridiction de votre choix avec控制 total sur le stockage et l'accès.",
+      "networking": "Réseau Privé",
+      "networkingDesc": "Connexions réseau dédiées, support VPN et points de terminaison API privés pour une connectivité sécurisée.",
+      "storage": "Stockage Personnalisé",
+      "storageDesc": "Configurez la capacité de stockage, laredondance et les stratégies de sauvegarde selon vos besoins."
+    },
+    "benefits": {
+      "title": "Pourquoi Choisir le Cloud Privé",
+      "description": "Obtenez le meilleur des deux mondes: la flexibilité du cloud avec la sécurité de l'infrastructure dédiée.",
+      "scaling": "Évolution Élastique",
+      "scalingDesc": "Augmentez ou réduisez vos ressources selon la demande sans surprovisionnement.",
+      "costs": "Coûts Prévisibles",
+      "costsDesc": "Tarification mensuelle fixe avec facturation transparente et sans surprises.",
+      "support": "Support Premium",
+      "supportDesc": "Responsable de compte dédié et support prioritaire avec temps de réponse garantis.",
+      "performance": "Haute Performance",
+      "performanceDesc": "Matériel de qualité entreprise avec réseau optimisé pour un débit maximum."
+    },
+    "pricing": {
+      "title": "Tarifs Flexibles",
+      "description": "Choisissez la configuration qui correspond le mieux à vos besoins. Tous les tarifs incluent le support entreprise.",
+      "standard": "Standard",
+      "standardDesc": "Parfait pour les organisations en croissance",
+      "professional": "Professionnel",
+      "professionalDesc": "Pour les charges de travail exigeantes",
+      "enterprise": "Entreprise",
+      "enterpriseDesc": "Performance et contrôle maximum",
+      "custom": "Sur devis",
+      "mostPopular": "Plus Populaire",
+      "getStarted": "Commencer",
+      "standardFeatures": [
+        "Serveurs virtuels dédi��s",
+        "500Go de stockage",
+        "Surveillance 24/7",
+        "Support email",
+        "99,9% de disponibilité",
+        "Sécurité basique"
+      ],
+      "professionalFeatures": [
+        "Serveurs physiques dédiés",
+        "2To de stockage",
+        "Support prioritaire",
+        "99,99% de disponibilité",
+        "Sécurité avancée",
+        "Réseau personnalisé"
+      ],
+      "enterpriseFeatures": [
+        "Déploiement rack complet",
+        "Stockage illimité",
+        "Responsable de compte dédié",
+        "99,999% de disponibilité",
+        "Conformité personnalisée",
+        "Options sur premise"
+      ]
+    },
+    "compliance": {
+      "title": "Conçu pour la Conformité",
+      "description": "Notre infrastructure cloud privé est conçue pour répondre aux exigences réglementaires les plus strictes de tous les secteurs.",
+      "dataEncryption": "Chiffrement des données",
+      "tenantIsolation": "Isolation des locataires",
+      "regionsAvailable": "Régions disponibles",
+      "securityMonitoring": "Surveillance sécurité 24/7"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur nos solutions cloud privé.",
+      "diffPublic": {
+        "title": "Quelle est la différence entre cloud privé et cloud public?",
+        "answer": "Le cloud privé fournit une infrastructure dédiée à une seule organisation, offrant sécurité renforcée, personnalisation et performance. Le cloud public partage les ressources entre plusieurs locataires."
+      },
+      "dataCenter": {
+        "title": "Puis-je choisir l'emplacement de mon centre de données?",
+        "answer": "Oui, nous proposons plusieurs emplacements de centres de données en Europe, Amérique du Nord et Asie. Vous pouvez sélectionner la région qui répond le mieux à vos exigences de conformité et de latence."
+      },
+      "migration": {
+        "title": "Quel support de migration offrez-vous?",
+        "answer": "Notre équipe fournit une assistance migration complète incluant planification, exécution et validation. Nous assurons un temps d'arrêt minimal pendant la transition."
+      },
+      "billing": {
+        "title": "Comment fonctionne la facturation?",
+        "answer": "Nous proposons des options de facturation flexibles incluant des plans mensuels et annuel. Le prix est basé sur votre configuration sélectionnée sans frais cachés."
+      },
+      "commitment": {
+        "title": "Y a-t-il un engagement minimum?",
+        "answer": "Nous proposons des contrats à court et long terme pour répondre à vos besoins. Contactez-nous pour discuter de la meilleure option pour votre organisation."
+      }
+    },
+    "updates": {
+      "title": "Dernières Mises à Jour",
+      "description": "Restez à jour avec les dernières améliorations de notre plateforme cloud privé."
+    },
+    "cta": {
+      "title": "Prêt à Déployer?",
+      "description": "Contactez notre équipe pour discuter de vos exigences cloud privé et obtenir un devis personnalisé.",
+      "ctaQuote": "Demander un Devis",
+      "contactSales": "Contacter les Ventes"
+    }
+  },
+  "AIAgents": {
+    "hero": {
+      "badge": "Plateforme d'Identité pour Agents IA",
+      "title": "Identité Sécurisée pour Agents IA Autonomes",
+      "description": "Identité et gestion d'accès conçues pour les agents IA. Émission de credentials sécurisés, scoping de capacités, authentification inter-agents et observabilité complète pour votre flotte d'agents.",
+      "ctaDocs": "Voir la Documentation",
+      "ctaGithub": "Dépôt GitHub"
+    },
+    "metrics": {
+      "agentAuth": "Authentification agent",
+      "agentsSupported": "Agents supportés",
+      "slaAvailability": "Disponibilité SLA",
+      "credentialLeaks": "Fuites de credentials"
+    },
+    "trustedBy": "Approuvé par les leaders de l'industrie",
+    "capabilities": {
+      "title": "Fonctionnalités Principales",
+      "description": "Chaque fonctionnalité conçue spécifiquement pour l'identité des agents IA et les systèmes autonomes.",
+      "aiNative": "Identité Native IA",
+      "aiNativeDesc": "Couche d'identité conçue pour les agents IA avec gestion des credentials, gestion de session et scoping des permissions pour les systèmes autonomes.",
+      "credentials": "Credentials d'Agent",
+      "credentialsDesc": "Émission de credentials sécurisés pour les agents IA avec rotation automatique, permissions scopées et suivi d'utilisation pour chaque identité d'agent.",
+      "mesh": "Mesh d'Agents",
+      "meshDesc": "Activez la communication inter-agents sécurisée avec identités vérifiées, accès basé sur les capacités et pistes d'audit sur votre flotte d'agents.",
+      "security": "Sécurité Autonome",
+      "securityDesc": "Politiques basées sur les risques qui s'adaptent au comportement des agents avec détection d'anomalies, limitation de débit et réponse automatique aux menaces.",
+      "workflows": "Workflows d'Agent",
+      "workflowsDesc": "Définissez des workflows basés sur l'identité que les agents peuvent exécuter avec permissions explicites et chaînes d'approbation multi-étapes.",
+      "observability": "Observabilité Complète",
+      "observabilityDesc": "Pistes d'audit complètes, métriques et traces pour chaque action d'agent avec tableaux de bord en temps réel et alertes."
+    },
+    "compare": {
+      "title": "Comment Nous Comparons",
+      "description": "Découvrez pourquoi les organisations leaders choisissent Aether pour l'identité des agents IA.",
+      "feature": "Fonctionnalité",
+      "aether": "Aether",
+      "aws": "AWS IAM",
+      "azure": "Azure AD",
+      "okta": "Okta",
+      "agentCredentials": "Credentials d'agent",
+      "capabilityScoping": "Scoping de capacités",
+      "agentMesh": "Mesh d'agents",
+      "workflowExecution": "Exécution de workflow",
+      "autonomousSecurity": "Sécurité autonome",
+      "selfHosted": "Auto-hébergé",
+      "slaGuarantee": "Garantie SLA"
+    },
+    "code": {
+      "title": "Intégrez en Minutes, Pas en Semaines",
+      "description": "Nos SDK permettent d'ajouter facilement l'identité d'agent à vos applications IA avec seulement quelques lignes de code.",
+      "quickstart": "Guides de Démarrage"
+    },
+    "deployment": {
+      "title": "Déployez Comme Vous Voulez",
+      "description": "Que vous ayez besoin d'une isolation complète, d'évolutivité cloud ou d'une approche hybride, Aether s'adapte à votre infrastructure.",
+      "onPremise": "Sur Premise",
+      "onPremiseDesc": "Déployez dans votre propre centre de données avec isolation complète pour les opérations IA sensibles.",
+      "cloudNative": "Cloud Natif",
+      "cloudNativeDesc": "Déploiement Kubernetes natif avec mise à l'échelle horizontale et intégrations fournisseurs cloud.",
+      "hybrid": "Hybride",
+      "hybridDesc": "Reliez les agents sur premise avec les services IA cloud par fédérations sécurisées."
+    },
+    "industries": {
+      "title": "Conçu pour Chaque Industrie",
+      "description": "Solutions d'identité spécialisées pour les agents IA dans les industries réglementées.",
+      "healthcare": "IA pour la Santé",
+      "healthcareDesc": "Agents IA conformes HIPAA pour le traitement des données patients, workflows cliniques et recherche médicale.",
+      "financial": "Services Financiers",
+      "financialDesc": "Agents IA pour le trading, l'analyse des risques et la conformité réglementaire avec pistes d'audit complètes.",
+      "enterprise": "Automatisation Entreprise",
+      "enterpriseDesc": "Agents autonomes pour les processus métier, traitement de documents et support aux décisions.",
+      "ecommerce": "E-commerce",
+      "ecommerceDesc": "Agents IA pour le service client, gestion des stocks et recommandations personnalisées."
+    },
+    "compliance": {
+      "title": "Conçu pour les Industries Réglementées",
+      "description": "Aether pour Agents IA répond aux exigences strictes de sécurité et de conformité des organisations de santé, finance, gouvernement et entreprise.",
+      "encryptionRest": "Chiffrement au repos",
+      "encryptionTransit": "Chiffrement en transit",
+      "deploymentReady": "Déploiement prêt",
+      "auditTrail": "Piste complète"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur Aether pour Agents IA.",
+      "diffIam": {
+        "title": "Comment Aether pour Agents IA diffère-t-il d'un IAM traditionnel?",
+        "answer": "Aether pour Agents IA est conçu pour les systèmes IA autonomes. Il gère des concepts spécifiques aux agents comme le scoping de capacités, la communication inter-agents, l'exécution de workflows et les politiques de sécurité adaptatives que les systèmes IAM traditionnels ne supportent pas."
+      },
+      "llm": {
+        "title": "Puis-je utiliser Aether avec mon fournisseur LLM existant?",
+        "answer": "Oui, Aether s'intègre avec OpenAI, Anthropic, Google Gemini et tout modèle compatible LangChain. Nous ajoutons continuellement de nouvelles intégrations."
+      },
+      "credentialSecurity": {
+        "title": "Comment gérez-vous la sécurité des credentials des agents?",
+        "answer": "Nous utilisons des modules de sécurité matérielle (HSM) pour le stockage des clés, rotation automatique des credentials, tokens à courte durée et journalisation d'audit complète. Les credentials ne quittent jamais votre infrastructure sécurisée."
+      },
+      "freeTier": {
+        "title": "Y a-t-il un tarif gratuit pour les tests?",
+        "answer": "Oui, Aether Community Edition est gratuit et inclut jusqu'à 100 agents. Pour les déploiements plus importants, contactez notre équipe commerciale."
+      }
+    },
+    "resources": {
+      "title": "Ressources",
+      "description": "Explorez notre documentation, guides et dernières recherches sur la sécurité des agents IA.",
+      "whitepaper": "Livre Blanc",
+      "whitepaperDesc": "Guide d'Architecture d'Identité pour Agents IA",
+      "ebook": "E-book",
+      "ebookDesc": "Sécuriser les Systèmes IA Autonomes",
+      "webinar": "Webinaire",
+      "webinarDesc": "Construire des Agents IA de Confiance",
+      "caseStudy": "Étude de Cas",
+      "caseStudyDesc": "Comment TechFlow a mis à l'échelle à 10K+ Agents IA"
+    },
+    "team": {
+      "title": "Conçu par des Experts",
+      "description": "Notre équipe apporte des décennies d'expérience en identité, sécurité et infrastructure IA."
+    },
+    "updates": {
+      "title": "Mises à Jour Récentes",
+      "description": "Restez à jour avec les dernières fonctionnalités et améliorations."
+    },
+    "cta": {
+      "title": "Sécurisez Votre Flotte d'Agents IA",
+      "description": "Déployez Aether pour Agents IA aujourd'hui et gagnez un contrôle complet sur l'identité, les credentials et les permissions des agents. Open source, auto-hébergé, enterprise-ready.",
       "getStarted": "Commencer",
       "contactSales": "Contacter les Ventes"
     }

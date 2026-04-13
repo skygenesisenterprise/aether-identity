@@ -86,13 +86,13 @@ const { user, session } = await sso.verifyCallback(url);`,
 ];
 
 const comparison = [
-  { feature: "Self-hosted SSO", aether: true, okta: false, auth0: false, azure: false },
-  { feature: "SAML 2.0 Support", aether: true, okta: true, auth0: true, azure: true },
-  { feature: "OIDC / OAuth 2.0", aether: true, okta: true, auth0: true, azure: true },
-  { feature: "Identity Brokering", aether: true, okta: true, auth0: true, azure: true },
-  { feature: "Application Gateway", aether: true, okta: false, auth0: false, azure: true },
-  { feature: "Custom IdP Plugins", aether: true, okta: false, auth0: false, azure: false },
-  { feature: "No per-user pricing", aether: true, okta: false, auth0: false, azure: false },
+  { featureKey: "comparison.selfHosted", aether: true, okta: false, auth0: false, azure: false },
+  { featureKey: "comparison.saml", aether: true, okta: true, auth0: true, azure: true },
+  { featureKey: "comparison.oidc", aether: true, okta: true, auth0: true, azure: true },
+  { featureKey: "comparison.brokering", aether: true, okta: true, auth0: true, azure: true },
+  { featureKey: "comparison.gateway", aether: true, okta: false, auth0: false, azure: true },
+  { featureKey: "comparison.plugins", aether: true, okta: false, auth0: false, azure: false },
+  { featureKey: "comparison.pricing", aether: true, okta: false, auth0: false, azure: false },
 ];
 
 export default async function SSOPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -271,8 +271,8 @@ export default async function SSOPage({ params }: { params: Promise<{ locale: st
                 </thead>
                 <tbody>
                   {comparison.map((row) => (
-                    <tr key={row.feature} className="border-b border-border/50">
-                      <td className="py-4 px-4 text-sm text-foreground">{row.feature}</td>
+                    <tr key={row.featureKey} className="border-b border-border/50">
+                      <td className="py-4 px-4 text-sm text-foreground">{t(row.featureKey)}</td>
                       <td className="py-4 px-4 text-center">
                         {row.aether === true ? (
                           <CheckCircle2 className="h-5 w-5 text-emerald-600 mx-auto" />

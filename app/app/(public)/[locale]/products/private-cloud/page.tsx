@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -21,170 +22,162 @@ import {
   Activity,
 } from "lucide-react";
 
-const features = [
-  {
-    icon: Server,
-    title: "Dedicated Infrastructure",
-    description:
-      "Your own dedicated servers, storage, and network resources isolated from other customers.",
-  },
-  {
-    icon: Lock,
-    title: "Enhanced Security",
-    description:
-      "Military-grade encryption, network isolation, and advanced threat protection for your data.",
-  },
-  {
-    icon: Shield,
-    title: "Compliance Ready",
-    description:
-      "Meet regulatory requirements with dedicated environments and custom compliance certifications.",
-  },
-  {
-    icon: Database,
-    title: "Full Data Sovereignty",
-    description:
-      "Your data stays in your chosen jurisdiction with complete control over storage and access.",
-  },
-  {
-    icon: Network,
-    title: "Private Networking",
-    description:
-      "Dedicated network connections, VPN support, and private API endpoints for secure connectivity.",
-  },
-  {
-    icon: HardDrive,
-    title: "Custom Storage",
-    description:
-      "Configure storage capacity, redundancy, and backup strategies to match your requirements.",
-  },
-];
-
-const metrics = [
-  { value: "99.99%", label: "Uptime SLA" },
-  { value: "< 10ms", label: "Network latency" },
-  { value: "24/7", label: "Support coverage" },
-  { value: "Zero", label: "Shared resources" },
-];
-
-const benefits = [
-  {
-    icon: Scale,
-    title: "Elastic Scaling",
-    description: "Scale your resources up or down based on demand without over-provisioning.",
-  },
-  {
-    icon: RefreshCw,
-    title: "Predictable Costs",
-    description: "Fixed monthly pricing with transparent billing and no surprise charges.",
-  },
-  {
-    icon: HeadphonesIcon,
-    title: "Premium Support",
-    description: "Dedicated account manager and priority support with guaranteed response times.",
-  },
-  {
-    icon: Zap,
-    title: "High Performance",
-    description: "Enterprise-grade hardware with optimized networking for maximum throughput.",
-  },
-];
-
-const services = [
-  {
-    name: "Standard",
-    description: "Perfect for growing organizations",
-    price: "Custom pricing",
-    features: [
-      "Dedicated virtual servers",
-      "500GB storage",
-      "24/7 monitoring",
-      "Email support",
-      "99.9% uptime",
-      "Basic security",
-    ],
-  },
-  {
-    name: "Professional",
-    description: "For demanding workloads",
-    price: "Custom pricing",
-    features: [
-      "Dedicated physical servers",
-      "2TB storage",
-      "Priority support",
-      "99.99% uptime",
-      "Advanced security",
-      "Custom networking",
-    ],
-    popular: true,
-  },
-  {
-    name: "Enterprise",
-    description: "Maximum performance & control",
-    price: "Custom pricing",
-    features: [
-      "Full rack deployment",
-      "Unlimited storage",
-      "Dedicated account manager",
-      "99.999% uptime",
-      "Custom compliance",
-      "On-premise options",
-    ],
-  },
-];
-
-const faqs = [
-  {
-    question: "What is the difference between private cloud and public cloud?",
-    answer:
-      "Private cloud provides dedicated infrastructure for a single organization, offering enhanced security, customization, and performance. Public cloud shares resources across multiple tenants.",
-  },
-  {
-    question: "Can I choose my data center location?",
-    answer:
-      "Yes, we offer multiple data center locations across Europe, North America, and Asia. You can select the region that best meets your compliance and latency requirements.",
-  },
-  {
-    question: "What migration support do you offer?",
-    answer:
-      "Our team provides comprehensive migration assistance including planning, execution, and validation. We ensure minimal downtime during the transition.",
-  },
-  {
-    question: "How does billing work?",
-    answer:
-      "We offer flexible billing options including monthly and annual plans. Pricing is based on your selected configuration with no hidden fees.",
-  },
-  {
-    question: "Is there a minimum commitment?",
-    answer:
-      "We offer both short-term and long-term contracts to match your needs. Contact us to discuss the best option for your organization.",
-  },
-];
-
-const recentUpdates = [
-  {
-    version: "Q1 2026",
-    date: "April 2026",
-    description: "New data center in Frankfurt with enhanced compliance options",
-  },
-  {
-    version: "Q4 2025",
-    date: "December 2025",
-    description: "Added GPU instance types for AI/ML workloads",
-  },
-  {
-    version: "Q3 2025",
-    date: "September 2025",
-    description: "Expanded storage options with NVMe performance tier",
-  },
-];
-
 export default async function PrivateCloudPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "PrivateCloud" });
+
+  const features = [
+    {
+      icon: Server,
+      title: t("features.dedicated"),
+      description: t("features.dedicatedDesc"),
+    },
+    {
+      icon: Lock,
+      title: t("features.security"),
+      description: t("features.securityDesc"),
+    },
+    {
+      icon: Shield,
+      title: t("features.compliance"),
+      description: t("features.complianceDesc"),
+    },
+    {
+      icon: Database,
+      title: t("features.sovereignty"),
+      description: t("features.sovereigntyDesc"),
+    },
+    {
+      icon: Network,
+      title: t("features.networking"),
+      description: t("features.networkingDesc"),
+    },
+    {
+      icon: HardDrive,
+      title: t("features.storage"),
+      description: t("features.storageDesc"),
+    },
+  ];
+
+  const metrics = [
+    { value: "99.99%", label: t("metrics.uptimeSla") },
+    { value: "< 10ms", label: t("metrics.networkLatency") },
+    { value: "24/7", label: t("metrics.supportCoverage") },
+    { value: "Zero", label: t("metrics.sharedResources") },
+  ];
+
+  const benefits = [
+    {
+      icon: Scale,
+      title: t("benefits.scaling"),
+      description: t("benefits.scalingDesc"),
+    },
+    {
+      icon: RefreshCw,
+      title: t("benefits.costs"),
+      description: t("benefits.costsDesc"),
+    },
+    {
+      icon: HeadphonesIcon,
+      title: t("benefits.support"),
+      description: t("benefits.supportDesc"),
+    },
+    {
+      icon: Zap,
+      title: t("benefits.performance"),
+      description: t("benefits.performanceDesc"),
+    },
+  ];
+
+  const services = [
+    {
+      name: t("pricing.standard"),
+      description: t("pricing.standardDesc"),
+      price: t("pricing.custom"),
+      features: [
+        "Dedicated virtual servers",
+        "500GB storage",
+        "24/7 monitoring",
+        "Email support",
+        "99.9% uptime",
+        "Basic security",
+      ],
+    },
+    {
+      name: t("pricing.professional"),
+      description: t("pricing.professionalDesc"),
+      price: t("pricing.custom"),
+      features: [
+        "Dedicated physical servers",
+        "2TB storage",
+        "Priority support",
+        "99.99% uptime",
+        "Advanced security",
+        "Custom networking",
+      ],
+      popular: true,
+    },
+    {
+      name: t("pricing.enterprise"),
+      description: t("pricing.enterpriseDesc"),
+      price: t("pricing.custom"),
+      features: [
+        "Full rack deployment",
+        "Unlimited storage",
+        "Dedicated account manager",
+        "99.999% uptime",
+        "Custom compliance",
+        "On-premise options",
+      ],
+    },
+  ];
+
+  const faqs = [
+    {
+      question: t("faq.diffPublic.title"),
+      answer: t("faq.diffPublic.answer"),
+    },
+    {
+      question: t("faq.dataCenter.title"),
+      answer: t("faq.dataCenter.answer"),
+    },
+    {
+      question: t("faq.migration.title"),
+      answer: t("faq.migration.answer"),
+    },
+    {
+      question: t("faq.billing.title"),
+      answer: t("faq.billing.answer"),
+    },
+    {
+      question: t("faq.commitment.title"),
+      answer: t("faq.commitment.answer"),
+    },
+  ];
+
+  const recentUpdates = [
+    {
+      version: "Q1 2026",
+      date: "April 2026",
+      description: "New data center in Frankfurt with enhanced compliance options",
+    },
+    {
+      version: "Q4 2025",
+      date: "December 2025",
+      description: "Added GPU instance types for AI/ML workloads",
+    },
+    {
+      version: "Q3 2025",
+      date: "September 2025",
+      description: "Expanded storage options with NVMe performance tier",
+    },
+  ];
+
+  const complianceStandards = ["SOC 2", "GDPR", "ISO 27001", "HIPAA", "PCI DSS", "FedRAMP"];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -197,25 +190,24 @@ export default async function PrivateCloudPage({
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />
-                Private Cloud Solutions
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                Dedicated Cloud Infrastructure for Enterprise
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Deploy your workloads on fully dedicated infrastructure with complete isolation,
-                enhanced security, and full data sovereignty.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
                 <Link href="#contact">
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    Request a Quote
+                    {t("hero.ctaQuote")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="#features">
                   <Button variant="outline" size="lg" className="h-12 px-6 text-base">
-                    Explore Features
+                    {t("hero.ctaFeatures")}
                   </Button>
                 </Link>
               </div>
@@ -244,10 +236,10 @@ export default async function PrivateCloudPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Enterprise-Grade Features
+                {t("features.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Everything you need to run your most demanding workloads with confidence.
+                {t("features.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -273,11 +265,10 @@ export default async function PrivateCloudPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Why Choose Private Cloud
+                {t("benefits.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Get the best of both worlds: the flexibility of cloud with the security of dedicated
-                infrastructure.
+                {t("benefits.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -301,10 +292,11 @@ export default async function PrivateCloudPage({
         <section className="py-20 lg:py-28 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Flexible Plans</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("pricing.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Choose the configuration that best fits your needs. All plans include enterprise
-                support.
+                {t("pricing.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
@@ -319,7 +311,7 @@ export default async function PrivateCloudPage({
                 >
                   {service.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-blue-500 text-white text-xs font-medium rounded-full">
-                      Most Popular
+                      {t("pricing.mostPopular")}
                     </div>
                   )}
                   <h3 className="text-xl font-semibold text-foreground mb-2">{service.name}</h3>
@@ -335,7 +327,7 @@ export default async function PrivateCloudPage({
                   </ul>
                   <Link href="#contact">
                     <Button className="w-full" variant={service.popular ? "default" : "outline"}>
-                      Get Started
+                      {t("pricing.getStarted")}
                     </Button>
                   </Link>
                 </div>
@@ -350,14 +342,13 @@ export default async function PrivateCloudPage({
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                  Built for Compliance
+                  {t("compliance.title")}
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                  Our private cloud infrastructure is designed to meet the most stringent regulatory
-                  requirements across industries.
+                  {t("compliance.description")}
                 </p>
                 <div className="mt-8 grid grid-cols-2 gap-3">
-                  {["SOC 2", "GDPR", "ISO 27001", "HIPAA", "PCI DSS", "FedRAMP"].map((standard) => (
+                  {complianceStandards.map((standard) => (
                     <div key={standard} className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
                       <span className="text-sm text-foreground">{standard}</span>
@@ -369,22 +360,30 @@ export default async function PrivateCloudPage({
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Shield className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">AES-256</div>
-                  <div className="text-sm text-muted-foreground">Data encryption</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("compliance.dataEncryption")}
+                  </div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Lock className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">Zero</div>
-                  <div className="text-sm text-muted-foreground">Tenant isolation</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("compliance.tenantIsolation")}
+                  </div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Globe className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">10+</div>
-                  <div className="text-sm text-muted-foreground">Regions available</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("compliance.regionsAvailable")}
+                  </div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Activity className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">24/7</div>
-                  <div className="text-sm text-muted-foreground">Security monitoring</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("compliance.securityMonitoring")}
+                  </div>
                 </div>
               </div>
             </div>
@@ -396,10 +395,10 @@ export default async function PrivateCloudPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Frequently Asked Questions
+                {t("faq.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Common questions about our private cloud solutions.
+                {t("faq.description")}
               </p>
             </div>
             <FaqAccordion faqs={faqs} />
@@ -410,9 +409,11 @@ export default async function PrivateCloudPage({
         <section className="py-20 lg:py-28 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Latest Updates</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("updates.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Stay up to date with the latest improvements to our private cloud platform.
+                {t("updates.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
@@ -440,20 +441,17 @@ export default async function PrivateCloudPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Ready to Deploy?
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Contact our team to discuss your private cloud requirements and get a customized
-                quote.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                  Request a Quote
+                  {t("cta.ctaQuote")}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
                 <Link href="/contact">
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    Contact Sales
+                    {t("cta.contactSales")}
                   </Button>
                 </Link>
               </div>
