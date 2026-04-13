@@ -99,10 +99,10 @@ export function CodeBlock({
                   transition={{ duration: 0.15 }}
                   className="absolute right-0 top-full mt-1 py-1 w-32 rounded-md border border-border bg-card shadow-lg z-50"
                 >
-                  {samples.map((sample) => (
+                  {samples.map((sample, index) => (
                     <button
                       type="button"
-                      key={sample.language}
+                      key={`${sample.language}-${index}`}
                       onClick={() => {
                         setSelectedLang(sample.language);
                         setIsOpen(false);

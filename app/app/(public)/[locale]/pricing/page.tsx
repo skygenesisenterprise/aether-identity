@@ -36,7 +36,7 @@ const tiers = [
     name: "Professional",
     description: "For growing organizations needing more power",
     price: "€99",
-    period: "/month",
+    period: "/years",
     features: [
       { name: "Up to 10,000 users", included: true },
       { name: "OAuth 2.0 / OIDC", included: true },
