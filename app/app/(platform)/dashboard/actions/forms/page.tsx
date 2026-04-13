@@ -16,14 +16,12 @@ import {
   LogIn,
   Shield,
   UserPlus,
-  Mail,
   Lock,
   CheckCircle2,
   XCircle,
   AlertTriangle,
   ChevronRight,
   Search,
-  Filter,
   FormInput,
   LayoutTemplate,
   Variable,
@@ -206,7 +204,7 @@ export default function ActionsFormsPage() {
       <div className="border-b bg-background">
         <div className="px-6 py-6">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Actions Forms</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Identity Actions Forms</h1>
             <p className="text-muted-foreground">
               Create and manage custom forms for authentication flows.
             </p>

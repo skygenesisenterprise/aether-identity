@@ -193,7 +193,7 @@ export default function SecurityMonitoringPage() {
       <div className="border-b bg-background">
         <div className="px-6 py-6">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Security Monitoring</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Identity Security Monitoring</h1>
             <p className="text-muted-foreground">
               Monitor threat detection, blocked attempts, and security events.
             </p>

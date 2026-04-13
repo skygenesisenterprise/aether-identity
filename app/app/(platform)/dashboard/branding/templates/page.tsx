@@ -195,7 +195,7 @@ export default function TemplatesPage() {
       <div className="border-b bg-background">
         <div className="px-6 py-6">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Page Templates</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Identity Page Templates</h1>
             <p className="text-muted-foreground">
               Manage and customize login page templates for your applications
             </p>

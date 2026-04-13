@@ -116,7 +116,7 @@ export default function ExternalAppsPage() {
       <div className="border-b bg-background">
         <div className="px-6 py-6">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight">SSO Integrations</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Identity SSO Integrations</h1>
             <p className="text-muted-foreground">
               Enable single sign-on for your SaaS applications and external services.
             </p>

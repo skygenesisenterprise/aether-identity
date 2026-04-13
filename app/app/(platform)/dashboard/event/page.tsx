@@ -4,8 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   Search,
-  Filter,
-  Download,
   RefreshCw,
   LogIn,
   UserPlus,
@@ -13,15 +11,8 @@ import {
   Shield,
   Key,
   Globe,
-  Mail,
-  ArrowUpRight,
-  ArrowDownLeft,
   ChevronRight,
-  CheckCircle2,
-  XCircle,
-  Clock,
   Eye,
-  Trash2,
   MoreHorizontal,
 } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts";
@@ -30,7 +21,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import {
   Select,
@@ -239,7 +229,7 @@ export default function EventsPage() {
       <div className="border-b bg-background">
         <div className="px-6 py-6">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Event Logs</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Identity Event Logs</h1>
             <p className="text-muted-foreground">
               Monitor authentication events and troubleshoot issues.
             </p>

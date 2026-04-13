@@ -101,7 +101,7 @@ export default function CustomLoginPage() {
       <div className="border-b bg-background">
         <div className="px-6 py-6">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Custom Login</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Identity Custom Login</h1>
             <p className="text-muted-foreground">Customize the appearance of your login pages.</p>
           </div>
         </div>

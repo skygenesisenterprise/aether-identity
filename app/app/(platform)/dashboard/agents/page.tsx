@@ -193,7 +193,7 @@ export default function AgentsPage() {
             </span>
           </div>
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight">AI Agents</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Identity AI Agents</h1>
             <p className="text-muted-foreground">
               Secure your AI Agents with robust user authentication, secure API access on behalf of
               users, and fine-grained authorization.

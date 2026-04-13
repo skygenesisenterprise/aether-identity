@@ -188,7 +188,7 @@ export default function LogsStreamPage() {
       <div className="border-b bg-background">
         <div className="px-6 py-6">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Live Logs Stream</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Identity Live Logs</h1>
             <p className="text-muted-foreground">
               Real-time authentication events and activity stream.
             </p>

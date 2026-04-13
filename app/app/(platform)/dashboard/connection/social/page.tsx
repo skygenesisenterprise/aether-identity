@@ -87,7 +87,7 @@ export default function SocialPage() {
                 <Network className="h-5 w-5 text-primary" />
               </div>
               <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Social Connections</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">Identity Social Connections</h1>
                 <p className="text-muted-foreground">
                   Configure social connections so that you can let your users login with them.
                 </p>

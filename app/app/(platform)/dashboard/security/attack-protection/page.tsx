@@ -292,7 +292,7 @@ export default function AttackProtectionPage() {
       <div className="border-b bg-background">
         <div className="px-6 py-6">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Attack Protection</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Identity Attack Protection</h1>
             <p className="text-muted-foreground">
               Configure security protections against brute force, rate limiting, and suspicious
               activities.

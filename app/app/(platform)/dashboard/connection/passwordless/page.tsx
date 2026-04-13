@@ -144,7 +144,7 @@ export default function PasswordlessPage() {
                 <Key className="h-5 w-5 text-primary" />
               </div>
               <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Passwordless Connections</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">Identity Passwordless Connections</h1>
                 <p className="text-muted-foreground">
                   Enable passwordless authentication for your users.
                 </p>

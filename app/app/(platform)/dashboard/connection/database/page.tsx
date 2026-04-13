@@ -131,7 +131,7 @@ export default function DatabasePage() {
                 <Database className="h-5 w-5 text-primary" />
               </div>
               <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Database Connections</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">Identity Database Connections</h1>
                 <p className="text-muted-foreground">
                   Securely store and manage your customer&apos;s authorization credentials.
                 </p>

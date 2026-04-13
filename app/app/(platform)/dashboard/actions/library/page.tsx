@@ -193,7 +193,7 @@ export default function ActionsLibraryPage() {
       <div className="border-b bg-background">
         <div className="px-6 py-6">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Actions Library</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Identity Actions Library</h1>
             <p className="text-muted-foreground">
               Create and manage custom authentication logic with Actions.
             </p>

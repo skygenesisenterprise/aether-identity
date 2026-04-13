@@ -111,7 +111,7 @@ export default function EnterprisePage() {
                 <Building2 className="h-5 w-5 text-primary" />
               </div>
               <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Enterprise Connections</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">Identity Enterprise Connections</h1>
                 <p className="text-muted-foreground">
                   Enable Single Sign-On (SSO) for your enterprise with SAML, OIDC, AD/LDAP and more.
                 </p>

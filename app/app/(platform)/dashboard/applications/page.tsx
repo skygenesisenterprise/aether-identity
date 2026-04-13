@@ -123,7 +123,7 @@ export default function ApplicationsPage() {
       <div className="border-b bg-background">
         <div className="px-6 py-6">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Applications</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Identity Applications</h1>
             <p className="text-muted-foreground">
               Manage your client applications and API credentials.
             </p>

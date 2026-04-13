@@ -280,7 +280,7 @@ export default function TriggersPage() {
       <div className="border-b bg-background">
         <div className="px-6 py-6">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Triggers</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Identity Triggers</h1>
             <p className="text-muted-foreground">
               Configure event triggers that launch your Actions.
             </p>

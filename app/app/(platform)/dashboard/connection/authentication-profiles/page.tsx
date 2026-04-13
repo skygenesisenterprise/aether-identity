@@ -133,7 +133,7 @@ export default function AuthenticationProfilesPage() {
                 <ShieldCheck className="h-5 w-5 text-primary" />
               </div>
               <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Authentication Profiles</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">Identity Authentication Profiles</h1>
                 <p className="text-muted-foreground">
                   Configure passwordless and MFA authentication methods for your users.
                 </p>

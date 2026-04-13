@@ -203,7 +203,7 @@ export default function LogsPage() {
       <div className="border-b bg-background">
         <div className="px-6 py-6">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Logs</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Identity Logs</h1>
             <p className="text-muted-foreground">
               View and analyze authentication logs and events.
             </p>
