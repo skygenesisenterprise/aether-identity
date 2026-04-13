@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -28,191 +29,173 @@ import {
   Key,
 } from "lucide-react";
 
-const features = [
-  {
-    icon: HeartPulse,
-    title: "Patient Portal Security",
-    description:
-      "Secure patient authentication with MFA, biometric support, and smart card integration for accessing medical records, scheduling appointments, and managing prescriptions.",
-  },
-  {
-    icon: Stethoscope,
-    title: "Telemedicine Authentication",
-    description:
-      "HIPAA-compliant video consultation authentication with end-to-end encryption, session timeouts, and audit logging for all telehealth interactions.",
-  },
-  {
-    icon: Hospital,
-    title: "EHR/EMR Integration",
-    description:
-      "Seamless integration with Epic, Cerner, Allscripts, and other major EHR systems using SAML 2.0, OAuth 2.0, and FHIR-based identity protocols.",
-  },
-  {
-    icon: UserCog,
-    title: "Provider Identity Management",
-    description:
-      "Manage credentials for physicians, nurses, administrative staff, and contractors with role-based access tailored to clinical workflows.",
-  },
-  {
-    icon: Activity,
-    title: "Real-Time Monitoring",
-    description:
-      "Continuous security monitoring with anomaly detection, failed login alerts, and suspicious activity flags for compliance and threat prevention.",
-  },
-  {
-    icon: Brain,
-    title: "Clinical Decision Support",
-    description:
-      "Attribute-based access control that adapts permissions based on patient-provider relationships, department assignments, and treatment contexts.",
-  },
-];
-
-const complianceFeatures = [
-  {
-    icon: Shield,
-    title: "HIPAA Compliance",
-    description:
-      "Full HIPAA Security Rule compliance with administrative, physical, and technical safeguards built into every authentication flow.",
-  },
-  {
-    icon: ClipboardCheck,
-    title: "Audit Trail",
-    description:
-      "Comprehensive audit logging of all PHI access with immutable records, retention policies, and export capabilities for compliance audits.",
-  },
-  {
-    icon: Lock,
-    title: "Data Encryption",
-    description:
-      "AES-256 encryption at rest and TLS 1.3 in transit. Support for customer-managed encryption keys in on-premise deployments.",
-  },
-  {
-    icon: Scale,
-    title: "Access Governance",
-    description:
-      "Automated access reviews, least-privilege enforcement, and segregation of duties (SoD) policies to meet regulatory requirements.",
-  },
-];
-
-const metrics = [
-  { value: "100%", label: "HIPAA compliance" },
-  { value: "< 15ms", label: "Authentication latency" },
-  { value: "99.99%", label: "System availability" },
-  { value: "Zero", label: "Data breaches" },
-];
-
-const useCases = [
-  {
-    icon: Users,
-    title: "Patient Access",
-    description:
-      "Self-service password management, MFA enrollment, and secure sharing of medical records with family members or other providers.",
-  },
-  {
-    icon: Building2,
-    title: "Staff Authentication",
-    description:
-      "Single sign-on across clinical applications, smart card integration, and proximity-based authentication for hospital environments.",
-  },
-  {
-    icon: Database,
-    title: "Interoperability",
-    description:
-      "Federated identity across healthcare networks, HIEs, and partner organizations using standards-based protocols.",
-  },
-  {
-    icon: Globe,
-    title: "Remote Work",
-    description:
-      "Secure VPN-less access for remote clinical staff, telehealth providers, and administrative personnel working from home.",
-  },
-];
-
-const integrations = [
-  "Epic MyChart",
-  "Cerner PowerChart",
-  "Allscripts Sunrise",
-  "MEDITECH Expanse",
-  "eClinicalWorks",
-  "Athenahealth",
-  "NextGen Healthcare",
-  "MEDITECH",
-];
-
-const deploymentOptions = [
-  {
-    icon: Server,
-    title: "On-Premise",
-    description:
-      "Deploy within your data center or private cloud. Air-gapped options available for maximum security environments.",
-  },
-  {
-    icon: Database,
-    title: "Private Cloud",
-    description:
-      "Dedicated infrastructure in your cloud environment (AWS, Azure, GCP) with full data sovereignty.",
-  },
-  {
-    icon: Globe,
-    title: "Hybrid",
-    description:
-      "Bridge on-premise EHR systems with cloud applications while maintaining consistent identity policies.",
-  },
-];
-
-const faqs = [
-  {
-    question: "Is Aether HIPAA certified?",
-    answer:
-      "Aether Identity is designed to meet HIPAA Security Rule requirements. We provide a Business Associate Agreement (BAA) for all healthcare deployments and can assist with your compliance documentation.",
-  },
-  {
-    question: "Can we integrate with our existing EHR system?",
-    answer:
-      "Yes, Aether supports SAML 2.0, OAuth 2.0/OpenID Connect, and SCIM integrations with all major EHR platforms including Epic, Cerner, Allscripts, and MEDITECH.",
-  },
-  {
-    question: "How do you handle patient consent for data sharing?",
-    answer:
-      "Aether supports granular consent management through attribute-based policies. You can define which data types can be shared with which parties based on patient consent records.",
-  },
-  {
-    question: "Can healthcare staff use their existing hospital credentials?",
-    answer:
-      "Yes, Aether supports user federation with Active Directory, LDAP, and existing IAM systems. Staff can continue using their hospital credentials while gaining SSO access to clinical applications.",
-  },
-  {
-    question: "Do you offer emergency access (break-glass) procedures?",
-    answer:
-      "Yes, Aether supports emergency access workflows with elevated privilege provisioning, dual-actor approval, and mandatory post-access review documentation.",
-  },
-];
-
-const resources = [
-  {
-    icon: FileText,
-    title: "Whitepaper",
-    description: "Healthcare Identity Management Guide",
-  },
-  {
-    icon: ClipboardCheck,
-    title: "Compliance Report",
-    description: "HIPAA Security Rule Implementation",
-  },
-  {
-    icon: Calendar,
-    title: "Webinar",
-    description: "EHR Integration Best Practices",
-  },
-  {
-    icon: BarChart3,
-    title: "Case Study",
-    description: "Regional Hospital Network Migration",
-  },
-];
-
 export default async function HealthcarePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Healthcare" });
+
+  const features = [
+    {
+      icon: HeartPulse,
+      title: t("features.patient.title"),
+      description: t("features.patient.description"),
+    },
+    {
+      icon: Stethoscope,
+      title: t("features.telemedicine.title"),
+      description: t("features.telemedicine.description"),
+    },
+    {
+      icon: Hospital,
+      title: t("features.ehr.title"),
+      description: t("features.ehr.description"),
+    },
+    {
+      icon: UserCog,
+      title: t("features.provider.title"),
+      description: t("features.provider.description"),
+    },
+    {
+      icon: Activity,
+      title: t("features.monitoring.title"),
+      description: t("features.monitoring.description"),
+    },
+    {
+      icon: Brain,
+      title: t("features.clinical.title"),
+      description: t("features.clinical.description"),
+    },
+  ];
+
+  const complianceFeatures = [
+    {
+      icon: Shield,
+      title: t("compliance.hipaa.title"),
+      description: t("compliance.hipaa.description"),
+    },
+    {
+      icon: ClipboardCheck,
+      title: t("compliance.audit.title"),
+      description: t("compliance.audit.description"),
+    },
+    {
+      icon: Lock,
+      title: t("compliance.encryption.title"),
+      description: t("compliance.encryption.description"),
+    },
+    {
+      icon: Scale,
+      title: t("compliance.governance.title"),
+      description: t("compliance.governance.description"),
+    },
+  ];
+
+  const metrics = [
+    { value: "100%", label: t("metrics.hipaa") },
+    { value: "< 15ms", label: t("metrics.latency") },
+    { value: "99.99%", label: t("metrics.availability") },
+    { value: "Zero", label: t("metrics.breaches") },
+  ];
+
+  const useCases = [
+    {
+      icon: Users,
+      title: t("useCases.patient.title"),
+      description: t("useCases.patient.description"),
+    },
+    {
+      icon: Building2,
+      title: t("useCases.staff.title"),
+      description: t("useCases.staff.description"),
+    },
+    {
+      icon: Database,
+      title: t("useCases.interoperability.title"),
+      description: t("useCases.interoperability.description"),
+    },
+    {
+      icon: Globe,
+      title: t("useCases.remote.title"),
+      description: t("useCases.remote.description"),
+    },
+  ];
+
+  const integrations = [
+    "Epic MyChart",
+    "Cerner PowerChart",
+    "Allscripts Sunrise",
+    "MEDITECH Expanse",
+    "eClinicalWorks",
+    "Athenahealth",
+    "NextGen Healthcare",
+    "MEDITECH",
+  ];
+
+  const deploymentOptions = [
+    {
+      icon: Server,
+      title: t("deployment.onPremise"),
+      description:
+        "Deploy within your data center or private cloud. Air-gapped options available for maximum security environments.",
+    },
+    {
+      icon: Database,
+      title: t("deployment.private"),
+      description:
+        "Dedicated infrastructure in your cloud environment (AWS, Azure, GCP) with full data sovereignty.",
+    },
+    {
+      icon: Globe,
+      title: t("deployment.hybrid"),
+      description:
+        "Bridge on-premise EHR systems with cloud applications while maintaining consistent identity policies.",
+    },
+  ];
+
+  const faqs = [
+    {
+      question: t("faq.hipaa.title"),
+      answer: t("faq.hipaa.answer"),
+    },
+    {
+      question: t("faq.ehr.title"),
+      answer: t("faq.ehr.answer"),
+    },
+    {
+      question: t("faq.consent.title"),
+      answer: t("faq.consent.answer"),
+    },
+    {
+      question: t("faq.credentials.title"),
+      answer: t("faq.credentials.answer"),
+    },
+    {
+      question: t("faq.emergency.title"),
+      answer: t("faq.emergency.answer"),
+    },
+  ];
+
+  const resources = [
+    {
+      icon: FileText,
+      title: t("resources.whitepaper"),
+      description: t("resources.whitepaperDesc"),
+    },
+    {
+      icon: ClipboardCheck,
+      title: t("resources.compliance"),
+      description: t("resources.complianceDesc"),
+    },
+    {
+      icon: Calendar,
+      title: t("resources.webinar"),
+      description: t("resources.webinarDesc"),
+    },
+    {
+      icon: BarChart3,
+      title: t("resources.caseStudy"),
+      description: t("resources.caseStudyDesc"),
+    },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -225,26 +208,24 @@ export default async function HealthcarePage({ params }: { params: Promise<{ loc
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                Healthcare Solutions
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                HIPAA-Compliant Identity for Modern Healthcare
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Secure patient portals, provider authentication, EHR integration, and telemedicine
-                platforms with enterprise-grade identity management designed for healthcare
-                regulatory requirements.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
-                <Link href="/contact">
+                <Link href={`/${locale}/contact`}>
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    Request Demo
+                    {t("hero.ctaContact")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/docs">
+                <Link href={`/${locale}/docs`}>
                   <Button variant="outline" size="lg" className="gap-2 h-12 px-6 text-base">
-                    View Documentation
+                    {t("hero.ctaDocs")}
                   </Button>
                 </Link>
               </div>
@@ -273,11 +254,10 @@ export default async function HealthcarePage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Built for Healthcare Workflows
+                {t("features.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Every feature designed to meet the unique security, compliance, and usability
-                requirements of healthcare environments.
+                {t("features.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -289,7 +269,7 @@ export default async function HealthcarePage({ params }: { params: Promise<{ loc
                     </div>
                     <h3 className="text-base font-semibold text-foreground">{feature.title}</h3>
                   </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed pl-13">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
@@ -303,10 +283,10 @@ export default async function HealthcarePage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Healthcare Compliance Built-In
+                {t("compliance.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Meet HIPAA, HITECH, and emerging healthcare data regulations with confidence.
+                {t("compliance.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -331,11 +311,10 @@ export default async function HealthcarePage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Comprehensive Use Cases
+                {t("useCases.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                From patient access to clinical workflows, Aether secures every touchpoint in the
-                healthcare ecosystem.
+                {t("useCases.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -360,10 +339,10 @@ export default async function HealthcarePage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                EHR System Integrations
+                {t("integrations.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Seamless integration with the healthcare applications you already use.
+                {t("integrations.description")}
               </p>
             </div>
             <div className="flex flex-wrap justify-center items-center gap-4">
@@ -377,7 +356,7 @@ export default async function HealthcarePage({ params }: { params: Promise<{ loc
               ))}
             </div>
             <p className="mt-8 text-center text-sm text-muted-foreground">
-              Don&apos;t see your EHR? Contact us for custom integration support.
+              {t("integrations.notFound")}
             </p>
           </div>
         </section>
@@ -387,11 +366,10 @@ export default async function HealthcarePage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Deploy According to Your Policy
+                {t("deployment.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Whether you require complete on-premise control or cloud scalability, Aether adapts
-                to your infrastructure and data residency requirements.
+                {t("deployment.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
@@ -417,69 +395,62 @@ export default async function HealthcarePage({ params }: { params: Promise<{ loc
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                  Enterprise Security for Patient Data
+                  {t("security.title")}
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                  Protect sensitive health information with military-grade security controls
-                  designed specifically for healthcare environments.
+                  {t("security.description")}
                 </p>
                 <div className="mt-8 grid grid-cols-2 gap-4">
                   <div className="p-4 rounded-lg bg-muted/50 border border-border">
                     <Shield className="h-6 w-6 text-foreground mb-2" />
                     <div className="text-lg font-semibold text-foreground">AES-256</div>
-                    <div className="text-sm text-muted-foreground">Encryption at rest</div>
+                    <div className="text-sm text-muted-foreground">
+                      {t("security.encryptionRest")}
+                    </div>
                   </div>
                   <div className="p-4 rounded-lg bg-muted/50 border border-border">
                     <Lock className="h-6 w-6 text-foreground mb-2" />
                     <div className="text-lg font-semibold text-foreground">TLS 1.3</div>
-                    <div className="text-sm text-muted-foreground">Encryption in transit</div>
+                    <div className="text-sm text-muted-foreground">
+                      {t("security.encryptionTransit")}
+                    </div>
                   </div>
                   <div className="p-4 rounded-lg bg-muted/50 border border-border">
                     <Fingerprint className="h-6 w-6 text-foreground mb-2" />
                     <div className="text-lg font-semibold text-foreground">WebAuthn</div>
-                    <div className="text-sm text-muted-foreground">Biometric support</div>
+                    <div className="text-sm text-muted-foreground">{t("security.biometric")}</div>
                   </div>
                   <div className="p-4 rounded-lg bg-muted/50 border border-border">
                     <Key className="h-6 w-6 text-foreground mb-2" />
                     <div className="text-lg font-semibold text-foreground">CMEK</div>
-                    <div className="text-sm text-muted-foreground">Customer keys</div>
+                    <div className="text-sm text-muted-foreground">{t("security.keys")}</div>
                   </div>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="flex items-center gap-3 p-4 rounded-lg border border-border bg-card">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-sm text-foreground">SAML 2.0 & OAuth 2.0/OIDC support</span>
+                  <span className="text-sm text-foreground">{t("security.saml")}</span>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-lg border border-border bg-card">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-sm text-foreground">
-                    Smart card & proximity card integration
-                  </span>
+                  <span className="text-sm text-foreground">{t("security.smartcard")}</span>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-lg border border-border bg-card">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-sm text-foreground">
-                    Automatic session timeout policies
-                  </span>
+                  <span className="text-sm text-foreground">{t("security.session")}</span>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-lg border border-border bg-card">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-sm text-foreground">
-                    Dual-factor authentication (TOTP, SMS, email)
-                  </span>
+                  <span className="text-sm text-foreground">{t("security.mfa")}</span>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-lg border border-border bg-card">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-sm text-foreground">
-                    Break-glass emergency access workflows
-                  </span>
+                  <span className="text-sm text-foreground">{t("security.breakglass")}</span>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-lg border border-border bg-card">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-sm text-foreground">
-                    Real-time threat detection & alerting
-                  </span>
+                  <span className="text-sm text-foreground">{t("security.threat")}</span>
                 </div>
               </div>
             </div>
@@ -491,10 +462,10 @@ export default async function HealthcarePage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Frequently Asked Questions
+                {t("faq.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Common questions about healthcare identity management.
+                {t("faq.description")}
               </p>
             </div>
             <FaqAccordion faqs={faqs} />
@@ -505,9 +476,11 @@ export default async function HealthcarePage({ params }: { params: Promise<{ loc
         <section className="py-20 lg:py-28 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Resources</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("resources.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Explore guides, compliance documentation, and case studies for healthcare identity.
+                {t("resources.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -532,22 +505,19 @@ export default async function HealthcarePage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Secure Your Healthcare Identity Today
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Join healthcare organizations that trust Aether Identity to protect patient data and
-                enable secure clinical workflows.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/contact">
+                <Link href={`/${locale}/contact`}>
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                    Request a Demo
+                    {t("cta.contact")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/docs">
+                <Link href={`/${locale}/docs`}>
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    View Documentation
+                    {t("cta.docs")}
                   </Button>
                 </Link>
               </div>

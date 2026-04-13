@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -28,107 +29,101 @@ import {
   AppWindow,
 } from "lucide-react";
 
-const capabilities = [
-  {
-    icon: Key,
-    title: "Client Credentials Flow",
-    description:
-      "OAuth 2.0 Client Credentials flow for secure machine-to-machine authentication with automatic token refresh.",
-  },
-  {
-    icon: Shield,
-    title: "API Key Management",
-    description:
-      "Generate, rotate, and manage API keys with granular scopes and expiration policies.",
-  },
-  {
-    icon: Network,
-    title: "Service Mesh Integration",
-    description:
-      "Native integration with Istio, Linkerd, and Consul for zero-trust service communication.",
-  },
-  {
-    icon: Lock,
-    title: "Mutual TLS (mTLS)",
-    description:
-      "Certificate-based authentication with automated certificate rotation and trust management.",
-  },
-  {
-    icon: Server,
-    title: "Self-Hosted Infrastructure",
-    description:
-      "Deploy on your infrastructure with Docker, Kubernetes, or bare metal. Your data stays under your control.",
-  },
-  {
-    icon: Workflow,
-    title: "Token Introspection",
-    description:
-      "Real-time token validation and introspection for stateless authorization decisions.",
-  },
-];
+export default async function M2MPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "M2M" });
 
-const metrics = [
-  { value: "< 5ms", label: "Token issuance latency" },
-  { value: "100K+", label: "Requests per second" },
-  { value: "99.99%", label: "SLA availability" },
-  { value: "Zero", label: "Vendor lock-in" },
-];
+  const capabilities = [
+    {
+      icon: Key,
+      title: t("capabilities.credentials"),
+      description: t("capabilities.credentialsDesc"),
+    },
+    {
+      icon: Shield,
+      title: t("capabilities.apiKeys"),
+      description: t("capabilities.apiKeysDesc"),
+    },
+    {
+      icon: Network,
+      title: t("capabilities.serviceMesh"),
+      description: t("capabilities.serviceMeshDesc"),
+    },
+    {
+      icon: Lock,
+      title: t("capabilities.mtls"),
+      description: t("capabilities.mtlsDesc"),
+    },
+    {
+      icon: Server,
+      title: t("capabilities.selfHosted"),
+      description: t("capabilities.selfHostedDesc"),
+    },
+    {
+      icon: Workflow,
+      title: t("capabilities.introspection"),
+      description: t("capabilities.introspectionDesc"),
+    },
+  ];
 
-const protocols = [
-  {
-    icon: Lock,
-    title: "OAuth 2.0",
-    description:
-      "Client Credentials, JWT Bearer, and refresh token flows for secure service authentication.",
-  },
-  {
-    icon: Shield,
-    title: "OpenID Connect",
-    description:
-      "Service account discovery and standardized token claims for inter-service identity.",
-  },
-  {
-    icon: Network,
-    title: "mTLS",
-    description: "Mutual TLS with automated certificate lifecycle management and mesh integration.",
-  },
-  {
-    icon: Key,
-    title: "API Keys",
-    description: "Revocable API keys with scoped permissions and automatic rotation support.",
-  },
-];
+  const metrics = [
+    { value: "< 5ms", label: t("metrics.tokenLatency") },
+    { value: "100K+", label: t("metrics.requestsPerSecond") },
+    { value: "99.99%", label: t("metrics.slaAvailability") },
+    { value: "Zero", label: t("metrics.vendorLockin") },
+  ];
 
-const useCases = [
-  {
-    icon: Cpu,
-    title: "Microservices Authentication",
-    description:
-      "Secure inter-service communication with fine-grained access control and audit trails.",
-  },
-  {
-    icon: AppWindow,
-    title: "API Gateway Security",
-    description: "Centralized authentication and authorization at the API gateway layer.",
-  },
-  {
-    icon: Bot,
-    title: "CI/CD Pipeline Access",
-    description:
-      "Secure authentication for build systems, deployment pipelines, and automation tools.",
-  },
-  {
-    icon: Cloud,
-    title: "Serverless Functions",
-    description: "Lightweight authentication for AWS Lambda, Azure Functions, and Cloud Functions.",
-  },
-];
+  const protocols = [
+    {
+      icon: Lock,
+      title: t("protocols.oauth"),
+      description: t("protocols.oauthDesc"),
+    },
+    {
+      icon: Shield,
+      title: t("protocols.oidc"),
+      description: t("protocols.oidcDesc"),
+    },
+    {
+      icon: Network,
+      title: t("protocols.mtls"),
+      description: t("protocols.mtlsDesc"),
+    },
+    {
+      icon: Key,
+      title: t("protocols.apiKeys"),
+      description: t("protocols.apiKeysDesc"),
+    },
+  ];
 
-const sampleCode = [
-  {
-    language: "typescript",
-    filename: "auth.ts",
-    code: `import { AetherClient } from '@aether-identity/node';
+  const useCases = [
+    {
+      icon: Cpu,
+      title: t("useCases.microservices"),
+      description: t("useCases.microservicesDesc"),
+    },
+    {
+      icon: AppWindow,
+      title: t("useCases.apiGateway"),
+      description: t("useCases.apiGatewayDesc"),
+    },
+    {
+      icon: Bot,
+      title: t("useCases.cicd"),
+      description: t("useCases.cicdDesc"),
+    },
+    {
+      icon: Cloud,
+      title: t("useCases.serverless"),
+      description: t("useCases.serverlessDesc"),
+    },
+  ];
+
+  const sampleCode = [
+    {
+      language: "typescript",
+      filename: "auth.ts",
+      code: `import { AetherClient } from '@aether-identity/node';
 
 const aether = new AetherClient({
   domain: 'auth.yourcompany.com',
@@ -145,11 +140,11 @@ const token = await aether.getToken({
 const response = await fetch('https://api.yourcompany.com/data', {
   headers: { 'Authorization': \`Bearer \${token.access_token}\` },
 });`,
-  },
-  {
-    language: "python",
-    filename: "auth.py",
-    code: `from aether_client import AetherClient
+    },
+    {
+      language: "python",
+      filename: "auth.py",
+      code: `from aether_client import AetherClient
 
 aether = AetherClient(
     domain='auth.yourcompany.com',
@@ -167,86 +162,86 @@ response = requests.get(
     'https://api.yourcompany.com/data',
     headers={'Authorization': f'Bearer {token.access_token}'}
 )`,
-  },
-];
+    },
+  ];
 
-const comparison = [
-  { feature: "Self-hosted", aether: true, keycloak: true, auth0: false, okta: false },
-  { feature: "Client Credentials flow", aether: true, keycloak: true, auth0: true, okta: true },
-  { feature: "mTLS support", aether: true, keycloak: true, auth0: false, okta: true },
-  { feature: "Service mesh integration", aether: true, keycloak: false, auth0: false, okta: false },
-  { feature: "API key management", aether: true, keycloak: true, auth0: true, okta: true },
-  { feature: "Token introspection", aether: true, keycloak: true, auth0: true, okta: true },
-  { feature: "No vendor lock-in", aether: true, keycloak: true, auth0: false, okta: false },
-  { feature: "SLA guarantee", aether: "99.99%", keycloak: "N/A", auth0: "99.9%", okta: "99.9%" },
-];
+  const comparison = [
+    { feature: "Self-hosted", aether: true, keycloak: true, auth0: false, okta: false },
+    { feature: "Client Credentials flow", aether: true, keycloak: true, auth0: true, okta: true },
+    { feature: "mTLS support", aether: true, keycloak: true, auth0: false, okta: true },
+    {
+      feature: "Service mesh integration",
+      aether: true,
+      keycloak: false,
+      auth0: false,
+      okta: false,
+    },
+    { feature: "API key management", aether: true, keycloak: true, auth0: true, okta: true },
+    { feature: "Token introspection", aether: true, keycloak: true, auth0: true, okta: true },
+    { feature: "No vendor lock-in", aether: true, keycloak: true, auth0: false, okta: false },
+    { feature: "SLA guarantee", aether: "99.99%", keycloak: "N/A", auth0: "99.9%", okta: "99.9%" },
+  ];
 
-const integrations = [
-  { name: "Kubernetes", category: "Orchestration" },
-  { name: "Istio", category: "Service Mesh" },
-  { name: "Linkerd", category: "Service Mesh" },
-  { name: "NGINX", category: "API Gateway" },
-  { name: "Kong", category: "API Gateway" },
-  { name: "Envoy", category: "Proxy" },
-  { name: "Terraform", category: "Infrastructure" },
-  { name: "AWS", category: "Cloud" },
-  { name: "Azure", category: "Cloud" },
-  { name: "GCP", category: "Cloud" },
-];
+  const integrations = [
+    { name: "Kubernetes", category: "Orchestration" },
+    { name: "Istio", category: "Service Mesh" },
+    { name: "Linkerd", category: "Service Mesh" },
+    { name: "NGINX", category: "API Gateway" },
+    { name: "Kong", category: "API Gateway" },
+    { name: "Envoy", category: "Proxy" },
+    { name: "Terraform", category: "Infrastructure" },
+    { name: "AWS", category: "Cloud" },
+    { name: "Azure", category: "Cloud" },
+    { name: "GCP", category: "Cloud" },
+  ];
 
-const faqs = [
-  {
-    question: "How does M2M authentication differ from user authentication?",
-    answer:
-      "Machine-to-machine authentication uses service accounts and client credentials instead of user credentials. Tokens are typically shorter-lived and don't require user interaction for refresh.",
-  },
-  {
-    question: "Can I use M2M authentication for both internal and external APIs?",
-    answer:
-      "Yes, Aether supports both internal service-to-service communication and external API authentication with appropriate scope restrictions and rate limiting.",
-  },
-  {
-    question: "How do you handle certificate rotation for mTLS?",
-    answer:
-      "Aether automatically rotates certificates before expiration using the SPIFFE standard. This requires zero downtime and no manual intervention.",
-  },
-  {
-    question: "Is there a limit on the number of service accounts?",
-    answer:
-      "No, Aether supports unlimited service accounts. You can create as many as needed for your microservices architecture.",
-  },
-  {
-    question: "Do you support JWT validation for offline verification?",
-    answer:
-      "Yes, Aether issues signed JWTs that can be validated offline using public keys, eliminating the need for network calls during authorization.",
-  },
-];
+  const faqs = [
+    {
+      question: t("faq.diffUser.title"),
+      answer: t("faq.diffUser.answer"),
+    },
+    {
+      question: t("faq.internalExternal.title"),
+      answer: t("faq.internalExternal.answer"),
+    },
+    {
+      question: t("faq.certRotation.title"),
+      answer: t("faq.certRotation.answer"),
+    },
+    {
+      question: t("faq.serviceAccounts.title"),
+      answer: t("faq.serviceAccounts.answer"),
+    },
+    {
+      question: t("faq.jwtValidation.title"),
+      answer: t("faq.jwtValidation.answer"),
+    },
+  ];
 
-const resources = [
-  {
-    icon: FileText,
-    title: "Documentation",
-    description: "M2M Authentication Setup Guide",
-  },
-  {
-    icon: BookOpen,
-    title: "Tutorial",
-    description: "Securing Microservices with mTLS",
-  },
-  {
-    icon: Calendar,
-    title: "Webinar",
-    description: "Zero-Trust Architecture for Services",
-  },
-  {
-    icon: BarChart3,
-    title: "Case Study",
-    description: "How FinTech Corp Secured 500+ Services",
-  },
-];
+  const resources = [
+    {
+      icon: FileText,
+      title: t("resources.documentation"),
+      description: t("resources.documentationDesc"),
+    },
+    {
+      icon: BookOpen,
+      title: t("resources.tutorial"),
+      description: t("resources.tutorialDesc"),
+    },
+    {
+      icon: Calendar,
+      title: t("resources.webinar"),
+      description: t("resources.webinarDesc"),
+    },
+    {
+      icon: BarChart3,
+      title: t("resources.caseStudy"),
+      description: t("resources.caseStudyDesc"),
+    },
+  ];
 
-export default async function M2MPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
+  const securityStandards = ["SOC 2 Type II", "GDPR", "ISO 27001", "HIPAA"];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -259,26 +254,25 @@ export default async function M2MPage({ params }: { params: Promise<{ locale: st
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                Machine-to-Machine Identity
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                Secure Service-to-Service Authentication
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Enterprise-grade machine identity management with OAuth 2.0, mTLS, and seamless
-                integration into your microservices architecture.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
                 <Link href="/docs">
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    View Documentation
+                    {t("hero.ctaDocs")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="https://github.com/skygenesisenterprise/aether-identity">
                   <Button variant="outline" size="lg" className="gap-2 h-12 px-6 text-base">
                     <GitHubIcon className="h-4 w-4" />
-                    GitHub Repository
+                    {t("hero.ctaGithub")}
                   </Button>
                 </Link>
               </div>
@@ -307,10 +301,10 @@ export default async function M2MPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Protocol Support
+                {t("protocols.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Industry-standard protocols for machine identity with flexible deployment options.
+                {t("protocols.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -334,9 +328,11 @@ export default async function M2MPage({ params }: { params: Promise<{ locale: st
         <section className="py-20 lg:py-28 border-b border-border bg-muted/30">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">How We Compare</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("compare.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                See why leading organizations choose Aether for machine-to-machine authentication.
+                {t("compare.description")}
               </p>
             </div>
             <div className="overflow-x-auto">
@@ -344,19 +340,19 @@ export default async function M2MPage({ params }: { params: Promise<{ locale: st
                 <thead>
                   <tr className="border-b border-border">
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
-                      Feature
+                      {t("compare.feature")}
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-semibold text-foreground">
-                      Aether
+                      {t("compare.aether")}
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-medium text-muted-foreground">
-                      Keycloak
+                      {t("compare.keycloak")}
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-medium text-muted-foreground">
-                      Auth0
+                      {t("compare.auth0")}
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-medium text-muted-foreground">
-                      Okta
+                      {t("compare.okta")}
                     </th>
                   </tr>
                 </thead>
@@ -416,11 +412,10 @@ export default async function M2MPage({ params }: { params: Promise<{ locale: st
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-balance">
-                  Integrate in Minutes, Not Weeks
+                  {t("code.title")}
                 </h2>
                 <p className="mt-4 text-lg text-background/70 leading-relaxed">
-                  Our SDKs handle token acquisition, refresh, and validation so you can focus on
-                  your application logic.
+                  {t("code.description")}
                 </p>
                 <div className="mt-8">
                   <div className="flex flex-wrap gap-2">
@@ -438,7 +433,7 @@ export default async function M2MPage({ params }: { params: Promise<{ locale: st
                   <Link href="/docs/quickstarts">
                     <Button variant="secondary" size="lg" className="gap-2">
                       <Code2 className="h-4 w-4" />
-                      Quickstart Guides
+                      {t("code.quickstart")}
                     </Button>
                   </Link>
                 </div>
@@ -455,11 +450,10 @@ export default async function M2MPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Core Capabilities
+                {t("capabilities.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Built for high-scale service authentication with enterprise-grade security and
-                observability.
+                {t("capabilities.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -485,10 +479,10 @@ export default async function M2MPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Common Use Cases
+                {t("useCases.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Aether handles authentication for diverse machine-to-machine scenarios at any scale.
+                {t("useCases.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -514,51 +508,48 @@ export default async function M2MPage({ params }: { params: Promise<{ locale: st
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                  Enterprise Security
+                  {t("security.title")}
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                  Built with security-first architecture to meet the most demanding compliance
-                  requirements.
+                  {t("security.description")}
                 </p>
                 <div className="mt-8 grid grid-cols-2 gap-3">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span className="text-sm text-foreground">SOC 2 Type II</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span className="text-sm text-foreground">GDPR</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span className="text-sm text-foreground">ISO 27001</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span className="text-sm text-foreground">HIPAA</span>
-                  </div>
+                  {securityStandards.map((standard) => (
+                    <div key={standard} className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                      <span className="text-sm text-foreground">{standard}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Shield className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">AES-256</div>
-                  <div className="text-sm text-muted-foreground">Encryption at rest</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("security.encryptionRest")}
+                  </div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Lock className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">TLS 1.3</div>
-                  <div className="text-sm text-muted-foreground">Encryption in transit</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("security.encryptionTransit")}
+                  </div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Gauge className="h-8 w-8 text-foreground mb-3" />
-                  <div className="text-2xl font-semibold text-foreground">Rate Limiting</div>
-                  <div className="text-sm text-muted-foreground">Per-service limits</div>
+                  <div className="text-2xl font-semibold text-foreground">
+                    {t("security.rateLimiting")}
+                  </div>
+                  <div className="text-sm text-muted-foreground">{t("security.rateLimitDesc")}</div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Layers className="h-8 w-8 text-foreground mb-3" />
-                  <div className="text-2xl font-semibold text-foreground">Audit Logs</div>
-                  <div className="text-sm text-muted-foreground">Complete trail</div>
+                  <div className="text-2xl font-semibold text-foreground">
+                    {t("security.auditLogs")}
+                  </div>
+                  <div className="text-sm text-muted-foreground">{t("security.completeTrail")}</div>
                 </div>
               </div>
             </div>
@@ -570,10 +561,10 @@ export default async function M2MPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Frequently Asked Questions
+                {t("faq.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Common questions about machine-to-machine authentication.
+                {t("faq.description")}
               </p>
             </div>
             <FaqAccordion faqs={faqs} />
@@ -584,9 +575,11 @@ export default async function M2MPage({ params }: { params: Promise<{ locale: st
         <section className="py-20 lg:py-28 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Resources</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("resources.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Explore our documentation, guides, and technical resources.
+                {t("resources.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -611,22 +604,19 @@ export default async function M2MPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Secure Your Machine Identity Today
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Deploy Aether Identity for M2M authentication and eliminate credential management
-                headaches. Open source, self-hosted, enterprise-ready.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link href="/docs">
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                    Get Started
+                    {t("cta.getStarted")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="/contact">
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    Contact Sales
+                    {t("cta.contactSales")}
                   </Button>
                 </Link>
               </div>

@@ -1402,5 +1402,895 @@
       "getStarted": "Get Started",
       "contactSales": "Contact Sales"
     }
+  },
+  "B2C": {
+    "hero": {
+      "badge": "Consumer Identity Solution",
+      "title": "Customer Identity That Converts",
+      "description": "Secure, seamless authentication for consumer applications. Reduce friction, increase conversions, and build lasting customer relationships.",
+      "ctaDocs": "View Documentation",
+      "ctaGithub": "GitHub Repository"
+    },
+    "metrics": {
+      "reducedFriction": "Reduced login friction",
+      "slaUptime": "Uptime SLA",
+      "higherConversion": "Higher conversion",
+      "passwordsManage": "Passwords to manage"
+    },
+    "capabilities": {
+      "title": "Build Trust with Every Login",
+      "description": "Modern authentication that balances security with user experience. Every login should feel effortless, every account secure.",
+      "biometric": "Biometric Authentication",
+      "biometricDesc": "Face ID, Touch ID, and WebAuthn support for seamless passwordless login across web and mobile applications.",
+      "social": "Social Login",
+      "socialDesc": "One-click authentication with Google, Apple, Facebook, and other major identity providers.",
+      "magic": "Magic Links & OTP",
+      "magicDesc": "Email and SMS-based authentication eliminating the need for passwords while maintaining security.",
+      "customer": "Customer Identity Management",
+      "customerDesc": "Complete user profile management with consent tracking, preference centers, and GDPR compliance.",
+      "crossBorder": "Cross-Border Identity",
+      "crossBorderDesc": "Support for international phone numbers, identity verification, and localized authentication flows.",
+      "fraud": "Fraud Prevention",
+      "fraudDesc": "Real-time risk analysis, device fingerprinting, and behavioral biometrics to prevent account takeover."
+    },
+    "loginOptions": {
+      "title": "Authentication Your Users Love",
+      "description": "Give users multiple ways to authenticate that fit their preferences and security needs.",
+      "passwordless": "Passwordless",
+      "passwordlessDesc": "Eliminate passwords entirely with biometric authentication, magic links, or passkeys.",
+      "socialProviders": "Social Providers",
+      "socialProvidersDesc": "Let users authenticate with their existing Google, Apple, or social media accounts.",
+      "mobileSso": "Mobile SSO",
+      "mobileSsoDesc": "Seamless authentication across iOS and Android apps with shared credentials.",
+      "enterpriseSso": "Enterprise SSO",
+      "enterpriseSsoDesc": "Bridge consumer and enterprise identities with SAML and OIDC federation."
+    },
+    "features": {
+      "title": "Customer Data Done Right",
+      "description": "Comprehensive customer identity management that respects privacy while enabling personalized experiences.",
+      "progressive": "Progressive Profiling",
+      "progressiveDesc": "Gather user information gradually to reduce signup friction while building comprehensive customer profiles.",
+      "preference": "Preference Centers",
+      "preferenceDesc": "Allow customers to manage their data, communications, and privacy settings from a single dashboard.",
+      "linking": "Account Linking",
+      "linkingDesc": "Enable users to link multiple authentication methods to a single account for flexible recovery.",
+      "session": "Session Management",
+      "sessionDesc": "Give users visibility into active sessions with the ability to revoke access remotely.",
+      "emailVerify": "Email Verification",
+      "emailVerifyDesc": "Automated email verification flows with customizable templates and delivery settings.",
+      "export": "Customer Data Export",
+      "exportDesc": "One-click GDPR-compliant data export in standard formats for portability."
+    },
+    "industries": {
+      "title": "Built for Consumer Apps",
+      "description": "Tailored identity solutions for every type of consumer-facing application.",
+      "ecommerce": "E-commerce",
+      "ecommerceDesc": "Streamlined customer accounts, wishlists, and personalized shopping experiences.",
+      "healthcare": "Healthcare",
+      "healthcareDesc": "Patient portal authentication with HIPAA-compliant identity verification.",
+      "fintech": "Fintech",
+      "fintechDesc": "Secure customer onboarding with identity verification and strong authentication.",
+      "marketplaces": "Marketplaces",
+      "marketplacesDesc": "Buyer and seller identity management with reputation and trust systems."
+    },
+    "compliance": {
+      "title": "Privacy by Design",
+      "description": "Built from the ground up to meet global privacy regulations. Handle customer data with confidence and compliance.",
+      "consent": "Granular tracking",
+      "rightDelete": "Automated workflows",
+      "dataExport": "Portable formats",
+      "breachAlert": "Instant notifications"
+    },
+    "code": {
+      "title": "Integrate in Minutes",
+      "description": "Our SDKs make it simple to add powerful authentication to any consumer application. Support for web, iOS, and Android out of the box.",
+      "quickstart": "Quickstart Guides"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "description": "Common questions about consumer identity management.",
+      "diffB2b": {
+        "title": "How does B2C authentication differ from B2B?",
+        "answer": "B2C focuses on consumer-facing applications with emphasis on reducing login friction, supporting social logins, and managing consent. B2B typically involves organizational authentication, role-based access, and enterprise federation."
+      },
+      "migration": {
+        "title": "Can I migrate existing customer accounts?",
+        "answer": "Yes, we provide migration tools to import users from Auth0, Okta, Firebase Auth, or any custom identity system. We handle password hashing compatibility and seamless transition."
+      },
+      "consentGdpr": {
+        "title": "How do you handle consent under GDPR?",
+        "answer": "Aether provides built-in consent management with granular preference centers, audit trails for consent changes, and easy data export/deletion for data subject requests."
+      },
+      "deviceLoss": {
+        "title": "What happens if a user loses their device?",
+        "answer": "Users can recover their account through backup methods like email, phone, or security questions. Administrative recovery options are also available."
+      },
+      "progressive": {
+        "title": "Do you support progressive profiling?",
+        "answer": "Yes, you can collect user information gradually across sessions to reduce signup friction while building complete user profiles."
+      }
+    },
+    "resources": {
+      "title": "Resources",
+      "description": "Explore guides and research on consumer identity management.",
+      "whitepaper": "Whitepaper",
+      "whitepaperDesc": "Consumer Identity architecture Best Practices",
+      "ebook": "E-book",
+      "ebookDesc": "Reducing Customer Login Friction",
+      "caseStudy": "Case Study",
+      "caseStudyDesc": "How RetailBrand Increased Conversions by 65%"
+    },
+    "cta": {
+      "title": "Transform Your Customer Experience",
+      "description": "Secure, frictionless authentication that helps you build lasting customer relationships while staying compliant.",
+      "getStarted": "Get Started",
+      "contactSales": "Contact Sales"
+    }
+  },
+  "B2B": {
+    "hero": {
+      "badge": "B2B Identity Solutions",
+      "title": "Identity for Every Business Relationship",
+      "description": "Securely manage employees, customers, partners, and contractors with a unified identity platform built for complex B2B ecosystems.",
+      "ctaDocs": "View Documentation",
+      "ctaContact": "Contact Sales"
+    },
+    "metrics": {
+      "onboardingTime": "Reduced onboarding time",
+      "slaAvailability": "SLA availability",
+      "partnerIntegration": "Faster partner integration",
+      "vendorLockin": "Vendor lock-in"
+    },
+    "capabilities": {
+      "title": "Comprehensive B2B Identity",
+      "description": "A single platform to manage all external identity relationships with the security, compliance, and flexibility your business demands.",
+      "partner": "Partner Identity Management",
+      "partnerDesc": "Secure external access with granular permissions, session controls, and detailed audit trails for all partner interactions.",
+      "external": "External User Authentication",
+      "externalDesc": "Dedicated flows for customers, vendors, and contractors with customizable onboarding and enrollment experiences.",
+      "api": "API Access Management",
+      "apiDesc": "Fine-grained OAuth 2.0 scopes and token management for machine-to-machine communication and partner integrations.",
+      "delegation": "Delegation & Impersonation",
+      "delegationDesc": "Allow employees to act on behalf of customers or partners with full audit logging and approval workflows.",
+      "sso": "Cross-Organization SSO",
+      "ssoDesc": "Federated authentication across partner domains with SAML 2.0 and OIDC federation protocols.",
+      "risk": "Risk-Based Authentication",
+      "riskDesc": "Adaptive policies based on user context, device fingerprint, geolocation, and behavioral analysis."
+    },
+    "solutions": {
+      "title": "Built for All Identity Types",
+      "description": "Tailored workflows and permissions for every type of external access.",
+      "employee": "Employee Access",
+      "employeeDesc": "Secure workforce identity with SSO, MFA, and role-based access across all enterprise applications.",
+      "employeeFeatures": ["SSO integration", "Device management", "Lifecycle automation"],
+      "customer": "Customer Identity",
+      "customerDesc": "Seamless customer experiences with registration, profile management, and preference centers.",
+      "customerFeatures": ["Social login", "Progressive profiling", "Consent management"],
+      "partnerPortal": "Partner Portal",
+      "partnerPortalDesc": "Controlled partner access with dedicated workspaces, API keys, and usage monitoring.",
+      "partnerFeatures": ["Partner directories", "API entitlements", "Usage analytics"],
+      "audit": "Complete Audit Trail",
+      "auditDesc": "Every access decision logged with full context for compliance and investigation.",
+      "auditFeatures": ["Real-time logging", "Compliance reports", "Investigation tools"]
+    },
+    "code": {
+      "title": "Integrate Partner Access in Minutes",
+      "description": "Our SDKs and pre-built connectors make integrating B2B identity into your applications seamless and straightforward.",
+      "quickstart": "Quickstart Guides"
+    },
+    "compare": {
+      "title": "Compare Solutions",
+      "description": "See how Aether stacks up against other B2B identity providers.",
+      "feature": "Feature",
+      "aether": "Aether",
+      "keycloak": "Keycloak",
+      "auth0": "Auth0",
+      "okta": "Okta"
+    },
+    "benefits": {
+      "title": "Enterprise-Grade Benefits",
+      "description": "Built for scale with the security and compliance features enterprises demand.",
+      "lifecycle": "Automated Lifecycle",
+      "lifecycleDesc": "Automated provisioning and deprovisioning based on HR systems, contracts, and policy rules.",
+      "governance": "Consistent Governance",
+      "governanceDesc": "Unified access policies across all user types with centralized visibility and reporting.",
+      "integration": "Integration Ready",
+      "integrationDesc": "Pre-built connectors for Salesforce, SAP, Oracle, and 200+ enterprise applications.",
+      "audit": "Complete Audit Trail",
+      "auditDesc": "Every access decision logged with full context for compliance and investigation."
+    },
+    "compliance": {
+      "title": "Built for Regulated Industries",
+      "description": "Aether B2B Identity meets the stringent security and compliance requirements of healthcare, finance, and government sectors.",
+      "encryptionRest": "Encryption at rest",
+      "encryptionTransit": "Encryption in transit",
+      "multiTenant": "Multi-tenant",
+      "isolation": "Logical isolation",
+      "auditLogs": "Audit Logs",
+      "completeTrail": "Complete trail"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "description": "Common questions about Aether B2B identity solutions.",
+      "multitenant": {
+        "title": "How does Aether handle multi-tenant B2B scenarios?",
+        "answer": "Aether provides dedicated namespaces per organization with isolated configurations, branding, and user directories. Cross-organization access is controlled through explicit federation agreements."
+      },
+      "migration": {
+        "title": "Can I migrate from Auth0 or Okta B2B solutions?",
+        "answer": "Yes, we provide migration tools and assistance to import your organizations, users, and access configurations. Contact our team for a customized migration plan."
+      },
+      "sla": {
+        "title": "What about SLA guarantees for B2B identity?",
+        "answer": "Aether provides 99.99% SLA for enterprise deployments with dedicated support and compensation clauses."
+      },
+      "freeTier": {
+        "title": "Is there a free tier for B2B?",
+        "answer": "Yes, Aether Community Edition supports basic B2B scenarios. For advanced features like delegation and partner federation, contact our sales team."
+      },
+      "gdpr": {
+        "title": "How do you handle regulatory requirements like GDPR?",
+        "answer": "Aether includes built-in consent management, data export, deletion workflows, and processing agreements for GDPR compliance."
+      }
+    },
+    "resources": {
+      "title": "Resources",
+      "description": "Explore documentation, guides, and research on B2B identity management.",
+      "whitepaper": "Whitepaper",
+      "whitepaperDesc": "B2B Identity Architecture Guide",
+      "ebook": "E-book",
+      "ebookDesc": "Zero Trust for External Access",
+      "webinar": "Webinar",
+      "webinarDesc": "Modern Partner Identity Management",
+      "caseStudy": "Case Study",
+      "caseStudyDesc": "How TechCorp Scaled Partner Access"
+    },
+    "partners": {
+      "title": "Technical Partners",
+      "description": "Seamlessly integrated with the enterprise applications you use."
+    },
+    "team": {
+      "title": "Built by Experts",
+      "description": "Our team brings decades of experience in identity, security, and enterprise infrastructure."
+    },
+    "updates": {
+      "title": "Recent Updates",
+      "description": "Stay up to date with the latest B2B features and improvements."
+    },
+    "cta": {
+      "title": "Secure Every Business Relationship",
+      "description": "Deploy Aether B2B Identity today and unify all your external access under one platform.",
+      "getStarted": "Get Started",
+      "contactSales": "Contact Sales"
+    }
+  },
+  "M2M": {
+    "hero": {
+      "badge": "Machine-to-Machine Identity",
+      "title": "Secure Service-to-Service Authentication",
+      "description": "Enterprise-grade machine identity management with OAuth 2.0, mTLS, and seamless integration into your microservices architecture.",
+      "ctaDocs": "View Documentation",
+      "ctaGithub": "GitHub Repository"
+    },
+    "metrics": {
+      "tokenLatency": "Token issuance latency",
+      "requestsPerSecond": "Requests per second",
+      "slaAvailability": "SLA availability",
+      "vendorLockin": "Vendor lock-in"
+    },
+    "protocols": {
+      "title": "Protocol Support",
+      "description": "Industry-standard protocols for machine identity with flexible deployment options.",
+      "oauth": "OAuth 2.0",
+      "oauthDesc": "Client Credentials, JWT Bearer, and refresh token flows for secure service authentication.",
+      "oidc": "OpenID Connect",
+      "oidcDesc": "Service account discovery and standardized token claims for inter-service identity.",
+      "mtls": "mTLS",
+      "mtlsDesc": "Mutual TLS with automated certificate lifecycle management and mesh integration.",
+      "apiKeys": "API Keys",
+      "apiKeysDesc": "Revocable API keys with scoped permissions and automatic rotation support."
+    },
+    "capabilities": {
+      "title": "Core Capabilities",
+      "description": "Built for high-scale service authentication with enterprise-grade security and observability.",
+      "credentials": "Client Credentials Flow",
+      "credentialsDesc": "OAuth 2.0 Client Credentials flow for secure machine-to-machine authentication with automatic token refresh.",
+      "apiKeys": "API Key Management",
+      "apiKeysDesc": "Generate, rotate, and manage API keys with granular scopes and expiration policies.",
+      "serviceMesh": "Service Mesh Integration",
+      "serviceMeshDesc": "Native integration with Istio, Linkerd, and Consul for zero-trust service communication.",
+      "mtls": "Mutual TLS (mTLS)",
+      "mtlsDesc": "Certificate-based authentication with automated certificate rotation and trust management.",
+      "selfHosted": "Self-Hosted Infrastructure",
+      "selfHostedDesc": "Deploy on your infrastructure with Docker, Kubernetes, or bare metal. Your data stays under your control.",
+      "introspection": "Token Introspection",
+      "introspectionDesc": "Real-time token validation and introspection for stateless authorization decisions."
+    },
+    "compare": {
+      "title": "How We Compare",
+      "description": "See why leading organizations choose Aether for machine-to-machine authentication.",
+      "feature": "Feature",
+      "aether": "Aether",
+      "keycloak": "Keycloak",
+      "auth0": "Auth0",
+      "okta": "Okta"
+    },
+    "code": {
+      "title": "Integrate in Minutes, Not Weeks",
+      "description": "Our SDKs handle token acquisition, refresh, and validation so you can focus on your application logic.",
+      "quickstart": "Quickstart Guides"
+    },
+    "useCases": {
+      "title": "Common Use Cases",
+      "description": "Aether handles authentication for diverse machine-to-machine scenarios at any scale.",
+      "microservices": "Microservices Authentication",
+      "microservicesDesc": "Secure inter-service communication with fine-grained access control and audit trails.",
+      "apiGateway": "API Gateway Security",
+      "apiGatewayDesc": "Centralized authentication and authorization at the API gateway layer.",
+      "cicd": "CI/CD Pipeline Access",
+      "cicdDesc": "Secure authentication for build systems, deployment pipelines, and automation tools.",
+      "serverless": "Serverless Functions",
+      "serverlessDesc": "Lightweight authentication for AWS Lambda, Azure Functions, and Cloud Functions."
+    },
+    "security": {
+      "title": "Enterprise Security",
+      "description": "Built with security-first architecture to meet the most demanding compliance requirements.",
+      "encryptionRest": "Encryption at rest",
+      "encryptionTransit": "Encryption in transit",
+      "rateLimiting": "Rate Limiting",
+      "rateLimitDesc": "Per-service limits",
+      "auditLogs": "Audit Logs",
+      "completeTrail": "Complete trail"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "description": "Common questions about machine-to-machine authentication.",
+      "diffUser": {
+        "title": "How does M2M authentication differ from user authentication?",
+        "answer": "Machine-to-machine authentication uses service accounts and client credentials instead of user credentials. Tokens are typically shorter-lived and don't require user interaction for refresh."
+      },
+      "internalExternal": {
+        "title": "Can I use M2M authentication for both internal and external APIs?",
+        "answer": "Yes, Aether supports both internal service-to-service communication and external API authentication with appropriate scope restrictions and rate limiting."
+      },
+      "certRotation": {
+        "title": "How do you handle certificate rotation for mTLS?",
+        "answer": "Aether automatically rotates certificates before expiration using the SPIFFE standard. This requires zero downtime and no manual intervention."
+      },
+      "serviceAccounts": {
+        "title": "Is there a limit on the number of service accounts?",
+        "answer": "No, Aether supports unlimited service accounts. You can create as many as needed for your microservices architecture."
+      },
+      "jwtValidation": {
+        "title": "Do you support JWT validation for offline verification?",
+        "answer": "Yes, Aether issues signed JWTs that can be validated offline using public keys, eliminating the need for network calls during authorization."
+      }
+    },
+    "resources": {
+      "title": "Resources",
+      "description": "Explore our documentation, guides, and technical resources.",
+      "documentation": "Documentation",
+      "documentationDesc": "M2M Authentication Setup Guide",
+      "tutorial": "Tutorial",
+      "tutorialDesc": "Securing Microservices with mTLS",
+      "webinar": "Webinar",
+      "webinarDesc": "Zero-Trust Architecture for Services",
+      "caseStudy": "Case Study",
+      "caseStudyDesc": "How FinTech Corp Secured 500+ Services"
+    },
+    "cta": {
+      "title": "Secure Your Machine Identity Today",
+      "description": "Deploy Aether Identity for M2M authentication and eliminate credential management headaches. Open source, self-hosted, enterprise-ready.",
+      "getStarted": "Get Started",
+      "contactSales": "Contact Sales"
+    }
+  },
+  "Passwordless": {
+    "hero": {
+      "badge": "Passwordless Authentication",
+      "title": "The Future of Authentication is Password-Free",
+      "description": "Eliminate the weakest link in your security chain. Implement secure, frictionless authentication that users love and attackers cannot compromise.",
+      "ctaDocs": "Implementation Guide",
+      "ctaContact": "Talk to Sales"
+    },
+    "metrics": {
+      "eliminatesBreaches": "Eliminates password breaches",
+      "supportTickets": "Reduction in support tickets",
+      "fasterAuth": "Faster user authentication",
+      "failedLogin": "Failed login rate"
+    },
+    "benefits": {
+      "title": "Why Go Passwordless",
+      "description": "Passwords are the leading cause of security breaches. Passwordless authentication eliminates this attack vector while improving user experience.",
+      "security": {
+        "title": "Enhanced Security",
+        "description": "Eliminate password breaches entirely. Passwordless authentication uses cryptographic keys that cannot be guessed, reused, or leaked."
+      },
+      "ux": {
+        "title": "Faster User Experience",
+        "description": "Users authenticate in seconds, not minutes. No more forgotten passwords or reset requests to handle."
+      },
+      "device": {
+        "title": "Seamless Device Integration",
+        "description": "Leverage devices users already carry. Biometric authentication feels natural on mobile and desktop."
+      },
+      "support": {
+        "title": "Reduced Support Costs",
+        "description": "Drastically reduce password-related support tickets. Users never need to reset credentials again."
+      }
+    },
+    "methods": {
+      "title": "Authentication Methods",
+      "description": "Choose the passwordless methods that fit your users and security requirements. Aether Identity supports all major passwordless standards.",
+      "passkeys": {
+        "title": "Passkeys (WebAuthn)",
+        "description": "Industry-standard passwordless authentication using cryptographic credentials stored on users' devices. Supports fingerprint, face recognition, and hardware security keys.",
+        "features": [
+          "Phishing-resistant",
+          "Device-bound credentials",
+          "Platform authenticator support",
+          "Cross-device authentication"
+        ]
+      },
+      "magicLink": {
+        "title": "Magic Links",
+        "description": "Email-based authentication where users receive a unique, time-limited link to complete sign-in. No passwords or apps required.",
+        "features": [
+          "No app installation",
+          "Email-based verification",
+          "Time-limited tokens",
+          "Device tracking optional"
+        ]
+      },
+      "otp": {
+        "title": "OTP (One-Time Password)",
+        "description": "Time-based or counter-based codes delivered via email, SMS, or authenticator apps. Familiar and widely accepted.",
+        "features": [
+          "Multiple delivery methods",
+          "Offline capability",
+          "High adoption rate",
+          "Familiar user pattern"
+        ]
+      },
+      "email": {
+        "title": "Email Verification",
+        "description": "Passwordless email authentication where users confirm identity by clicking a link or entering a code sent to their email.",
+        "features": [
+          "No new apps needed",
+          "Instant setup",
+          "Audit trail built-in",
+          "Universal accessibility"
+        ]
+      }
+    },
+    "comparison": {
+      "title": "Method Comparison",
+      "description": "Compare passwordless methods across security, usability, and implementation factors.",
+      "criteria": "Criteria",
+      "password": "Password",
+      "passkey": "Passkey",
+      "magicLink": "Magic Link",
+      "otp": "OTP",
+      "security": "Security Level",
+      "experience": "User Experience",
+      "complexity": "Setup Complexity",
+      "dependency": "Device Dependency",
+      "recovery": "Recovery Options"
+    },
+    "useCases": {
+      "title": "Use Cases",
+      "description": "Passwordless authentication adapts to various scenarios, from customer-facing applications to enterprise internal systems.",
+      "onboarding": {
+        "title": "Customer Onboarding",
+        "description": "Remove friction from signup flows. New users can create accounts and authenticate immediately without remembering yet another password."
+      },
+      "employee": {
+        "title": "Employee Access",
+        "description": "Simplify internal authentication. Employees access applications with biometrics or security keys, improving productivity and security."
+      },
+      "partner": {
+        "title": "Partner Integrations",
+        "description": "Enable secure partner access without password management overhead. Partners authenticate using their own identity providers."
+      },
+      "admin": {
+        "title": "Admin Security",
+        "description": "Secure administrative accounts with the strongest authentication available. Protect critical systems with passkeys and hardware tokens."
+      }
+    },
+    "implementation": {
+      "title": "Easy Implementation",
+      "description": "Integrate passwordless authentication in minutes with our SDKs and comprehensive documentation. Support for all major frameworks and languages.",
+      "checklist": {
+        "webauthn": "Full FIDO2/WebAuthn support",
+        "magic": "Magic link and email OTP",
+        "totp": "TOTP authenticator integration",
+        "adaptive": "Adaptive authentication policies"
+      },
+      "cta": "Quickstart Guide",
+      "example": "Example: Enable Passkeys"
+    },
+    "compliance": {
+      "title": "Standards Compliant",
+      "description": "Aether Identity implements industry-standard passwordless protocols, ensuring compatibility and compliance with regulatory requirements.",
+      "fido": "FIDO2/WebAuthn Compliant",
+      "eidas": "eIDAS Ready",
+      "gdpr": "GDPR Compatible",
+      "soc": "SOC 2 Type II",
+      "iso": "ISO 27001"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "description": "Common questions about passwordless authentication.",
+      "what": {
+        "title": "What is passwordless authentication?",
+        "answer": "Passwordless authentication is any method of verifying user identity without using traditional passwords. This includes passkeys, magic links, OTPs, and biometric authentication. These methods are more secure and provide better user experience."
+      },
+      "safe": {
+        "title": "Are passkeys safe?",
+        "answer": "Yes, passkeys are among the most secure authentication methods available. They use cryptographic key pairs that are resistant to phishing, cannot be reused across sites, and are stored securely on user's devices. They meet or exceed the security of traditional multi-factor authentication."
+      },
+      "lost": {
+        "title": "What happens if a user loses their device?",
+        "answer": "Aether Identity provides multiple recovery options including cloud sync for passkeys, backup verification methods, and administrative account recovery. Users can also register multiple authenticators for redundancy."
+      },
+      "alongside": {
+        "title": "Can I use passwordless alongside passwords?",
+        "answer": "Yes, you can enable passwordless authentication as an option while maintaining password-based login. Many organizations run both methods during a transition period. However, we recommend going fully passwordless for optimal security."
+      },
+      "offline": {
+        "title": "Do passwordless methods work offline?",
+        "answer": "TOTP and some passkey implementations work offline. Magic links and email verification require connectivity. For offline scenarios, we recommend TOTP-based authenticators or hardware security keys."
+      }
+    },
+    "resources": {
+      "title": "Resources",
+      "description": "Explore our documentation and guides for implementing passwordless authentication.",
+      "whitepaper": "Whitepaper",
+      "whitepaperDesc": "Passwordless Security Implementation Guide",
+      "ebook": "E-book",
+      "ebookDesc": "Complete Guide to Passkeys",
+      "webinar": "Webinar",
+      "webinarDesc": "Migrating from Passwords to Passkeys",
+      "video": "Video Demo",
+      "videoDesc": "Passwordless Authentication Setup"
+    },
+    "cta": {
+      "title": "Ready to Eliminate Passwords?",
+      "description": "Implement passwordless authentication today. Start with our free tier and scale as your needs grow.",
+      "getStarted": "Get Started",
+      "contact": "Contact Sales"
+    }
+  },
+  "Financial": {
+    "hero": {
+      "badge": "Financial Services Solutions",
+      "title": "Secure Identity Infrastructure for Financial Institutions",
+      "description": "Enterprise-grade identity and access management built for banks, payment service providers, and fintech companies. Meet regulatory requirements while delivering seamless customer experiences.",
+      "ctaContact": "Contact Sales",
+      "ctaDocs": "View Documentation"
+    },
+    "metrics": {
+      "uptime": "Uptime SLA",
+      "latency": "Authentication latency",
+      "frameworks": "Compliance frameworks",
+      "breaches": "Data breaches"
+    },
+    "benefits": {
+      "title": "Built for Financial Services",
+      "description": "Purpose-built identity management that addresses the unique security, compliance, and user experience requirements of the financial industry.",
+      "psd2": {
+        "title": "PSD2 & Open Banking Compliance",
+        "description": "Built-in support for PSD2 regulatory requirements, secure API access, and third-party provider (TPP) integration."
+      },
+      "security": {
+        "title": "Multi-Layered Security",
+        "description": "End-to-end encryption, hardware security module (HSM) integration, and real-time fraud detection capabilities."
+      },
+      "adaptive": {
+        "title": "Adaptive Authentication",
+        "description": "Risk-based authentication with biometric verification, device fingerprinting, and behavioral analysis."
+      },
+      "ciam": {
+        "title": "Customer Identity & Access Management",
+        "description": "Seamless onboarding with progressive profiling, self-service account management, and consent management."
+      },
+      "rbac": {
+        "title": "Role-Based Access Control",
+        "description": "Granular permissions for internal staff, external auditors, and third-party service providers with full audit trails."
+      },
+      "global": {
+        "title": "Global Regulatory Support",
+        "description": "Pre-configured compliance templates for GDPR, PCI-DSS, SOX, and local banking regulations across jurisdictions."
+      }
+    },
+    "useCases": {
+      "title": "Solutions for Every Financial Service",
+      "description": "Tailored identity management for retail banking, corporate banking, trading, payments, and insurance.",
+      "retail": {
+        "title": "Retail Banking",
+        "description": "Secure customer authentication for online and mobile banking with PSD2-compliant strong customer authentication (SCA).",
+        "features": [
+          "Mobile banking authentication",
+          "Biometric login support",
+          "Transaction authorization",
+          "Account takeover protection"
+        ]
+      },
+      "corporate": {
+        "title": "Corporate Banking",
+        "description": "Enterprise-grade identity management for business banking portals, treasury operations, and payment workflows.",
+        "features": [
+          "Multi-factor authentication",
+          "API security for treasury",
+          "Delegation & approval workflows",
+          "Audit-ready logging"
+        ]
+      },
+      "trading": {
+        "title": "Trading Platforms",
+        "description": "High-assurance authentication for trading applications requiring real-time identity verification and compliance.",
+        "features": [
+          "Real-time identity verification",
+          "Regulatory compliance automation",
+          "Session management",
+          "Trade audit trails"
+        ]
+      },
+      "payments": {
+        "title": "Payment Services",
+        "description": "Secure payment authentication for PSPs, e-wallets, and payment gateways with 3D Secure 2.0 support.",
+        "features": [
+          "3D Secure 2.0 integration",
+          "Payment tokenization",
+          "Fraud prevention",
+          "PCI-DSS compliance"
+        ]
+      },
+      "cards": {
+        "title": "Card Issuers",
+        "description": "Cardholder authentication for digital card management, instant issuance, and dynamic card controls.",
+        "features": [
+          "Virtual card activation",
+          "Spending limit controls",
+          "Geolocation alerts",
+          "Instant notifications"
+        ]
+      },
+      "insurance": {
+        "title": "Insurance",
+        "description": "Secure portals for policyholders, agents, and claims processing with identity verification for sensitive operations.",
+        "features": [
+          "Policyholder self-service",
+          "Agent authentication",
+          "Claims workflow security",
+          "Document signing verification"
+        ]
+      }
+    },
+    "security": {
+      "title": "Enterprise Security Features",
+      "description": "Financial-grade security capabilities that meet the most stringent requirements for protection of customer assets and data.",
+      "hsm": {
+        "title": "Hardware Security Module (HSM)",
+        "description": "Integrate with Thales, Utimaco, or cloud HSMs for cryptographic key protection."
+      },
+      "fraud": {
+        "title": "Fraud Detection Integration",
+        "description": "Connect with fraud detection platforms to assess risk in real-time during authentication."
+      },
+      "behavioral": {
+        "title": "Behavioral Analytics",
+        "description": "Machine learning-based anomaly detection to identify suspicious login patterns."
+      },
+      "audit": {
+        "title": "Audit & Compliance Reporting",
+        "description": "Automated compliance reports for regulatory examinations and internal audits."
+      }
+    },
+    "compliance": {
+      "title": "Regulatory Compliance Built-In",
+      "description": "Aether Identity comes pre-configured with compliance templates and automation for major financial regulations, reducing implementation time and ensuring continuous compliance.",
+      "encryptionRest": "Encryption at rest",
+      "encryptionTransit": "Encryption in transit",
+      "hsm": "Key protection",
+      "passwordless": "Passwordless auth"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "description": "Common questions about financial services identity management.",
+      "psd2": {
+        "title": "How does Aether support PSD2 compliance?",
+        "answer": "Aether provides built-in support for PSD2 requirements including strong customer authentication (SCA), secure communication APIs for TPP access, consent management, and dynamic linking. Our solution is regularly updated to reflect the latest EBA guidelines."
+      },
+      "integration": {
+        "title": "Can Aether integrate with our existing banking core systems?",
+        "answer": "Yes, Aether provides pre-built integrations with major banking platforms including Fis, Temenos, Avaloq, and Oracle Flexcube. Our professional services team can also build custom integrations for legacy systems."
+      },
+      "performance": {
+        "title": "How does Aether handle high-volume authentication for trading platforms?",
+        "answer": "Aether is built for high-performance scenarios with sub-10ms authentication latency. Our distributed architecture supports horizontal scaling and can handle millions of authentications per day with 99.99% uptime."
+      },
+      "pci": {
+        "title": "Is Aether certified for PCI-DSS?",
+        "answer": "Aether can be deployed in a PCI-DSS compliant manner. When deployed according to our security guidelines and combined with your card infrastructure, Aether helps you meet PCI-DSS requirements for authentication and access control."
+      },
+      "premise": {
+        "title": "Do you offer on-premise deployment for banks with strict data residency requirements?",
+        "answer": "Yes, Aether supports full on-premise deployment including air-gapped installations. We also offer cloud deployments in specific regions to meet data residency requirements in jurisdictions like Germany, France, and Switzerland."
+      }
+    },
+    "resources": {
+      "title": "Resources",
+      "description": "Explore our documentation, compliance guides, and case studies for financial services.",
+      "whitepaper": "Whitepaper",
+      "whitepaperDesc": "Financial Services Identity Architecture Guide",
+      "caseStudy": "Case Study",
+      "caseStudyDesc": "How a European Bank Achieved PSD2 Compliance",
+      "technical": "Technical Guide",
+      "technicalDesc": "Integration with Core Banking Systems",
+      "compliance": "Compliance Brief",
+      "complianceDesc": "PSD2 SCA Implementation Best Practices"
+    },
+    "partners": {
+      "title": "Integration with Banking Systems",
+      "description": "Seamlessly integrate with your existing core banking, payment processing, and fraud detection systems."
+    },
+    "cta": {
+      "title": "Secure Your Financial Services Infrastructure",
+      "description": "Deploy enterprise-grade identity management that meets regulatory requirements and delivers seamless customer experiences.",
+      "contact": "Contact Sales",
+      "docs": "View Documentation"
+    }
+  },
+  "Healthcare": {
+    "hero": {
+      "badge": "Healthcare Solutions",
+      "title": "HIPAA-Compliant Identity for Modern Healthcare",
+      "description": "Secure patient portals, provider authentication, EHR integration, and telemedicine platforms with enterprise-grade identity management designed for healthcare regulatory requirements.",
+      "ctaContact": "Request Demo",
+      "ctaDocs": "View Documentation"
+    },
+    "metrics": {
+      "hipaa": "HIPAA compliance",
+      "latency": "Authentication latency",
+      "availability": "System availability",
+      "breaches": "Data breaches"
+    },
+    "features": {
+      "title": "Built for Healthcare Workflows",
+      "description": "Every feature designed to meet the unique security, compliance, and usability requirements of healthcare environments.",
+      "patient": {
+        "title": "Patient Portal Security",
+        "description": "Secure patient authentication with MFA, biometric support, and smart card integration for accessing medical records, scheduling appointments, and managing prescriptions."
+      },
+      "telemedicine": {
+        "title": "Telemedicine Authentication",
+        "description": "HIPAA-compliant video consultation authentication with end-to-end encryption, session timeouts, and audit logging for all telehealth interactions."
+      },
+      "ehr": {
+        "title": "EHR/EMR Integration",
+        "description": "Seamless integration with Epic, Cerner, Allscripts, and other major EHR systems using SAML 2.0, OAuth 2.0, and FHIR-based identity protocols."
+      },
+      "provider": {
+        "title": "Provider Identity Management",
+        "description": "Manage credentials for physicians, nurses, administrative staff, and contractors with role-based access tailored to clinical workflows."
+      },
+      "monitoring": {
+        "title": "Real-Time Monitoring",
+        "description": "Continuous security monitoring with anomaly detection, failed login alerts, and suspicious activity flags for compliance and threat prevention."
+      },
+      "clinical": {
+        "title": "Clinical Decision Support",
+        "description": "Attribute-based access control that adapts permissions based on patient-provider relationships, department assignments, and treatment contexts."
+      }
+    },
+    "compliance": {
+      "title": "Healthcare Compliance Built-In",
+      "description": "Meet HIPAA, HITECH, and emerging healthcare data regulations with confidence.",
+      "hipaa": {
+        "title": "HIPAA Compliance",
+        "description": "Full HIPAA Security Rule compliance with administrative, physical, and technical safeguards built into every authentication flow."
+      },
+      "audit": {
+        "title": "Audit Trail",
+        "description": "Comprehensive audit logging of all PHI access with immutable records, retention policies, and export capabilities for compliance audits."
+      },
+      "encryption": {
+        "title": "Data Encryption",
+        "description": "AES-256 encryption at rest and TLS 1.3 in transit. Support for customer-managed encryption keys in on-premise deployments."
+      },
+      "governance": {
+        "title": "Access Governance",
+        "description": "Automated access reviews, least-privilege enforcement, and segregation of duties (SoD) policies to meet regulatory requirements."
+      }
+    },
+    "useCases": {
+      "title": "Comprehensive Use Cases",
+      "description": "From patient access to clinical workflows, Aether secures every touchpoint in the healthcare ecosystem.",
+      "patient": {
+        "title": "Patient Access",
+        "description": "Self-service password management, MFA enrollment, and secure sharing of medical records with family members or other providers."
+      },
+      "staff": {
+        "title": "Staff Authentication",
+        "description": "Single sign-on across clinical applications, smart card integration, and proximity-based authentication for hospital environments."
+      },
+      "interoperability": {
+        "title": "Interoperability",
+        "description": "Federated identity across healthcare networks, HIEs, and partner organizations using standards-based protocols."
+      },
+      "remote": {
+        "title": "Remote Work",
+        "description": "Secure VPN-less access for remote clinical staff, telehealth providers, and administrative personnel working from home."
+      }
+    },
+    "integrations": {
+      "title": "EHR System Integrations",
+      "description": "Seamless integration with the healthcare applications you already use.",
+      "notFound": "Don't see your EHR? Contact us for custom integration support."
+    },
+    "deployment": {
+      "title": "Deploy According to Your Policy",
+      "description": "Whether you require complete on-premise control or cloud scalability, Aether adapts to your infrastructure and data residency requirements.",
+      "onPremise": "On-Premise",
+      "private": "Private Cloud",
+      "hybrid": "Hybrid"
+    },
+    "security": {
+      "title": "Enterprise Security for Patient Data",
+      "description": "Protect sensitive health information with military-grade security controls designed specifically for healthcare environments.",
+      "encryptionRest": "Encryption at rest",
+      "encryptionTransit": "Encryption in transit",
+      "biometric": "Biometric support",
+      "keys": "Customer keys",
+      "saml": "SAML 2.0 & OAuth 2.0/OIDC support",
+      "smartcard": "Smart card & proximity card integration",
+      "session": "Automatic session timeout policies",
+      "mfa": "Dual-factor authentication (TOTP, SMS, email)",
+      "breakglass": "Break-glass emergency access workflows",
+      "threat": "Real-time threat detection & alerting"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "description": "Common questions about healthcare identity management.",
+      "hipaa": {
+        "title": "Is Aether HIPAA certified?",
+        "answer": "Aether Identity is designed to meet HIPAA Security Rule requirements. We provide a Business Associate Agreement (BAA) for all healthcare deployments and can assist with your compliance documentation."
+      },
+      "ehr": {
+        "title": "Can we integrate with our existing EHR system?",
+        "answer": "Yes, Aether supports SAML 2.0, OAuth 2.0/OpenID Connect, and SCIM integrations with all major EHR platforms including Epic, Cerner, Allscripts, and MEDITECH."
+      },
+      "consent": {
+        "title": "How do you handle patient consent for data sharing?",
+        "answer": "Aether supports granular consent management through attribute-based policies. You can define which data types can be shared with which parties based on patient consent records."
+      },
+      "credentials": {
+        "title": "Can healthcare staff use their existing hospital credentials?",
+        "answer": "Yes, Aether supports user federation with Active Directory, LDAP, and existing IAM systems. Staff can continue using their hospital credentials while gaining SSO access to clinical applications."
+      },
+      "emergency": {
+        "title": "Do you offer emergency access (break-glass) procedures?",
+        "answer": "Yes, Aether supports emergency access workflows with elevated privilege provisioning, dual-actor approval, and mandatory post-access review documentation."
+      }
+    },
+    "resources": {
+      "title": "Resources",
+      "description": "Explore guides, compliance documentation, and case studies for healthcare identity.",
+      "whitepaper": "Whitepaper",
+      "whitepaperDesc": "Healthcare Identity Management Guide",
+      "compliance": "Compliance Report",
+      "complianceDesc": "HIPAA Security Rule Implementation",
+      "webinar": "Webinar",
+      "webinarDesc": "EHR Integration Best Practices",
+      "caseStudy": "Case Study",
+      "caseStudyDesc": "Regional Hospital Network Migration"
+    },
+    "cta": {
+      "title": "Secure Your Healthcare Identity Today",
+      "description": "Join healthcare organizations that trust Aether Identity to protect patient data and enable secure clinical workflows.",
+      "contact": "Request a Demo",
+      "docs": "View Documentation"
+    }
   }
 }

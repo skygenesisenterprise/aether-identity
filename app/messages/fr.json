@@ -1402,5 +1402,907 @@
       "getStarted": "Commencer",
       "contactSales": "Contacter les Ventes"
     }
+  },
+  "B2C": {
+    "hero": {
+      "badge": "Solution Identité Consommateur",
+      "title": "Identité Client Qui Convertit",
+      "description": "Authentification sécurisée et transparente pour les applications grand public. Réduisez la friction, augmentez les conversions et construisez des relations clients durables.",
+      "ctaDocs": "Voir la Documentation",
+      "ctaGithub": "Dépôt GitHub"
+    },
+    "metrics": {
+      "reducedFriction": "Friction de connexion réduite",
+      "slaUptime": "Disponibilité SLA",
+      "higherConversion": "Conversion plus élevée",
+      "passwordsManage": "Mots de passe à gérer"
+    },
+    "capabilities": {
+      "title": "Construisez la Confiance à Chaque Connexion",
+      "description": "Authentification moderne qui équilibre sécurité et expérience utilisateur. Chaque connexion doit être sans effort, chaque compte sécurisé.",
+      "biometric": "Authentification Biométrique",
+      "biometricDesc": "Support Face ID, Touch ID et WebAuthn pour connexion sans mot de passe transparente sur web et mobile.",
+      "social": "Connexion Sociale",
+      "socialDesc": "Authentification en un clic avec Google, Apple, Facebook et autres fournisseurs d'identité majeurs.",
+      "magic": "Liens Magiques & OTP",
+      "magicDesc": "Authentification par email et SMS éliminant le besoin de mots de passe tout en maintenant la sécurité.",
+      "customer": "Gestion Identité Client",
+      "customerDesc": "Gestion complète du profil utilisateur avec suivi du consentement, centres de préférences et conformité GDPR.",
+      "crossBorder": "Identité Transfrontalière",
+      "crossBorderDesc": "Support pour numéros de téléphone internationaux, vérification d'identité et flux d'authentification localisés.",
+      "fraud": "Prévention de la Fraude",
+      "fraudDesc": "Analyse de risque en temps réel, empreintedevice et biométrie comportementale pour prévenir le détournement de compte."
+    },
+    "loginOptions": {
+      "title": "Authentification Que Vos Utilisateurs Aiment",
+      "description": "Donnez aux utilisateurs plusieurs façons de s'authentifier selon leurs préférences et besoins de sécurité.",
+      "passwordless": "Sans Mot de Passe",
+      "passwordlessDesc": "Éliminez entièrement les mots de passe avec authentification biométrique, liens magiques ou passkeys.",
+      "socialProviders": "Fournisseurs Sociaux",
+      "socialProvidersDesc": "Permettez aux utilisateurs de s'authentifier avec leurs comptes Google, Apple ou réseaux sociaux existants.",
+      "mobileSso": "SSO Mobile",
+      "mobileSsoDesc": "Authentification transparente sur iOS et Android avec identifiants partagés.",
+      "enterpriseSso": "SSO Entreprise",
+      "enterpriseSsoDesc": "Reliez les identités consommateur et entreprise avec fédération SAML et OIDC."
+    },
+    "features": {
+      "title": "Données Client Bien Faites",
+      "description": "Gestion complète de l'identité client qui respecte la vie privée tout en permettant des expériences personnalisées.",
+      "progressive": "Profiling Progressif",
+      "progressiveDesc": "Collectez les informations utilisateur progressivement pour réduire la friction d'inscription tout en construisant des profils clients complets.",
+      "preference": "Centres de Préférences",
+      "preferenceDesc": "Permettez aux clients de gérer leurs données, communications et paramètres de confidentialité depuis un seul tableau de bord.",
+      "linking": "Liaison de Compte",
+      "linkingDesc": "Permettez aux utilisateurs de lier plusieurs méthodes d'authentification à un seul compte pour une récupération flexible.",
+      "session": "Gestion de Session",
+      "sessionDesc": "Donnez aux utilisateurs une visibilité sur les sessions actives avec possibilité de révoquer l'accès à distance.",
+      "emailVerify": "Vérification Email",
+      "emailVerifyDesc": "Flux de vérification email automatisés avec templates personnalisables et paramètres de livraison.",
+      "export": "Export Données Client",
+      "exportDesc": "Export de données conforme GDPR en un clic dans des formats standards pour la portabilité."
+    },
+    "industries": {
+      "title": "Conçu pour les Apps Consommateur",
+      "description": "Solutions d'identité adaptées pour tout type d'application grand public.",
+      "ecommerce": "E-commerce",
+      "ecommerceDesc": "Comptes clients simplifiés, wishlists et expériences d'achat personnalisées.",
+      "healthcare": "Santé",
+      "healthcareDesc": "Authentification de portal patient avec vérification d'identité conforme HIPAA.",
+      "fintech": "Fintech",
+      "fintechDesc": "Onboarding client sécurisé avec vérification d'identité et authentification fuerte.",
+      "marketplaces": "Marketplaces",
+      "marketplacesDesc": "Gestion d'identité acheteurs et vendeurs avec systèmes de réputation et confiance."
+    },
+    "compliance": {
+      "title": "Confidentialité par Conception",
+      "description": "Conçu dès la base pour répondre aux réglementations mondiales sur la confidentialité. Gérez les données clients avec confiance et conformité.",
+      "consent": "Suivi granulaire",
+      "rightDelete": "Workflows automatisés",
+      "dataExport": "Formats portables",
+      "breachAlert": "Notifications instantanées"
+    },
+    "code": {
+      "title": "Intégrez en Minutes",
+      "description": "Nos SDK permettent d'ajouter facilement une authentification puissante à toute application consommateur. Support pour web, iOS et Android prêt à l'emploi.",
+      "quickstart": "Guides de Démarrage"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur la gestion d'identité consommateur.",
+      "diffB2b": {
+        "title": "Comment l'authentification B2C diffère-t-elle du B2B?",
+        "answer": "B2C se concentre sur les applications grand public avec emphasis sur la réduction de la friction de connexion, le support des connexions sociales et la gestion du consentement. B2B implique typiquement authentification organisationnelle, accès basé sur les rôles et fédération entreprise."
+      },
+      "migration": {
+        "title": "Puis-je migrer les comptes clients existants?",
+        "answer": "Oui, nous fournissons des outils de migration pour importer des utilisateurs depuis Auth0, Okta, Firebase Auth ou tout système d'identité personnalisé. Nous gérons la compatibilité de hachage de mot de passe et la transition transparente."
+      },
+      "consentGdpr": {
+        "title": "Comment gérez-vous le consentement sous GDPR?",
+        "answer": "Aether fournit une gestion de consentement intégrée avec centres de préférences granulaires, pistes d'audit pour les changements de consentement et export/suppression facile pour les demandes du sujet des données."
+      },
+      "deviceLoss": {
+        "title": "Que se passe-t-il si un utilisateur perd son appareil?",
+        "answer": "Les utilisateurs peuvent récupérer leur compte via des méthodes de sauvegarde comme email, téléphone ou questions de sécurité. Des options de récupération administratives sont également disponibles."
+      },
+      "progressive": {
+        "title": "Supportez-vous le profiling progressif?",
+        "answer": "Oui, vous pouvez collecter les informations utilisateur progressivement au travers des sessions pour réduire la friction d'inscription tout en construisant des profils utilisateurs complets."
+      }
+    },
+    "resources": {
+      "title": "Ressources",
+      "description": "Explorez les guides et recherches sur la gestion d'identité consommateur.",
+      "whitepaper": "Livre Blanc",
+      "whitepaperDesc": "Meilleures Pratiques d'Architecture d'Identité Consommateur",
+      "ebook": "E-book",
+      "ebookDesc": "Réduire la Friction de Connexion Client",
+      "caseStudy": "Étude de Cas",
+      "caseStudyDesc": "Comment RetailBrand a Augmenté les Conversions de 65%"
+    },
+    "cta": {
+      "title": "Transformez Votre Expérience Client",
+      "description": "Authentification sécurisée et sans friction qui vous aide à construire des relations clients durables tout en restant conforme.",
+      "getStarted": "Commencer",
+      "contactSales": "Contacter les Ventes"
+    }
+  },
+  "B2B": {
+    "hero": {
+      "badge": "Solutions Identité B2B",
+      "title": "Identité pour Chaque Relation Commerciale",
+      "description": "Gérez en toute sécurité les employés, clients, partenaires et contractors avec une plateforme d'identité unifiée conçue pour les écosystèmes B2B complexes.",
+      "ctaDocs": "Voir la Documentation",
+      "ctaContact": "Contacter les Ventes"
+    },
+    "metrics": {
+      "onboardingTime": "Temps d'onboarding réduit",
+      "slaAvailability": "Disponibilité SLA",
+      "partnerIntegration": "Intégration partenaire plus rapide",
+      "vendorLockin": "Dépendance fournisseur"
+    },
+    "capabilities": {
+      "title": "Identité B2B Complète",
+      "description": "Une plateforme unique pour gérer toutes les relations d'identité externes avec la sécurité, la conformité et la flexibilité que votre entreprise exige.",
+      "partner": "Gestion Identité Partenaire",
+      "partnerDesc": "Accès externe sécurisé avec permissions granulaires, contrôles de session et pistes d'audit détaillées pour toutes les interactions partenaires.",
+      "external": "Authentification Utilisateur Externe",
+      "externalDesc": "Flux dédiés pour clients, vendors et contractors avec expériences d'onboarding et d enrollment personnalisables.",
+      "api": "Gestion Accès API",
+      "apiDesc": "Scopes OAuth 2.0 granulaires et gestion de tokens pour communication machine-to-machine et intégrations partenaires.",
+      "delegation": "Délégation & Impersonation",
+      "delegationDesc": "Permettez aux employés d'agir au nom des clients ou partenaires avec journalisation d'audit complète et workflows d'approbation.",
+      "sso": "SSO Multi-Organisation",
+      "ssoDesc": "Authentification fédérée à travers les domaines partenaires avec protocoles de fédération SAML 2.0 et OIDC.",
+      "risk": "Authentification Basée sur le Risque",
+      "riskDesc": "Politiques adaptatives basées sur le contexte utilisateur, empreintedevice, géolocalisation et analyse comportementale."
+    },
+    "solutions": {
+      "title": "Conçu pour Tous les Types d'Identité",
+      "description": "Workflows et permissions adaptés pour chaque type d'accès externe.",
+      "employee": "Accès Employé",
+      "employeeDesc": "Identité workforce sécurisée avec SSO, MFA et accès basé sur les rôles à travers toutes les applications entreprise.",
+      "employeeFeatures": [
+        "Intégration SSO",
+        "Gestion d'appareil",
+        "Automatisation du cycle de vie"
+      ],
+      "customer": "Identité Client",
+      "customerDesc": "Expériences client transparentes avec inscription, gestion de profil et centres de préférences.",
+      "customerFeatures": ["Connexion sociale", "Profiling progressif", "Gestion du consentement"],
+      "partnerPortal": "Portal Partenaire",
+      "partnerPortalDesc": "Accès partenaire contrôlé avec espaces de travail dédiés, clés API et surveillance d'utilisation.",
+      "partnerFeatures": [
+        "Répertoires partenaires",
+        "Entitlements API",
+        "Analytique d'utilisation"
+      ],
+      "audit": "Piste d'Audit Complète",
+      "auditDesc": "Chaque décision d'accès journalisée avec contexte complet pour conformité et investigation.",
+      "auditFeatures": [
+        "Journalisation temps réel",
+        "Rapports de conformité",
+        "Outils d'investigation"
+      ]
+    },
+    "code": {
+      "title": "Intégrez l'Accès Partenaire en Minutes",
+      "description": "Nos SDK et connecteurs préconstruits rendent l'intégration de l'identité B2B dans vos applications transparente et simple.",
+      "quickstart": "Guides de Démarrage"
+    },
+    "compare": {
+      "title": "Comparer les Solutions",
+      "description": "Découvrez comment Aether se compare aux autres fournisseurs d'identité B2B.",
+      "feature": "Fonctionnalité",
+      "aether": "Aether",
+      "keycloak": "Keycloak",
+      "auth0": "Auth0",
+      "okta": "Okta"
+    },
+    "benefits": {
+      "title": "Avantages de Qualité Entreprise",
+      "description": "Conçu pour la mise à l'échelle avec les fonctionnalités de sécurité et de conformité que les entreprises exigent.",
+      "lifecycle": "Cycle de Vie Automatisé",
+      "lifecycleDesc": "Provisionnement et déprovisionnement automatisés basés sur les systèmes RH, contrats et règles de politique.",
+      "governance": "Gouvernance Cohérente",
+      "governanceDesc": "Politiques d'accès unifiées à travers tous les types d'utilisateurs avec visibilité et rapports centralisés.",
+      "integration": "Prêt pour l'Intégration",
+      "integrationDesc": "Connecteurs préconstruits pour Salesforce, SAP, Oracle et 200+ applications entreprise.",
+      "audit": "Piste d'Audit Complète",
+      "auditDesc": "Chaque décision d'accès journalisée avec contexte complet pour conformité et investigation."
+    },
+    "compliance": {
+      "title": "Conçu pour les Industries Réglementées",
+      "description": "L'Identité B2B d'Aether répond aux exigences strictes de sécurité et de conformité des secteurs de la santé, finance et gouvernement.",
+      "encryptionRest": "Chiffrement au repos",
+      "encryptionTransit": "Chiffrement en transit",
+      "multiTenant": "Multi-tenant",
+      "isolation": "Isolation logique",
+      "auditLogs": "Journaux d'Audit",
+      "completeTrail": "Piste complète"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur les solutions d'identité B2B d'Aether.",
+      "multitenant": {
+        "title": "Comment Aether gère-t-il les scénarios B2B multi-tenant?",
+        "answer": "Aether fournit des namespaces dédiés par organisation avec configurations isolées, branding et répertoires utilisateurs. L'accès inter-organisation est contrôlé par des accords de fédération explicites."
+      },
+      "migration": {
+        "title": "Puis-je migrer depuis Auth0 ou Okta B2B?",
+        "answer": "Oui, nous fournissons des outils de migration et assistance pour importer vos organisations, utilisateurs et configurations d'accès. Contactez notre équipe pour un plan de migration personnalisé."
+      },
+      "sla": {
+        "title": "Que dir des garanties SLA pour l'identité B2B?",
+        "answer": "Aether fournit un SLA 99.99% pour les déploiements entreprise avec support dédié et clauses de compensation."
+      },
+      "freeTier": {
+        "title": "Y a-t-il un tarif gratuit pour B2B?",
+        "answer": "Oui, Aether Community Edition supporte les scénarios B2B basiques. Pour les fonctionnalités avancées comme la délégation et la fédération partenaire, contactez notre équipe commerciale."
+      },
+      "gdpr": {
+        "title": "Comment gérez-vous les exigences réglementaires comme GDPR?",
+        "answer": "Aether inclut la gestion du consentement intégrée, export de données, workflows de suppression et accords de traitement pour la conformité GDPR."
+      }
+    },
+    "resources": {
+      "title": "Ressources",
+      "description": "Explorez la documentation, guides et recherches sur la gestion d'identité B2B.",
+      "whitepaper": "Livre Blanc",
+      "whitepaperDesc": "Guide d'Architecture d'Identité B2B",
+      "ebook": "E-book",
+      "ebookDesc": "Zero Trust pour l'Accès Externe",
+      "webinar": "Webinaire",
+      "webinarDesc": "Gestion Moderne de l'Identité Partenaire",
+      "caseStudy": "Étude de Cas",
+      "caseStudyDesc": "Comment TechCorp a Mis à l'Échelle l'Accès Partenaire"
+    },
+    "partners": {
+      "title": "Partenaires Techniques",
+      "description": "Intégré de manière transparente avec les applications entreprise que vous utilisez."
+    },
+    "team": {
+      "title": "Conçu par des Experts",
+      "description": "Notre équipe apporte des décennies d'expérience en identité, sécurité et infrastructure entreprise."
+    },
+    "updates": {
+      "title": "Mises à Jour Récentes",
+      "description": "Restez à jour avec les dernières fonctionnalités et améliorations B2B."
+    },
+    "cta": {
+      "title": "Sécurisez Chaque Relation Commerciale",
+      "description": "Déployez l'Identité B2B d'Aether aujourd'hui et unifiez tous vos accès externes sous une seule plateforme.",
+      "getStarted": "Commencer",
+      "contactSales": "Contacter les Ventes"
+    }
+  },
+  "M2M": {
+    "hero": {
+      "badge": "Identité Machine-à-Machine",
+      "title": "Authentification Service-à-Service Sécurisée",
+      "description": "Gestion d'identité machine de qualité entreprise avec OAuth 2.0, mTLS et intégration transparente dans votre architecture de microservices.",
+      "ctaDocs": "Voir la Documentation",
+      "ctaGithub": "Dépôt GitHub"
+    },
+    "metrics": {
+      "tokenLatency": "Latence d'émission de token",
+      "requestsPerSecond": "Requêtes par seconde",
+      "slaAvailability": "Disponibilité SLA",
+      "vendorLockin": "Dépendance fournisseur"
+    },
+    "protocols": {
+      "title": "Support des Protocoles",
+      "description": "Protocoles standard de l'industrie pour l'identité machine avec options de déploiement flexibles.",
+      "oauth": "OAuth 2.0",
+      "oauthDesc": "Flux Client Credentials, JWT Bearer et refresh token pour authentification service sécurisée.",
+      "oidc": "OpenID Connect",
+      "oidcDesc": "Découverte de compte service et claims de token standardisés pour l'identité inter-services.",
+      "mtls": "mTLS",
+      "mtlsDesc": "Mutual TLS avec gestion automatisée du cycle de vie des certificats et intégration mesh.",
+      "apiKeys": "Clés API",
+      "apiKeysDesc": "Clés API révocables avec permissions granulaires et support de rotation automatique."
+    },
+    "capabilities": {
+      "title": "Fonctionnalités Principales",
+      "description": "Conçu pour l'authentification service à grande échelle avec sécurité et observabilité de qualité entreprise.",
+      "credentials": "Flux Client Credentials",
+      "credentialsDesc": "Flux OAuth 2.0 Client Credentials pour authentification machine-à-machine sécurisée avec refresh automatique de token.",
+      "apiKeys": "Gestion des Clés API",
+      "apiKeysDesc": "Générez, rotatez et gérez les clés API avec scopes granulaires et politiques d'expiration.",
+      "serviceMesh": "Intégration Service Mesh",
+      "serviceMeshDesc": "Intégration native avec Istio, Linkerd et Consul pour communication service zero-trust.",
+      "mtls": "Mutual TLS (mTLS)",
+      "mtlsDesc": "Authentification basée sur les certificats avec rotation automatique des certificats et gestion de la confiance.",
+      "selfHosted": "Infrastructure Auto-hébergée",
+      "selfHostedDesc": "Déployez sur votre infrastructure avec Docker, Kubernetes ou bare metal. Vos données restent sous votre contrôle.",
+      "introspection": "Introspection de Token",
+      "introspectionDesc": "Validation et introspection de token en temps réel pour les décisions d'autorisation stateless."
+    },
+    "compare": {
+      "title": "Comment Nous Comparons",
+      "description": "Découvrez pourquoi les organisations leaders choisissent Aether pour l'authentification machine-à-machine.",
+      "feature": "Fonctionnalité",
+      "aether": "Aether",
+      "keycloak": "Keycloak",
+      "auth0": "Auth0",
+      "okta": "Okta"
+    },
+    "code": {
+      "title": "Intégrez en Minutes, Pas en Semaines",
+      "description": "Nos SDK gèrent l'acquisition, le refresh et la validation des tokens pour que vous puissiez vous concentrer sur la logique de votre application.",
+      "quickstart": "Guides de Démarrage"
+    },
+    "useCases": {
+      "title": "Cas d'Usage Courants",
+      "description": "Aether gère l'authentification pour divers scénarios machine-à-machine à n'importe quelle échelle.",
+      "microservices": "Authentification Microservices",
+      "microservicesDesc": "Communication inter-service sécurisée avec contrôle d'accès granulaire et pistes d'audit.",
+      "apiGateway": "Sécurité API Gateway",
+      "apiGatewayDesc": "Authentification et autorisation centralisées au niveau de la passerelle API.",
+      "cicd": "Accès Pipeline CI/CD",
+      "cicdDesc": "Authentification sécurisée pour les systèmes de build, pipelines de déploiement et outils d'automatisation.",
+      "serverless": " Fonctions Serverless",
+      "serverlessDesc": "Authentification légère pour AWS Lambda, Azure Functions et Cloud Functions."
+    },
+    "security": {
+      "title": "Sécurité de Qualité Entreprise",
+      "description": "Conçu avec une architecture security-first pour répondre aux exigences de conformité les plus strictes.",
+      "encryptionRest": "Chiffrement au repos",
+      "encryptionTransit": "Chiffrement en transit",
+      "rateLimiting": "Limitation de Débit",
+      "rateLimitDesc": "Limites par service",
+      "auditLogs": "Journaux d'Audit",
+      "completeTrail": "Piste complète"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur l'authentification machine-à-machine.",
+      "diffUser": {
+        "title": "Comment l'authentification M2M diffère-t-elle de l'authentification utilisateur?",
+        "answer": "L'authentification machine-à-machine utilise des comptes service et client credentials au lieu des identifiants utilisateur. Les tokens ont typically une durée de vie plus courte et ne nécessitent pas d'interaction utilisateur pour le refresh."
+      },
+      "internalExternal": {
+        "title": "Puis-je utiliser l'authentification M2M pour les API internes et externes?",
+        "answer": "Oui, Aether supporte la communication service-à-service interne et l'authentification API externe avec restrictions de scope et limitation de débit appropriées."
+      },
+      "certRotation": {
+        "title": "Comment gérez-vous la rotation des certificats pour mTLS?",
+        "answer": "Aether fait automatiquement tourner les certificats avant expiration en utilisant le standard SPIFFE. Cela nécessite zéro temps d'arrêt et aucune intervention manuelle."
+      },
+      "serviceAccounts": {
+        "title": "Y a-t-il une limite sur le nombre de comptes service?",
+        "answer": "Non, Aether supporte les comptes service illimités. Vous pouvez en créer autant que nécessaire pour votre architecture de microservices."
+      },
+      "jwtValidation": {
+        "title": "Supportez-vous la validation JWT pour vérification offline?",
+        "answer": "Oui, Aether émet des JWT signés qui peuvent être validés offline en utilisant des clés publiques, éliminant le besoin d'appels réseau pendant l'autorisation."
+      }
+    },
+    "resources": {
+      "title": "Ressources",
+      "description": "Explorez notre documentation, guides et ressources techniques.",
+      "documentation": "Documentation",
+      "documentationDesc": "Guide de Configuration d'Authentification M2M",
+      "tutorial": "Tutoriel",
+      "tutorialDesc": "Sécuriser les Microservices avec mTLS",
+      "webinar": "Webinaire",
+      "webinarDesc": "Architecture Zero-Trust pour les Services",
+      "caseStudy": "Étude de Cas",
+      "caseStudyDesc": "Comment FinTech Corp a Sécurisé 500+ Services"
+    },
+    "cta": {
+      "title": "Sécurisez Votre Identité Machine Aujourd'hui",
+      "description": "Déployez Aether Identity pour l'authentification M2M et éliminez les maux de tête de gestion des credentials. Open source, auto-hébergé, enterprise-ready.",
+      "getStarted": "Commencer",
+      "contactSales": "Contacter les Ventes"
+    }
+  },
+  "Passwordless": {
+    "hero": {
+      "badge": "Authentification Sans Mot de Passe",
+      "title": "L'Avenir de l'Authentification Sans Mot de Passe",
+      "description": "Éliminez le maillon le plus faible de votre chaîne de sécurité. Implémentez une authentification sécurisée et sans friction que les utilisateurs adorent et que les attaquants ne peuvent pas compromettre.",
+      "ctaDocs": "Guide d'Implémentation",
+      "ctaContact": "Parler aux Ventes"
+    },
+    "metrics": {
+      "eliminatesBreaches": "Élimine les violations de mots de passe",
+      "supportTickets": "Réduction des tickets de support",
+      "fasterAuth": "Authentification utilisateur plus rapide",
+      "failedLogin": "Taux de connexion échouée"
+    },
+    "benefits": {
+      "title": "Pourquoi Passer Sans Mot de Passe",
+      "description": "Les mots de passe sont la principale cause des violations de sécurité. L'authentification sans mot de passe élimine ce vecteur d'attaque tout en améliorant l'expérience utilisateur.",
+      "security": {
+        "title": "Sécurité Améliorée",
+        "description": "Éliminez complètement les violations de mots de passe. L'authentification sans mot de passe utilise des clés cryptographiques qui ne peuvent pas être devinées, réutilisées ou fuitées."
+      },
+      "ux": {
+        "title": "Expérience Utilisateur Plus Rapide",
+        "description": "Les utilisateurs s'authentifient en secondes, pas en minutes. Plus de mots de passe oubliés ou de demandes de réinitialisation à gérer."
+      },
+      "device": {
+        "title": "Intégration Transparent avec les Appareils",
+        "description": "Exploitez les appareils que les utilisateurs portent déjà. L'authentification biométrique semble naturelle sur mobile et bureau."
+      },
+      "support": {
+        "title": "Coûts de Support Réduits",
+        "description": "Réduisez considérablement les tickets de support liés aux mots de passe. Les utilisateurs n'ont plus jamais besoin de réinitialiser leurs identifiants."
+      }
+    },
+    "methods": {
+      "title": "Méthodes d'Authentification",
+      "description": "Choisissez les méthodes sans mot de passe qui correspondent à vos utilisateurs et exigences de sécurité. Aether Identity prend en charge toutes les principales normes sans mot de passe.",
+      "passkeys": {
+        "title": "Passkeys (WebAuthn)",
+        "description": "Authentification sans mot de passe standard de l'industrie utilisant des identifiants cryptographiques stockés sur les appareils des utilisateurs. Supporte les empreintes digitales, la reconnaissance faciale et les clés de sécurité matérielles.",
+        "features": [
+          "Résistant au phishing",
+          "Identifiants liés à l'appareil",
+          "Support des authentificateurs de plateforme",
+          "Authentification跨-appareil"
+        ]
+      },
+      "magicLink": {
+        "title": "Liens Magiques",
+        "description": "Authentification par e-mail où les utilisateurs reçoivent un lien unique et à durée limitée pour compléter la connexion. Pas de mots de passe ou applications requis.",
+        "features": [
+          "Pas d'installation d'application",
+          "Vérification par e-mail",
+          "Tokens à durée limitée",
+          "Suivi des appareils optionnel"
+        ]
+      },
+      "otp": {
+        "title": "OTP (Mot de Passe Unique)",
+        "description": "Codes basés sur le temps ou le compteur livrés par e-mail, SMS ou applications d'authentification. Familier et largement accepté.",
+        "features": [
+          "Méthodes de livraison multiples",
+          "Capacité hors ligne",
+          "Taux d'adoption élevé",
+          "Modèle utilisateur familier"
+        ]
+      },
+      "email": {
+        "title": "Vérification par E-mail",
+        "description": "Authentification sans mot de passe par e-mail où les utilisateurs confirment leur identité en cliquant sur un lien ou en entrant un code envoyé à leur e-mail.",
+        "features": [
+          "Pas de nouvelles applications nécessaires",
+          "Configuration instantanée",
+          "Piste d'audit intégrée",
+          "Accessibilité universelle"
+        ]
+      }
+    },
+    "comparison": {
+      "title": "Comparaison des Méthodes",
+      "description": "Comparez les méthodes sans mot de passe selon la sécurité, la facilité d'utilisation et les facteurs d'implémentation.",
+      "criteria": "Critère",
+      "password": "Mot de passe",
+      "passkey": "Passkey",
+      "magicLink": "Lien Magique",
+      "otp": "OTP",
+      "security": "Niveau de Sécurité",
+      "experience": "Expérience Utilisateur",
+      "complexity": "Complexité de Configuration",
+      "dependency": "Dépendance à l'Appareil",
+      "recovery": "Options de Récupération"
+    },
+    "useCases": {
+      "title": "Cas d'Utilisation",
+      "description": "L'authentification sans mot de passe s'adapte à divers scénarios, des applications orientées clients aux systèmes internes d'entreprise.",
+      "onboarding": {
+        "title": "Intégration Client",
+        "description": "Retirez la friction des flux d'inscription. Les nouveaux utilisateurs peuvent créer des comptes et s'authentifier immédiatement sans se souvenir d'un autre mot de passe."
+      },
+      "employee": {
+        "title": "Accès Employé",
+        "description": "Simplifiez l'authentification interne. Les employés accèdent aux applications avec des biométries ou des clés de sécurité, améliorant la productivité et la sécurité."
+      },
+      "partner": {
+        "title": "Intégrations Partenaires",
+        "description": "Permettez un accès partenaire sécurisé sans surcharge de gestion de mots de passe. Les partenaires s'authentifient avec leurs propres fournisseurs d'identité."
+      },
+      "admin": {
+        "title": "Sécurité Admin",
+        "description": "Sécurisez les comptes administratifs avec l'authentification la plus forte disponible. Protégez les systèmes critiques avec des passkeys et des jetons matériels."
+      }
+    },
+    "implementation": {
+      "title": "Implémentation Facile",
+      "description": "Intégrez l'authentification sans mot de passe en quelques minutes avec nos SDK et notre documentation complète. Support pour tous les principaux frameworks et langages.",
+      "checklist": {
+        "webauthn": "Support FIDO2/WebAuthn complet",
+        "magic": "Lien magique et OTP par e-mail",
+        "totp": "Intégration authentificateur TOTP",
+        "adaptive": "Politiques d'authentification adaptative"
+      },
+      "cta": "Guide de Démarrage Rapide",
+      "example": "Exemple: Activer les Passkeys"
+    },
+    "compliance": {
+      "title": "Conforme aux Standards",
+      "description": "Aether Identity implémente des protocoles sans mot de passe standard de l'industrie, assurant la compatibilité et la conformité aux exigences réglementaires.",
+      "fido": "Conforme FIDO2/WebAuthn",
+      "eidas": "Prêt eIDAS",
+      "gdpr": "Compatible RGPD",
+      "soc": "SOC 2 Type II",
+      "iso": "ISO 27001"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur l'authentification sans mot de passe.",
+      "what": {
+        "title": "Qu'est-ce que l'authentification sans mot de passe?",
+        "answer": "L'authentification sans mot de passe est toute méthode de vérification de l'identité utilisateur sans utiliser les mots de passe traditionnels. Cela inclut les passkeys, les liens magiques, les OTP et l'authentification biométrique. Ces méthodes sont plus sécurisées et offrent une meilleure expérience utilisateur."
+      },
+      "safe": {
+        "title": "Les passkeys sont-ils sûrs?",
+        "answer": "Oui, les passkeys sont parmi les méthodes d'authentification les plus sûres disponibles. Ils utilisent des paires de clés cryptographiques résistantes au phishing, ne peuvent pas être réutilisées entre les sites et sont stockées en toute sécurité sur les appareils des utilisateurs. Ils atteignent ou dépassent la sécurité de l'authentification multifactorielle traditionnelle."
+      },
+      "lost": {
+        "title": "Que se passe-t-il si un utilisateur perd son appareil?",
+        "answer": "Aether Identity fournit plusieurs options de récupération incluant la synchronisation cloud pour les passkeys, les méthodes de vérification de sauvegarde et la récupération de compte administrative. Les utilisateurs peuvent également enregistrer plusieurs authentificateurs pour la redondance."
+      },
+      "alongside": {
+        "title": "Puis-je utiliser sans mot de passe aux côtés des mots de passe?",
+        "answer": "Oui, vous pouvez activer l'authentification sans mot de passe comme option tout en maintenant la connexion par mot de passe. De nombreuses organisations utilisent les deux méthodes pendant une période de transition. Cependant, nous recommandons d'aller entièrement sans mot de passe pour une sécurité optimale."
+      },
+      "offline": {
+        "title": "Les méthodes sans mot de passe fonctionnent-elles hors ligne?",
+        "answer": "TOTP et certaines implémentations de passkey fonctionnent hors ligne. Les liens magiques et la vérification par e-mail nécessitent la connectivité. Pour les scénarios hors ligne, nous recommandons les authentificateurs TOTP ou les clés de sécurité matérielles."
+      }
+    },
+    "resources": {
+      "title": "Ressources",
+      "description": "Explorez notre documentation et guides pour implémenter l'authentification sans mot de passe.",
+      "whitepaper": "Livre Blanc",
+      "whitepaperDesc": "Guide d'Implémentation de Sécurité Sans Mot de Passe",
+      "ebook": "E-book",
+      "ebookDesc": "Guide Complet des Passkeys",
+      "webinar": "Webinaire",
+      "webinarDesc": "Migration des Mots de Passe vers les Passkeys",
+      "video": "Démo Vidéo",
+      "videoDesc": "Configuration de l'Authentification Sans Mot de Passe"
+    },
+    "cta": {
+      "title": "Prêt à Éliminer les Mots de Passe?",
+      "description": "Implémentez l'authentification sans mot de passe aujourd'hui. Commencez avec notre offre gratuite et évoluez selon vos besoins.",
+      "getStarted": "Commencer",
+      "contact": "Contacter les Ventes"
+    }
+  },
+  "Financial": {
+    "hero": {
+      "badge": "Solutions pour Services Financiers",
+      "title": "Infrastructure d'Identité Sécurisée pour Institutions Financières",
+      "description": "Gestion d'identité et d'accès de qualité entreprise conçue pour les banques, les fournisseurs de services de paiement et les fintech. Répondez aux exigences réglementaires tout en offrant des expériences client fluides.",
+      "ctaContact": "Contacter les Ventes",
+      "ctaDocs": "Voir la Documentation"
+    },
+    "metrics": {
+      "uptime": "SLA de Disponibilité",
+      "latency": "Latence d'authentification",
+      "frameworks": "Cadres de conformité",
+      "breaches": "Violations de données"
+    },
+    "benefits": {
+      "title": "Conçu pour les Services Financiers",
+      "description": "Gestion d'identité conçue pour répondre aux exigences uniques de sécurité, de conformité et d'expérience utilisateur du secteur financier.",
+      "psd2": {
+        "title": "Conformité PSD2 & Open Banking",
+        "description": "Support intégré pour les exigences réglementaires PSD2, accès API sécurisé et intégration des fournisseurs tiers (TPP)."
+      },
+      "security": {
+        "title": "Sécurité Multi-Niveaux",
+        "description": "Chiffrement de bout en bout, intégration de module de sécurité matérielle (HSM) et capacités de détection de fraude en temps réel."
+      },
+      "adaptive": {
+        "title": "Authentification Adaptative",
+        "description": "Authentification basée sur les risques avec vérification biométrique, empreinte digitale de l'appareil et analyse comportementale."
+      },
+      "ciam": {
+        "title": "Gestion d'Identité Client",
+        "description": "Intégration transparente avec profilage progressif, gestion de compte en libre-service et gestion du consentement."
+      },
+      "rbac": {
+        "title": "Contrôle d'Accès Basé sur les Rôles",
+        "description": "Permissions granulaires pour le personnel interne, les auditeurs externes et les fournisseurs de services tiers avec pistes d'audit complètes."
+      },
+      "global": {
+        "title": "Support Réglementaire Mondial",
+        "description": "Modèles de conformité pré-configurés pour RGPD, PCI-DSS, SOX et réglementations bancaires locales dans toutes les juridictions."
+      }
+    },
+    "useCases": {
+      "title": "Solutions pour Chaque Service Financier",
+      "description": "Gestion d'identité adaptée pour la banque de détail, la banque d'entreprise, le trading, les paiements et l'assurance.",
+      "retail": {
+        "title": "Banque de Détail",
+        "description": "Authentification client sécurisée pour la banque en ligne et mobile avec authentification forte (SCA) conforme PSD2.",
+        "features": [
+          "Authentification bancaire mobile",
+          "Support connexion biométrique",
+          "Autorisation de transaction",
+          "Protection contre la prise de compte"
+        ]
+      },
+      "corporate": {
+        "title": "Banque d'Entreprise",
+        "description": "Gestion d'identité de qualité entreprise pour portails de banque d'entreprise, opérations de trésorerie et flux de paiement.",
+        "features": [
+          "Authentification multi-facteurs",
+          "Sécurité API pour trésorerie",
+          "Flux de délégation & approbation",
+          "Journalisation prête pour l'audit"
+        ]
+      },
+      "trading": {
+        "title": "Plateformes de Trading",
+        "description": "Authentification de haute assurance pour les applications de trading nécessitant vérification d'identité en temps réel et conformité.",
+        "features": [
+          "Vérification d'identité en temps réel",
+          "Automatisation de conformité réglementaire",
+          "Gestion de session",
+          "Pistes d'audit de trading"
+        ]
+      },
+      "payments": {
+        "title": "Services de Paiement",
+        "description": "Authentification de paiement sécurisée pour PSP, porte-feuilles électroniques et passerelles de paiement avec support 3D Secure 2.0.",
+        "features": [
+          "Intégration 3D Secure 2.0",
+          "Tokenisation de paiement",
+          "Prévention de fraude",
+          "Conformité PCI-DSS"
+        ]
+      },
+      "cards": {
+        "title": "Émetteurs de Cartes",
+        "description": "Authentification du titulaire de carte pour gestion de carte numérique, émission instantanée et contrôles de carte dynamiques.",
+        "features": [
+          "Activation de carte virtuelle",
+          "Contrôles de limite de dépenses",
+          "Alertes de géolocalisation",
+          "Notifications instantanées"
+        ]
+      },
+      "insurance": {
+        "title": "Assurance",
+        "description": "Portails sécurisés pour assurés, agents et traitement des sinistres avec vérification d'identité pour les opérations sensibles.",
+        "features": [
+          "Libre-service assuré",
+          "Authentification des agents",
+          "Sécurité du flux de sinistres",
+          "Vérification de signature de document"
+        ]
+      }
+    },
+    "security": {
+      "title": "Fonctionnalités de Sécurité Entreprise",
+      "description": "Capacités de sécurité de qualité financière qui répondent aux exigences les plus strictes pour la protection des actifs et des données clients.",
+      "hsm": {
+        "title": "Module de Sécurité Matérielle (HSM)",
+        "description": "Intégration avec Thales, Utimaco ou HSM cloud pour la protection des clés cryptographiques."
+      },
+      "fraud": {
+        "title": "Intégration Détection de Fraude",
+        "description": "Connexion avec les plateformes de détection de fraude pour évaluer le risque en temps réel lors de l'authentification."
+      },
+      "behavioral": {
+        "title": "Analyse Comportementale",
+        "description": "Détection d'anomalies basée sur l'apprentissage automatique pour identifier les schémas de connexion suspects."
+      },
+      "audit": {
+        "title": "Rapports d'Audit & Conformité",
+        "description": "Rapports de conformité automatisés pour les examens réglementaires et les audits internes."
+      }
+    },
+    "compliance": {
+      "title": "Conformité Réglementaire Intégrée",
+      "description": "Aether Identity est pré-configuré avec des modèles et automatisations de conformité pour les réglementations financières majeures, réduisant le temps de mise en œuvre et assurant une conformité continue.",
+      "encryptionRest": "Chiffrement au repos",
+      "encryptionTransit": "Chiffrement en transit",
+      "hsm": "Protection des clés",
+      "passwordless": "Auth sans mot de passe"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur la gestion d'identité pour services financiers.",
+      "psd2": {
+        "title": "Comment Aether supporte-t-il la conformité PSD2?",
+        "answer": "Aether fournit un support intégré pour les exigences PSD2, y compris l'authentification forte (SCA), les API de communication sécurisées pour l'accès TPP, la gestion du consentement et le lien dynamique. Notre solution est régulièrement mise à jour pour refléter les dernières directives EBA."
+      },
+      "integration": {
+        "title": "Aether peut-il s'intégrer à nos systèmes bancaires existants?",
+        "answer": "Oui, Aether fournit des intégrations pré-construites avec les principales plateformes bancaires incluant Fis, Temenos, Avaloq et Oracle Flexcube. Notre équipe de professionnels peut également construire des intégrations personnalisées pour les systèmes hérités."
+      },
+      "performance": {
+        "title": "Comment Aether gère-t-il l'authentification à haut volume pour les plateformes de trading?",
+        "answer": "Aether est conçu pour les scénarios de haute performance avec une latence d'authentification inférieure à 10ms. Notre architecture distribuée supporte la mise à l'échelle horizontale et peut gérer des millions d'authentifications par jour avec 99,99% de disponibilité."
+      },
+      "pci": {
+        "title": "Aether est-il certifié PCI-DSS?",
+        "answer": "Aether peut être déployé de manière conforme PCI-DSS. Lorsqu'il est déployé selon nos directives de sécurité et combiné avec votre infrastructure карт, Aether vous aide à répondre aux exigences PCI-DSS pour l'authentification et le contrôle d'accès."
+      },
+      "premise": {
+        "title": "Offrez-vous un déploiement sur site pour les banques avec des exigences strictes de résidence des données?",
+        "answer": "Oui, Aether supporte le déploiement sur site complet, y compris les installations air-gapped. Nous proposons également des déploiements cloud dans des régions spécifiques pour répondre aux exigences de résidence des données dans des juridictions comme l'Allemagne, la France et la Suisse."
+      }
+    },
+    "resources": {
+      "title": "Ressources",
+      "description": "Explorez notre documentation, guides de conformité et études de cas pour les services financiers.",
+      "whitepaper": "Livre Blanc",
+      "whitepaperDesc": "Guide d'Architecture d'Identité pour Services Financiers",
+      "caseStudy": "Étude de Cas",
+      "caseStudyDesc": "Comment une Banque Européenne a Atteint la Conformité PSD2",
+      "technical": "Guide Technique",
+      "technicalDesc": "Intégration avec les Systèmes Bancaires Principaux",
+      "compliance": "Brief de Conformité",
+      "complianceDesc": "Meilleures Pratiques d'Implémentation SCA PSD2"
+    },
+    "partners": {
+      "title": "Intégration avec les Systèmes Bancaires",
+      "description": "Intégrez de manière transparente avec vos systèmes bancaires principaux, de traitement des paiements et de détection de fraude."
+    },
+    "cta": {
+      "title": "Sécurisez Votre Infrastructure de Services Financiers",
+      "description": "Déployez une gestion d'identité de qualité entreprise qui répond aux exigences réglementaires et offre des expériences client fluides.",
+      "contact": "Contacter les Ventes",
+      "docs": "Voir la Documentation"
+    }
+  },
+  "Healthcare": {
+    "hero": {
+      "badge": "Solutions de Santé",
+      "title": "Identité Conforme HIPAA pour la Santé Moderne",
+      "description": "Portails patients sécurisés, authentification des fournisseurs, intégration EHR et plateformes de télémédecine avec gestion d'identité de qualité entreprise conçue pour les exigences réglementaires de santé.",
+      "ctaContact": "Demander une Démo",
+      "ctaDocs": "Voir la Documentation"
+    },
+    "metrics": {
+      "hipaa": "Conformité HIPAA",
+      "latency": "Latence d'authentification",
+      "availability": "Disponibilité système",
+      "breaches": "Violations de données"
+    },
+    "features": {
+      "title": "Conçu pour les Flux de Travail de Santé",
+      "description": "Chaque fonctionnalité conçue pour répondre aux exigences uniques de sécurité, de conformité et d'utilisabilité des environnements de santé.",
+      "patient": {
+        "title": "Sécurité du Portail Patient",
+        "description": "Authentification sécurisée des patients avec MFA, support biométrique et intégration de carte à puce pour accéder aux dossiers médicaux, planifier des rendez-vous et gérer les ordonnances."
+      },
+      "telemedicine": {
+        "title": "Authentification Télémédecine",
+        "description": "Authentification de consultation vidéo conforme HIPAA avec chiffrement de bout en bout, délais d'expiration de session et journalisation pour toutes les interactions de télémédecine."
+      },
+      "ehr": {
+        "title": "Intégration EHR/EMR",
+        "description": "Intégration transparente avec Epic, Cerner, Allscripts et autres systèmes EHR majeurs utilisant SAML 2.0, OAuth 2.0 et protocoles d'identité basés sur FHIR."
+      },
+      "provider": {
+        "title": "Gestion d'Identité des Fournisseurs",
+        "description": "Gérer les identifiants pour les médecins, infirmières, personnel administratif et contractants avec un accès basé sur les rôles adapté aux flux de travail cliniques."
+      },
+      "monitoring": {
+        "title": "Surveillance en Temps Réel",
+        "description": "Surveillance continue de la sécurité avec détection d'anomalies, alertes de connexion échouée et indicateurs d'activité suspecte pour la conformité et la prévention des menaces."
+      },
+      "clinical": {
+        "title": "Support à la Décision Clinique",
+        "description": "Contrôle d'accès basé sur les attributs qui adapte les autorisations en fonction des relations patient-fournisseur, des affectations de département et des contextes de traitement."
+      }
+    },
+    "compliance": {
+      "title": "Conformité Santé Intégrée",
+      "description": "Respectez HIPAA, HITECH et les réglementations émergentes sur les données de santé avec confiance.",
+      "hipaa": {
+        "title": "Conformité HIPAA",
+        "description": "Conformité complète à la règle de sécurité HIPAA avec sauvegardes administratives, physiques et techniques intégrées à chaque flux d'authentification."
+      },
+      "audit": {
+        "title": "Piste d'Audit",
+        "description": "Journalisation complète de tout accès aux PHI avec enregistrements immuables, politiques de rétention et capacités d'export pour les audits de conformité."
+      },
+      "encryption": {
+        "title": "Chiffrement des Données",
+        "description": "Chiffrement AES-256 au repos et TLS 1.3 en transit. Support pour les clés de chiffrement gérées par le client dans les déploiements sur site."
+      },
+      "governance": {
+        "title": "Gouvernance d'Accès",
+        "description": "Révisions d'accès automatisées, application du privilège minimum et politiques de séparation des fonctions (SoD) pour répondre aux exigences réglementaires."
+      }
+    },
+    "useCases": {
+      "title": "Cas d'Utilisation Complets",
+      "description": "De l'accès patient aux flux de travail cliniques, Aether sécurise chaque point de contact dans l'écosystème de santé.",
+      "patient": {
+        "title": "Accès Patient",
+        "description": "Gestion de mot de passe en libre-service, inscription MFA et partage sécurisé de dossiers médicaux avec des membres de la famille ou d'autres fournisseurs."
+      },
+      "staff": {
+        "title": "Authentification du Personnel",
+        "description": "Authentification unique sur les applications cliniques, intégration de cartes à puces et authentification par proximité pour les environnements hospitaliers."
+      },
+      "interoperability": {
+        "title": "Interopérabilité",
+        "description": "Identité fédérée à travers les réseaux de santé, HIES et organisations partenaires utilisant des protocoles standard."
+      },
+      "remote": {
+        "title": "Travail à Distance",
+        "description": "Accès sécurisé sans VPN pour le personnel clinique à distance, fournisseurs de télémédecine et personnel administratif travaillant depuis chez eux."
+      }
+    },
+    "integrations": {
+      "title": "Intégrations Systèmes EHR",
+      "description": "Intégration transparente avec les applications de santé que vous utilisez déjà.",
+      "notFound": "Vous ne voyez pas votre EHR? Contactez-nous pour une intégration personnalisée."
+    },
+    "deployment": {
+      "title": "Déployez Selon Votre Politique",
+      "description": "Que vous ayez besoin d'un contrôle complet sur site ou d'une scalabilité cloud, Aether s'adapte à votre infrastructure et aux exigences de résidence des données.",
+      "onPremise": "Sur Site",
+      "private": "Cloud Privé",
+      "hybrid": "Hybride"
+    },
+    "security": {
+      "title": "Sécurité d'Entreprise pour les Données Patients",
+      "description": "Protégez les informations de santé sensibles avec des contrôles de sécurité de qualité militaire conçus spécifiquement pour les environnements de santé.",
+      "encryptionRest": "Chiffrement au repos",
+      "encryptionTransit": "Chiffrement en transit",
+      "biometric": "Support biométrique",
+      "keys": "Clés client",
+      "saml": "Support SAML 2.0 & OAuth 2.0/OIDC",
+      "smartcard": "Intégration carte à puces & proximité",
+      "session": "Politiques de délai d'expiration automatique",
+      "mfa": "Authentification à deux facteurs (TOTP, SMS, email)",
+      "breakglass": "Flux de travail d'accès d'urgence",
+      "threat": "Détection de menaces & alertes en temps réel"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur la gestion d'identité dans la santé.",
+      "hipaa": {
+        "title": "Aether est-il certifié HIPAA?",
+        "answer": "Aether Identity est conçu pour répondre aux exigences de la règle de sécurité HIPAA. Nous fournissons un accord de partenaire commercial (BAA) pour tous les déploiements de santé et pouvons vous aider avec votre documentation de conformité."
+      },
+      "ehr": {
+        "title": "Pouvons-nous nous intégrer à notre système EHR existant?",
+        "answer": "Oui, Aether supporte les intégrations SAML 2.0, OAuth 2.0/OpenID Connect et SCIM avec toutes les plateformes EHR majeures incluant Epic, Cerner, Allscripts et MEDITECH."
+      },
+      "consent": {
+        "title": "Comment gérez-vous le consentement des patients pour le partage de données?",
+        "answer": "Aether supporte la gestion granulaire du consentement à travers des politiques basées sur les attributs. Vous pouvez définir quels types de données peuvent être partagés avec quelles parties en fonction des dossiers de consentement des patients."
+      },
+      "credentials": {
+        "title": "Le personnel de santé peut-il utiliser ses identifiants hospitaliers existants?",
+        "answer": "Oui, Aether supporte la fédération d'utilisateurs avec Active Directory, LDAP et les systèmes IAM existants. Le personnel peut continuer à utiliser ses identifiants hospitaliers tout en gagnant un accès SSO aux applications cliniques."
+      },
+      "emergency": {
+        "title": "Offrez-vous des procédures d'accès d'urgence (break-glass)?",
+        "answer": "Oui, Aether supporte les flux de travail d'accès d'urgence avec approvisionnement de privilèges élevé, approbation à deux acteurs et documentation post-accès obligatoire."
+      }
+    },
+    "resources": {
+      "title": "Ressources",
+      "description": "Explorez les guides, la documentation de conformité et les études de cas pour l'identité de santé.",
+      "whitepaper": "Livre Blanc",
+      "whitepaperDesc": "Guide de Gestion d'Identité pour la Santé",
+      "compliance": "Rapport de Conformité",
+      "complianceDesc": "Implémentation de la Règle de Sécurité HIPAA",
+      "webinar": "Webinaire",
+      "webinarDesc": "Meilleures Pratiques d'Intégration EHR",
+      "caseStudy": "Étude de Cas",
+      "caseStudyDesc": "Migration d'un Réseau Hospitalier Régional"
+    },
+    "cta": {
+      "title": "Sécurisez Votre Identité de Santé Aujourd'hui",
+      "description": "Rejoignez les organisations de santé qui font confiance à Aether Identity pour protéger les données patients et permettre des flux de travail cliniques sécurisés.",
+      "contact": "Demander une Démo",
+      "docs": "Voir la Documentation"
+    }
   }
 }

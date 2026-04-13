@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -21,211 +22,201 @@ import {
   Rocket,
 } from "lucide-react";
 
-const benefits = [
-  {
-    icon: Shield,
-    title: "Enhanced Security",
-    description:
-      "Eliminate password breaches entirely. Passwordless authentication uses cryptographic keys that cannot be guessed, reused, or leaked.",
-  },
-  {
-    icon: Zap,
-    title: "Faster User Experience",
-    description:
-      "Users authenticate in seconds, not minutes. No more forgotten passwords or reset requests to handle.",
-  },
-  {
-    icon: Smartphone,
-    title: "Seamless Device Integration",
-    description:
-      "Leverage devices users already carry. Biometric authentication feels natural on mobile and desktop.",
-  },
-  {
-    icon: BarChart3,
-    title: "Reduced Support Costs",
-    description:
-      "Drastically reduce password-related support tickets. Users never need to reset credentials again.",
-  },
-];
-
-const methods = [
-  {
-    title: "Passkeys (WebAuthn)",
-    description:
-      "Industry-standard passwordless authentication using cryptographic credentials stored on users' devices. Supports fingerprint, face recognition, and hardware security keys.",
-    features: [
-      "Phishing-resistant",
-      "Device-bound credentials",
-      "Platform authenticator support",
-      "Cross-device authentication",
-    ],
-  },
-  {
-    title: "Magic Links",
-    description:
-      "Email-based authentication where users receive a unique, time-limited link to complete sign-in. No passwords or apps required.",
-    features: [
-      "No app installation",
-      "Email-based verification",
-      "Time-limited tokens",
-      "Device tracking optional",
-    ],
-  },
-  {
-    title: "OTP (One-Time Password)",
-    description:
-      "Time-based or counter-based codes delivered via email, SMS, or authenticator apps. Familiar and widely accepted.",
-    features: [
-      "Multiple delivery methods",
-      "Offline capability",
-      "High adoption rate",
-      "Familiar user pattern",
-    ],
-  },
-  {
-    title: "Email Verification",
-    description:
-      "Passwordless email authentication where users confirm identity by clicking a link or entering a code sent to their email.",
-    features: [
-      "No new apps needed",
-      "Instant setup",
-      "Audit trail built-in",
-      "Universal accessibility",
-    ],
-  },
-];
-
-const metrics = [
-  { value: "100%", label: "Eliminates password breaches" },
-  { value: "80%", label: "Reduction in support tickets" },
-  { value: "3x", label: "Faster user authentication" },
-  { value: "< 1%", label: "Failed login rate" },
-];
-
-const useCases = [
-  {
-    icon: UserPlus,
-    title: "Customer Onboarding",
-    description:
-      "Remove friction from signup flows. New users can create accounts and authenticate immediately without remembering yet another password.",
-  },
-  {
-    icon: LogIn,
-    title: "Employee Access",
-    description:
-      "Simplify internal authentication. Employees access applications with biometrics or security keys, improving productivity and security.",
-  },
-  {
-    icon: Globe,
-    title: "Partner Integrations",
-    description:
-      "Enable secure partner access without password management overhead. Partners authenticate using their own identity providers.",
-  },
-  {
-    icon: Database,
-    title: "Admin Security",
-    description:
-      "Secure administrative accounts with the strongest authentication available. Protect critical systems with passkeys and hardware tokens.",
-  },
-];
-
-const comparison = [
-  {
-    method: "Security Level",
-    password: "Low",
-    passkey: "Very High",
-    magicLink: "High",
-    otp: "Medium",
-  },
-  {
-    method: "User Experience",
-    password: "Medium",
-    passkey: "Excellent",
-    magicLink: "Good",
-    otp: "Good",
-  },
-  { method: "Setup Complexity", password: "N/A", passkey: "Low", magicLink: "Low", otp: "Low" },
-  {
-    method: "Device Dependency",
-    password: "None",
-    passkey: "High",
-    magicLink: "Low",
-    otp: "Medium",
-  },
-  {
-    method: "Recovery Options",
-    password: "Password reset",
-    passkey: "Account recovery",
-    magicLink: "Resend link",
-    otp: "Resend code",
-  },
-];
-
-const complianceStandards = [
-  "FIDO2/WebAuthn Compliant",
-  "eIDAS Ready",
-  "GDPR Compatible",
-  "SOC 2 Type II",
-  "ISO 27001",
-];
-
-const resources = [
-  {
-    icon: FileText,
-    title: "Whitepaper",
-    description: " passwordless Security Implementation Guide",
-  },
-  {
-    icon: BookOpen,
-    title: "E-book",
-    description: "Complete Guide to Passkeys",
-  },
-  {
-    icon: Calendar,
-    title: "Webinar",
-    description: "Migrating from Passwords to Passkeys",
-  },
-  {
-    icon: Video,
-    title: "Video Demo",
-    description: "Passwordless Authentication Setup",
-  },
-];
-
-const faqs = [
-  {
-    question: "What is passwordless authentication?",
-    answer:
-      "Passwordless authentication is any method of verifying user identity without using traditional passwords. This includes passkeys, magic links, OTPs, and biometric authentication. These methods are more secure and provide better user experience.",
-  },
-  {
-    question: "Are passkeys safe?",
-    answer:
-      "Yes, passkeys are among the most secure authentication methods available. They use cryptographic key pairs that are resistant to phishing, cannot be reused across sites, and are stored securely on user's devices. They meet or exceed the security of traditional multi-factor authentication.",
-  },
-  {
-    question: "What happens if a user loses their device?",
-    answer:
-      "Aether Identity provides multiple recovery options including cloud sync for passkeys, backup verification methods, and administrative account recovery. Users can also register multiple authenticators for redundancy.",
-  },
-  {
-    question: "Can I use passwordless alongside passwords?",
-    answer:
-      "Yes, you can enable passwordless authentication as an option while maintaining password-based login. Many organizations run both methods during a transition period. However, we recommend going fully passwordless for optimal security.",
-  },
-  {
-    question: "Do passwordless methods work offline?",
-    answer:
-      "TOTP and some passkey implementations work offline. Magic links and email verification require connectivity. For offline scenarios, we recommend TOTP-based authenticators or hardware security keys.",
-  },
-];
-
 export default async function PasswordlessPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Passwordless" });
+
+  const benefits = [
+    {
+      icon: Shield,
+      title: t("benefits.security.title"),
+      description: t("benefits.security.description"),
+    },
+    {
+      icon: Zap,
+      title: t("benefits.ux.title"),
+      description: t("benefits.ux.description"),
+    },
+    {
+      icon: Smartphone,
+      title: t("benefits.device.title"),
+      description: t("benefits.device.description"),
+    },
+    {
+      icon: BarChart3,
+      title: t("benefits.support.title"),
+      description: t("benefits.support.description"),
+    },
+  ];
+
+  const methods = [
+    {
+      title: t("methods.passkeys.title"),
+      description: t("methods.passkeys.description"),
+      features: [
+        t("methods.passkeys.features.0"),
+        t("methods.passkeys.features.1"),
+        t("methods.passkeys.features.2"),
+        t("methods.passkeys.features.3"),
+      ],
+    },
+    {
+      title: t("methods.magicLink.title"),
+      description: t("methods.magicLink.description"),
+      features: [
+        t("methods.magicLink.features.0"),
+        t("methods.magicLink.features.1"),
+        t("methods.magicLink.features.2"),
+        t("methods.magicLink.features.3"),
+      ],
+    },
+    {
+      title: t("methods.otp.title"),
+      description: t("methods.otp.description"),
+      features: [
+        t("methods.otp.features.0"),
+        t("methods.otp.features.1"),
+        t("methods.otp.features.2"),
+        t("methods.otp.features.3"),
+      ],
+    },
+    {
+      title: t("methods.email.title"),
+      description: t("methods.email.description"),
+      features: [
+        t("methods.email.features.0"),
+        t("methods.email.features.1"),
+        t("methods.email.features.2"),
+        t("methods.email.features.3"),
+      ],
+    },
+  ];
+
+  const metrics = [
+    { value: "100%", label: t("metrics.eliminatesBreaches") },
+    { value: "80%", label: t("metrics.supportTickets") },
+    { value: "3x", label: t("metrics.fasterAuth") },
+    { value: "< 1%", label: t("metrics.failedLogin") },
+  ];
+
+  const useCases = [
+    {
+      icon: UserPlus,
+      title: t("useCases.onboarding.title"),
+      description: t("useCases.onboarding.description"),
+    },
+    {
+      icon: LogIn,
+      title: t("useCases.employee.title"),
+      description: t("useCases.employee.description"),
+    },
+    {
+      icon: Globe,
+      title: t("useCases.partner.title"),
+      description: t("useCases.partner.description"),
+    },
+    {
+      icon: Database,
+      title: t("useCases.admin.title"),
+      description: t("useCases.admin.description"),
+    },
+  ];
+
+  const comparison = [
+    {
+      method: t("comparison.security"),
+      password: t("comparison.password"),
+      passkey: "Very High",
+      magicLink: "High",
+      otp: "Medium",
+    },
+    {
+      method: t("comparison.experience"),
+      password: "Medium",
+      passkey: "Excellent",
+      magicLink: "Good",
+      otp: "Good",
+    },
+    {
+      method: t("comparison.complexity"),
+      password: "N/A",
+      passkey: "Low",
+      magicLink: "Low",
+      otp: "Low",
+    },
+    {
+      method: t("comparison.dependency"),
+      password: "None",
+      passkey: "High",
+      magicLink: "Low",
+      otp: "Medium",
+    },
+    {
+      method: t("comparison.recovery"),
+      password: "Password reset",
+      passkey: "Account recovery",
+      magicLink: "Resend link",
+      otp: "Resend code",
+    },
+  ];
+
+  const complianceStandards = [
+    t("compliance.fido"),
+    t("compliance.eidas"),
+    t("compliance.gdpr"),
+    t("compliance.soc"),
+    t("compliance.iso"),
+  ];
+
+  const resources = [
+    {
+      icon: FileText,
+      title: t("resources.whitepaper"),
+      description: t("resources.whitepaperDesc"),
+    },
+    {
+      icon: BookOpen,
+      title: t("resources.ebook"),
+      description: t("resources.ebookDesc"),
+    },
+    {
+      icon: Calendar,
+      title: t("resources.webinar"),
+      description: t("resources.webinarDesc"),
+    },
+    {
+      icon: Video,
+      title: t("resources.video"),
+      description: t("resources.videoDesc"),
+    },
+  ];
+
+  const faqs = [
+    {
+      question: t("faq.what.title"),
+      answer: t("faq.what.answer"),
+    },
+    {
+      question: t("faq.safe.title"),
+      answer: t("faq.safe.answer"),
+    },
+    {
+      question: t("faq.lost.title"),
+      answer: t("faq.lost.answer"),
+    },
+    {
+      question: t("faq.alongside.title"),
+      answer: t("faq.alongside.answer"),
+    },
+    {
+      question: t("faq.offline.title"),
+      answer: t("faq.offline.answer"),
+    },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -238,25 +229,24 @@ export default async function PasswordlessPage({
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                Passwordless Authentication
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                The Future of Authentication is Password-Free
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Eliminate the weakest link in your security chain. Implement secure, frictionless
-                authentication that users love and attackers cannot compromise.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
-                <Link href="/docs/guides/passwordless">
+                <Link href={`/${locale}/docs/guides/passwordless`}>
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    Implementation Guide
+                    {t("hero.ctaDocs")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/contact">
+                <Link href={`/${locale}/contact`}>
                   <Button variant="outline" size="lg" className="h-12 px-6 text-base">
-                    Talk to Sales
+                    {t("hero.ctaContact")}
                   </Button>
                 </Link>
               </div>
@@ -285,11 +275,10 @@ export default async function PasswordlessPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Why Go Passwordless
+                {t("benefits.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Passwords are the leading cause of security breaches. Passwordless authentication
-                eliminates this attack vector while improving user experience.
+                {t("benefits.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -315,11 +304,10 @@ export default async function PasswordlessPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Authentication Methods
+                {t("methods.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Choose the passwordless methods that fit your users and security requirements.
-                Aether Identity supports all major passwordless standards.
+                {t("methods.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
@@ -353,10 +341,10 @@ export default async function PasswordlessPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Method Comparison
+                {t("comparison.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Compare passwordless methods across security, usability, and implementation factors.
+                {t("comparison.description")}
               </p>
             </div>
             <div className="overflow-x-auto">
@@ -364,19 +352,19 @@ export default async function PasswordlessPage({
                 <thead>
                   <tr className="border-b border-border">
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
-                      Criteria
+                      {t("comparison.criteria")}
                     </th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
-                      Password
+                      {t("comparison.password")}
                     </th>
                     <th className="text-left py-4 px-4 text-sm font-semibold text-foreground">
-                      Passkey
+                      {t("comparison.passkey")}
                     </th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
-                      Magic Link
+                      {t("comparison.magicLink")}
                     </th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
-                      OTP
+                      {t("comparison.otp")}
                     </th>
                   </tr>
                 </thead>
@@ -402,10 +390,11 @@ export default async function PasswordlessPage({
         <section className="py-20 lg:py-28 border-b border-border bg-muted/30">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Use Cases</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("useCases.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Passwordless authentication adapts to various scenarios, from customer-facing
-                applications to enterprise internal systems.
+                {t("useCases.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -431,43 +420,50 @@ export default async function PasswordlessPage({
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                  Easy Implementation
+                  {t("implementation.title")}
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                  Integrate passwordless authentication in minutes with our SDKs and comprehensive
-                  documentation. Support for all major frameworks and languages.
+                  {t("implementation.description")}
                 </p>
                 <div className="mt-8 space-y-4">
                   <div className="flex items-center gap-3">
                     <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                    <span className="text-sm text-foreground">Full FIDO2/WebAuthn support</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                    <span className="text-sm text-foreground">Magic link and email OTP</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                    <span className="text-sm text-foreground">TOTP authenticator integration</span>
+                    <span className="text-sm text-foreground">
+                      {t("implementation.checklist.webauthn")}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
                     <span className="text-sm text-foreground">
-                      Adaptive authentication policies
+                      {t("implementation.checklist.magic")}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
+                    <span className="text-sm text-foreground">
+                      {t("implementation.checklist.totp")}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
+                    <span className="text-sm text-foreground">
+                      {t("implementation.checklist.adaptive")}
                     </span>
                   </div>
                 </div>
                 <div className="mt-8">
-                  <Link href="/docs/guides/passwordless">
+                  <Link href={`/${locale}/docs/guides/passwordless`}>
                     <Button size="lg" className="gap-2">
                       <Rocket className="h-4 w-4" />
-                      Quickstart Guide
+                      {t("implementation.cta")}
                     </Button>
                   </Link>
                 </div>
               </div>
               <div className="bg-muted/50 rounded-lg border border-border p-6">
-                <div className="text-sm text-muted-foreground mb-4">Example: Enable Passkeys</div>
+                <div className="text-sm text-muted-foreground mb-4">
+                  {t("implementation.example")}
+                </div>
                 <pre className="text-sm text-foreground overflow-x-auto">
                   <code>{`import { AetherClient } from '@aether-identity/node';
 
@@ -499,11 +495,10 @@ await aether.auth.passwordless.register({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Standards Compliant
+                {t("compliance.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Aether Identity implements industry-standard passwordless protocols, ensuring
-                compatibility and compliance with regulatory requirements.
+                {t("compliance.description")}
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -525,10 +520,10 @@ await aether.auth.passwordless.register({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Frequently Asked Questions
+                {t("faq.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Common questions about passwordless authentication.
+                {t("faq.description")}
               </p>
             </div>
             <FaqAccordion faqs={faqs} />
@@ -539,9 +534,11 @@ await aether.auth.passwordless.register({
         <section className="py-20 lg:py-28 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Resources</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("resources.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Explore our documentation and guides for implementing passwordless authentication.
+                {t("resources.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -566,22 +563,19 @@ await aether.auth.passwordless.register({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Ready to Eliminate Passwords?
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Implement passwordless authentication today. Start with our free tier and scale as
-                your needs grow.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/docs/guides/passwordless">
+                <Link href={`/${locale}/docs/guides/passwordless`}>
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                    Get Started
+                    {t("cta.getStarted")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/contact">
+                <Link href={`/${locale}/contact`}>
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    Contact Sales
+                    {t("cta.contact")}
                   </Button>
                 </Link>
               </div>

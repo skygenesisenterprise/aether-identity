@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -32,87 +33,82 @@ import {
   ScrollText,
 } from "lucide-react";
 
-const capabilities = [
-  {
-    icon: Handshake,
-    title: "Partner Identity Management",
-    description:
-      "Secure external access with granular permissions, session controls, and detailed audit trails for all partner interactions.",
-  },
-  {
-    icon: UserCheck,
-    title: "External User Authentication",
-    description:
-      "Dedicated flows for customers, vendors, and contractors with customizable onboarding and enrollment experiences.",
-  },
-  {
-    icon: Key,
-    title: "API Access Management",
-    description:
-      "Fine-grained OAuth 2.0 scopes and token management for machine-to-machine communication and partner integrations.",
-  },
-  {
-    icon: Workflow,
-    title: "Delegation & Impersonation",
-    description:
-      "Allow employees to act on behalf of customers or partners with full audit logging and approval workflows.",
-  },
-  {
-    icon: Globe,
-    title: "Cross-Organization SSO",
-    description:
-      "Federated authentication across partner domains with SAML 2.0 and OIDC federation protocols.",
-  },
-  {
-    icon: Gauge,
-    title: "Risk-Based Authentication",
-    description:
-      "Adaptive policies based on user context, device fingerprint, geolocation, and behavioral analysis.",
-  },
-];
+export default async function B2BPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "B2B" });
 
-const metrics = [
-  { value: "85%", label: "Reduced onboarding time" },
-  { value: "99.99%", label: "SLA availability" },
-  { value: "10x", label: "Faster partner integration" },
-  { value: "Zero", label: "Vendor lock-in" },
-];
+  const capabilities = [
+    {
+      icon: Handshake,
+      title: t("capabilities.partner"),
+      description: t("capabilities.partnerDesc"),
+    },
+    {
+      icon: UserCheck,
+      title: t("capabilities.external"),
+      description: t("capabilities.externalDesc"),
+    },
+    {
+      icon: Key,
+      title: t("capabilities.api"),
+      description: t("capabilities.apiDesc"),
+    },
+    {
+      icon: Workflow,
+      title: t("capabilities.delegation"),
+      description: t("capabilities.delegationDesc"),
+    },
+    {
+      icon: Globe,
+      title: t("capabilities.sso"),
+      description: t("capabilities.ssoDesc"),
+    },
+    {
+      icon: Gauge,
+      title: t("capabilities.risk"),
+      description: t("capabilities.riskDesc"),
+    },
+  ];
 
-const solutions = [
-  {
-    icon: Briefcase,
-    title: "Employee Access",
-    description:
-      "Secure workforce identity with SSO, MFA, and role-based access across all enterprise applications.",
-    features: ["SSO integration", "Device management", "Lifecycle automation"],
-  },
-  {
-    icon: UsersIcon,
-    title: "Customer Identity",
-    description:
-      "Seamless customer experiences with registration, profile management, and preference Centers.",
-    features: ["Social login", "Progressive profiling", "Consent management"],
-  },
-  {
-    icon: Handshake,
-    title: "Partner Portal",
-    description:
-      "Controlled partner access with dedicated workspaces, API keys, and usage monitoring.",
-    features: ["Partner directories", "API entitlements", "Usage analytics"],
-  },
-  {
-    icon: ScrollText,
-    title: "Complete Audit Trail",
-    description: "Every access decision logged with full context for compliance and investigation.",
-    features: ["Real-time logging", "Compliance reports", "Investigation tools"],
-  },
-];
+  const metrics = [
+    { value: "85%", label: t("metrics.onboardingTime") },
+    { value: "99.99%", label: t("metrics.slaAvailability") },
+    { value: "10x", label: t("metrics.partnerIntegration") },
+    { value: "Zero", label: t("metrics.vendorLockin") },
+  ];
 
-const sampleCode = [
-  {
-    language: "typescript",
-    filename: "auth.ts",
-    code: `import { AetherClient } from '@aether-identity/node';
+  const solutions = [
+    {
+      icon: Briefcase,
+      title: t("solutions.employee"),
+      description: t("solutions.employeeDesc"),
+      features: ["SSO integration", "Device management", "Lifecycle automation"],
+    },
+    {
+      icon: UsersIcon,
+      title: t("solutions.customer"),
+      description: t("solutions.customerDesc"),
+      features: ["Social login", "Progressive profiling", "Consent management"],
+    },
+    {
+      icon: Handshake,
+      title: t("solutions.partnerPortal"),
+      description: t("solutions.partnerPortalDesc"),
+      features: ["Partner directories", "API entitlements", "Usage analytics"],
+    },
+    {
+      icon: ScrollText,
+      title: t("solutions.audit"),
+      description: t("solutions.auditDesc"),
+      features: ["Real-time logging", "Compliance reports", "Investigation tools"],
+    },
+  ];
+
+  const sampleCode = [
+    {
+      language: "typescript",
+      filename: "auth.ts",
+      code: `import { AetherClient } from '@aether-identity/node';
 
 const aether = new AetherClient({
   domain: 'auth.yourcompany.com',
@@ -130,11 +126,11 @@ const { organization, permissions } = await aether.verify(
 if (permissions.includes('partners:read')) {
   // Authorized access
 }`,
-  },
-  {
-    language: "python",
-    filename: "auth.py",
-    code: `from aether_client import AetherClient
+    },
+    {
+      language: "python",
+      filename: "auth.py",
+      code: `from aether_client import AetherClient
 
 aether = AetherClient(
     domain='auth.yourcompany.com',
@@ -151,137 +147,118 @@ organization, permissions = await aether.verify(
 # Check specific partner permission
 if 'partners:read' in permissions:
     # Authorized access`,
-  },
-];
+    },
+  ];
 
-const complianceStandards = [
-  "SOC 2 Type II",
-  "GDPR",
-  "eIDAS",
-  "ISO 27001",
-  "WCAG 2.1",
-  "OpenID Certified",
-];
+  const complianceStandards = [
+    "SOC 2 Type II",
+    "GDPR",
+    "eIDAS",
+    "ISO 27001",
+    "WCAG 2.1",
+    "OpenID Certified",
+  ];
 
-const comparison = [
-  { feature: "Multi-tenant", aether: true, keycloak: true, auth0: true, okta: true },
-  { feature: "Partner directories", aether: true, keycloak: true, auth0: true, okta: true },
-  { feature: "Delegation", aether: true, keycloak: true, auth0: false, okta: true },
-  { feature: "API access management", aether: true, keycloak: true, auth0: true, okta: true },
-  { feature: "Partner SSO federation", aether: true, keycloak: true, auth0: true, okta: true },
-  { feature: "Token exchange", aether: true, keycloak: true, auth0: true, okta: false },
-  { feature: "Self-hosted option", aether: true, keycloak: true, auth0: false, okta: false },
-];
+  const comparison = [
+    { feature: "Multi-tenant", aether: true, keycloak: true, auth0: true, okta: true },
+    { feature: "Partner directories", aether: true, keycloak: true, auth0: true, okta: true },
+    { feature: "Delegation", aether: true, keycloak: true, auth0: false, okta: true },
+    { feature: "API access management", aether: true, keycloak: true, auth0: true, okta: true },
+    { feature: "Partner SSO federation", aether: true, keycloak: true, auth0: true, okta: true },
+    { feature: "Token exchange", aether: true, keycloak: true, auth0: true, okta: false },
+    { feature: "Self-hosted option", aether: true, keycloak: true, auth0: false, okta: false },
+  ];
 
-const benefits = [
-  {
-    icon: RefreshCw,
-    title: "Automated Lifecycle",
-    description:
-      "Automated provisioning and deprovisioning based on HR systems, contracts, and policy rules.",
-  },
-  {
-    icon: Scale,
-    title: "Consistent Governance",
-    description:
-      "Unified access policies across all user types with centralized visibility and reporting.",
-  },
-  {
-    icon: Network,
-    title: "Integration Ready",
-    description:
-      "Pre-built connectors for Salesforce, SAP, Oracle, and 200+ enterprise applications.",
-  },
-  {
-    icon: ScrollText,
-    title: "Complete Audit Trail",
-    description: "Every access decision logged with full context for compliance and investigation.",
-  },
-];
+  const benefits = [
+    {
+      icon: RefreshCw,
+      title: t("benefits.lifecycle"),
+      description: t("benefits.lifecycleDesc"),
+    },
+    {
+      icon: Scale,
+      title: t("benefits.governance"),
+      description: t("benefits.governanceDesc"),
+    },
+    {
+      icon: Network,
+      title: t("benefits.integration"),
+      description: t("benefits.integrationDesc"),
+    },
+    {
+      icon: ScrollText,
+      title: t("benefits.audit"),
+      description: t("benefits.auditDesc"),
+    },
+  ];
 
-const faqs = [
-  {
-    question: "How does Aether handle multi-tenant B2B scenarios?",
-    answer:
-      "Aether provides dedicated namespaces per organization with isolated configurations, branding, and user directories. Cross-organization access is controlled through explicit federation agreements.",
-  },
-  {
-    question: "Can I migrate from Auth0 or Okta B2B solutions?",
-    answer:
-      "Yes, we provide migration tools and assistance to import your organizations, users, and access configurations. Contact our team for a customized migration plan.",
-  },
-  {
-    question: "What about SLA guarantees for B2B identity?",
-    answer:
-      "Aether provides 99.99% SLA for enterprise deployments with dedicated support and compensation clauses.",
-  },
-  {
-    question: "Is there a free tier for B2B?",
-    answer:
-      "Yes, Aether Community Edition supports basic B2B scenarios. For advanced features like delegation and partner federation, contact our sales team.",
-  },
-  {
-    question: "How do you handle regulatory requirements like GDPR?",
-    answer:
-      "Aether includes built-in consent management, data export, deletion workflows, and processing agreements for GDPR compliance.",
-  },
-];
+  const faqs = [
+    {
+      question: t("faq.multitenant.title"),
+      answer: t("faq.multitenant.answer"),
+    },
+    {
+      question: t("faq.migration.title"),
+      answer: t("faq.migration.answer"),
+    },
+    {
+      question: t("faq.sla.title"),
+      answer: t("faq.sla.answer"),
+    },
+    {
+      question: t("faq.freeTier.title"),
+      answer: t("faq.freeTier.answer"),
+    },
+    {
+      question: t("faq.gdpr.title"),
+      answer: t("faq.gdpr.answer"),
+    },
+  ];
 
-const resources = [
-  {
-    icon: FileText,
-    title: "Whitepaper",
-    description: "B2B Identity Architecture Guide",
-  },
-  {
-    icon: BookOpen,
-    title: "E-book",
-    description: "Zero Trust for External Access",
-  },
-  {
-    icon: Calendar,
-    title: "Webinar",
-    description: "Modern Partner Identity Management",
-  },
-  {
-    icon: BarChart3,
-    title: "Case Study",
-    description: "How TechCorp Scaled Partner Access",
-  },
-];
+  const resources = [
+    {
+      icon: FileText,
+      title: t("resources.whitepaper"),
+      description: t("resources.whitepaperDesc"),
+    },
+    {
+      icon: BookOpen,
+      title: t("resources.ebook"),
+      description: t("resources.ebookDesc"),
+    },
+    {
+      icon: Calendar,
+      title: t("resources.webinar"),
+      description: t("resources.webinarDesc"),
+    },
+    {
+      icon: BarChart3,
+      title: t("resources.caseStudy"),
+      description: t("resources.caseStudyDesc"),
+    },
+  ];
 
-const technicalPartners = [
-  { name: "Salesforce" },
-  { name: "SAP" },
-  { name: "Oracle" },
-  { name: "Microsoft" },
-  { name: "ServiceNow" },
-  { name: "Slack" },
-];
+  const technicalPartners = [
+    { name: "Salesforce" },
+    { name: "SAP" },
+    { name: "Oracle" },
+    { name: "Microsoft" },
+    { name: "ServiceNow" },
+    { name: "Slack" },
+  ];
 
-const teamMembers = [
-  { name: "Alex Chen", role: "CEO & Founder", image: "AC" },
-  { name: "Sarah Miller", role: "CTO", image: "SM" },
-  { name: "James Wilson", role: "VP Engineering", image: "JW" },
-  { name: "Emily Davis", role: "Head of Security", image: "ED" },
-];
+  const teamMembers = [
+    { name: "Alex Chen", role: "CEO & Founder", image: "AC" },
+    { name: "Sarah Miller", role: "CTO", image: "SM" },
+    { name: "James Wilson", role: "VP Engineering", image: "JW" },
+    { name: "Emily Davis", role: "Head of Security", image: "ED" },
+  ];
 
-const recentUpdates = [
-  { version: "v2.4.0", date: "March 2026", description: "Partner federation improvements" },
-  {
-    version: "v2.3.0",
-    date: "February 2026",
-    description: "Enhanced delegation workflows",
-  },
-  {
-    version: "v2.2.0",
-    date: "January 2026",
-    description: "API entitlement management",
-  },
-];
-
-export default async function B2BPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
+  const recentUpdates = [
+    { version: "v2.4.0", date: "March 2026", description: "Partner federation improvements" },
+    { version: "v2.3.0", date: "February 2026", description: "Enhanced delegation workflows" },
+    { version: "v2.2.0", date: "January 2026", description: "API entitlement management" },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -293,25 +270,24 @@ export default async function B2BPage({ params }: { params: Promise<{ locale: st
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                B2B Identity Solutions
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                Identity for Every Business Relationship
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Securely manage employees, customers, partners, and contractors with a unified
-                identity platform built for complex B2B ecosystems.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
                 <Link href="/docs">
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    View Documentation
+                    {t("hero.ctaDocs")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="/contact">
                   <Button variant="outline" size="lg" className="h-12 px-6 text-base">
-                    Contact Sales
+                    {t("hero.ctaContact")}
                   </Button>
                 </Link>
               </div>
@@ -338,11 +314,10 @@ export default async function B2BPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Comprehensive B2B Identity
+                {t("capabilities.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                A single platform to manage all external identity relationships with the security,
-                compliance, and flexibility your business demands.
+                {t("capabilities.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -367,10 +342,10 @@ export default async function B2BPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Built for All Identity Types
+                {t("solutions.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Tailored workflows and permissions for every type of external access.
+                {t("solutions.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
@@ -405,17 +380,16 @@ export default async function B2BPage({ params }: { params: Promise<{ locale: st
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-balance">
-                  Integrate Partner Access in Minutes
+                  {t("code.title")}
                 </h2>
                 <p className="mt-4 text-lg text-background/70 leading-relaxed">
-                  Our SDKs and pre-built connectors make integrating B2B identity into your
-                  applications seamless and straightforward.
+                  {t("code.description")}
                 </p>
                 <div className="mt-8">
                   <Link href="/docs/quickstarts">
                     <Button variant="secondary" size="lg" className="gap-2">
                       <Code2 className="h-4 w-4" />
-                      Quickstart Guides
+                      {t("code.quickstart")}
                     </Button>
                   </Link>
                 </div>
@@ -431,10 +405,10 @@ export default async function B2BPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Enterprise-Grade Benefits
+                {t("benefits.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Built for scale with the security and compliance features enterprises demand.
+                {t("benefits.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -458,10 +432,10 @@ export default async function B2BPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Compare Solutions
+                {t("compare.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                See how Aether stacks up against other B2B identity providers.
+                {t("compare.description")}
               </p>
             </div>
             <div className="overflow-x-auto">
@@ -469,19 +443,19 @@ export default async function B2BPage({ params }: { params: Promise<{ locale: st
                 <thead>
                   <tr className="border-b border-border">
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
-                      Feature
+                      {t("compare.feature")}
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-semibold text-foreground">
-                      Aether
+                      {t("compare.aether")}
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-medium text-muted-foreground">
-                      Keycloak
+                      {t("compare.keycloak")}
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-medium text-muted-foreground">
-                      Auth0
+                      {t("compare.auth0")}
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-medium text-muted-foreground">
-                      Okta
+                      {t("compare.okta")}
                     </th>
                   </tr>
                 </thead>
@@ -538,11 +512,10 @@ export default async function B2BPage({ params }: { params: Promise<{ locale: st
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                  Built for Regulated Industries
+                  {t("compliance.title")}
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                  Aether B2B Identity meets the stringent security and compliance requirements of
-                  healthcare, finance, and government sectors.
+                  {t("compliance.description")}
                 </p>
                 <div className="mt-8 grid grid-cols-2 gap-3">
                   {complianceStandards.map((standard) => (
@@ -557,22 +530,32 @@ export default async function B2BPage({ params }: { params: Promise<{ locale: st
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Shield className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">AES-256</div>
-                  <div className="text-sm text-muted-foreground">Encryption at rest</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("compliance.encryptionRest")}
+                  </div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Lock className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">TLS 1.3</div>
-                  <div className="text-sm text-muted-foreground">Encryption in transit</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("compliance.encryptionTransit")}
+                  </div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Building2 className="h-8 w-8 text-foreground mb-3" />
-                  <div className="text-2xl font-semibold text-foreground">Multi-tenant</div>
-                  <div className="text-sm text-muted-foreground">Logical isolation</div>
+                  <div className="text-2xl font-semibold text-foreground">
+                    {t("compliance.multiTenant")}
+                  </div>
+                  <div className="text-sm text-muted-foreground">{t("compliance.isolation")}</div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Zap className="h-8 w-8 text-foreground mb-3" />
-                  <div className="text-2xl font-semibold text-foreground">Audit Logs</div>
-                  <div className="text-sm text-muted-foreground">Complete trail</div>
+                  <div className="text-2xl font-semibold text-foreground">
+                    {t("compliance.auditLogs")}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("compliance.completeTrail")}
+                  </div>
                 </div>
               </div>
             </div>
@@ -583,10 +566,10 @@ export default async function B2BPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Frequently Asked Questions
+                {t("faq.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Common questions about Aether B2B identity solutions.
+                {t("faq.description")}
               </p>
             </div>
             <FaqAccordion faqs={faqs} />
@@ -596,9 +579,11 @@ export default async function B2BPage({ params }: { params: Promise<{ locale: st
         <section className="py-20 lg:py-28 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Resources</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("resources.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Explore documentation, guides, and research on B2B identity management.
+                {t("resources.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -622,10 +607,10 @@ export default async function B2BPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Technical Partners
+                {t("partners.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Seamlessly integrated with the enterprise applications you use.
+                {t("partners.description")}
               </p>
             </div>
             <div className="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
@@ -642,11 +627,10 @@ export default async function B2BPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Built by Experts
+                {t("team.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Our team brings decades of experience in identity, security, and enterprise
-                infrastructure.
+                {t("team.description")}
               </p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -669,9 +653,11 @@ export default async function B2BPage({ params }: { params: Promise<{ locale: st
         <section className="py-20 lg:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Recent Updates</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("updates.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Stay up to date with the latest B2B features and improvements.
+                {t("updates.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
@@ -698,22 +684,19 @@ export default async function B2BPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Secure Every Business Relationship
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Deploy Aether B2B Identity today and unify all your external access under one
-                platform.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link href="/docs">
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                    Get Started
+                    {t("cta.getStarted")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="/contact">
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    Contact Sales
+                    {t("cta.contactSales")}
                   </Button>
                 </Link>
               </div>
