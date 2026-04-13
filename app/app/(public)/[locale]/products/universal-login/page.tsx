@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -31,67 +32,58 @@ import {
 const capabilities = [
   {
     icon: LogIn,
-    title: "Universal Authentication",
-    description:
-      "Seamless login experience across all your applications with a single set of credentials. Support for web, mobile, and desktop platforms.",
+    titleKey: "universalAuth",
+    descriptionKey: "universalAuthDesc",
   },
   {
     icon: RefreshCw,
-    title: "Session Synchronization",
-    description:
-      "Real-time session state synchronization across all devices and applications. Users stay logged in seamlessly as they switch between apps.",
+    titleKey: "sessionSync",
+    descriptionKey: "sessionSyncDesc",
   },
   {
     icon: Smartphone,
-    title: "Cross-Device SSO",
-    description:
-      "Enterprise-grade single sign-on that works across web, iOS, Android, and native desktop applications with consistent UX.",
+    titleKey: "crossDeviceSso",
+    descriptionKey: "crossDeviceSsoDesc",
   },
   {
     icon: Fingerprint,
-    title: "Adaptive Authentication",
-    description:
-      "Risk-based authentication that adapts security requirements based on device, location, and user behavior patterns.",
+    titleKey: "adaptiveAuth",
+    descriptionKey: "adaptiveAuthDesc",
   },
   {
     icon: Monitor,
-    title: "Customizable Branding",
-    description:
-      "Fully white-label the login experience with custom themes, logos, and styling to maintain brand consistency.",
+    titleKey: "customizableBranding",
+    descriptionKey: "customizableBrandingDesc",
   },
   {
     icon: Plug,
-    title: "Identity Provider Integration",
-    description:
-      "Connect to existing identity providers including Okta, Auth0, Azure AD, or any SAML/OIDC compliant IdP.",
+    titleKey: "idpIntegration",
+    descriptionKey: "idpIntegrationDesc",
   },
 ];
 
 const metrics = [
-  { value: "< 50ms", label: "Login page load time" },
-  { value: "99.99%", label: "SLA availability" },
-  { value: "10M+", label: "Logins per month" },
-  { value: "Zero", label: "Password fatigue" },
+  { value: "< 50ms", labelKey: "loginPageLoad" },
+  { value: "99.99%", labelKey: "sla" },
+  { value: "10M+", labelKey: "loginsPerMonth" },
+  { value: "Zero", labelKey: "passwordFatigue" },
 ];
 
 const deploymentOptions = [
   {
     icon: Cloud,
-    title: "Cloud-Hosted",
-    description:
-      "Fully managed service with automatic scaling, global CDN, and enterprise SLAs. Deploy in minutes.",
+    titleKey: "cloudHosted",
+    descriptionKey: "cloudHostedDesc",
   },
   {
     icon: Database,
-    title: "On-Premise",
-    description:
-      "Deploy within your infrastructure for complete data sovereignty and compliance requirements.",
+    titleKey: "onPremise",
+    descriptionKey: "onPremiseDesc",
   },
   {
     icon: GitBranch,
-    title: "Hybrid",
-    description:
-      "Cloud-managed control plane with on-premise session storage for maximum flexibility.",
+    titleKey: "hybrid",
+    descriptionKey: "hybridDesc",
   },
 ];
 
@@ -156,87 +148,86 @@ const complianceStandards = [
 
 const features = [
   {
-    title: "Passwordless Authentication",
-    description:
-      "Eliminate passwords entirely with WebAuthn, magic links, or biometric authentication for frictionless user experience.",
+    titleKey: "passwordless",
+    descriptionKey: "passwordlessDesc",
   },
   {
-    title: "Social Login",
-    description:
-      "Support for Google, GitHub, Microsoft, Apple, and 50+ other social identity providers out of the box.",
+    titleKey: "socialLogin",
+    descriptionKey: "socialLoginDesc",
   },
   {
-    title: "Enterprise SSO",
-    description:
-      "SAML 2.0 and OIDC federation with Azure AD, Okta, OneLogin, and any SAML-compliant identity provider.",
+    titleKey: "enterpriseSso",
+    descriptionKey: "enterpriseSsoDesc",
   },
   {
-    title: "Multi-Factor Authentication",
-    description:
-      "TOTP, SMS, email, and WebAuthn second factors with flexible policies and remember device features.",
+    titleKey: "mfa",
+    descriptionKey: "mfaDesc",
   },
   {
-    title: "Progressive Profiling",
-    description:
-      "Collect user attributes incrementally across sessions to reduce signup friction while building complete profiles.",
+    titleKey: "progressiveProfiling",
+    descriptionKey: "progressiveProfilingDesc",
   },
   {
-    title: "Account Recovery",
-    description:
-      "Secure account recovery flows with verified email, phone, or backup codes to prevent account lockouts.",
-  },
-];
-
-const faqs = [
-  {
-    question: "How does Universal Login differ from traditional SSO?",
-    answer:
-      "Universal Login provides a modern, consistent authentication experience across all applications regardless of the underlying identity system. Unlike traditional SSO solutions, it offers a unified user experience with built-in session management, passwordless options, and adaptive security policies.",
-  },
-  {
-    question: "Can I integrate with my existing identity provider?",
-    answer:
-      "Yes, Universal Login integrates with Okta, Azure AD, Auth0, Keycloak, and any SAML 2.0 or OIDC-compliant identity provider. You can federate authentication while maintaining your existing user directory.",
-  },
-  {
-    question: "Is the login page customizable?",
-    answer:
-      "Absolutely. You can customize colors, logos, backgrounds, typography, and even the full HTML/CSS template. White-label options are available for enterprise deployments.",
-  },
-  {
-    question: "How does passwordless authentication work?",
-    answer:
-      "Passwordless authentication uses WebAuthn (FIDO2) for biometric or hardware key authentication, magic links sent via email, or one-time codes via SMS. This eliminates password fatigue while improving security.",
-  },
-  {
-    question: "What happens if the identity provider goes down?",
-    answer:
-      "Universal Login includes built-in failover mechanisms and session caching. Users with active sessions remain authenticated, and fallback authentication methods can be configured for emergencies.",
+    titleKey: "accountRecovery",
+    descriptionKey: "accountRecoveryDesc",
   },
 ];
 
 const resources = [
   {
     icon: FileText,
-    title: "Documentation",
-    description: "Integration guides and API reference",
+    titleKey: "documentation",
+    descriptionKey: "documentationDesc",
   },
   {
     icon: BookOpen,
-    title: "Tutorial",
-    description: "Step-by-step Universal Login setup",
+    titleKey: "tutorial",
+    descriptionKey: "tutorialDesc",
   },
   {
     icon: Calendar,
-    title: "Webinar",
-    description: "Best practices for passwordless migration",
+    titleKey: "webinar",
+    descriptionKey: "webinarDesc",
   },
   {
     icon: BarChart3,
-    title: "Case Study",
-    description: "How Acme Corp reduced login friction by 70%",
+    titleKey: "caseStudy",
+    descriptionKey: "caseStudyDesc",
   },
-];
+] as const;
+
+interface Capability {
+  icon: typeof LogIn;
+  titleKey: string;
+  descriptionKey: string;
+}
+
+interface Feature {
+  titleKey: string;
+  descriptionKey: string;
+}
+
+interface Metric {
+  value: string;
+  labelKey: string;
+}
+
+interface DeploymentOption {
+  icon: typeof Cloud;
+  titleKey: string;
+  descriptionKey: string;
+}
+
+interface Resource {
+  icon: typeof FileText;
+  titleKey: string;
+  descriptionKey: string;
+}
+
+interface FaqItem {
+  question: string;
+  answer: string;
+}
 
 export default async function UniversalLoginPage({
   params,
@@ -244,6 +235,30 @@ export default async function UniversalLoginPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "UniversalLogin" });
+
+  const faqs = [
+    {
+      question: t("faq.diff.title"),
+      answer: t("faq.diff.answer"),
+    },
+    {
+      question: t("faq.idp.title"),
+      answer: t("faq.idp.answer"),
+    },
+    {
+      question: t("faq.customize.title"),
+      answer: t("faq.customize.answer"),
+    },
+    {
+      question: t("faq.passwordless.title"),
+      answer: t("faq.passwordless.answer"),
+    },
+    {
+      question: t("faq.down.title"),
+      answer: t("faq.down.answer"),
+    },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -256,26 +271,25 @@ export default async function UniversalLoginPage({
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                Enterprise Authentication
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                One Login for All Your Applications
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Provide a seamless, secure authentication experience across all your web and mobile
-                applications. Universal Login unifies your brand while eliminating password fatigue.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
-                <Link href="/docs">
+                <Link href={`/${locale}/docs`}>
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    View Documentation
+                    {t("hero.ctaDocs")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="https://github.com/skygenesisenterprise/aether-identity">
                   <Button variant="outline" size="lg" className="gap-2 h-12 px-6 text-base">
                     <GitHubIcon className="h-4 w-4" />
-                    GitHub Repository
+                    {t("hero.ctaGithub")}
                   </Button>
                 </Link>
               </div>
@@ -288,11 +302,13 @@ export default async function UniversalLoginPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
               {metrics.map((metric) => (
-                <div key={metric.label}>
+                <div key={metric.labelKey}>
                   <div className="text-3xl sm:text-4xl font-semibold text-foreground">
                     {metric.value}
                   </div>
-                  <div className="mt-1 text-sm text-muted-foreground">{metric.label}</div>
+                  <div className="mt-1 text-sm text-muted-foreground">
+                    {t(`metrics.${metric.labelKey}`)}
+                  </div>
                 </div>
               ))}
             </div>
@@ -304,24 +320,25 @@ export default async function UniversalLoginPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Everything You Need for Modern Authentication
+                {t("capabilities.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Built for developers who demand flexibility without compromising on security or user
-                experience.
+                {t("capabilities.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {capabilities.map((capability) => (
-                <div key={capability.title} className="group">
+                <div key={capability.titleKey} className="group">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-foreground/5 group-hover:bg-foreground/10 transition-colors">
                       <capability.icon className="h-5 w-5 text-foreground" />
                     </div>
-                    <h3 className="text-base font-semibold text-foreground">{capability.title}</h3>
+                    <h3 className="text-base font-semibold text-foreground">
+                      {t(`capabilities.${capability.titleKey}`)}
+                    </h3>
                   </div>
                   <p className="text-sm text-muted-foreground leading-relaxed pl-13">
-                    {capability.description}
+                    {t(`capabilities.${capability.descriptionKey}`)}
                   </p>
                 </div>
               ))}
@@ -335,11 +352,10 @@ export default async function UniversalLoginPage({
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-balance">
-                  Integrate in Minutes
+                  {t("code.title")}
                 </h2>
                 <p className="mt-4 text-lg text-background/70 leading-relaxed">
-                  Our React component library makes it easy to add powerful authentication to any
-                  application with just a few lines of code.
+                  {t("code.description")}
                 </p>
                 <div className="mt-8">
                   <div className="flex flex-wrap gap-2">
@@ -354,10 +370,10 @@ export default async function UniversalLoginPage({
                   </div>
                 </div>
                 <div className="mt-8">
-                  <Link href="/docs/quickstarts">
+                  <Link href={`/${locale}/docs/quickstarts`}>
                     <Button variant="secondary" size="lg" className="gap-2">
                       <Code2 className="h-4 w-4" />
-                      Quickstart Guide
+                      {t("code.cta")}
                     </Button>
                   </Link>
                 </div>
@@ -374,21 +390,23 @@ export default async function UniversalLoginPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Advanced Features
+                {t("features.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Everything you need to build a secure, user-friendly authentication system.
+                {t("features.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {features.map((feature) => (
                 <div
-                  key={feature.title}
+                  key={feature.titleKey}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
                 >
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{feature.title}</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    {t(`features.${feature.titleKey}`)}
+                  </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {feature.description}
+                    {t(`features.${feature.descriptionKey}`)}
                   </p>
                 </div>
               ))}
@@ -401,23 +419,24 @@ export default async function UniversalLoginPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Deploy Your Way
+                {t("deployment.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Choose between fully managed cloud service, on-premise deployment, or a hybrid
-                approach that gives you the best of both worlds.
+                {t("deployment.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
               {deploymentOptions.map((option) => (
                 <div
-                  key={option.title}
+                  key={option.titleKey}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
                 >
                   <option.icon className="h-8 w-8 text-foreground mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{option.title}</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    {t(`deployment.${option.titleKey}`)}
+                  </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {option.description}
+                    {t(`deployment.${option.descriptionKey}`)}
                   </p>
                 </div>
               ))}
@@ -431,11 +450,10 @@ export default async function UniversalLoginPage({
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                  Enterprise-Grade Security
+                  {t("compliance.title")}
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                  Universal Login is built with security at its core, meeting the stringent
-                  requirements of regulated industries.
+                  {t("compliance.description")}
                 </p>
                 <div className="mt-8 grid grid-cols-2 gap-3">
                   {complianceStandards.map((standard) => (
@@ -450,22 +468,26 @@ export default async function UniversalLoginPage({
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Shield className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">AES-256</div>
-                  <div className="text-sm text-muted-foreground">Encryption at rest</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("compliance.encryptionRest")}
+                  </div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Lock className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">TLS 1.3</div>
-                  <div className="text-sm text-muted-foreground">Encryption in transit</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("compliance.encryptionTransit")}
+                  </div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Gauge className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">99.99%</div>
-                  <div className="text-sm text-muted-foreground">Uptime SLA</div>
+                  <div className="text-sm text-muted-foreground">{t("compliance.uptime")}</div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Layers className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">2FA</div>
-                  <div className="text-sm text-muted-foreground">Built-in support</div>
+                  <div className="text-sm text-muted-foreground">{t("compliance.2fa")}</div>
                 </div>
               </div>
             </div>
@@ -477,10 +499,10 @@ export default async function UniversalLoginPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Frequently Asked Questions
+                {t("faq.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Common questions about Universal Login.
+                {t("faq.description")}
               </p>
             </div>
             <FaqAccordion faqs={faqs} />
@@ -491,21 +513,25 @@ export default async function UniversalLoginPage({
         <section className="py-20 lg:py-28 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Resources</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("resources.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Explore our documentation and guides to get started with Universal Login.
+                {t("resources.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {resources.map((resource) => (
                 <div
-                  key={resource.title}
+                  key={resource.titleKey}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors cursor-pointer"
                 >
                   <resource.icon className="h-8 w-8 text-foreground mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{resource.title}</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    {t(`resources.${resource.titleKey}`)}
+                  </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {resource.description}
+                    {t(`resources.${resource.descriptionKey}`)}
                   </p>
                 </div>
               ))}
@@ -518,22 +544,19 @@ export default async function UniversalLoginPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Simplify Your Authentication
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Give your users a seamless login experience across all applications. Try Universal
-                Login today.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/docs">
+                <Link href={`/${locale}/docs`}>
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                    Get Started
+                    {t("cta.getStarted")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/contact">
+                <Link href={`/${locale}/contact`}>
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    Contact Sales
+                    {t("cta.contactSales")}
                   </Button>
                 </Link>
               </div>

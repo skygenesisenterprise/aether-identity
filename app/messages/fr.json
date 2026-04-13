@@ -40,5 +40,515 @@
   "Meta": {
     "title": "The Etheria Times - Actualités en direct et info en continu",
     "description": "Toute l'actualité en direct, les news et infos en continu : politique, économie, société, culture, sport et international sur The Etheria Times."
+  },
+  "Public": {
+    "hero": {
+      "badge": "Plateforme d'Identité Open Source",
+      "title": "Infrastructure d'Identité d'Entreprise Sous Votre Contrôle",
+      "description": "Un fournisseur OAuth 2.0 et OpenID Connect auto-hébergé conçu pour les organisations qui nécessitent une souveraineté complète sur l'authentification, l'autorisation et les données utilisateurs.",
+      "ctaDocs": "Voir la Documentation",
+      "ctaGithub": "Dépôt GitHub"
+    },
+    "metrics": {
+      "tokenLatency": "Latence de validation des jetons",
+      "sla": "Disponibilité SLA",
+      "authentications": "Authentifications gérées",
+      "vendorLockin": "Dépendance fournisseur"
+    },
+    "capabilities": {
+      "title": "Capacités Principales",
+      "description": "Construit sur des standards ouverts avec une fiabilité de qualité entreprise. Chaque composant est conçu pour l'extensibilité et les exigences de conformité.",
+      "oauth": {
+        "title": "OAuth 2.0 / OpenID Connect",
+        "description": "Implémentation conforme aux standards avec prise en charge complète des flux authorization code, PKCE, client credentials et refresh token."
+      },
+      "mfa": {
+        "title": "Authentification Multi-Facteurs",
+        "description": "TOTP, WebAuthn, SMS et vérification par email avec politiques d'authentification adaptatives basées sur les risques."
+      },
+      "federation": {
+        "title": "Fédération d'Utilisateurs",
+        "description": "Connectez vos annuaires LDAP, Active Directory ou fournisseurs d'identité externes sans migrer les identifiants."
+      },
+      "authorization": {
+        "title": "Autorisation Fine",
+        "description": "Contrôle d'accès basé sur les rôles (RBAC) et politiques basées sur les attributs avec évaluation des permissions en temps réel."
+      },
+      "selfHosted": {
+        "title": "Infrastructure Auto-Hébergée",
+        "description": "Déployez sur votre infrastructure avec Docker, Kubernetes ou bare metal. Vos données restent sous votre contrôle."
+      },
+      "sessions": {
+        "title": "Gestion Globale des Sessions",
+        "description": "Gestion distribuée des sessions avec authentification unique (SSO) applicative et durées de jetons configurables."
+      }
+    },
+    "comparison": {
+      "title": "Comment Nous Comparons",
+      "description": "Découvrez pourquoi les organisations leaders choose Aether plutôt que les fournisseurs d'identité traditionnels.",
+      "feature": "Fonctionnalité"
+    },
+    "code": {
+      "title": "Intégrez en Minutes, Pas en Semaines",
+      "description": "Nos SDKs abstrait la complexité des flux OAuth tout en vous donnant un accès complet aux primitives sous-jacentes si nécessaire.",
+      "cta": "Guides de Démarrage"
+    },
+    "deployment": {
+      "title": "Déployez Comme Vous Voulez",
+      "description": "Que vous ayez besoin d'une isolation complète, d'évolutivité cloud ou d'une approche hybride, Aether Identity s'adapte à vos exigences d'infrastructure.",
+      "onPremise": "On-Premise",
+      "onPremiseDesc": "Contrôle total sur votre infrastructure d'identité avec support de déploiement air-gappé.",
+      "cloudNative": "Cloud Native",
+      "cloudNativeDesc": "Prêt pour Kubernetes avec Helm charts, scaling horizontal et intégrations fournisseurs cloud.",
+      "hybrid": "Hybride",
+      "hybridDesc": "Reliez vos répertoires on-premise aux applications cloud via une fédération sécurisée."
+    },
+    "industries": {
+      "title": "Conçu Pour Chaque Industrie",
+      "description": "Solutions d'identité spécialisées adaptées aux exigences uniques de sécurité et conformité de votre secteur.",
+      "healthcare": "Santé",
+      "healthcareDesc": "Gestion d'identité conforme HIPAA pour portals patients, télémédecine et dossiers médicaux électroniques.",
+      "finance": "Finance",
+      "financeDesc": "Authentification sécurisée pour applications bancaires, plateformes de trading et conformité réglementaire.",
+      "government": "Gouvernement",
+      "governmentDesc": "Solutions FedRAMP Ready pour services aux citoyens, réseaux internes sécurisés et collaboration inter-agences.",
+      "ecommerce": "E-commerce",
+      "ecommerceDesc": "Authentification transparente des clients avec prévention de fraude et intégration de paiement sécurisé."
+    },
+    "compliance": {
+      "title": "Conçu Pour les Industries Réglementées",
+      "description": "Aether Identity est conçu pour répondre aux exigences strictes de sécurité et conformité des organisations de santé, finance, gouvernement et entreprise.",
+      "encryptionRest": "Chiffrement au repos",
+      "encryptionTransit": "Chiffrement en transit",
+      "airGap": "Air-Gap",
+      "airGapDesc": "Déployment prêt",
+      "auditLogs": "Journaux d'Audit",
+      "auditLogsDesc": "Piste complète"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur Aether Identity et nos solutions entreprise."
+    },
+    "resources": {
+      "title": "Ressources",
+      "description": "Explorez notre documentation, guides et dernières recherches sur la sécurité d'identité."
+    },
+    "partners": {
+      "title": "Partenaires Techniques",
+      "description": "Intégré de manière transparente avec les outils et plateformes que vous utilisez déjà."
+    },
+    "team": {
+      "title": "Construit Par des Experts",
+      "description": "Notre équipe apporte des décennies d'expérience en identité, sécurité et infrastructure d'entreprise."
+    },
+    "updates": {
+      "title": "Mises à Jour Récentes",
+      "description": "Restez à jour avec les dernières fonctionnalités et améliorations."
+    },
+    "cta": {
+      "title": "Prenez le Contrôle de Votre Infrastructure d'Identité",
+      "description": "Déployez Aether Identity aujourd'hui et éliminez votre dépendance aux fournisseurs d'identité tiers. Open source, auto-hébergé, prêt pour l'entreprise.",
+      "getStarted": "Commencer",
+      "contactSales": "Contacter les Ventes"
+    },
+    "footer": {
+      "product": "Produit",
+      "solutions": "Solutions",
+      "developers": "Développeurs",
+      "pricing": "Tarifs",
+      "blog": "Blog",
+      "company": "Entreprise",
+      "about": "À propos",
+      "careers": "Carrières",
+      "contact": "Contact",
+      "legal": "Légal",
+      "privacy": "Politique de Confidentialité",
+      "terms": "Conditions d'Utilisation",
+      "security": "Sécurité",
+      "copyright": "© 2026 Sky Genesis Enterprise. Tous droits réservés."
+    }
+  },
+  "Header": {
+    "product": "Produit",
+    "solutions": "Solutions",
+    "developers": "Développeurs",
+    "pricing": "Tarifs",
+    "blog": "Blog",
+    "contactSales": "Contacter les Ventes",
+    "login": "Connexion",
+    "signUp": "S'inscrire",
+    "dashboard": "Tableau de Bord",
+    "corePlatform": "Plateforme Principale",
+    "universalLogin": "Connexion Universelle",
+    "universalLoginDesc": "Authentification sécurisée personnalisable",
+    "singleSignOn": "Authentification Unique",
+    "singleSignOnDesc": "Une connexion pour toutes les applications",
+    "multiFactorAuth": "Authentification Multi-Facteurs",
+    "multiFactorAuthDesc": "AMF adaptative basée sur les risques",
+    "userManagement": "Gestion des Utilisateurs",
+    "userManagementDesc": "Cycle de vie complet de l'identité",
+    "enterprise": "Entreprise",
+    "enterpriseConnections": "Connexions Entreprise",
+    "enterpriseConnectionsDesc": "SAML, LDAP, Active Directory",
+    "organizations": "Organisations",
+    "organizationsDesc": "Solutions B2B multi-tenant",
+    "fineGrainedAuthorization": "Autorisation Fine",
+    "fineGrainedAuthorizationDesc": "Contrôle d'accès basé sur les relations",
+    "privateCloud": "Cloud Privé",
+    "privateCloudDesc": "Infrastructure dédiée",
+    "aiAgents": "Aether Identity pour Agents IA",
+    "aiAgentsDesc": "Authentification et autorisation sécurisées pour les applications alimentées par l'IA et les agents autonomes.",
+    "new": "Nouveau",
+    "learnMore": "En savoir plus",
+    "resources": "Ressources",
+    "documentation": "Documentation",
+    "documentationDesc": "Guides et références API",
+    "quickstarts": "Démarrages Rapides",
+    "quickstartsDesc": "Commencez en quelques minutes",
+    "apiReference": "Référence API",
+    "apiReferenceDesc": "Documentation API complète",
+    "sdksLibraries": "SDKs et Bibliothèques",
+    "sdksLibrariesDesc": "Bibliothèques clientes officielles",
+    "tools": "Outils",
+    "cli": "CLI",
+    "cliDesc": "Interface en ligne de commande",
+    "postman": "Collections Postman",
+    "postmanDesc": "Collections de test API",
+    "extensions": "Extensions",
+    "extensionsDesc": "Étendre les fonctionnalités",
+    "community": "Communauté",
+    "communityDesc": "Rejoignez la discussion",
+    "byUseCase": "Par Cas d'Usage",
+    "b2cIdentity": "Identité B2C",
+    "b2cIdentityDesc": "Applications grand public",
+    "b2bSaas": "B2B SaaS",
+    "b2bSaasDesc": "Applications entreprise multi-tenant",
+    "machineToMachine": "Machine à Machine",
+    "machineToMachineDesc": "Authentification API et service",
+    "passwordless": "Sans Mot de Passe",
+    "passwordlessDesc": "Authentification sans friction",
+    "byIndustry": "Par Industrie",
+    "financialServices": "Services Financiers",
+    "financialServicesDesc": "Solutions bancaires et fintech",
+    "healthcare": "Santé",
+    "healthcareDesc": "Identité conforme HIPAA",
+    "retailEcommerce": "Retail et E-commerce",
+    "retailEcommerceDesc": "Identité client à grande échelle",
+    "publicSector": "Secteur Public",
+    "publicSectorDesc": "Services gouvernementaux sécurisés"
+  },
+  "UniversalLogin": {
+    "hero": {
+      "badge": "Authentification d'Entreprise",
+      "title": "Une Seule Connexion pour Toutes Vos Applications",
+      "description": "Offrez une expérience d'authentification transparente et sécurisée sur toutes vos applications web et mobiles. Universal Login unifie votre marque tout en éliminant la fatigue des mots de passe.",
+      "ctaDocs": "Voir la Documentation",
+      "ctaGithub": "Dépôt GitHub"
+    },
+    "metrics": {
+      "loginPageLoad": "Temps de chargement",
+      "sla": "Disponibilité SLA",
+      "loginsPerMonth": "Connexions par mois",
+      "passwordFatigue": "Fatigue des mots de passe"
+    },
+    "capabilities": {
+      "title": "Tout Ce Dont Vous Besoin pour l'Authentification Moderne",
+      "description": "Conçu pour les développeurs qui exigent de la flexibilité sans compromettre la sécurité ou l'expérience utilisateur.",
+      "universalAuth": "Authentification Universelle",
+      "universalAuthDesc": "Expérience de connexion transparente sur toutes vos applications avec un seul identifiant. Support pour les plateformes web, mobile et bureau.",
+      "sessionSync": "Synchronisation de Session",
+      "sessionSyncDesc": "Synchronisation de l'état de session en temps réel sur tous les appareils et applications. Les utilisateurs restent connectés de manière transparente.",
+      "crossDeviceSso": "SSO Multi-Appareils",
+      "crossDeviceSsoDesc": "Single Sign-On de qualité professionnelle fonctionnant sur web, iOS, Android et applications bureau natives avec une UX cohérente.",
+      "adaptiveAuth": "Authentification Adaptive",
+      "adaptiveAuthDesc": "Authentification basée sur les risques qui adapte les exigences de sécurité en fonction de l'appareil, de la localisation et des comportements.",
+      "customizableBranding": "Personnalisation de Marque",
+      "customizableBrandingDesc": "Expérience de connexion entièrement-whitelabel avec thèmes, logos et styles personnalisés.",
+      "idpIntegration": "Intégration Fédération",
+      "idpIntegrationDesc": "Connexion aux fournisseurs d'identité existants comme Okta, Auth0, Azure AD ou tout IdP conforme SAML/OIDC."
+    },
+    "code": {
+      "title": "Intégrez en Minutes",
+      "description": "Notre bibliothèque de composants React facilite l'ajout d'une authentification puissante à n'importe quelle application avec quelques lignes de code.",
+      "cta": "Guide de Démarrage"
+    },
+    "features": {
+      "title": "Fonctionnalités Avancées",
+      "description": "Tout ce dont vous avez besoin pour construire un système d'authentification sécurisé et convivial.",
+      "passwordless": "Authentification Sans Mot de Passe",
+      "passwordlessDesc": "Éliminez complètement les mots de passe avec WebAuthn, liens magiques ou authentification biométrique.",
+      "socialLogin": "Connexion Sociale",
+      "socialLoginDesc": "Support pour Google, GitHub, Microsoft, Apple et plus de 50 autres fournisseurs d'identité sociaux.",
+      "enterpriseSso": "SSO d'Entreprise",
+      "enterpriseSsoDesc": "Fédération SAML 2.0 et OIDC avec Azure AD, Okta, OneLogin et tout fournisseur d'identité conforme SAML.",
+      "mfa": "Authentification Multi-Facteurs",
+      "mfaDesc": "TOTP, SMS, email et seconds facteurs WebAuthn avec politiques flexibles.",
+      "progressiveProfiling": "Profiling Progressif",
+      "progressiveProfilingDesc": "Collectez les attributs utilisateur progressivement pour réduire la friction d'inscription.",
+      "accountRecovery": "Récupération de Compte",
+      "accountRecoveryDesc": "Flux de récupération de compte sécurisés avec email, téléphone ou codes de secours."
+    },
+    "deployment": {
+      "title": "Déployez Selon Vos Besoins",
+      "description": "Choisissez entre service cloud entièrement géré, déploiement sur premise ou approche hybride.",
+      "cloudHosted": "Hébergé Cloud",
+      "cloudHostedDesc": "Service entièrement géré avec mise à l'échelle automatique, CDN global et SLAs entreprise.",
+      "onPremise": "Sur Premise",
+      "onPremiseDesc": "Déployez dans votre infrastructure pour une souveraineté complète des données.",
+      "hybrid": "Hybride",
+      "hybridDesc": "Plan de contrôle géré cloud avec stockage de session sur premise pour une flexibilité maximale."
+    },
+    "compliance": {
+      "title": "Sécurité de Qualité Entreprise",
+      "description": "Universal Login est conçu avec la sécurité au cœur, répondant aux exigences strictes des industries réglementées.",
+      "encryptionRest": "Chiffrement au repos",
+      "encryptionTransit": "Chiffrement en transit",
+      "uptime": "SLA de disponibilité",
+      "2fa": "2FA"
+    },
+    "resources": {
+      "title": "Ressources",
+      "description": "Explorez notre documentation et guides pour commencer avec Universal Login.",
+      "documentation": "Documentation",
+      "documentationDesc": "Guides d'intégration et référence API",
+      "tutorial": "Tutoriel",
+      "tutorialDesc": "Configuration pas à pas d'Universal Login",
+      "webinar": "Webinaire",
+      "webinarDesc": "Bonnes pratiques pour la migration sans mot de passe",
+      "caseStudy": "Étude de Cas",
+      "caseStudyDesc": "Comment Acme Corp a réduit la friction de connexion de 70%"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur Universal Login.",
+      "diff": {
+        "title": "Comment Universal Login diffère-t-il du SSO traditionnel?",
+        "answer": "Universal Login offre une expérience d'authentification moderne et cohérente sur toutes les applications, indépendamment du système d'identité sous-jacent. Contrairement aux solutions SSO traditionnelles, il offre une expérience utilisateur unifiée avec gestion de session intégrée, options sans mot de passe et politiques de sécurité adaptatives."
+      },
+      "idp": {
+        "title": "Puis-je m'intégrer avec mon fournisseur d'identité existant?",
+        "answer": "Oui, Universal Login s'intègre avec Okta, Azure AD, Auth0, Keycloak et tout fournisseur d'identité conforme SAML 2.0 ou OIDC. Vous pouvez fédérer l'authentification tout en conservant votre répertoire utilisateur existant."
+      },
+      "customize": {
+        "title": "La page de connexion est-elle personnalisable?",
+        "answer": "Absolument. Vous pouvez personnaliser les couleurs, logos, arrière-plans, typographie et même le template HTML/CSS complet. Les options whitelabel sont disponibles pour les déploiements entreprise."
+      },
+      "passwordless": {
+        "title": "Comment fonctionne l'authentification sans mot de passe?",
+        "answer": "L'authentification sans mot de passe utilise WebAuthn (FIDO2) pour l'authentification biométrique ou clé matérielle, des liens magiques envoyés par email, ou des codes à usage unique par SMS. Cela élimine la fatigue des mots de passe tout en améliorant la sécurité."
+      },
+      "down": {
+        "title": "Que se passe-t-il si le fournisseur d'identité tombe en panne?",
+        "answer": "Universal Login inclut des mécanismes de basculement intégrés et de mise en cache des sessions. Les utilisateurs avec des sessions actives restent authentifiés, et des méthodes d'authentification de secours peuvent être configurées pour les urgences."
+      }
+    },
+    "cta": {
+      "title": "Simplifiez Votre Authentification",
+      "description": "Offrez à vos utilisateurs une expérience de connexion transparente sur toutes les应用程序. Essayez Universal Login aujourd'hui.",
+      "getStarted": "Commencer",
+      "contactSales": "Contacter les Ventes"
+    }
+  },
+  "SSO": {
+    "hero": {
+      "badge": "SSO d'Entreprise",
+      "title": "Single Sign-On Universel pour Votre Infrastructure",
+      "description": "Connectez toutes vos applications via une passerelle d'authentification unifiée. SAML, OAuth et OpenID Connect avec support complet et zéro vendor lock-in.",
+      "ctaDocs": "Voir la Documentation",
+      "ctaGithub": "Dépôt GitHub"
+    },
+    "metrics": {
+      "ssoLatency": "Latence de redirection SSO",
+      "availability": "Disponibilité du service",
+      "integrations": "Intégrations applicatives",
+      "downtime": "Temps d'arrêt sur 24 mois"
+    },
+    "capabilities": {
+      "title": "Tout Ce Dont Vous Besoin pour le SSO d'Entreprise",
+      "description": "Fédération d'identité complète qui fonctionne avec votre infrastructure existante et s'adapte à votre organisation.",
+      "universalSso": "Single Sign-On Universel",
+      "universalSsoDesc": "Authentifiez-vous une fois, accédez à tout. SSO transparent sur web, mobile et applications bureau.",
+      "identityProtocols": "Protocoles d'Identité d'Entreprise",
+      "identityProtocolsDesc": "Support complet pour SAML 2.0, OAuth 2.0 et OpenID Connect. Intégrez avec tout fournisseur d'identité.",
+      "adaptiveMfa": "Authentification Multi-Facteurs Adaptive",
+      "adaptiveMfaDesc": "MFA basée sur les risques avec TOTP, WebAuthn, SMS, email et notifications push.",
+      "userManagement": "Gestion Centralisée des Utilisateurs",
+      "userManagementDesc": "Répertoire utilisateur unifié avec synchronisation de groupes, mappage d'attributs et contrôle d'accès basé sur les rôles.",
+      "appGateway": "Passerelle d'Application",
+      "appGatewayDesc": "Proxy inverse avec authentification intégrée pour applications legacy. Protégez les services internes sans modifications de code.",
+      "sessionFederation": "Fédération de Sessions",
+      "sessionFederationDesc": "État de session partagé entre applications. Une connexion se propage instantanément."
+    },
+    "features": {
+      "title": "Support des Protocoles",
+      "description": "Protocoles standard pour une compatibilité maximale avec vos applications et fournisseurs d'identité existants.",
+      "samlSpIdp": "SAML SP & IdP",
+      "samlSpIdpDesc": "Agir en tant que Fournisseur de Services et Fournisseur d'Identité",
+      "oauth": "OAuth 2.0 / OIDC",
+      "oauthDesc": "Autorisation moderne avec support complet des protocoles",
+      "identityBrokering": "Intermédiation d'Identité",
+      "identityBrokeringDesc": "Connectez plusieurs IdPs externes via une passerelle unique",
+      "attributeMapping": "Mappage d'Attributs",
+      "attributeMappingDesc": "Transformez les données utilisateur entre systèmes d'identité",
+      "trustChain": "Gestion de Chaîne de Confiance",
+      "trustChainDesc": "Configurez et gérez les relations d'identité de confiance",
+      "auditCompliance": "Audit et Conformité",
+      "auditComplianceDesc": "Journalisation complète de tous les événements d'authentification"
+    },
+    "comparison": {
+      "title": "Comment Nous Comparons",
+      "description": "Voyez pourquoi les organisations choisissent Aether SSO plutôt que les alternatives cloud uniquement.",
+      "feature": "Fonctionnalité"
+    },
+    "code": {
+      "title": "Intégrez en Minutes",
+      "description": "SDKs simples et protocoles standard rendent l'intégration straightforward. Configurez une fois, authentifiez partout.",
+      "cta": "Guides de Démarrage"
+    },
+    "useCases": {
+      "title": "Cas d'Usage Courants",
+      "description": "Architecture flexible gère même les scénarios d'identité les plus complexes.",
+      "multiIdp": "Agrégation Multi-IdP",
+      "multiIdpDesc": "Agrégez plusieurs fournisseurs d'identité (Azure AD, Okta, IdPs personnalisés) en un point d'authentification unique.",
+      "legacyApp": "Protection des Applications Legacy",
+      "legacyAppDesc": "Ajoutez authentication aux applications sans support des protocoles modernes via la passerelle proxy inverse intégrée.",
+      "b2bPartner": "Accès Partenaires B2B",
+      "b2bPartnerDesc": "Activez l'authentification sécurisée des partenaires via fédération SAML. Contrôlez l'accès partenaire sans gérer d'utilisateurs externes.",
+      "multiRegion": "Déploiement Multi-Région",
+      "multiRegionDesc": "Déployez des nœuds SSO à travers les régions avec état de session partagé pour un accès global avec faible latence."
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur Aether SSO."
+    },
+    "cta": {
+      "title": "Prêt à Moderniser Votre SSO?",
+      "description": "Déployez Aether SSO et gagnez un contrôle complet sur votre infrastructure d'authentification. Open source, auto-hébergé, enterprise-ready.",
+      "getStarted": "Commencer",
+      "contactSales": "Contacter les Ventes"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur Aether SSO.",
+      "diff": {
+        "title": "Comment Aether SSO diffère-t-il d'Auth0 ou Okta?",
+        "answer": "Aether SSO est auto-hébergé, vous donnant un contrôle complet sur votre infrastructure d'identity. Contrairement aux services cloud, il n'y a pas de frais par utilisateur, et vos données ne quittent jamais votre réseau. C'ideal pour les organisations avec des exigences strictes de souveraineté des données."
+      },
+      "multiIdp": {
+        "title": "Aether peut-il fédérer avec plusieurs fournisseurs d'identité?",
+        "answer": "Oui, Aether supporte l'intermédiation d'identité - vous pouvez connecter plusieurs IdPs (Okta, Azure AD, Ping Identity, etc.) et présenter une interface d'authentification unifiée à vos applications."
+      },
+      "legacy": {
+        "title": "Aether fonctionne-t-il avec les applications legacy?",
+        "answer": "Oui, la passerelle d'application intégrée peut protéger toute application HTTP sans nécessiter de modifications de code. Elle gère la gestion des sessions et peut même faire le pont entre SAML et OAuth."
+      },
+      "migration": {
+        "title": "Comment migrer depuis une solution SSO existante?",
+        "answer": "Nous fournissons des outils de migration pour Okta, Auth0 et Azure AD. Notre équipe peut assister avec le transfert de métadonnées, le mappage d'attributs et les tests pour assurer une transition en douceur."
+      },
+      "limits": {
+        "title": "Y a-t-il une limite sur le nombre d'applications?",
+        "answer": "Non, Aether n'a pas de limites d'applications. Vous pouvez enregistrer autant de connexions SP ou IdP que nécessaire. Le facteur limitant est la capacité de votre infrastructure."
+      }
+    }
+  },
+  "MFA": {
+    "hero": {
+      "badge": "Authentification Multi-Facteurs",
+      "title": "MFA d'Entreprise Sans Vendor Lock-In",
+      "description": "Authentification sécurisée avec TOTP, WebAuthn, SMS, email et politiques adaptatives basées sur les risques. Auto-hébergé, auto-contrôlé, qualité entreprise.",
+      "ctaDocs": "Voir la Documentation",
+      "ctaGithub": "Dépôt GitHub"
+    },
+    "metrics": {
+      "uptime": "Disponibilité SLA",
+      "verificationLatency": "Latence de vérification MFA",
+      "fido2Certified": "Certifié FIDO2",
+      "phishingIncidents": "Incidents de phishing en 2025"
+    },
+    "capabilities": {
+      "title": "Sécurité d'Authentification Complète",
+      "description": "Solution MFA moderne avec support pour toutes les méthodes d'authentification et politiques de sécurité adaptatives.",
+      "webauthn": "WebAuthn / FIDO2",
+      "webauthnDesc": "Authentification sans mot de passe utilisant clés matérielles, Touch ID, Face ID et Windows Hello. Niveau de sécurité le plus élevé avec identifiants anti-phishing.",
+      "totp": "TOTP / Applications Authentificatrices",
+      "totpDesc": "Mots de passe temporaires compatibles avec Google Authenticator, Authy, Microsoft Authenticator et toute application conforme RFC 6238.",
+      "email": "Vérification par Email",
+      "emailDesc": "Codes de vérification sécurisés par email avec modèles personalisables, options de branding et suivi de livraison.",
+      "sms": "Vérification par SMS",
+      "smsDesc": "Authentification à deux facteurs via SMS avec support pour plusieurs fournisseurs, options de repli et limitation de taux.",
+      "adaptive": "Authentification Adaptive basées sur les Risques",
+      "adaptiveDesc": "Analyse des risques par apprentissage automatique qui renforce automatiquement l'authentification pour les connexions suspectes.",
+      "hardware": "Support des Clés Matérielles",
+      "hardwareDesc": "Support pour YubiKey, Titan Security Key et autres tokens FIDO2. Gestion et enregistrement des clés de qualité entreprise."
+    },
+    "features": {
+      "title": "Fonctionnalités MFA Avancées",
+      "description": "Fonctionnalités entreprise pour une sécurité maximale sans sacrifier l'expérience utilisateur.",
+      "passwordless": "Connexion Sans Mot de Passe",
+      "passwordlessDesc": "Éliminez entièrement les mots de passe avec WebAuthn et liens magiques",
+      "stepUp": "Authentification Progressive",
+      "stepUpDesc": "Augmentez le niveau de confiance pour les actions sensibles",
+      "enrollment": "Flux d'Enrôlement MFA",
+      "enrollmentDesc": "Enrôlement guidée avec méthodes de sauvegarde",
+      "recovery": "Mécanismes de Récupération",
+      "recoveryDesc": "Récupération de compte sécurisée sans compromettre la sécurité",
+      "policy": "Application des Politiques",
+      "policyDesc": "Contrôles granulaires sur quand et comment MFA est requis",
+      "compliance": "Journalisation de Conformité",
+      "complianceDesc": "Piste d'audit complète pour les exigences réglementaires"
+    },
+    "comparison": {
+      "title": "Comment Nous Comparons",
+      "description": "Voyez pourquoi les organisations choisissent Aether MFA plutôt que les alternatives cloud uniquement.",
+      "feature": "Fonctionnalité"
+    },
+    "code": {
+      "title": "Intégration Facile",
+      "description": "SDKs simples rendent l'ajout de MFA à vos applications straightforward. Support pour toutes les méthodes d'authentification principales.",
+      "cta": "Guides de Démarrage"
+    },
+    "benefits": {
+      "title": "Pourquoi Choisir Aether MFA?",
+      "description": "Solution MFA la plus sécurisée et flexible pour les entreprises modernes.",
+      "vendorLockin": "Zéro Vendor Lock-In",
+      "vendorLockinDesc": "Solution auto-hébergée signifie que vous possédez votre infrastructure d'authentification. Migrez à tout moment avec des protocoles standard.",
+      "frictionless": "Expérience Utilisateur Sans Friction",
+      "frictionlessDesc": "L'authentification adaptative signifie que les utilisateurs de confiance obtiennent un accès transparent tandis que l'activité suspecte déclenche une vérification supplémentaire.",
+      "phishing": "Résistant au Phishing",
+      "phishingDesc": "Les identifiants WebAuthn sont liés à des origines spécifiques, les rendant impossibles à phishing. Sécurité matérielle pour vos utilisateurs.",
+      "compliance": "Conformité Complète",
+      "complianceDesc": "Journalisation complète, conformité SOC 2, prêt pour GDPR. Respectez les exigences réglementaires les plus strictes."
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur Aether MFA.",
+      "duo": {
+        "title": "Comment Aether MFA se compare-t-il à Duo Security?",
+        "answer": "Aether MFA offre toutes les fonctionnalités de Duo avec déploiement auto-hébergé, pas de tarification par utilisateur et souveraineté complète des données. Vous conservez un contrôle total sur votre infrastructure d'authentification."
+      },
+      "idp": {
+        "title": "Aether peut-il s'intégrer avec notre IdP existant?",
+        "answer": "Oui, Aether MFA s'intègre avec tout fournisseur OAuth 2.0/OIDC, SAML IdP, ou peut fonctionner comme solution MFA autonome. Il fonctionne avec Okta, Azure AD, Keycloak, etc."
+      },
+      "loss": {
+        "title": "Que se passe-t-il si un utilisateur perd son second facteur?",
+        "answer": "Aether fournit plusieurs options de récupération incluant codes de sauvegarde, récupération d'appareil de confiance et récupération initiée par admin avec vérification d'identité. La récupération est journalisée pour la conformité."
+      },
+      "passwordless": {
+        "title": "L'authentification sans mot de passe est-elle supportée?",
+        "answer": "Oui, Aether supporte entièrement WebAuthn/FIDO2 pour l'authentification sans mot de passe. Les utilisateurs peuvent s'authentifier avec des clés matérielles, capteurs biométriques ou identifiants basés sur l'appareil."
+      },
+      "enforce": {
+        "title": "Peut-on appliquer MFA pour des utilisateurs ou groupes spécifiques?",
+        "answer": "Oui, le moteur de politiques d'Aether permet des règles granulaires basées sur les attributs utilisateur, groupes, plages IP, scores de risque ou toutes conditions personnalisées."
+      }
+    },
+    "cta": {
+      "title": "Sécurisez Votre Authentification Aujourd'hui",
+      "description": "Déployez Aether MFA et gagnez un contrôle complet sur votre sécurité d'authentification. Open source, auto-hébergé, enterprise-ready.",
+      "getStarted": "Commencer",
+      "contactSales": "Contacter les Ventes"
+    }
   }
 }

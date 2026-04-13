@@ -2,7 +2,29 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, ChevronDown, ArrowRight, Shield, Users, Key, Lock, Layers, Code, BookOpen, FileText, Zap, Building2, Smartphone, Globe, Server, Database, Settings, LifeBuoy } from "lucide-react";
+import { useTranslations } from "next-intl";
+import {
+  Menu,
+  X,
+  ChevronDown,
+  ArrowRight,
+  Shield,
+  Users,
+  Key,
+  Lock,
+  Layers,
+  Code,
+  BookOpen,
+  FileText,
+  Zap,
+  Building2,
+  Smartphone,
+  Globe,
+  Server,
+  Database,
+  Settings,
+  LifeBuoy,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useLocale } from "@/context/locale-context";
@@ -30,84 +52,409 @@ interface MegaMenu {
   };
 }
 
-const productMenu: MegaMenu = {
+const productMenuEN: MegaMenu = {
   sections: [
     {
       title: "Core Platform",
       items: [
-        { name: "Universal Login", href: "/products/universal-login", description: "Customizable, secure authentication", icon: <Lock className="h-5 w-5" /> },
-        { name: "Single Sign-On", href: "/products/sso", description: "One login for all applications", icon: <Key className="h-5 w-5" /> },
-        { name: "Multi-Factor Auth", href: "/products/mfa", description: "Adaptive, risk-based MFA", icon: <Shield className="h-5 w-5" /> },
-        { name: "User Management", href: "/products/user-management", description: "Complete identity lifecycle", icon: <Users className="h-5 w-5" /> },
+        {
+          name: "Universal Login",
+          href: "/products/universal-login",
+          description: "Customizable, secure authentication",
+          icon: <Lock className="h-5 w-5" />,
+        },
+        {
+          name: "Single Sign-On",
+          href: "/products/sso",
+          description: "One login for all applications",
+          icon: <Key className="h-5 w-5" />,
+        },
+        {
+          name: "Multi-Factor Auth",
+          href: "/products/mfa",
+          description: "Adaptive, risk-based MFA",
+          icon: <Shield className="h-5 w-5" />,
+        },
+        {
+          name: "User Management",
+          href: "/products/user-management",
+          description: "Complete identity lifecycle",
+          icon: <Users className="h-5 w-5" />,
+        },
       ],
     },
     {
       title: "Enterprise",
       items: [
-        { name: "Enterprise Connections", href: "/products/enterprise", description: "SAML, LDAP, Active Directory", icon: <Building2 className="h-5 w-5" /> },
-        { name: "Organizations", href: "/products/organizations", description: "Multi-tenant B2B solutions", icon: <Layers className="h-5 w-5" /> },
-        { name: "Fine-Grained Authorization", href: "/products/fga", description: "Relationship-based access control", icon: <Settings className="h-5 w-5" /> },
-        { name: "Private Cloud", href: "/products/private-cloud", description: "Dedicated infrastructure", icon: <Server className="h-5 w-5" /> },
+        {
+          name: "Enterprise Connections",
+          href: "/products/enterprise",
+          description: "SAML, LDAP, Active Directory",
+          icon: <Building2 className="h-5 w-5" />,
+        },
+        {
+          name: "Organizations",
+          href: "/products/organizations",
+          description: "Multi-tenant B2B solutions",
+          icon: <Layers className="h-5 w-5" />,
+        },
+        {
+          name: "Fine-Grained Authorization",
+          href: "/products/fga",
+          description: "Relationship-based access control",
+          icon: <Settings className="h-5 w-5" />,
+        },
+        {
+          name: "Private Cloud",
+          href: "/products/private-cloud",
+          description: "Dedicated infrastructure",
+          icon: <Server className="h-5 w-5" />,
+        },
       ],
     },
   ],
   featured: {
     title: "Aether Identity for AI Agents",
-    description: "Secure authentication and authorization for AI-powered applications and autonomous agents.",
+    description:
+      "Secure authentication and authorization for AI-powered applications and autonomous agents.",
     href: "/products/ai-agents",
     badge: "New",
   },
 };
 
-const developersMenu: MegaMenu = {
+const developersMenuEN: MegaMenu = {
   sections: [
     {
       title: "Resources",
       items: [
-        { name: "Documentation", href: "/developers", description: "Guides and API references", icon: <BookOpen className="h-5 w-5" /> },
-        { name: "Quickstarts", href: "/developers/quickstarts", description: "Get started in minutes", icon: <Zap className="h-5 w-5" /> },
-        { name: "API Reference", href: "/developers/api", description: "Complete API documentation", icon: <Code className="h-5 w-5" /> },
-        { name: "SDKs & Libraries", href: "/developers/sdks", description: "Official client libraries", icon: <Layers className="h-5 w-5" /> },
+        {
+          name: "Documentation",
+          href: "/developers",
+          description: "Guides and API references",
+          icon: <BookOpen className="h-5 w-5" />,
+        },
+        {
+          name: "Quickstarts",
+          href: "/developers/quickstarts",
+          description: "Get started in minutes",
+          icon: <Zap className="h-5 w-5" />,
+        },
+        {
+          name: "API Reference",
+          href: "/developers/api",
+          description: "Complete API documentation",
+          icon: <Code className="h-5 w-5" />,
+        },
+        {
+          name: "SDKs & Libraries",
+          href: "/developers/sdks",
+          description: "Official client libraries",
+          icon: <Layers className="h-5 w-5" />,
+        },
       ],
     },
     {
       title: "Tools",
       items: [
-        { name: "CLI", href: "/developers/cli", description: "Command-line interface", icon: <FileText className="h-5 w-5" /> },
-        { name: "Postman Collections", href: "/developers/postman", description: "API testing collections", icon: <Database className="h-5 w-5" /> },
-        { name: "Extensions", href: "/developers/extensions", description: "Extend functionality", icon: <Settings className="h-5 w-5" /> },
-        { name: "Community", href: "/community", description: "Join the discussion", icon: <Users className="h-5 w-5" /> },
+        {
+          name: "CLI",
+          href: "/developers/cli",
+          description: "Command-line interface",
+          icon: <FileText className="h-5 w-5" />,
+        },
+        {
+          name: "Postman Collections",
+          href: "/developers/postman",
+          description: "API testing collections",
+          icon: <Database className="h-5 w-5" />,
+        },
+        {
+          name: "Extensions",
+          href: "/developers/extensions",
+          description: "Extend functionality",
+          icon: <Settings className="h-5 w-5" />,
+        },
+        {
+          name: "Community",
+          href: "/community",
+          description: "Join the discussion",
+          icon: <Users className="h-5 w-5" />,
+        },
       ],
     },
   ],
 };
 
-const solutionsMenu: MegaMenu = {
+const solutionsMenuEN: MegaMenu = {
   sections: [
     {
       title: "By Use Case",
       items: [
-        { name: "B2C Identity", href: "/solutions/b2c", description: "Consumer-facing applications", icon: <Smartphone className="h-5 w-5" /> },
-        { name: "B2B SaaS", href: "/solutions/b2b", description: "Multi-tenant enterprise apps", icon: <Building2 className="h-5 w-5" /> },
-        { name: "Machine-to-Machine", href: "/solutions/m2m", description: "API & service authentication", icon: <Server className="h-5 w-5" /> },
-        { name: "Passwordless", href: "/solutions/passwordless", description: "Friction-free authentication", icon: <Key className="h-5 w-5" /> },
+        {
+          name: "B2C Identity",
+          href: "/solutions/b2c",
+          description: "Consumer-facing applications",
+          icon: <Smartphone className="h-5 w-5" />,
+        },
+        {
+          name: "B2B SaaS",
+          href: "/solutions/b2b",
+          description: "Multi-tenant enterprise apps",
+          icon: <Building2 className="h-5 w-5" />,
+        },
+        {
+          name: "Machine-to-Machine",
+          href: "/solutions/m2m",
+          description: "API & service authentication",
+          icon: <Server className="h-5 w-5" />,
+        },
+        {
+          name: "Passwordless",
+          href: "/solutions/passwordless",
+          description: "Friction-free authentication",
+          icon: <Key className="h-5 w-5" />,
+        },
       ],
     },
     {
       title: "By Industry",
       items: [
-        { name: "Financial Services", href: "/solutions/financial", description: "Banking & fintech solutions", icon: <Shield className="h-5 w-5" /> },
-        { name: "Healthcare", href: "/solutions/healthcare", description: "HIPAA-compliant identity", icon: <LifeBuoy className="h-5 w-5" /> },
-        { name: "Retail & E-commerce", href: "/solutions/retail", description: "Customer identity at scale", icon: <Globe className="h-5 w-5" /> },
-        { name: "Public Sector", href: "/solutions/government", description: "Secure government services", icon: <Building2 className="h-5 w-5" /> },
+        {
+          name: "Financial Services",
+          href: "/solutions/financial",
+          description: "Banking & fintech solutions",
+          icon: <Shield className="h-5 w-5" />,
+        },
+        {
+          name: "Healthcare",
+          href: "/solutions/healthcare",
+          description: "HIPAA-compliant identity",
+          icon: <LifeBuoy className="h-5 w-5" />,
+        },
+        {
+          name: "Retail & E-commerce",
+          href: "/solutions/retail",
+          description: "Customer identity at scale",
+          icon: <Globe className="h-5 w-5" />,
+        },
+        {
+          name: "Public Sector",
+          href: "/solutions/government",
+          description: "Secure government services",
+          icon: <Building2 className="h-5 w-5" />,
+        },
       ],
     },
   ],
 };
 
-function MegaMenuDropdown({ menu, isOpen }: { menu: MegaMenu; isOpen: boolean }) {
+const productMenuFR: MegaMenu = {
+  sections: [
+    {
+      title: "Plateforme Principale",
+      items: [
+        {
+          name: "Connexion Universelle",
+          href: "/products/universal-login",
+          description: "Authentification sécurisée personnalisable",
+          icon: <Lock className="h-5 w-5" />,
+        },
+        {
+          name: "Authentification Unique",
+          href: "/products/sso",
+          description: "Une connexion pour toutes les applications",
+          icon: <Key className="h-5 w-5" />,
+        },
+        {
+          name: "Authentification Multi-Facteurs",
+          href: "/products/mfa",
+          description: "AMF adaptative basée sur les risques",
+          icon: <Shield className="h-5 w-5" />,
+        },
+        {
+          name: "Gestion des Utilisateurs",
+          href: "/products/user-management",
+          description: "Cycle de vie complet de l'identité",
+          icon: <Users className="h-5 w-5" />,
+        },
+      ],
+    },
+    {
+      title: "Entreprise",
+      items: [
+        {
+          name: "Connexions Entreprise",
+          href: "/products/enterprise",
+          description: "SAML, LDAP, Active Directory",
+          icon: <Building2 className="h-5 w-5" />,
+        },
+        {
+          name: "Organisations",
+          href: "/products/organizations",
+          description: "Solutions B2B multi-tenant",
+          icon: <Layers className="h-5 w-5" />,
+        },
+        {
+          name: "Autorisation Fine",
+          href: "/products/fga",
+          description: "Contrôle d'accès basé sur les relations",
+          icon: <Settings className="h-5 w-5" />,
+        },
+        {
+          name: "Cloud Privé",
+          href: "/products/private-cloud",
+          description: "Infrastructure dédiée",
+          icon: <Server className="h-5 w-5" />,
+        },
+      ],
+    },
+  ],
+  featured: {
+    title: "Aether Identity pour Agents IA",
+    description:
+      "Authentification et autorisation sécurisées pour les applications alimentées par l'IA et les agents autonomes.",
+    href: "/products/ai-agents",
+    badge: "Nouveau",
+  },
+};
+
+const developersMenuFR: MegaMenu = {
+  sections: [
+    {
+      title: "Ressources",
+      items: [
+        {
+          name: "Documentation",
+          href: "/developers",
+          description: "Guides et références API",
+          icon: <BookOpen className="h-5 w-5" />,
+        },
+        {
+          name: "Démarrages Rapides",
+          href: "/developers/quickstarts",
+          description: "Commencez en quelques minutes",
+          icon: <Zap className="h-5 w-5" />,
+        },
+        {
+          name: "Référence API",
+          href: "/developers/api",
+          description: "Documentation API complète",
+          icon: <Code className="h-5 w-5" />,
+        },
+        {
+          name: "SDKs et Bibliothèques",
+          href: "/developers/sdks",
+          description: "Bibliothèques clientes officielles",
+          icon: <Layers className="h-5 w-5" />,
+        },
+      ],
+    },
+    {
+      title: "Outils",
+      items: [
+        {
+          name: "CLI",
+          href: "/developers/cli",
+          description: "Interface en ligne de commande",
+          icon: <FileText className="h-5 w-5" />,
+        },
+        {
+          name: "Collections Postman",
+          href: "/developers/postman",
+          description: "Collections de test API",
+          icon: <Database className="h-5 w-5" />,
+        },
+        {
+          name: "Extensions",
+          href: "/developers/extensions",
+          description: "Étendre les fonctionnalités",
+          icon: <Settings className="h-5 w-5" />,
+        },
+        {
+          name: "Communauté",
+          href: "/community",
+          description: "Rejoignez la discussion",
+          icon: <Users className="h-5 w-5" />,
+        },
+      ],
+    },
+  ],
+};
+
+const solutionsMenuFR: MegaMenu = {
+  sections: [
+    {
+      title: "Par Cas d'Usage",
+      items: [
+        {
+          name: "Identité B2C",
+          href: "/solutions/b2c",
+          description: "Applications grand public",
+          icon: <Smartphone className="h-5 w-5" />,
+        },
+        {
+          name: "B2B SaaS",
+          href: "/solutions/b2b",
+          description: "Applications entreprise multi-tenant",
+          icon: <Building2 className="h-5 w-5" />,
+        },
+        {
+          name: "Machine à Machine",
+          href: "/solutions/m2m",
+          description: "Authentification API et service",
+          icon: <Server className="h-5 w-5" />,
+        },
+        {
+          name: "Sans Mot de Passe",
+          href: "/solutions/passwordless",
+          description: "Authentification sans friction",
+          icon: <Key className="h-5 w-5" />,
+        },
+      ],
+    },
+    {
+      title: "Par Industrie",
+      items: [
+        {
+          name: "Services Financiers",
+          href: "/solutions/financial",
+          description: "Solutions bancaires et fintech",
+          icon: <Shield className="h-5 w-5" />,
+        },
+        {
+          name: "Santé",
+          href: "/solutions/healthcare",
+          description: "Identité conforme HIPAA",
+          icon: <LifeBuoy className="h-5 w-5" />,
+        },
+        {
+          name: "Retail et E-commerce",
+          href: "/solutions/retail",
+          description: "Identité client à grande échelle",
+          icon: <Globe className="h-5 w-5" />,
+        },
+        {
+          name: "Secteur Public",
+          href: "/solutions/government",
+          description: "Services gouvernementaux sécurisés",
+          icon: <Building2 className="h-5 w-5" />,
+        },
+      ],
+    },
+  ],
+};
+
+function MegaMenuDropdown({
+  menu,
+  isOpen,
+  labels,
+}: {
+  menu: MegaMenu;
+  isOpen: boolean;
+  labels?: { learnMore?: string };
+}) {
   const { locale } = useLocale();
-  
+
   const getLocaleHref = (href: string) => {
     if (href === "/") return `/${locale}`;
     return `/${locale}${href}`;
@@ -155,7 +502,7 @@ function MegaMenuDropdown({ menu, isOpen }: { menu: MegaMenu; isOpen: boolean })
               ))}
             </div>
           </div>
-          
+
           {menu.featured && (
             <div className="w-72 bg-muted/50 p-6 border-l border-border">
               <div className="flex items-center gap-2 mb-3">
@@ -165,9 +512,7 @@ function MegaMenuDropdown({ menu, isOpen }: { menu: MegaMenu; isOpen: boolean })
                   </span>
                 )}
               </div>
-              <h4 className="text-sm font-semibold text-foreground mb-2">
-                {menu.featured.title}
-              </h4>
+              <h4 className="text-sm font-semibold text-foreground mb-2">{menu.featured.title}</h4>
               <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
                 {menu.featured.description}
               </p>
@@ -175,7 +520,7 @@ function MegaMenuDropdown({ menu, isOpen }: { menu: MegaMenu; isOpen: boolean })
                 href={getLocaleHref(menu.featured.href)}
                 className="inline-flex items-center gap-1 text-xs font-medium text-foreground hover:underline"
               >
-                Learn more
+                {labels?.learnMore || "Learn more"}
                 <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
@@ -192,6 +537,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const { locale } = useLocale();
   const { isAuthenticated } = useAuth();
+  const t = useTranslations("Header");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -206,12 +552,18 @@ export function Header() {
     return `/${locale}${href}`;
   };
 
+  const isFrench = locale === "fr" || locale.startsWith("be_fr") || locale.startsWith("ch_fr");
+
+  const productMenu = isFrench ? productMenuFR : productMenuEN;
+  const developersMenu = isFrench ? developersMenuFR : developersMenuEN;
+  const solutionsMenu = isFrench ? solutionsMenuFR : solutionsMenuEN;
+
   const navItems = [
-    { name: "Product", menu: productMenu },
-    { name: "Solutions", menu: solutionsMenu },
-    { name: "Developers", menu: developersMenu },
-    { name: "Pricing", href: "/pricing" },
-    { name: "Blog", href: "/blog" },
+    { name: t("product"), menu: productMenu },
+    { name: t("solutions"), menu: solutionsMenu },
+    { name: t("developers"), menu: developersMenu },
+    { name: t("pricing"), href: "/pricing" },
+    { name: t("blog"), href: "/blog" },
   ];
 
   return (
@@ -278,7 +630,11 @@ export function Header() {
                     </button>
                   )}
                   {item.menu && (
-                    <MegaMenuDropdown menu={item.menu} isOpen={activeMenu === item.name} />
+                    <MegaMenuDropdown
+                      menu={item.menu}
+                      isOpen={activeMenu === item.name}
+                      labels={{ learnMore: t("learnMore") }}
+                    />
                   )}
                 </li>
               ))}
@@ -291,25 +647,29 @@ export function Header() {
               href={getLocaleHref("/contact")}
               className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              Contact Sales
+              {t("contactSales")}
             </Link>
-            
+
             {isAuthenticated ? (
               <Link href="/dashboard">
                 <Button size="sm" className="h-9 px-4 font-medium">
-                  Dashboard
+                  {t("dashboard")}
                 </Button>
               </Link>
             ) : (
               <>
                 <Link href="/login" className="hidden sm:block">
-                  <Button variant="ghost" size="sm" className="h-9 px-4 font-medium text-muted-foreground hover:text-foreground">
-                    Log In
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-9 px-4 font-medium text-muted-foreground hover:text-foreground"
+                  >
+                    {t("login")}
                   </Button>
                 </Link>
                 <Link href="/register">
                   <Button size="sm" className="h-9 px-4 font-medium">
-                    Sign Up
+                    {t("signUp")}
                   </Button>
                 </Link>
               </>
@@ -371,26 +731,24 @@ export function Header() {
                 )}
               </div>
             ))}
-            
+
             <div className="pt-4 border-t border-border space-y-3">
               <Link
                 href={getLocaleHref("/contact")}
                 className="block text-sm font-medium text-muted-foreground"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Contact Sales
+                {t("contactSales")}
               </Link>
               {!isAuthenticated && (
                 <div className="flex gap-3">
                   <Link href="/login" className="flex-1">
                     <Button variant="outline" className="w-full">
-                      Log In
+                      {t("login")}
                     </Button>
                   </Link>
                   <Link href="/register" className="flex-1">
-                    <Button className="w-full">
-                      Sign Up
-                    </Button>
+                    <Button className="w-full">{t("signUp")}</Button>
                   </Link>
                 </div>
               )}

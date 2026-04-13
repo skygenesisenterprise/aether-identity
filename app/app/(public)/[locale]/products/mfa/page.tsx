@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -27,82 +28,28 @@ import {
 } from "lucide-react";
 
 const capabilities = [
-  {
-    icon: Fingerprint,
-    title: "WebAuthn / FIDO2",
-    description:
-      "Passwordless authentication using hardware keys, Touch ID, Face ID, and Windows Hello. Highest level of security with phishing-resistant credentials.",
-  },
-  {
-    icon: Smartphone,
-    title: "TOTP / Authenticator Apps",
-    description:
-      "Time-based one-time passwords compatible with Google Authenticator, Authy, Microsoft Authenticator, and any RFC 6238 compliant app.",
-  },
-  {
-    icon: Mail,
-    title: "Email Verification",
-    description:
-      "Secure email-based verification codes with templated messages, branding options, and delivery tracking.",
-  },
-  {
-    icon: MessageSquare,
-    title: "SMS Verification",
-    description:
-      "Two-factor authentication via SMS with support for multiple providers, fallback options, and rate limiting.",
-  },
-  {
-    icon: Eye,
-    title: "Adaptive Risk-Based Auth",
-    description:
-      "Machine learning-powered risk analysis that automatically steps up authentication for suspicious logins.",
-  },
-  {
-    icon: Key,
-    title: "Hardware Token Support",
-    description:
-      "Support for YubiKey, Titan Security Key, and other FIDO2-compatible tokens. Enterprise-grade key management and enrollment.",
-  },
+  { icon: Fingerprint, titleKey: "webauthn", descriptionKey: "webauthnDesc" },
+  { icon: Smartphone, titleKey: "totp", descriptionKey: "totpDesc" },
+  { icon: Mail, titleKey: "email", descriptionKey: "emailDesc" },
+  { icon: MessageSquare, titleKey: "sms", descriptionKey: "smsDesc" },
+  { icon: Eye, titleKey: "adaptive", descriptionKey: "adaptiveDesc" },
+  { icon: Key, titleKey: "hardware", descriptionKey: "hardwareDesc" },
 ];
 
 const features = [
-  {
-    title: "Passwordless Login",
-    description: "Eliminate passwords entirely with WebAuthn and magic links",
-    tags: ["WebAuthn", "Magic Links", "FIDO2", "Biometrics"],
-  },
-  {
-    title: "Step-Up Authentication",
-    description: "Increase trust level for sensitive actions",
-    tags: ["Transaction Signing", "Risk Scoring", "Policy Engine"],
-  },
-  {
-    title: "MFA Enrollment Flows",
-    description: "Guided user enrollment with backup methods",
-    tags: ["Self-Service", "Admin Enforced", "Backup Codes"],
-  },
-  {
-    title: "Recovery Mechanisms",
-    description: "Secure account recovery without compromising security",
-    tags: ["Trusted Devices", "Recovery Codes", "Identity Verification"],
-  },
-  {
-    title: "Policy Enforcement",
-    description: "Granular controls over when and how MFA is required",
-    tags: ["Conditional Access", "Network Rules", "Time-Based"],
-  },
-  {
-    title: "Compliance Logging",
-    description: "Complete audit trail for regulatory requirements",
-    tags: ["SOC 2", "GDPR", "HIPAA", "PCI DSS"],
-  },
+  { titleKey: "passwordless", descriptionKey: "passwordlessDesc" },
+  { titleKey: "stepUp", descriptionKey: "stepUpDesc" },
+  { titleKey: "enrollment", descriptionKey: "enrollmentDesc" },
+  { titleKey: "recovery", descriptionKey: "recoveryDesc" },
+  { titleKey: "policy", descriptionKey: "policyDesc" },
+  { titleKey: "compliance", descriptionKey: "complianceDesc" },
 ];
 
 const metrics = [
-  { value: "99.99%", label: "Uptime SLA" },
-  { value: "< 5ms", label: "MFA verification latency" },
-  { value: "100%", label: "FIDO2 certified" },
-  { value: "Zero", label: "Phishing incidents in 2025" },
+  { value: "99.99%", labelKey: "uptime" },
+  { value: "< 5ms", labelKey: "verificationLatency" },
+  { value: "100%", labelKey: "fido2Certified" },
+  { value: "Zero", labelKey: "phishingIncidents" },
 ];
 
 const sampleCode = [
@@ -201,6 +148,30 @@ const faqs = [
 
 export default async function MFAPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "MFA" });
+
+  const faqs = [
+    {
+      question: t("faq.duo.title"),
+      answer: t("faq.duo.answer"),
+    },
+    {
+      question: t("faq.idp.title"),
+      answer: t("faq.idp.answer"),
+    },
+    {
+      question: t("faq.loss.title"),
+      answer: t("faq.loss.answer"),
+    },
+    {
+      question: t("faq.passwordless.title"),
+      answer: t("faq.passwordless.answer"),
+    },
+    {
+      question: t("faq.enforce.title"),
+      answer: t("faq.enforce.answer"),
+    },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -213,26 +184,25 @@ export default async function MFAPage({ params }: { params: Promise<{ locale: st
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-purple-500" />
-                Multi-Factor Authentication
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                Enterprise MFA Without the Vendor Lock-In
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Secure authentication with TOTP, WebAuthn, SMS, email, and adaptive risk-based
-                policies. Self-hosted, self-controlled, enterprise-grade.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
-                <Link href="/docs">
+                <Link href={`/${locale}/docs`}>
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    View Documentation
+                    {t("hero.ctaDocs")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="https://github.com/skygenesisenterprise/aether-identity">
                   <Button variant="outline" size="lg" className="gap-2 h-12 px-6 text-base">
                     <GitHubIcon className="h-4 w-4" />
-                    GitHub Repository
+                    {t("hero.ctaGithub")}
                   </Button>
                 </Link>
               </div>
@@ -245,11 +215,13 @@ export default async function MFAPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
               {metrics.map((metric) => (
-                <div key={metric.label}>
+                <div key={metric.labelKey}>
                   <div className="text-3xl sm:text-4xl font-semibold text-foreground">
                     {metric.value}
                   </div>
-                  <div className="mt-1 text-sm text-muted-foreground">{metric.label}</div>
+                  <div className="mt-1 text-sm text-muted-foreground">
+                    {t(`metrics.${metric.labelKey}`)}
+                  </div>
                 </div>
               ))}
             </div>
@@ -261,24 +233,25 @@ export default async function MFAPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Complete Authentication Security
+                {t("capabilities.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Modern MFA solution with support for all authentication methods and adaptive
-                security policies.
+                {t("capabilities.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {capabilities.map((capability) => (
-                <div key={capability.title} className="group">
+                <div key={capability.titleKey} className="group">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-foreground/5 group-hover:bg-foreground/10 transition-colors">
                       <capability.icon className="h-5 w-5 text-foreground" />
                     </div>
-                    <h3 className="text-base font-semibold text-foreground">{capability.title}</h3>
+                    <h3 className="text-base font-semibold text-foreground">
+                      {t(`capabilities.${capability.titleKey}`)}
+                    </h3>
                   </div>
                   <p className="text-sm text-muted-foreground leading-relaxed pl-13">
-                    {capability.description}
+                    {t(`capabilities.${capability.descriptionKey}`)}
                   </p>
                 </div>
               ))}
@@ -291,32 +264,24 @@ export default async function MFAPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Advanced MFA Features
+                {t("features.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Enterprise features for maximum security without sacrificing user experience.
+                {t("features.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {features.map((feature) => (
                 <div
-                  key={feature.title}
+                  key={feature.titleKey}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
                 >
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{feature.title}</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    {t(`features.${feature.titleKey}`)}
+                  </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                    {feature.description}
+                    {t(`features.${feature.descriptionKey}`)}
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    {feature.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-1 text-xs bg-muted text-muted-foreground rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
                 </div>
               ))}
             </div>
@@ -327,9 +292,11 @@ export default async function MFAPage({ params }: { params: Promise<{ locale: st
         <section className="py-20 lg:py-28 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">How We Compare</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("comparison.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                See why organizations choose Aether MFA over cloud-only alternatives.
+                {t("comparison.description")}
               </p>
             </div>
             <div className="overflow-x-auto">
@@ -399,36 +366,16 @@ export default async function MFAPage({ params }: { params: Promise<{ locale: st
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-balance">
-                  Easy Integration
+                  {t("code.title")}
                 </h2>
                 <p className="mt-4 text-lg text-background/70 leading-relaxed">
-                  Simple SDKs make adding MFA to your applications straightforward. Support for all
-                  major authentication methods.
+                  {t("code.description")}
                 </p>
                 <div className="mt-8">
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1.5 text-sm bg-background/10 rounded-md text-background/80">
-                      WebAuthn
-                    </span>
-                    <span className="px-3 py-1.5 text-sm bg-background/10 rounded-md text-background/80">
-                      TOTP
-                    </span>
-                    <span className="px-3 py-1.5 text-sm bg-background/10 rounded-md text-background/80">
-                      SMS
-                    </span>
-                    <span className="px-3 py-1.5 text-sm bg-background/10 rounded-md text-background/80">
-                      Email
-                    </span>
-                    <span className="px-3 py-1.5 text-sm bg-background/10 rounded-md text-background/80">
-                      Push
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-8">
-                  <Link href="/docs/quickstarts">
+                  <Link href={`/${locale}/docs/quickstarts`}>
                     <Button variant="secondary" size="lg" className="gap-2">
                       <Zap className="h-4 w-4" />
-                      Quickstart Guides
+                      {t("code.cta")}
                     </Button>
                   </Link>
                 </div>
@@ -445,45 +392,47 @@ export default async function MFAPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Why Choose Aether MFA?
+                {t("benefits.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                The most secure and flexible MFA solution for modern enterprises.
+                {t("benefits.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="p-6 rounded-lg border border-border bg-card">
                 <LockOpen className="h-8 w-8 text-foreground mb-4" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">Zero Vendor Lock-In</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {t("benefits.vendorLockin")}
+                </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Self-hosted solution means you own your authentication infrastructure. Migrate
-                  anytime with standard protocols.
+                  {t("benefits.vendorLockinDesc")}
                 </p>
               </div>
               <div className="p-6 rounded-lg border border-border bg-card">
                 <UserCheck className="h-8 w-8 text-foreground mb-4" />
                 <h3 className="text-lg font-semibold text-foreground mb-2">
-                  Frictionless User Experience
+                  {t("benefits.frictionless")}
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Adaptive authentication means trusted users get seamless access while suspicious
-                  activity triggers additional verification.
+                  {t("benefits.frictionlessDesc")}
                 </p>
               </div>
               <div className="p-6 rounded-lg border border-border bg-card">
                 <AlertTriangle className="h-8 w-8 text-foreground mb-4" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">Phishing-Resistant</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {t("benefits.phishing")}
+                </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  WebAuthn credentials are bound to specific origins, making them impossible to
-                  phish. Hardware-backed security for your users.
+                  {t("benefits.phishingDesc")}
                 </p>
               </div>
               <div className="p-6 rounded-lg border border-border bg-card">
                 <Gem className="h-8 w-8 text-foreground mb-4" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">Complete Compliance</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {t("benefits.compliance")}
+                </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Full audit logging, SOC 2 compliance, GDPR ready. Meet the strictest regulatory
-                  requirements with detailed authentication logs.
+                  {t("benefits.complianceDesc")}
                 </p>
               </div>
             </div>
@@ -495,10 +444,10 @@ export default async function MFAPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Frequently Asked Questions
+                {t("faq.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Common questions about Aether MFA.
+                {t("faq.description")}
               </p>
             </div>
             <FaqAccordion faqs={faqs} />
@@ -510,22 +459,19 @@ export default async function MFAPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Secure Your Authentication Today
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Deploy Aether MFA and gain complete control over your authentication security. Open
-                source, self-hosted, enterprise-ready.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/docs">
+                <Link href={`/${locale}/docs`}>
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                    Get Started
+                    {t("cta.getStarted")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/contact">
+                <Link href={`/${locale}/contact`}>
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    Contact Sales
+                    {t("cta.contactSales")}
                   </Button>
                 </Link>
               </div>

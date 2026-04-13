@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { locales, type Locale } from "@/lib/locale";
 
 interface FooterProps {
@@ -165,11 +166,47 @@ const countryNames: Record<string, string> = {
   CH: "Switzerland",
 };
 
-export async function Footer({ locale = "fr" }: FooterProps) {
+export async function Footer({ locale: initialLocale }: FooterProps) {
+  const locale = initialLocale || "fr";
+  const t = await getTranslations({ locale, namespace: "Public.footer" });
+
   const currentLocale = locales.find((l) => l.code === locale);
   const regionName = currentLocale?.label.split(" ")[0] || "International";
   const countryName = countryNames[currentLocale?.country || ""] || "International";
-  const footerLinks = getDefaultFooterLinks(locale);
+
+  const footerLinks = {
+    developers: {
+      title: t("developers"),
+      links: [
+        { name: "Documentation", href: `/${locale}/docs` },
+        { name: "API Reference", href: `/${locale}/docs/api` },
+        { name: "SDKs", href: `/${locale}/docs/sdks` },
+        { name: "Quickstarts", href: `/${locale}/docs/quickstarts` },
+        { name: "Status Page", href: "https://status.skygenesisenterprise.com" },
+      ],
+    },
+    resources: {
+      title: "Resources",
+      links: [
+        { name: "Blog", href: `/${locale}/blog` },
+        { name: "Case Studies", href: `/${locale}/case-studies` },
+        { name: "Whitepapers", href: `/${locale}/resources/whitepapers` },
+        { name: "Webinars", href: `/${locale}/resources/webinars` },
+        { name: "Community", href: "/discord" },
+      ],
+    },
+    company: {
+      title: t("company"),
+      links: [
+        { name: t("about"), href: `/${locale}/company/about` },
+        { name: t("careers"), href: `/${locale}/company/careers` },
+        { name: "Press", href: `/${locale}/company/press` },
+        { name: "Partners", href: `/${locale}/company/partners` },
+        { name: t("contact"), href: `/${locale}/contact` },
+      ],
+    },
+  };
+
   const prefix = `/${locale}`;
 
   const subscriptionLinks = [
@@ -179,11 +216,11 @@ export async function Footer({ locale = "fr" }: FooterProps) {
   ];
 
   const legalLinks = [
-    { name: "Privacy Policy", href: `${prefix}/privacy` },
-    { name: "Terms of Service", href: `${prefix}/terms` },
+    { name: t("privacy"), href: `${prefix}/privacy` },
+    { name: t("terms"), href: `${prefix}/terms` },
     { name: "Cookie Policy", href: `${prefix}/cookies` },
     { name: "GDPR", href: `${prefix}/gdpr` },
-    { name: "Security", href: `${prefix}/security` },
+    { name: t("security"), href: `${prefix}/security` },
   ];
 
   const socialLinks = [
