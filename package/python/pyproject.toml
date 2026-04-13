@@ -38,7 +38,7 @@ dependencies = [
 
 [project.optional-dependencies]
 server = [
-    "fastapi>=0.100.0",
+    "fastapi>=0.128.8",
     "flask>=2.0.0",
 ]
 dev = [
