@@ -270,6 +270,7 @@
     "aiAgentsDesc": "Authentification et autorisation sécurisées pour les applications alimentées par l'IA et les agents autonomes.",
     "new": "Nouveau",
     "learnMore": "En savoir plus",
+    "bySkyGenesis": "par Sky Genesis Enterprise",
     "resources": "Ressources",
     "documentation": "Documentation",
     "documentationDesc": "Guides et références API",
@@ -2302,6 +2303,309 @@
       "title": "Sécurisez Votre Identité de Santé Aujourd'hui",
       "description": "Rejoignez les organisations de santé qui font confiance à Aether Identity pour protéger les données patients et permettre des flux de travail cliniques sécurisés.",
       "contact": "Demander une Démo",
+      "docs": "Voir la Documentation"
+    }
+  },
+  "Retail": {
+    "hero": {
+      "badge": "Solutions de Retail",
+      "title": "Identité Sécurisée pour le Retail Moderne",
+      "description": "Protégez les comptes clients, sécurisez les paiements et offrez des expériences omnicanal fluides avec une gestion d'identité de qualité entreprise conçue pour le retail.",
+      "ctaContact": "Demander une Démo",
+      "ctaDocs": "Voir la Documentation"
+    },
+    "metrics": {
+      "cartAbandonment": "Réduction de l'abandon de panier",
+      "latency": "Latence d'authentification",
+      "availability": "Disponibilité système",
+      "fraudReduction": "Réduction de la fraude"
+    },
+    "features": {
+      "title": "Conçu pour les Opérations de Retail",
+      "description": "Chaque fonctionnalité conçue pour répondre aux exigences uniques de sécurité, d'expérience client et opérationnelles du retail moderne.",
+      "ecommerce": {
+        "title": "Authentification E-Commerce",
+        "description": "Connexion client sécurisée pour les boutiques en ligne avec MFA, intégration de connexion sociale et expériences de paiement fluides qui réduisent l'abandon de panier."
+      },
+      "payment": {
+        "title": "Sécurité des Paiements",
+        "description": "Authentification conforme PCI-DSS pour le traitement des paiements, support de tokenisation et transactions sécurisées sans carte présente."
+      },
+      "pos": {
+        "title": "Intégration POS",
+        "description": "Identité unifiée sur les canaux en magasin, en ligne et mobile. Support pour RFID, code-barres et authentification biométrique au point de vente."
+      },
+      "loyalty": {
+        "title": "Gestion des Programmes de Fidélité",
+        "description": "Identité client unique sur tous les points de contact. Liez les comptes de fidélité, suivez les préférences et offrez des expériences personnalisées."
+      },
+      "mobile": {
+        "title": "Sécurité des Applications Mobiles",
+        "description": "Authentification mobile sécurisée avec empreinte digitale de l'appareil, notifications push et support biométrique pour les applications de retail."
+      },
+      "fraud": {
+        "title": "Prévention de la Fraude",
+        "description": "Évaluation des risques en temps réel, authentification adaptative et détection d'anomalies pour prévenir la prise de compte et les transactions frauduleuses."
+      }
+    },
+    "compliance": {
+      "title": "Conformité Retail Intégrée",
+      "description": "Respectez PCI-DSS, RGPD et les réglementations émergentes sur les données de retail avec confiance.",
+      "pci": {
+        "title": "Conformité PCI-DSS",
+        "description": "Conformité PCI-DSS complète pour l'authentification des paiements. Tokenisation et chiffrement pour protéger les données des titulaires de carte."
+      },
+      "encryption": {
+        "title": "Chiffrement des Données",
+        "description": "Chiffrement AES-256 au repos et TLS 1.3 en transit. Clés de chiffrement gérées par le client disponibles pour les déploiements sur site."
+      },
+      "gdpr": {
+        "title": "Prêt RGPD",
+        "description": "Gestion des données clients conforme au RGPD. Droit à l'effacement, portabilité des données et gestion du consentement intégrés."
+      },
+      "governance": {
+        "title": "Gouvernance d'Accès",
+        "description": "Contrôle d'accès basé sur les rôles pour le personnel retail, franchisés et partenaires. Permissions granulaires pour l'inventaire, les prix et les données clients."
+      }
+    },
+    "useCases": {
+      "title": "Cas d'Utilisation Complets",
+      "description": "De l'authentification client à la sécurité de la chaîne d'approvisionnement, Aether sécurise chaque point de contact dans l'écosystème retail.",
+      "omnichannel": {
+        "title": "Commerce Omnicanal",
+        "description": "Identité client unifiée sur le web, mobile et les magasins physiques. Personnalisation cohérente et suivi de fidélité."
+      },
+      "staff": {
+        "title": "Contrôle d'Accès Personnel",
+        "description": "Gérer les identifiants des employés, contractants et franchisés avec un accès basé sur les rôles pour les systèmes d'inventaire, de tarification et de reporting."
+      },
+      "wallets": {
+        "title": "Portefeuilles Numériques",
+        "description": "Intégration sécurisée avec Apple Pay, Google Pay et Samsung Pay pour des paiements fluides en magasin et en ligne."
+      },
+      "supply": {
+        "title": "Partenaires de la Chaîne d'Approvisionnement",
+        "description": "Authentification B2B pour les fournisseurs, distributeurs et partenaires logistiques avec accès API sécurisé et pistes d'audit."
+      }
+    },
+    "integrations": {
+      "title": "Intégrations de Plateformes E-Commerce",
+      "description": "Intégration transparente avec les plateformes de retail que vous utilisez déjà.",
+      "notFound": "Vous ne voyez pas votre plateforme? Contactez-nous pour une intégration personnalisée."
+    },
+    "deployment": {
+      "title": "Déployez Selon Votre Politique",
+      "description": "Que vous ayez besoin d'un contrôle complet sur site ou d'une scalabilité cloud, Aether s'adapte à votre infrastructure et aux exigences de résidence des données.",
+      "onPremise": "Sur Site",
+      "private": "Cloud Privé",
+      "hybrid": "Hybride"
+    },
+    "security": {
+      "title": "Sécurité d'Entreprise pour les Données Retail",
+      "description": "Protégez les informations clients et les données de paiement avec des contrôles de sécurité conçus spécifiquement pour les environnements retail.",
+      "encryptionRest": "Chiffrement au repos",
+      "encryptionTransit": "Chiffrement en transit",
+      "biometric": "Support biométrique",
+      "tokenization": "Tokens de paiement",
+      "oauth": "Support OAuth 2.0 / OpenID Connect",
+      "social": "Connexion sociale (Google, Apple, Facebook)",
+      "device": "Empreinte digitale de l'appareil & évaluation des risques",
+      "mfa": "Authentification multi-facteurs (TOTP, SMS, email)",
+      "fraud": "Détection de fraude & alertes en temps réel",
+      "session": "Gestion de session sur tous les canaux"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur la gestion d'identité dans le retail.",
+      "pci": {
+        "title": "Comment Aether gère-t-il la conformité PCI-DSS?",
+        "answer": "Aether Identity est conçu pour répondre aux exigences PCI-DSS pour l'authentification des paiements. Nous fournissons la tokenisation, le chiffrement et les contrôles d'accès qui vous aident à maintenir la conformité. Aether peut également s'intégrer à votre passerelle de paiement existante."
+      },
+      "ecommerce": {
+        "title": "Pouvons-nous nous intégrer à notre plateforme e-commerce existante?",
+        "answer": "Oui, Aether supporte les intégrations OAuth 2.0/OpenID Connect avec toutes les majeures plateformes e-commerce incluant Shopify, Magento, Salesforce Commerce Cloud et les implémentations personnalisées via notre API."
+      },
+      "omnichannel": {
+        "title": "Comment Aether supporte-t-il le retail omnicanal?",
+        "answer": "Aether fournit une identité client unifiée qui fonctionne sur le web, mobile et les magasins physiques. Les clients peuvent s'authentifier une fois et profiter d'expériences fluides sur tous les canaux avec un suivi de fidélité et une personnalisation cohérents."
+      },
+      "loyalty": {
+        "title": "Pouvons-nous utiliser notre programme de fidélité existant avec Aether?",
+        "answer": "Oui, Aether s'intègre aux programmes de fidélité existants via API. Nous pouvons fédérer les identités de fidélité, lier les comptes clients et synchroniser les préférences sur les canaux."
+      },
+      "fraud": {
+        "title": "Quelles fonctionnalités de prévention de fraude sont incluses?",
+        "answer": "Aether inclut l'empreinte digitale de l'appareil, l'analyse comportementale, l'authentification basée sur les risques et la détection de menaces en temps réel. Vous pouvez configurer des politiques adaptatives basées sur le risque de transaction, la géographie et le comportement utilisateur."
+      }
+    },
+    "resources": {
+      "title": "Ressources",
+      "description": "Explorez les guides, la documentation de conformité et les études de cas pour l'identité retail.",
+      "whitepaper": "Livre Blanc",
+      "whitepaperDesc": "Guide de Gestion d'Identité Retail",
+      "ebook": "E-book",
+      "ebookDesc": "Sécurité du Commerce Omnicanal",
+      "webinar": "Webinaire",
+      "webinarDesc": "Conformité PCI-DSS pour le Retail",
+      "caseStudy": "Étude de Cas",
+      "caseStudyDesc": "Succès de Migration d'un Distribiteur Mondial"
+    },
+    "cta": {
+      "title": "Sécurisez Votre Identité Retail Aujourd'hui",
+      "description": "Rejoignez les détaillants qui font confiance à Aether Identity pour protéger les données clients et offrir des expériences d'achat fluides.",
+      "contact": "Demander une Démo",
+      "docs": "Voir la Documentation"
+    }
+  },
+  "Government": {
+    "hero": {
+      "badge": "Solutions Gouvernementales",
+      "title": "Infrastructure d'Identité pour le Secteur Public",
+      "description": "Gestion d'identité auto-hébergée FedRAMP-ready conçue pour les agences gouvernementales. Sécurisez les services aux citoyens, protegez les données sensibles et maintenez un contrôle complet.",
+      "ctaContact": "Contacter les Ventes Gouvernementales",
+      "ctaDocs": "Voir la Documentation"
+    },
+    "agencies": {
+      "federal": "Agences Fédérales",
+      "state": "Gouvernements d'État",
+      "local": "Municipalités Locales",
+      "international": "Gouvernements Internationaux"
+    },
+    "capabilities": {
+      "title": "Sécurité de Grade Gouvernemental",
+      "description": "Conçu pour répondre aux exigences strictes de sécurité et de conformité des agences gouvernementales fédérales, étatiques et locales.",
+      "fedramp": {
+        "title": "Autorisé FedRAMP",
+        "description": "Parcours de conformité FedRAMP complet avec documentation d'Autorisation à Opérer (ATO) et support de surveillance continue."
+      },
+      "icam": {
+        "title": "Intégration ICAM",
+        "description": "Intégration transparente avec les frameworks ICAM gouvernementaux (Identity, Credential, and Access Management) et cartes PIV/PIV-I."
+      },
+      "zeroTrust": {
+        "title": "Architecture Zero Trust",
+        "description": "Implémentez les principes Zero Trust avec vérification continue, accès au privilège minimum et micro-segmentation."
+      },
+      "premise": {
+        "title": "Déploiement Sur Site",
+        "description": "Déployez dans les centres de données gouvernementaux avec capacités air-gapped. Vos données ne quittent jamais votre infrastructure."
+      },
+      "citizen": {
+        "title": "Identité Citoyen",
+        "description": "Authentification sécurisée pour les portails citoyens, l'inscription aux avantages et les applications de services publics."
+      },
+      "audit": {
+        "title": "Audit & Conformité",
+        "description": "Journaux d'audit complets, rapports de conformité FISMA et tableaux de bord de conformité automatisés."
+      }
+    },
+    "certifications": {
+      "title": "Certifications & Conformité",
+      "description": "Aether répond aux normes de sécurité et d'accessibilité gouvernementales les plus exigeantes."
+    },
+    "benefits": {
+      "title": "Pourquoi les Agences Gouvernementales Choisissent Aether",
+      "description": "Réduisez les coûts, accélérez la conformité et maintenez une souveraineté complète sur les données citoyens.",
+      "ato": {
+        "title": "Processus ATO Plus Rapide",
+        "description": "Documentation et artefacts de conformité pré-construits accélèrent votre Autorisation à Opérer FedRAMP."
+      },
+      "costs": {
+        "title": "Coûts Réduits",
+        "description": "Le déploiement auto-hébergé élimine les frais de licence par utilisateur et réduit les coûts d'infrastructure d'identité jusqu'à 60%."
+      },
+      "control": {
+        "title": "Contrôle Complet",
+        "description": "Vos données restent dans votre infrastructure. Aucun accès tiers aux informations citoyennes ou systèmes gouvernementaux."
+      },
+      "interop": {
+        "title": "Interopérabilité",
+        "description": "Intégration transparente avec les systèmes gouvernementaux existants, frameworks ICAM et bases de données des agences."
+      }
+    },
+    "solutions": {
+      "title": "Solutions pour Chaque Secteur Gouvernemental",
+      "description": "Gestion d'identité spécialisée adaptée aux besoins uniques des programmes gouvernementaux et services publics.",
+      "employee": {
+        "title": "Accès Employés Gouvernementaux",
+        "description": "Accès sécurisé interne aux agences avec intégration de carte PIV, authentification multi-facteurs et contrôle d'accès basé sur les rôles pour les systèmes gouvernementaux."
+      },
+      "transport": {
+        "title": "Transport Public",
+        "description": "Authentification citoyenne pour les applications de transport, gestion des tarifs et réseaux de transport multi-modaux."
+      },
+      "education": {
+        "title": "Éducation",
+        "description": "Gestion d'identité des étudiants et du personnel pour les portails éducatifs, aide financière et accès aux dossiers académiques."
+      },
+      "elections": {
+        "title": "Élections",
+        "description": "Authentification sécurisée des votants, vote par correspondance et systèmes d'administration électorale."
+      },
+      "benefits": {
+        "title": "Administration des Prestations",
+        "description": "Vérification d'identité citoyenne pour les services sociaux, allocations de chômage et programmes d'assistance publique."
+      },
+      "law": {
+        "title": "Application de la Loi",
+        "description": "Accès sécurisé aux bases de données de justice pénale, systèmes de gestion de cas et plateformes de collaboration inter-agences."
+      }
+    },
+    "deployment": {
+      "title": "Déployez Selon Vos Exigences",
+      "description": "Choisissez le modèle de déploiement qui répond à la posture de sécurité de votre agence et aux besoins d'infrastructure.",
+      "cloud": "Cloud Gouvernemental",
+      "onPremise": "Sur Site",
+      "hybrid": "Hybride"
+    },
+    "compliance": {
+      "title": "Conçu pour la Conformité",
+      "description": "Aether est conçu pour aider votre agence à répondre aux exigences de conformité de sécurité et d'accessibilité les plus exigeantes.",
+      "fips": "Modules cryptographiques",
+      "tls": "Transport sécurisé",
+      "nist": "Contrôles SP 800-53",
+      "audit": "Piste complète"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "description": "Questions courantes sur les solutions d'identité gouvernementales.",
+      "fedramp": {
+        "title": "Aether est-il autorisé FedRAMP?",
+        "answer": "Nous sommes actuellement sur le parcours d'autorisation FedRAMP avec AWS GovCloud et Azure Government. Notre option de déploiement sur site permet aux agences de utiliser leur ATO existant."
+      },
+      "piv": {
+        "title": "Aether supporte-t-il les cartes PIV/PIV-I?",
+        "answer": "Oui, Aether supporte entièrement les cartes PIV (Personal Identity Verification) et PIV-I (PIV-Interoperable) pour l'authentification des employés gouvernementaux."
+      },
+      "airgap": {
+        "title": "Aether peut-il être déployé dans un environnement air-gapped?",
+        "answer": "Oui, Aether supporte les déploiements air-gapped sans dépendances réseau externes. Tous les composants peuvent fonctionner entièrement hors ligne."
+      },
+      "agencies": {
+        "title": "Quelles agences utilisent actuellement Aether?",
+        "answer": "Aether est utilisé par diverses agences gouvernementales fédérales, étatiques et locales.Contactez notre équipe gouvernementale pour des études de cas spécifiques."
+      },
+      "section508": {
+        "title": "Comment Aether gère-t-il l'accessibilité Section 508?",
+        "answer": "Aether est construit avec la conformité Section 508 et WCAG 2.1 AA à l'esprit. Nos composants UI sont entièrement accessibles et subissent des audits d'accessibilité réguliers."
+      }
+    },
+    "resources": {
+      "title": "Ressources",
+      "description": "Guides, études de cas et ressources de conformité pour les agences gouvernementales.",
+      "whitepaper": "Livre Blanc",
+      "whitepaperDesc": "Guide de Conformité FedRAMP pour les Fournisseurs d'Identité",
+      "caseStudy": "Étude de Cas",
+      "caseStudyDesc": "Une Agence d'État Réduit les Coûts d'Auth de 60%",
+      "webinar": "Webinaire",
+      "webinarDesc": "Implémentation Zero Trust pour le Gouvernement",
+      "calculator": "Calculateur TCO",
+      "calculatorDesc": "Calculez Vos Économies d'Infrastructure d'Identité"
+    },
+    "cta": {
+      "title": "Sécurisez Votre Infrastructure d'Identité Gouvernementale",
+      "description": "Rejoignez les agences gouvernementales fédérales, étatiques et locales qui font confiance à Aether pour leurs besoins de gestion d'identité.",
+      "contact": "Contacter les Ventes Gouvernementales",
       "docs": "Voir la Documentation"
     }
   }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -34,212 +35,192 @@ import {
   Signal,
 } from "lucide-react";
 
-const capabilities = [
-  {
-    icon: Building2,
-    title: "FedRAMP Authorized",
-    description:
-      "Complete FedRAMP compliance pathway with Authority to Operate (ATO) documentation and continuous monitoring support.",
-  },
-  {
-    icon: Key,
-    title: "ICAM Integration",
-    description:
-      "Seamless integration with government ICAM (Identity, Credential, and Access Management) frameworks and PIV/PIV-I cards.",
-  },
-  {
-    icon: Shield,
-    title: "Zero Trust Architecture",
-    description:
-      "Implement Zero Trust principles with continuous verification, least privilege access, and micro-segmentation.",
-  },
-  {
-    icon: Database,
-    title: "On-Premise Deployment",
-    description:
-      "Deploy in government data centers with air-gapped capabilities. Your data never leaves your infrastructure.",
-  },
-  {
-    icon: Users,
-    title: "Citizen Identity",
-    description:
-      "Secure authentication for citizen portals, benefits enrollment, and public service applications.",
-  },
-  {
-    icon: FileCheck,
-    title: "Audit & Compliance",
-    description:
-      "Comprehensive audit logs, FISMA compliance reporting, and automated compliance dashboards.",
-  },
-];
-
-const certifications = [
-  { name: "FedRAMP Ready", status: "In Progress" },
-  { name: "FIPS 140-2", status: "Certified" },
-  { name: "SOC 2 Type II", status: "Certified" },
-  { name: "NIST SP 800-53", status: "Compliant" },
-  { name: "WCAG 2.1 AA", status: "Compliant" },
-  { name: "Section 508", status: "Compliant" },
-];
-
-const governmentSolutions = [
-  {
-    icon: UserCheck,
-    title: "Government Employee Access",
-    description:
-      "Secure internal agency access with PIV card integration, multi-factor authentication, and role-based access control for government systems.",
-  },
-  {
-    icon: Bus,
-    title: "Public Transportation",
-    description:
-      "Citizen authentication for transit applications, fare management, and multi-modal transportation networks.",
-  },
-  {
-    icon: GraduationCap,
-    title: "Education",
-    description:
-      "Student and faculty identity management for educational portals, financial aid, and academic records access.",
-  },
-  {
-    icon: Vote,
-    title: "Elections",
-    description:
-      "Secure voter authentication, absentee voting, and election administration systems.",
-  },
-  {
-    icon: Banknote,
-    title: "Benefits Administration",
-    description:
-      "Citizen identity verification for social services, unemployment benefits, and public assistance programs.",
-  },
-  {
-    icon: Search,
-    title: "Law Enforcement",
-    description:
-      "Secure access to criminal justice databases, case management systems, and inter-agency collaboration platforms.",
-  },
-];
-
-const deploymentOptions = [
-  {
-    icon: Database,
-    title: "Government Cloud",
-    description:
-      "Deploy on AWS GovCloud, Azure Government, or Google Cloud for Government with FedRAMP compliance.",
-  },
-  {
-    icon: Server,
-    title: "On-Premise",
-    description:
-      "Full control in your data center with air-gapped deployment options and government-approved hosting.",
-  },
-  {
-    icon: Cloud,
-    title: "Hybrid",
-    description:
-      "Bridge on-premise systems with cloud applications through secure federation and API integration.",
-  },
-];
-
-const complianceStandards = [
-  "FedRAMP",
-  "FISMA",
-  "NIST SP 800-53",
-  "HIPAA",
-  "Section 508",
-  "WCAG 2.1",
-  "E-Gov",
-  "Civic Services",
-];
-
-const agencyTypes = [
-  { name: "Federal Agencies", count: "24" },
-  { name: "State Governments", count: "50" },
-  { name: "Local Municipalities", count: "500+" },
-  { name: "International Governments", count: "12" },
-];
-
-const benefits = [
-  {
-    title: "Faster ATO Process",
-    description:
-      "Pre-built documentation and compliance artifacts accelerate your FedRAMP Authorization to Operate.",
-    icon: Clock,
-  },
-  {
-    title: "Reduced Costs",
-    description:
-      "Self-hosted deployment eliminates per-user licensing fees and reduces identity infrastructure costs by up to 60%.",
-    icon: Landmark,
-  },
-  {
-    title: "Complete Control",
-    description:
-      "Your data stays in your infrastructure. No third-party access to citizen information or government systems.",
-    icon: Lock,
-  },
-  {
-    title: "Interoperability",
-    description:
-      "Seamless integration with existing government systems, ICAM frameworks, and agency databases.",
-    icon: Handshake,
-  },
-];
-
-const faqs = [
-  {
-    question: "Is Aether FedRAMP authorized?",
-    answer:
-      "We are currently on the FedRAMP authorization pathway with AWS GovCloud and Azure Government. Our on-premise deployment option allows agencies to leverage their existing ATO.",
-  },
-  {
-    question: "Does Aether support PIV/PIV-I cards?",
-    answer:
-      "Yes, Aether fully supports PIV (Personal Identity Verification) and PIV-I (PIV-Interoperable) cards for government employee authentication.",
-  },
-  {
-    question: "Can Aether be deployed in an air-gapped environment?",
-    answer:
-      "Yes, Aether supports air-gapped deployments with no external network dependencies. All components can operate fully offline.",
-  },
-  {
-    question: "What agencies are currently using Aether?",
-    answer:
-      "Aether is being used by various federal, state, and local government agencies. Contact our government team for specific case studies.",
-  },
-  {
-    question: "How does Aether handle Section 508 accessibility?",
-    answer:
-      "Aether is built with Section 508 and WCAG 2.1 AA compliance in mind. Our UI components are fully accessible and undergo regular accessibility audits.",
-  },
-];
-
-const resources = [
-  {
-    icon: FileText,
-    title: "Whitepaper",
-    description: "FedRAMP Compliance Guide for Identity Providers",
-  },
-  {
-    icon: ClipboardList,
-    title: "Case Study",
-    description: "State Agency Reduces Auth Costs by 60%",
-  },
-  {
-    icon: Calendar,
-    title: "Webinar",
-    description: "Zero Trust Implementation for Government",
-  },
-  {
-    icon: BarChart3,
-    title: "TCO Calculator",
-    description: "Calculate Your Identity Infrastructure Savings",
-  },
-];
-
 export default async function GovernmentPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Government" });
+
+  const capabilities = [
+    {
+      icon: Building2,
+      title: t("capabilities.fedramp.title"),
+      description: t("capabilities.fedramp.description"),
+    },
+    {
+      icon: Key,
+      title: t("capabilities.icam.title"),
+      description: t("capabilities.icam.description"),
+    },
+    {
+      icon: Shield,
+      title: t("capabilities.zeroTrust.title"),
+      description: t("capabilities.zeroTrust.description"),
+    },
+    {
+      icon: Database,
+      title: t("capabilities.premise.title"),
+      description: t("capabilities.premise.description"),
+    },
+    {
+      icon: Users,
+      title: t("capabilities.citizen.title"),
+      description: t("capabilities.citizen.description"),
+    },
+    {
+      icon: FileCheck,
+      title: t("capabilities.audit.title"),
+      description: t("capabilities.audit.description"),
+    },
+  ];
+
+  const certifications = [
+    { name: "FedRAMP Ready", status: "In Progress" },
+    { name: "FIPS 140-2", status: "Certified" },
+    { name: "SOC 2 Type II", status: "Certified" },
+    { name: "NIST SP 800-53", status: "Compliant" },
+    { name: "WCAG 2.1 AA", status: "Compliant" },
+    { name: "Section 508", status: "Compliant" },
+  ];
+
+  const governmentSolutions = [
+    {
+      icon: UserCheck,
+      title: t("solutions.employee.title"),
+      description: t("solutions.employee.description"),
+    },
+    {
+      icon: Bus,
+      title: t("solutions.transport.title"),
+      description: t("solutions.transport.description"),
+    },
+    {
+      icon: GraduationCap,
+      title: t("solutions.education.title"),
+      description: t("solutions.education.description"),
+    },
+    {
+      icon: Vote,
+      title: t("solutions.elections.title"),
+      description: t("solutions.elections.description"),
+    },
+    {
+      icon: Banknote,
+      title: t("solutions.benefits.title"),
+      description: t("solutions.benefits.description"),
+    },
+    {
+      icon: Search,
+      title: t("solutions.law.title"),
+      description: t("solutions.law.description"),
+    },
+  ];
+
+  const deploymentOptions = [
+    {
+      icon: Database,
+      title: t("deployment.cloud"),
+      description:
+        "Deploy on AWS GovCloud, Azure Government, or Google Cloud for Government with FedRAMP compliance.",
+    },
+    {
+      icon: Server,
+      title: t("deployment.onPremise"),
+      description:
+        "Full control in your data center with air-gapped deployment options and government-approved hosting.",
+    },
+    {
+      icon: Cloud,
+      title: t("deployment.hybrid"),
+      description:
+        "Bridge on-premise systems with cloud applications through secure federation and API integration.",
+    },
+  ];
+
+  const complianceStandards = [
+    "FedRAMP",
+    "FISMA",
+    "NIST SP 800-53",
+    "HIPAA",
+    "Section 508",
+    "WCAG 2.1",
+    "E-Gov",
+    "Civic Services",
+  ];
+
+  const agencyTypes = [
+    { name: t("agencies.federal"), count: "24" },
+    { name: t("agencies.state"), count: "50" },
+    { name: t("agencies.local"), count: "500+" },
+    { name: t("agencies.international"), count: "12" },
+  ];
+
+  const benefits = [
+    {
+      title: t("benefits.ato.title"),
+      description: t("benefits.ato.description"),
+      icon: Clock,
+    },
+    {
+      title: t("benefits.costs.title"),
+      description: t("benefits.costs.description"),
+      icon: Landmark,
+    },
+    {
+      title: t("benefits.control.title"),
+      description: t("benefits.control.description"),
+      icon: Lock,
+    },
+    {
+      title: t("benefits.interop.title"),
+      description: t("benefits.interop.description"),
+      icon: Handshake,
+    },
+  ];
+
+  const faqs = [
+    {
+      question: t("faq.fedramp.title"),
+      answer: t("faq.fedramp.answer"),
+    },
+    {
+      question: t("faq.piv.title"),
+      answer: t("faq.piv.answer"),
+    },
+    {
+      question: t("faq.airgap.title"),
+      answer: t("faq.airgap.answer"),
+    },
+    {
+      question: t("faq.agencies.title"),
+      answer: t("faq.agencies.answer"),
+    },
+    {
+      question: t("faq.section508.title"),
+      answer: t("faq.section508.answer"),
+    },
+  ];
+
+  const resources = [
+    {
+      icon: FileText,
+      title: t("resources.whitepaper"),
+      description: t("resources.whitepaperDesc"),
+    },
+    {
+      icon: ClipboardList,
+      title: t("resources.caseStudy"),
+      description: t("resources.caseStudyDesc"),
+    },
+    {
+      icon: Calendar,
+      title: t("resources.webinar"),
+      description: t("resources.webinarDesc"),
+    },
+    {
+      icon: BarChart3,
+      title: t("resources.calculator"),
+      description: t("resources.calculatorDesc"),
+    },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -252,25 +233,24 @@ export default async function GovernmentPage({ params }: { params: Promise<{ loc
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                Government Solutions
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                Identity Infrastructure for the Public Sector
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                FedRAMP-ready, self-hosted identity management built for government agencies. Secure
-                citizen services, protect sensitive data, and maintain complete control.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
-                <Link href="/contact">
+                <Link href={`/${locale}/contact`}>
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    Contact Government Sales
+                    {t("hero.ctaContact")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/docs">
+                <Link href={`/${locale}/docs`}>
                   <Button variant="outline" size="lg" className="gap-2 h-12 px-6 text-base">
-                    View Documentation
+                    {t("hero.ctaDocs")}
                   </Button>
                 </Link>
               </div>
@@ -299,11 +279,10 @@ export default async function GovernmentPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Government-Grade Security
+                {t("capabilities.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Built to meet the stringent security and compliance requirements of federal, state,
-                and local government agencies.
+                {t("capabilities.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -315,7 +294,7 @@ export default async function GovernmentPage({ params }: { params: Promise<{ loc
                     </div>
                     <h3 className="text-base font-semibold text-foreground">{capability.title}</h3>
                   </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed pl-13">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {capability.description}
                   </p>
                 </div>
@@ -329,10 +308,10 @@ export default async function GovernmentPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Certifications & Compliance
+                {t("certifications.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Aether meets the most demanding government security and accessibility standards.
+                {t("certifications.description")}
               </p>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
@@ -364,11 +343,10 @@ export default async function GovernmentPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Why Government Agencies Choose Aether
+                {t("benefits.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Reduce costs, accelerate compliance, and maintain complete sovereignty over your
-                citizen data.
+                {t("benefits.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -390,11 +368,10 @@ export default async function GovernmentPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Solutions for Every Government Sector
+                {t("solutions.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Specialized identity management tailored to the unique needs of government programs
-                and public services.
+                {t("solutions.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -419,11 +396,10 @@ export default async function GovernmentPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Deploy According to Your Requirements
+                {t("deployment.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Choose the deployment model that meets your agency&apos;s security posture and
-                infrastructure needs.
+                {t("deployment.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
@@ -449,11 +425,10 @@ export default async function GovernmentPage({ params }: { params: Promise<{ loc
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                  Built for Compliance
+                  {t("compliance.title")}
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                  Aether is designed to help your agency meet the most demanding security and
-                  accessibility compliance requirements.
+                  {t("compliance.description")}
                 </p>
                 <div className="mt-8 grid grid-cols-2 gap-3">
                   {complianceStandards.map((standard) => (
@@ -468,22 +443,22 @@ export default async function GovernmentPage({ params }: { params: Promise<{ loc
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Scale className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">FIPS 140-2</div>
-                  <div className="text-sm text-muted-foreground">Cryptographic modules</div>
+                  <div className="text-sm text-muted-foreground">{t("compliance.fips")}</div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Signal className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">TLS 1.3</div>
-                  <div className="text-sm text-muted-foreground">Secure transport</div>
+                  <div className="text-sm text-muted-foreground">{t("compliance.tls")}</div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <AlertTriangle className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">NIST</div>
-                  <div className="text-sm text-muted-foreground">SP 800-53 controls</div>
+                  <div className="text-sm text-muted-foreground">{t("compliance.nist")}</div>
                 </div>
                 <div className="p-6 rounded-lg bg-muted/50 border border-border">
                   <Zap className="h-8 w-8 text-foreground mb-3" />
                   <div className="text-2xl font-semibold text-foreground">Audit Logs</div>
-                  <div className="text-sm text-muted-foreground">Complete trail</div>
+                  <div className="text-sm text-muted-foreground">{t("compliance.audit")}</div>
                 </div>
               </div>
             </div>
@@ -495,10 +470,10 @@ export default async function GovernmentPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Frequently Asked Questions
+                {t("faq.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Common questions about government identity solutions.
+                {t("faq.description")}
               </p>
             </div>
             <FaqAccordion faqs={faqs} />
@@ -509,9 +484,11 @@ export default async function GovernmentPage({ params }: { params: Promise<{ loc
         <section className="py-20 lg:py-28 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Resources</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("resources.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Guides, case studies, and compliance resources for government agencies.
+                {t("resources.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -536,22 +513,19 @@ export default async function GovernmentPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Secure Your Government Identity Infrastructure
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Join federal, state, and local government agencies that trust Aether for their
-                identity management needs.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/contact">
+                <Link href={`/${locale}/contact`}>
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                    Contact Government Sales
+                    {t("cta.contact")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/docs">
+                <Link href={`/${locale}/docs`}>
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    View Documentation
+                    {t("cta.docs")}
                   </Button>
                 </Link>
               </div>

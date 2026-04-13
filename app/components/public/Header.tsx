@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "@/i18n/navigation";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Menu,
   X,
@@ -24,10 +25,10 @@ import {
   Database,
   Settings,
   LifeBuoy,
+  Languages,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { useLocale } from "@/context/locale-context";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
@@ -52,408 +53,205 @@ interface MegaMenu {
   };
 }
 
-const productMenuEN: MegaMenu = {
-  sections: [
-    {
-      title: "Core Platform",
-      items: [
-        {
-          name: "Universal Login",
-          href: "/products/universal-login",
-          description: "Customizable, secure authentication",
-          icon: <Lock className="h-5 w-5" />,
-        },
-        {
-          name: "Single Sign-On",
-          href: "/products/sso",
-          description: "One login for all applications",
-          icon: <Key className="h-5 w-5" />,
-        },
-        {
-          name: "Multi-Factor Auth",
-          href: "/products/mfa",
-          description: "Adaptive, risk-based MFA",
-          icon: <Shield className="h-5 w-5" />,
-        },
-        {
-          name: "User Management",
-          href: "/products/user-management",
-          description: "Complete identity lifecycle",
-          icon: <Users className="h-5 w-5" />,
-        },
-      ],
-    },
-    {
-      title: "Enterprise",
-      items: [
-        {
-          name: "Enterprise Connections",
-          href: "/products/enterprise",
-          description: "SAML, LDAP, Active Directory",
-          icon: <Building2 className="h-5 w-5" />,
-        },
-        {
-          name: "Organizations",
-          href: "/products/organizations",
-          description: "Multi-tenant B2B solutions",
-          icon: <Layers className="h-5 w-5" />,
-        },
-        {
-          name: "Fine-Grained Authorization",
-          href: "/products/fga",
-          description: "Relationship-based access control",
-          icon: <Settings className="h-5 w-5" />,
-        },
-        {
-          name: "Private Cloud",
-          href: "/products/private-cloud",
-          description: "Dedicated infrastructure",
-          icon: <Server className="h-5 w-5" />,
-        },
-      ],
-    },
+const productMenuData: MenuData = {
+  sectionTitles: ["corePlatform", "enterprise"],
+  items: [
+    [
+      {
+        titleKey: "universalLogin",
+        descKey: "universalLoginDesc",
+        href: "/products/universal-login",
+        icon: <Lock className="h-5 w-5" />,
+      },
+      {
+        titleKey: "singleSignOn",
+        descKey: "singleSignOnDesc",
+        href: "/products/sso",
+        icon: <Key className="h-5 w-5" />,
+      },
+      {
+        titleKey: "multiFactorAuth",
+        descKey: "multiFactorAuthDesc",
+        href: "/products/mfa",
+        icon: <Shield className="h-5 w-5" />,
+      },
+      {
+        titleKey: "userManagement",
+        descKey: "userManagementDesc",
+        href: "/products/user-management",
+        icon: <Users className="h-5 w-5" />,
+      },
+    ],
+    [
+      {
+        titleKey: "enterpriseConnections",
+        descKey: "enterpriseConnectionsDesc",
+        href: "/products/enterprise",
+        icon: <Building2 className="h-5 w-5" />,
+      },
+      {
+        titleKey: "organizations",
+        descKey: "organizationsDesc",
+        href: "/products/organizations",
+        icon: <Layers className="h-5 w-5" />,
+      },
+      {
+        titleKey: "fineGrainedAuthorization",
+        descKey: "fineGrainedAuthorizationDesc",
+        href: "/products/fga",
+        icon: <Settings className="h-5 w-5" />,
+      },
+      {
+        titleKey: "privateCloud",
+        descKey: "privateCloudDesc",
+        href: "/products/private-cloud",
+        icon: <Server className="h-5 w-5" />,
+      },
+    ],
   ],
   featured: {
-    title: "Aether Identity for AI Agents",
-    description:
-      "Secure authentication and authorization for AI-powered applications and autonomous agents.",
+    titleKey: "aiAgents",
+    descKey: "aiAgentsDesc",
     href: "/products/ai-agents",
-    badge: "New",
+    badgeKey: "new",
   },
 };
 
-const developersMenuEN: MegaMenu = {
-  sections: [
-    {
-      title: "Resources",
-      items: [
-        {
-          name: "Documentation",
-          href: "/developers",
-          description: "Guides and API references",
-          icon: <BookOpen className="h-5 w-5" />,
-        },
-        {
-          name: "Quickstarts",
-          href: "/developers/quickstarts",
-          description: "Get started in minutes",
-          icon: <Zap className="h-5 w-5" />,
-        },
-        {
-          name: "API Reference",
-          href: "/developers/api",
-          description: "Complete API documentation",
-          icon: <Code className="h-5 w-5" />,
-        },
-        {
-          name: "SDKs & Libraries",
-          href: "/developers/sdks",
-          description: "Official client libraries",
-          icon: <Layers className="h-5 w-5" />,
-        },
-      ],
-    },
-    {
-      title: "Tools",
-      items: [
-        {
-          name: "CLI",
-          href: "/developers/cli",
-          description: "Command-line interface",
-          icon: <FileText className="h-5 w-5" />,
-        },
-        {
-          name: "Postman Collections",
-          href: "/developers/postman",
-          description: "API testing collections",
-          icon: <Database className="h-5 w-5" />,
-        },
-        {
-          name: "Extensions",
-          href: "/developers/extensions",
-          description: "Extend functionality",
-          icon: <Settings className="h-5 w-5" />,
-        },
-        {
-          name: "Community",
-          href: "/community",
-          description: "Join the discussion",
-          icon: <Users className="h-5 w-5" />,
-        },
-      ],
-    },
+const developersMenuData: MenuData = {
+  sectionTitles: ["resources", "tools"],
+  items: [
+    [
+      {
+        titleKey: "documentation",
+        descKey: "documentationDesc",
+        href: "/developers",
+        icon: <BookOpen className="h-5 w-5" />,
+      },
+      {
+        titleKey: "quickstarts",
+        descKey: "quickstartsDesc",
+        href: "/developers/quickstarts",
+        icon: <Zap className="h-5 w-5" />,
+      },
+      {
+        titleKey: "apiReference",
+        descKey: "apiReferenceDesc",
+        href: "/developers/api",
+        icon: <Code className="h-5 w-5" />,
+      },
+      {
+        titleKey: "sdksLibraries",
+        descKey: "sdksLibrariesDesc",
+        href: "/developers/sdks",
+        icon: <Layers className="h-5 w-5" />,
+      },
+    ],
+    [
+      {
+        titleKey: "cli",
+        descKey: "cliDesc",
+        href: "/developers/cli",
+        icon: <FileText className="h-5 w-5" />,
+      },
+      {
+        titleKey: "postman",
+        descKey: "postmanDesc",
+        href: "/developers/postman",
+        icon: <Database className="h-5 w-5" />,
+      },
+      {
+        titleKey: "extensions",
+        descKey: "extensionsDesc",
+        href: "/developers/extensions",
+        icon: <Settings className="h-5 w-5" />,
+      },
+      {
+        titleKey: "community",
+        descKey: "communityDesc",
+        href: "/community",
+        icon: <Users className="h-5 w-5" />,
+      },
+    ],
   ],
 };
 
-const solutionsMenuEN: MegaMenu = {
-  sections: [
-    {
-      title: "By Use Case",
-      items: [
-        {
-          name: "B2C Identity",
-          href: "/solutions/b2c",
-          description: "Consumer-facing applications",
-          icon: <Smartphone className="h-5 w-5" />,
-        },
-        {
-          name: "B2B SaaS",
-          href: "/solutions/b2b",
-          description: "Multi-tenant enterprise apps",
-          icon: <Building2 className="h-5 w-5" />,
-        },
-        {
-          name: "Machine-to-Machine",
-          href: "/solutions/m2m",
-          description: "API & service authentication",
-          icon: <Server className="h-5 w-5" />,
-        },
-        {
-          name: "Passwordless",
-          href: "/solutions/passwordless",
-          description: "Friction-free authentication",
-          icon: <Key className="h-5 w-5" />,
-        },
-      ],
-    },
-    {
-      title: "By Industry",
-      items: [
-        {
-          name: "Financial Services",
-          href: "/solutions/financial",
-          description: "Banking & fintech solutions",
-          icon: <Shield className="h-5 w-5" />,
-        },
-        {
-          name: "Healthcare",
-          href: "/solutions/healthcare",
-          description: "HIPAA-compliant identity",
-          icon: <LifeBuoy className="h-5 w-5" />,
-        },
-        {
-          name: "Retail & E-commerce",
-          href: "/solutions/retail",
-          description: "Customer identity at scale",
-          icon: <Globe className="h-5 w-5" />,
-        },
-        {
-          name: "Public Sector",
-          href: "/solutions/government",
-          description: "Secure government services",
-          icon: <Building2 className="h-5 w-5" />,
-        },
-      ],
-    },
+const solutionsMenuData: MenuData = {
+  sectionTitles: ["byUseCase", "byIndustry"],
+  items: [
+    [
+      {
+        titleKey: "b2cIdentity",
+        descKey: "b2cIdentityDesc",
+        href: "/solutions/b2c",
+        icon: <Smartphone className="h-5 w-5" />,
+      },
+      {
+        titleKey: "b2bSaas",
+        descKey: "b2bSaasDesc",
+        href: "/solutions/b2b",
+        icon: <Building2 className="h-5 w-5" />,
+      },
+      {
+        titleKey: "machineToMachine",
+        descKey: "machineToMachineDesc",
+        href: "/solutions/m2m",
+        icon: <Server className="h-5 w-5" />,
+      },
+      {
+        titleKey: "passwordless",
+        descKey: "passwordlessDesc",
+        href: "/solutions/passwordless",
+        icon: <Key className="h-5 w-5" />,
+      },
+    ],
+    [
+      {
+        titleKey: "financialServices",
+        descKey: "financialServicesDesc",
+        href: "/solutions/financial",
+        icon: <Shield className="h-5 w-5" />,
+      },
+      {
+        titleKey: "healthcare",
+        descKey: "healthcareDesc",
+        href: "/solutions/healthcare",
+        icon: <LifeBuoy className="h-5 w-5" />,
+      },
+      {
+        titleKey: "retailEcommerce",
+        descKey: "retailEcommerceDesc",
+        href: "/solutions/retail",
+        icon: <Globe className="h-5 w-5" />,
+      },
+      {
+        titleKey: "publicSector",
+        descKey: "publicSectorDesc",
+        href: "/solutions/government",
+        icon: <Building2 className="h-5 w-5" />,
+      },
+    ],
   ],
 };
 
-const productMenuFR: MegaMenu = {
-  sections: [
-    {
-      title: "Plateforme Principale",
-      items: [
-        {
-          name: "Connexion Universelle",
-          href: "/products/universal-login",
-          description: "Authentification sécurisée personnalisable",
-          icon: <Lock className="h-5 w-5" />,
-        },
-        {
-          name: "Authentification Unique",
-          href: "/products/sso",
-          description: "Une connexion pour toutes les applications",
-          icon: <Key className="h-5 w-5" />,
-        },
-        {
-          name: "Authentification Multi-Facteurs",
-          href: "/products/mfa",
-          description: "AMF adaptative basée sur les risques",
-          icon: <Shield className="h-5 w-5" />,
-        },
-        {
-          name: "Gestion des Utilisateurs",
-          href: "/products/user-management",
-          description: "Cycle de vie complet de l'identité",
-          icon: <Users className="h-5 w-5" />,
-        },
-      ],
-    },
-    {
-      title: "Entreprise",
-      items: [
-        {
-          name: "Connexions Entreprise",
-          href: "/products/enterprise",
-          description: "SAML, LDAP, Active Directory",
-          icon: <Building2 className="h-5 w-5" />,
-        },
-        {
-          name: "Organisations",
-          href: "/products/organizations",
-          description: "Solutions B2B multi-tenant",
-          icon: <Layers className="h-5 w-5" />,
-        },
-        {
-          name: "Autorisation Fine",
-          href: "/products/fga",
-          description: "Contrôle d'accès basé sur les relations",
-          icon: <Settings className="h-5 w-5" />,
-        },
-        {
-          name: "Cloud Privé",
-          href: "/products/private-cloud",
-          description: "Infrastructure dédiée",
-          icon: <Server className="h-5 w-5" />,
-        },
-      ],
-    },
-  ],
-  featured: {
-    title: "Aether Identity pour Agents IA",
-    description:
-      "Authentification et autorisation sécurisées pour les applications alimentées par l'IA et les agents autonomes.",
-    href: "/products/ai-agents",
-    badge: "Nouveau",
-  },
-};
-
-const developersMenuFR: MegaMenu = {
-  sections: [
-    {
-      title: "Ressources",
-      items: [
-        {
-          name: "Documentation",
-          href: "/developers",
-          description: "Guides et références API",
-          icon: <BookOpen className="h-5 w-5" />,
-        },
-        {
-          name: "Démarrages Rapides",
-          href: "/developers/quickstarts",
-          description: "Commencez en quelques minutes",
-          icon: <Zap className="h-5 w-5" />,
-        },
-        {
-          name: "Référence API",
-          href: "/developers/api",
-          description: "Documentation API complète",
-          icon: <Code className="h-5 w-5" />,
-        },
-        {
-          name: "SDKs et Bibliothèques",
-          href: "/developers/sdks",
-          description: "Bibliothèques clientes officielles",
-          icon: <Layers className="h-5 w-5" />,
-        },
-      ],
-    },
-    {
-      title: "Outils",
-      items: [
-        {
-          name: "CLI",
-          href: "/developers/cli",
-          description: "Interface en ligne de commande",
-          icon: <FileText className="h-5 w-5" />,
-        },
-        {
-          name: "Collections Postman",
-          href: "/developers/postman",
-          description: "Collections de test API",
-          icon: <Database className="h-5 w-5" />,
-        },
-        {
-          name: "Extensions",
-          href: "/developers/extensions",
-          description: "Étendre les fonctionnalités",
-          icon: <Settings className="h-5 w-5" />,
-        },
-        {
-          name: "Communauté",
-          href: "/community",
-          description: "Rejoignez la discussion",
-          icon: <Users className="h-5 w-5" />,
-        },
-      ],
-    },
-  ],
-};
-
-const solutionsMenuFR: MegaMenu = {
-  sections: [
-    {
-      title: "Par Cas d'Usage",
-      items: [
-        {
-          name: "Identité B2C",
-          href: "/solutions/b2c",
-          description: "Applications grand public",
-          icon: <Smartphone className="h-5 w-5" />,
-        },
-        {
-          name: "B2B SaaS",
-          href: "/solutions/b2b",
-          description: "Applications entreprise multi-tenant",
-          icon: <Building2 className="h-5 w-5" />,
-        },
-        {
-          name: "Machine à Machine",
-          href: "/solutions/m2m",
-          description: "Authentification API et service",
-          icon: <Server className="h-5 w-5" />,
-        },
-        {
-          name: "Sans Mot de Passe",
-          href: "/solutions/passwordless",
-          description: "Authentification sans friction",
-          icon: <Key className="h-5 w-5" />,
-        },
-      ],
-    },
-    {
-      title: "Par Industrie",
-      items: [
-        {
-          name: "Services Financiers",
-          href: "/solutions/financial",
-          description: "Solutions bancaires et fintech",
-          icon: <Shield className="h-5 w-5" />,
-        },
-        {
-          name: "Santé",
-          href: "/solutions/healthcare",
-          description: "Identité conforme HIPAA",
-          icon: <LifeBuoy className="h-5 w-5" />,
-        },
-        {
-          name: "Retail et E-commerce",
-          href: "/solutions/retail",
-          description: "Identité client à grande échelle",
-          icon: <Globe className="h-5 w-5" />,
-        },
-        {
-          name: "Secteur Public",
-          href: "/solutions/government",
-          description: "Services gouvernementaux sécurisés",
-          icon: <Building2 className="h-5 w-5" />,
-        },
-      ],
-    },
-  ],
+type MenuData = {
+  sectionTitles: string[];
+  items: { titleKey: string; descKey: string; href: string; icon: React.ReactNode }[][];
+  featured?: { titleKey: string; descKey: string; href: string; badgeKey?: string };
 };
 
 function MegaMenuDropdown({
-  menu,
+  sectionTitles,
+  items,
+  featured,
   isOpen,
-  labels,
 }: {
-  menu: MegaMenu;
+  sectionTitles: string[];
+  items: { titleKey: string; descKey: string; href: string; icon: React.ReactNode }[][];
+  featured?: { titleKey: string; descKey: string; href: string; badgeKey?: string };
   isOpen: boolean;
-  labels?: { learnMore?: string };
 }) {
-  const { locale } = useLocale();
+  const locale = useLocale();
+  const t = useTranslations("Header");
 
   const getLocaleHref = (href: string) => {
     if (href === "/") return `/${locale}`;
@@ -471,16 +269,16 @@ function MegaMenuDropdown({
         <div className="flex">
           <div className="flex-1 p-6">
             <div className="grid grid-cols-2 gap-8">
-              {menu.sections.map((section) => (
-                <div key={section.title}>
+              {sectionTitles.map((title, sectionIdx) => (
+                <div key={title}>
                   <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                    {section.title}
+                    {t(title)}
                   </h3>
                   <ul className="space-y-1">
-                    {section.items.map((item) => (
-                      <li key={item.name}>
+                    {items[sectionIdx].map((item) => (
+                      <li key={item.titleKey}>
                         <Link
-                          href={getLocaleHref(item.href || "/")}
+                          href={getLocaleHref(item.href)}
                           className="group flex items-start gap-3 p-2 -mx-2 rounded-lg hover:bg-muted transition-colors"
                         >
                           <span className="shrink-0 mt-0.5 text-muted-foreground group-hover:text-foreground transition-colors">
@@ -488,10 +286,10 @@ function MegaMenuDropdown({
                           </span>
                           <div>
                             <span className="block text-sm font-medium text-foreground group-hover:text-foreground">
-                              {item.name}
+                              {t(item.titleKey)}
                             </span>
                             <span className="block text-xs text-muted-foreground mt-0.5">
-                              {item.description}
+                              {t(item.descKey)}
                             </span>
                           </div>
                         </Link>
@@ -503,24 +301,24 @@ function MegaMenuDropdown({
             </div>
           </div>
 
-          {menu.featured && (
+          {featured && (
             <div className="w-72 bg-muted/50 p-6 border-l border-border">
               <div className="flex items-center gap-2 mb-3">
-                {menu.featured.badge && (
+                {featured.badgeKey && (
                   <span className="text-[10px] font-semibold uppercase tracking-wider bg-foreground text-background px-2 py-0.5 rounded-full">
-                    {menu.featured.badge}
+                    {t(featured.badgeKey)}
                   </span>
                 )}
               </div>
-              <h4 className="text-sm font-semibold text-foreground mb-2">{menu.featured.title}</h4>
+              <h4 className="text-sm font-semibold text-foreground mb-2">{t(featured.titleKey)}</h4>
               <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
-                {menu.featured.description}
+                {t(featured.descKey)}
               </p>
               <Link
-                href={getLocaleHref(menu.featured.href)}
+                href={getLocaleHref(featured.href)}
                 className="inline-flex items-center gap-1 text-xs font-medium text-foreground hover:underline"
               >
-                {labels?.learnMore || "Learn more"}
+                {t("learnMore")}
                 <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
@@ -531,11 +329,95 @@ function MegaMenuDropdown({
   );
 }
 
+function LanguageSwitcherDropdown() {
+  const locale = useLocale();
+  const [isOpen, setIsOpen] = useState(false);
+  const t = useTranslations("Header");
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const languages = [
+    { code: "en", label: "English", flag: "🇬🇧" },
+    { code: "fr", label: "Français", flag: "🇫🇷" },
+  ];
+
+  const currentLang = languages.find((l) => l.code === locale) || languages[0];
+
+  const handleLocaleChange = (newLocale: string) => {
+    router.replace(pathname, { locale: newLocale });
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      <button
+        className="flex items-center gap-2 px-2 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label="Select language"
+      >
+        <Languages className="h-4 w-4" />
+        <span className="hidden sm:inline">{currentLang.label}</span>
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-full mt-1 w-40 bg-background border border-border rounded-lg shadow-lg overflow-hidden z-50">
+          {languages.map((lang) => (
+            <button
+              key={lang.code}
+              className={cn(
+                "w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors",
+                locale === lang.code && "bg-muted font-medium text-foreground"
+              )}
+              onClick={() => handleLocaleChange(lang.code)}
+            >
+              <span>{lang.flag}</span>
+              <span>{lang.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MobileMenuContent({ menuData }: { menuData: MenuData }) {
+  const locale = useLocale();
+  const t = useTranslations("Header");
+
+  const getLocaleHref = (href: string) => {
+    if (href === "/") return `/${locale}`;
+    return `/${locale}${href}`;
+  };
+
+  return (
+    <div className="pl-4 space-y-1 mt-1">
+      {menuData.sectionTitles.map((sectionTitle, sectionIdx) => (
+        <div key={sectionTitle} className="py-2">
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            {t(sectionTitle)}
+          </span>
+          <div className="mt-2 space-y-1">
+            {menuData.items[sectionIdx].map((item) => (
+              <Link
+                key={item.titleKey}
+                href={getLocaleHref(item.href)}
+                className="block py-1.5 text-sm text-muted-foreground hover:text-foreground"
+              >
+                {t(item.titleKey)}
+              </Link>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
-  const { locale } = useLocale();
+  const locale = useLocale();
   const { isAuthenticated } = useAuth();
   const t = useTranslations("Header");
 
@@ -552,16 +434,10 @@ export function Header() {
     return `/${locale}${href}`;
   };
 
-  const isFrench = locale === "fr" || locale.startsWith("be_fr") || locale.startsWith("ch_fr");
-
-  const productMenu = isFrench ? productMenuFR : productMenuEN;
-  const developersMenu = isFrench ? developersMenuFR : developersMenuEN;
-  const solutionsMenu = isFrench ? solutionsMenuFR : solutionsMenuEN;
-
   const navItems = [
-    { name: t("product"), menu: productMenu },
-    { name: t("solutions"), menu: solutionsMenu },
-    { name: t("developers"), menu: developersMenu },
+    { name: t("product"), menuData: productMenuData },
+    { name: t("solutions"), menuData: solutionsMenuData },
+    { name: t("developers"), menuData: developersMenuData },
     { name: t("pricing"), href: "/pricing" },
     { name: t("blog"), href: "/blog" },
   ];
@@ -588,7 +464,7 @@ export function Header() {
                   Aether Identity
                 </span>
                 <span className="text-[10px] text-muted-foreground leading-tight tracking-wide">
-                  by Sky Genesis Enterprise
+                  {t("bySkyGenesis")}
                 </span>
               </div>
             </Link>
@@ -601,7 +477,7 @@ export function Header() {
                 <li
                   key={item.name}
                   className="relative"
-                  onMouseEnter={() => item.menu && setActiveMenu(item.name)}
+                  onMouseEnter={() => item.menuData && setActiveMenu(item.name)}
                   onMouseLeave={() => setActiveMenu(null)}
                 >
                   {item.href ? (
@@ -629,11 +505,12 @@ export function Header() {
                       />
                     </button>
                   )}
-                  {item.menu && (
+                  {item.menuData && (
                     <MegaMenuDropdown
-                      menu={item.menu}
+                      sectionTitles={item.menuData.sectionTitles}
+                      items={item.menuData.items}
+                      featured={item.menuData.featured}
                       isOpen={activeMenu === item.name}
-                      labels={{ learnMore: t("learnMore") }}
                     />
                   )}
                 </li>
@@ -642,13 +519,15 @@ export function Header() {
           </nav>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Link
               href={getLocaleHref("/contact")}
               className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               {t("contactSales")}
             </Link>
+
+            <LanguageSwitcherDropdown />
 
             {isAuthenticated ? (
               <Link href="/dashboard">
@@ -706,27 +585,7 @@ export function Header() {
                     <span className="block py-2 text-base font-medium text-foreground">
                       {item.name}
                     </span>
-                    <div className="pl-4 space-y-1 mt-1">
-                      {item.menu?.sections.map((section) => (
-                        <div key={section.title} className="py-2">
-                          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            {section.title}
-                          </span>
-                          <div className="mt-2 space-y-1">
-                            {section.items.map((subItem) => (
-                              <Link
-                                key={subItem.name}
-                                href={getLocaleHref(subItem.href || "/")}
-                                className="block py-1.5 text-sm text-muted-foreground hover:text-foreground"
-                                onClick={() => setMobileMenuOpen(false)}
-                              >
-                                {subItem.name}
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    {item.menuData && <MobileMenuContent menuData={item.menuData} />}
                   </div>
                 )}
               </div>

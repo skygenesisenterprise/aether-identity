@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -29,191 +30,173 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-const features = [
-  {
-    icon: ShoppingCart,
-    title: "E-Commerce Authentication",
-    description:
-      "Secure customer login for online stores with MFA, social login integration, and seamless checkout experiences that reduce cart abandonment.",
-  },
-  {
-    icon: CreditCard,
-    title: "Payment Security",
-    description:
-      "PCI-DSS compliant authentication for payment processing, tokenization support, and secure card-not-present transactions.",
-  },
-  {
-    icon: Store,
-    title: "POS Integration",
-    description:
-      "Unified identity across in-store, online, and mobile channels. Support for RFID, barcode, and biometric authentication at point of sale.",
-  },
-  {
-    icon: Users,
-    title: "Loyalty Program Management",
-    description:
-      "Single customer identity across all touchpoints. Link loyalty accounts, track preferences, and deliver personalized experiences.",
-  },
-  {
-    icon: Smartphone,
-    title: "Mobile App Security",
-    description:
-      "Secure mobile authentication with device fingerprinting, push notifications, and biometric support for retail apps.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Fraud Prevention",
-    description:
-      "Real-time risk assessment, adaptive authentication, and anomaly detection to prevent account takeover and fraudulent transactions.",
-  },
-];
-
-const complianceFeatures = [
-  {
-    icon: Shield,
-    title: "PCI-DSS Compliance",
-    description:
-      "Full PCI-DSS compliance for payment authentication. Tokenization and encryption to protect cardholder data.",
-  },
-  {
-    icon: Lock,
-    title: "Data Encryption",
-    description:
-      "AES-256 encryption at rest and TLS 1.3 in transit. Customer-managed encryption keys available for on-premise deployments.",
-  },
-  {
-    icon: Users2,
-    title: "GDPR Ready",
-    description:
-      "Customer data handling compliant with GDPR. Right to erasure, data portability, and consent management built-in.",
-  },
-  {
-    icon: Key,
-    title: "Access Governance",
-    description:
-      "Role-based access control for retail staff, franchisees, and partners. Granular permissions for inventory, pricing, and customer data.",
-  },
-];
-
-const metrics = [
-  { value: "40%", label: "Reduced cart abandonment" },
-  { value: "< 15ms", label: "Authentication latency" },
-  { value: "99.99%", label: "System availability" },
-  { value: "60%", label: "Fraud reduction" },
-];
-
-const useCases = [
-  {
-    icon: Globe,
-    title: "Omnichannel Commerce",
-    description:
-      "Unified customer identity across web, mobile, and physical stores. Consistent personalization and loyalty tracking.",
-  },
-  {
-    icon: Tag,
-    title: "Staff Access Control",
-    description:
-      "Manage employee, contractor, and franchisee credentials with role-based access to inventory, pricing, and reporting systems.",
-  },
-  {
-    icon: Wallet,
-    title: "Digital Wallets",
-    description:
-      "Secure integration with Apple Pay, Google Pay, and Samsung Pay for frictionless in-store and online payments.",
-  },
-  {
-    icon: Package,
-    title: "Supply Chain Partners",
-    description:
-      "B2B authentication for suppliers, distributors, and logistics partners with secure API access and audit trails.",
-  },
-];
-
-const integrations = [
-  "Shopify",
-  "Magento",
-  "Salesforce Commerce Cloud",
-  "Oracle CX",
-  "SAP Commerce",
-  "BigCommerce",
-  "WooCommerce",
-  "Square",
-];
-
-const deploymentOptions = [
-  {
-    icon: Server,
-    title: "On-Premise",
-    description:
-      "Deploy within your data center for complete control over customer data and authentication infrastructure.",
-  },
-  {
-    icon: Database,
-    title: "Private Cloud",
-    description:
-      "Dedicated infrastructure in your cloud environment (AWS, Azure, GCP) with full data sovereignty.",
-  },
-  {
-    icon: Globe,
-    title: "Hybrid",
-    description:
-      "Connect on-premise POS systems with cloud e-commerce platforms while maintaining consistent identity policies.",
-  },
-];
-
-const faqs = [
-  {
-    question: "How does Aether handle PCI-DSS compliance?",
-    answer:
-      "Aether Identity is designed to meet PCI-DSS requirements for payment authentication. We provide tokenization, encryption, and access controls that help you maintain compliance. Aether can also integrate with your existing payment gateway.",
-  },
-  {
-    question: "Can we integrate with our existing e-commerce platform?",
-    answer:
-      "Yes, Aether supports OAuth 2.0/OpenID Connect integrations with all major e-commerce platforms including Shopify, Magento, Salesforce Commerce Cloud, and custom implementations via our API.",
-  },
-  {
-    question: "How does Aether support omnichannel retail?",
-    answer:
-      "Aether provides a unified customer identity that works across web, mobile, and physical stores. Customers can authenticate once and enjoy seamless experiences across all channels with consistent loyalty tracking and personalization.",
-  },
-  {
-    question: "Can we use our existing loyalty program with Aether?",
-    answer:
-      "Yes, Aether integrates with existing loyalty programs via API. We can federate loyalty identities, link customer accounts, and synchronize preferences across channels.",
-  },
-  {
-    question: "What fraud prevention features are included?",
-    answer:
-      "Aether includes device fingerprinting, behavioral analysis, risk-based authentication, and real-time threat detection. You can configure adaptive policies based on transaction risk, geography, and user behavior.",
-  },
-];
-
-const resources = [
-  {
-    icon: FileText,
-    title: "Whitepaper",
-    description: "Retail Identity Management Guide",
-  },
-  {
-    icon: ShoppingCart,
-    title: "E-Book",
-    description: "Omnichannel Commerce Security",
-  },
-  {
-    icon: Calendar,
-    title: "Webinar",
-    description: "PCI-DSS Compliance for Retail",
-  },
-  {
-    icon: BarChart3,
-    title: "Case Study",
-    description: "Global Retailer Migration Success",
-  },
-];
-
 export default async function RetailPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Retail" });
+
+  const features = [
+    {
+      icon: ShoppingCart,
+      title: t("features.ecommerce.title"),
+      description: t("features.ecommerce.description"),
+    },
+    {
+      icon: CreditCard,
+      title: t("features.payment.title"),
+      description: t("features.payment.description"),
+    },
+    {
+      icon: Store,
+      title: t("features.pos.title"),
+      description: t("features.pos.description"),
+    },
+    {
+      icon: Users,
+      title: t("features.loyalty.title"),
+      description: t("features.loyalty.description"),
+    },
+    {
+      icon: Smartphone,
+      title: t("features.mobile.title"),
+      description: t("features.mobile.description"),
+    },
+    {
+      icon: TrendingUp,
+      title: t("features.fraud.title"),
+      description: t("features.fraud.description"),
+    },
+  ];
+
+  const complianceFeatures = [
+    {
+      icon: Shield,
+      title: t("compliance.pci.title"),
+      description: t("compliance.pci.description"),
+    },
+    {
+      icon: Lock,
+      title: t("compliance.encryption.title"),
+      description: t("compliance.encryption.description"),
+    },
+    {
+      icon: Users2,
+      title: t("compliance.gdpr.title"),
+      description: t("compliance.gdpr.description"),
+    },
+    {
+      icon: Key,
+      title: t("compliance.governance.title"),
+      description: t("compliance.governance.description"),
+    },
+  ];
+
+  const metrics = [
+    { value: "40%", label: t("metrics.cartAbandonment") },
+    { value: "< 15ms", label: t("metrics.latency") },
+    { value: "99.99%", label: t("metrics.availability") },
+    { value: "60%", label: t("metrics.fraudReduction") },
+  ];
+
+  const useCases = [
+    {
+      icon: Globe,
+      title: t("useCases.omnichannel.title"),
+      description: t("useCases.omnichannel.description"),
+    },
+    {
+      icon: Tag,
+      title: t("useCases.staff.title"),
+      description: t("useCases.staff.description"),
+    },
+    {
+      icon: Wallet,
+      title: t("useCases.wallets.title"),
+      description: t("useCases.wallets.description"),
+    },
+    {
+      icon: Package,
+      title: t("useCases.supply.title"),
+      description: t("useCases.supply.description"),
+    },
+  ];
+
+  const integrations = [
+    "Shopify",
+    "Magento",
+    "Salesforce Commerce Cloud",
+    "Oracle CX",
+    "SAP Commerce",
+    "BigCommerce",
+    "WooCommerce",
+    "Square",
+  ];
+
+  const deploymentOptions = [
+    {
+      icon: Server,
+      title: t("deployment.onPremise"),
+      description:
+        "Deploy within your data center for complete control over customer data and authentication infrastructure.",
+    },
+    {
+      icon: Database,
+      title: t("deployment.private"),
+      description:
+        "Dedicated infrastructure in your cloud environment (AWS, Azure, GCP) with full data sovereignty.",
+    },
+    {
+      icon: Globe,
+      title: t("deployment.hybrid"),
+      description:
+        "Connect on-premise POS systems with cloud e-commerce platforms while maintaining consistent identity policies.",
+    },
+  ];
+
+  const faqs = [
+    {
+      question: t("faq.pci.title"),
+      answer: t("faq.pci.answer"),
+    },
+    {
+      question: t("faq.ecommerce.title"),
+      answer: t("faq.ecommerce.answer"),
+    },
+    {
+      question: t("faq.omnichannel.title"),
+      answer: t("faq.omnichannel.answer"),
+    },
+    {
+      question: t("faq.loyalty.title"),
+      answer: t("faq.loyalty.answer"),
+    },
+    {
+      question: t("faq.fraud.title"),
+      answer: t("faq.fraud.answer"),
+    },
+  ];
+
+  const resources = [
+    {
+      icon: FileText,
+      title: t("resources.whitepaper"),
+      description: t("resources.whitepaperDesc"),
+    },
+    {
+      icon: ShoppingCart,
+      title: t("resources.ebook"),
+      description: t("resources.ebookDesc"),
+    },
+    {
+      icon: Calendar,
+      title: t("resources.webinar"),
+      description: t("resources.webinarDesc"),
+    },
+    {
+      icon: BarChart3,
+      title: t("resources.caseStudy"),
+      description: t("resources.caseStudyDesc"),
+    },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -226,25 +209,24 @@ export default async function RetailPage({ params }: { params: Promise<{ locale:
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                Retail Solutions
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                Secure Identity for Modern Retail
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Protect customer accounts, secure payments, and deliver seamless omnichannel
-                experiences with enterprise-grade identity management built for retail.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
-                <Link href="/contact">
+                <Link href={`/${locale}/contact`}>
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    Request Demo
+                    {t("hero.ctaContact")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/docs">
+                <Link href={`/${locale}/docs`}>
                   <Button variant="outline" size="lg" className="gap-2 h-12 px-6 text-base">
-                    View Documentation
+                    {t("hero.ctaDocs")}
                   </Button>
                 </Link>
               </div>
@@ -273,11 +255,10 @@ export default async function RetailPage({ params }: { params: Promise<{ locale:
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Built for Retail Operations
+                {t("features.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Every feature designed to meet the unique security, customer experience, and
-                operational requirements of modern retail.
+                {t("features.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -289,7 +270,7 @@ export default async function RetailPage({ params }: { params: Promise<{ locale:
                     </div>
                     <h3 className="text-base font-semibold text-foreground">{feature.title}</h3>
                   </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed pl-13">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
@@ -303,10 +284,10 @@ export default async function RetailPage({ params }: { params: Promise<{ locale:
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Retail Compliance Built-In
+                {t("compliance.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Meet PCI-DSS, GDPR, and emerging retail data regulations with confidence.
+                {t("compliance.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -331,11 +312,10 @@ export default async function RetailPage({ params }: { params: Promise<{ locale:
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Comprehensive Use Cases
+                {t("useCases.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                From customer authentication to supply chain security, Aether secures every
-                touchpoint in the retail ecosystem.
+                {t("useCases.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -360,10 +340,10 @@ export default async function RetailPage({ params }: { params: Promise<{ locale:
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                E-Commerce Platform Integrations
+                {t("integrations.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Seamless integration with the retail platforms you already use.
+                {t("integrations.description")}
               </p>
             </div>
             <div className="flex flex-wrap justify-center items-center gap-4">
@@ -377,7 +357,7 @@ export default async function RetailPage({ params }: { params: Promise<{ locale:
               ))}
             </div>
             <p className="mt-8 text-center text-sm text-muted-foreground">
-              Don&apos;t see your platform? Contact us for custom integration support.
+              {t("integrations.notFound")}
             </p>
           </div>
         </section>
@@ -387,11 +367,10 @@ export default async function RetailPage({ params }: { params: Promise<{ locale:
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Deploy According to Your Policy
+                {t("deployment.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Whether you require complete on-premise control or cloud scalability, Aether adapts
-                to your infrastructure and data residency requirements.
+                {t("deployment.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
@@ -417,71 +396,64 @@ export default async function RetailPage({ params }: { params: Promise<{ locale:
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                  Enterprise Security for Retail Data
+                  {t("security.title")}
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                  Protect customer information and payment data with security controls designed
-                  specifically for retail environments.
+                  {t("security.description")}
                 </p>
                 <div className="mt-8 grid grid-cols-2 gap-4">
                   <div className="p-4 rounded-lg bg-muted/50 border border-border">
                     <Shield className="h-6 w-6 text-foreground mb-2" />
                     <div className="text-lg font-semibold text-foreground">AES-256</div>
-                    <div className="text-sm text-muted-foreground">Encryption at rest</div>
+                    <div className="text-sm text-muted-foreground">
+                      {t("security.encryptionRest")}
+                    </div>
                   </div>
                   <div className="p-4 rounded-lg bg-muted/50 border border-border">
                     <Lock className="h-6 w-6 text-foreground mb-2" />
                     <div className="text-lg font-semibold text-foreground">TLS 1.3</div>
-                    <div className="text-sm text-muted-foreground">Encryption in transit</div>
+                    <div className="text-sm text-muted-foreground">
+                      {t("security.encryptionTransit")}
+                    </div>
                   </div>
                   <div className="p-4 rounded-lg bg-muted/50 border border-border">
                     <Fingerprint className="h-6 w-6 text-foreground mb-2" />
                     <div className="text-lg font-semibold text-foreground">WebAuthn</div>
-                    <div className="text-sm text-muted-foreground">Biometric support</div>
+                    <div className="text-sm text-muted-foreground">{t("security.biometric")}</div>
                   </div>
                   <div className="p-4 rounded-lg bg-muted/50 border border-border">
                     <QrCode className="h-6 w-6 text-foreground mb-2" />
                     <div className="text-lg font-semibold text-foreground">Tokenization</div>
-                    <div className="text-sm text-muted-foreground">Payment tokens</div>
+                    <div className="text-sm text-muted-foreground">
+                      {t("security.tokenization")}
+                    </div>
                   </div>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="flex items-center gap-3 p-4 rounded-lg border border-border bg-card">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-sm text-foreground">
-                    OAuth 2.0 / OpenID Connect support
-                  </span>
+                  <span className="text-sm text-foreground">{t("security.oauth")}</span>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-lg border border-border bg-card">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-sm text-foreground">
-                    Social login (Google, Apple, Facebook)
-                  </span>
+                  <span className="text-sm text-foreground">{t("security.social")}</span>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-lg border border-border bg-card">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-sm text-foreground">
-                    Device fingerprinting & risk assessment
-                  </span>
+                  <span className="text-sm text-foreground">{t("security.device")}</span>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-lg border border-border bg-card">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-sm text-foreground">
-                    Multi-factor authentication (TOTP, SMS, email)
-                  </span>
+                  <span className="text-sm text-foreground">{t("security.mfa")}</span>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-lg border border-border bg-card">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-sm text-foreground">
-                    Real-time fraud detection & alerting
-                  </span>
+                  <span className="text-sm text-foreground">{t("security.fraud")}</span>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-lg border border-border bg-card">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-sm text-foreground">
-                    Session management across channels
-                  </span>
+                  <span className="text-sm text-foreground">{t("security.session")}</span>
                 </div>
               </div>
             </div>
@@ -493,10 +465,10 @@ export default async function RetailPage({ params }: { params: Promise<{ locale:
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Frequently Asked Questions
+                {t("faq.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Common questions about retail identity management.
+                {t("faq.description")}
               </p>
             </div>
             <FaqAccordion faqs={faqs} />
@@ -507,9 +479,11 @@ export default async function RetailPage({ params }: { params: Promise<{ locale:
         <section className="py-20 lg:py-28 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Resources</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("resources.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Explore guides, compliance documentation, and case studies for retail identity.
+                {t("resources.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -534,22 +508,19 @@ export default async function RetailPage({ params }: { params: Promise<{ locale:
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Secure Your Retail Identity Today
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Join retailers that trust Aether Identity to protect customer data and deliver
-                seamless shopping experiences.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/contact">
+                <Link href={`/${locale}/contact`}>
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                    Request a Demo
+                    {t("cta.contact")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/docs">
+                <Link href={`/${locale}/docs`}>
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    View Documentation
+                    {t("cta.docs")}
                   </Button>
                 </Link>
               </div>
