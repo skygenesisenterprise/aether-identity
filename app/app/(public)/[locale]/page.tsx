@@ -165,8 +165,6 @@ const complianceStandards = [
   "FedRAMP Ready",
 ];
 
-const trustedBy = ["Acme Corp", "TechFlow", "SecureBank", "HealthPlus", "GlobalSys", "DataVault"];
-
 const comparison = [
   { feature: "Self-hosted", aether: true, keycloak: true, auth0: false, okta: false },
   { feature: "OAuth 2.0 / OIDC", aether: true, keycloak: true, auth0: true, okta: true },
@@ -328,24 +326,6 @@ export default async function PublicPage({ params }: { params: Promise<{ locale:
                     {metric.value}
                   </div>
                   <div className="mt-1 text-sm text-muted-foreground">{metric.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Trusted By Section */}
-        <section className="py-16 border-b border-border">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                Trusted by industry leaders
-              </p>
-            </div>
-            <div className="flex flex-wrap justify-center items-center gap-8 lg:gap-16">
-              {trustedBy.map((company) => (
-                <div key={company} className="text-xl font-semibold text-muted-foreground/60">
-                  {company}
                 </div>
               ))}
             </div>

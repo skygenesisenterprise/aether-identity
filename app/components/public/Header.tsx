@@ -64,18 +64,18 @@ const developersMenu: MegaMenu = {
     {
       title: "Resources",
       items: [
-        { name: "Documentation", href: "/docs", description: "Guides and API references", icon: <BookOpen className="h-5 w-5" /> },
-        { name: "Quickstarts", href: "/docs/quickstarts", description: "Get started in minutes", icon: <Zap className="h-5 w-5" /> },
-        { name: "API Reference", href: "/docs/api", description: "Complete API documentation", icon: <Code className="h-5 w-5" /> },
-        { name: "SDKs & Libraries", href: "/docs/sdks", description: "Official client libraries", icon: <Layers className="h-5 w-5" /> },
+        { name: "Documentation", href: "/developers", description: "Guides and API references", icon: <BookOpen className="h-5 w-5" /> },
+        { name: "Quickstarts", href: "/developers/quickstarts", description: "Get started in minutes", icon: <Zap className="h-5 w-5" /> },
+        { name: "API Reference", href: "/developers/api", description: "Complete API documentation", icon: <Code className="h-5 w-5" /> },
+        { name: "SDKs & Libraries", href: "/developers/sdks", description: "Official client libraries", icon: <Layers className="h-5 w-5" /> },
       ],
     },
     {
       title: "Tools",
       items: [
-        { name: "CLI", href: "/docs/cli", description: "Command-line interface", icon: <FileText className="h-5 w-5" /> },
-        { name: "Postman Collections", href: "/docs/postman", description: "API testing collections", icon: <Database className="h-5 w-5" /> },
-        { name: "Extensions", href: "/docs/extensions", description: "Extend functionality", icon: <Settings className="h-5 w-5" /> },
+        { name: "CLI", href: "/developers/cli", description: "Command-line interface", icon: <FileText className="h-5 w-5" /> },
+        { name: "Postman Collections", href: "/developers/postman", description: "API testing collections", icon: <Database className="h-5 w-5" /> },
+        { name: "Extensions", href: "/developers/extensions", description: "Extend functionality", icon: <Settings className="h-5 w-5" /> },
         { name: "Community", href: "/community", description: "Join the discussion", icon: <Users className="h-5 w-5" /> },
       ],
     },

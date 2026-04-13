@@ -29,8 +29,8 @@ function isValidLocale(locale: string): locale is Locale {
 }
 
 const AUTH_PATHS = ["/login", "/register"];
-const PROTECTED_PATHS = ["/dashboard", "/user"];
-const NO_LOCALE_PATHS = ["/pgp", "/discord", "/dashboard", "/user"];
+const PROTECTED_PATHS = ["/dashboard"];
+const NO_LOCALE_PATHS = ["/pgp", "/discord", "/dashboard", "/docs"];
 
 function isValidJWT(token: string | undefined): boolean {
   if (!token) return false;

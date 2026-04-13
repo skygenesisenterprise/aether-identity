@@ -1,18 +1,15 @@
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { DocsSidebar } from "@/components/docs/sidebar";
 import { DocsHeader } from "@/components/docs/header";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DocsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ProtectedRoute>
-      <SidebarProvider>
-        <DocsSidebar />
-        <SidebarInset>
-          <DocsHeader />
-          <main className="flex-1 overflow-auto">{children}</main>
-        </SidebarInset>
-      </SidebarProvider>
-    </ProtectedRoute>
+    <SidebarProvider>
+      <DocsSidebar />
+      <SidebarInset className="flex flex-col h-screen overflow-hidden">
+        <DocsHeader className="sticky top-0 z-50 flex-none" />
+        <main className="flex-1 overflow-auto">{children}</main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
