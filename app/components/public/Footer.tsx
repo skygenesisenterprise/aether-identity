@@ -191,10 +191,10 @@ export async function Footer({ locale: initialLocale }: FooterProps) {
       title: t("company"),
       links: [
         { name: t("about"), href: `/${locale}/company/about` },
-        { name: t("careers"), href: `/${locale}/company/careers` },
+        { name: t("careers"), href: "https://jobs.skygenesisenterprise.com" },
         { name: t("press"), href: `/${locale}/company/press` },
         { name: t("partners"), href: `/${locale}/company/partners` },
-        { name: t("contact"), href: `/${locale}/contact` },
+        { name: t("contact"), href: `/${locale}/company/contact` },
       ],
     },
   };
@@ -294,7 +294,7 @@ export async function Footer({ locale: initialLocale }: FooterProps) {
             </p>
             <p className="text-xs text-footer-muted">
               <Link
-                href="/pgp"
+                href={`${prefix}/pgp`}
                 className="hover:text-footer-link-hover transition-colors duration-150"
               >
                 {t("verifyKey")}

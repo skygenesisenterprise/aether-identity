@@ -368,7 +368,7 @@ if 'read:documents' in permissions:
                       {t("comparison.feature")}
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-semibold text-foreground">
-                      Aether
+                      Identity
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-medium text-muted-foreground">
                       Keycloak
