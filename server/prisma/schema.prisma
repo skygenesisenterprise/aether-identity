@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-go"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -42,6 +42,7 @@ model User {
   externalAccounts ExternalAccount[]
   ownedOrganizations Organization[] @relation("OrganizationOwner")
   devices       Device[]
+  userDomains   UserDomain[]
 
   @@map("users")
 }
@@ -113,6 +114,7 @@ model Role {
 
   userRoles       UserRole[]
   rolePermissions RolePermission[]
+  memberships    Membership[]
 
   @@map("roles")
 }
@@ -174,9 +176,9 @@ model Organization {
   updatedAt  DateTime  @default(now()) @map("updated_at")
   deletedAt   DateTime? @map("deleted_at")
 
-  owner      User          @relation(fields: [ownerId], references: [id])
+  owner      User          @relation("OrganizationOwner", fields: [ownerId], references: [id])
   memberships Membership[]
-  domains   Domain[]
+  domains   Domain[]      @relation("DomainOrganization")
 
   @@map("organizations")
 }
@@ -217,8 +219,8 @@ model Domain {
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @default(now()) @map("updated_at")
 
-  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
-  userDomains UserDomain[]
+  organization Organization? @relation("DomainOrganization", fields: [organizationId], references: [id], onDelete: SetNull)
+  userDomains UserDomain[] @relation("DomainUsers")
 
   @@map("domains")
 }
@@ -229,7 +231,7 @@ model UserDomain {
   domainId String @db.Uuid @map("domain_id")
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  domain Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  domain Domain @relation("DomainUsers", fields: [domainId], references: [id], onDelete: Cascade)
 
   @@unique([userId, domainId])
   @@map("user_domains")

@@ -9,6 +9,7 @@ DB_HOST="${DB_HOST:-db}"
 DB_PORT="${DB_PORT:-5432}"
 DB_USER="${DB_USER:-aether}"
 DB_NAME="${DB_NAME:-etheria_account}"
+DB_PASSWORD="${DB_PASSWORD:-password}"
 
 wait_for_db() {
     echo "[1/4] Waiting for PostgreSQL to be ready..."
@@ -36,6 +37,11 @@ test_connection() {
 }
 
 setup_prisma() {
+    if [ "$SKIP_PRISMA_SETUP" = "true" ]; then
+        echo "      Skipping Prisma setup (SKIP_PRISMA_SETUP=true)"
+        return 0
+    fi
+    
     echo "[3/4] Setting up Prisma..."
     
     cd /app/server/prisma
@@ -47,10 +53,22 @@ setup_prisma() {
     DATABASE_URL="postgresql://aether:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}" \
         PGPASSWORD="$DB_PASSWORD" npx prisma generate
     
-    echo "      Pushing schema to database..."
+    echo "      Checking for existing data..."
+    set +e
+    
+    # Check if users table exists and has data
+    USER_COUNT=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM users;" 2>/dev/null || echo "0")
+    
+    if [ "$USER_COUNT" -gt "0" ]; then
+        echo "      Found $USER_COUNT user(s) - PRESERVING existing data!"
+        echo "      Skipping Prisma schema changes..."
+        set -e
+        return 0
+    fi
+    
+    echo "      No existing data - pushing schema..."
     sleep 2
     
-    set +e
     PGPASSWORD="$DB_PASSWORD" DATABASE_URL="postgresql://aether:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}" \
         npx prisma db push --accept-data-loss --skip-generate
     PRISMA_EXIT=$?
@@ -60,7 +78,6 @@ setup_prisma() {
         echo "      Schema pushed successfully!"
     else
         echo "      Warning: Schema push failed, tables may not exist yet"
-        echo "      The application will create them on first connection if using Prisma"
     fi
     
     echo "      Prisma setup complete!"

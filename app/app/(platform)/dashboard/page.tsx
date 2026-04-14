@@ -174,15 +174,35 @@ function getEventIcon(type: string) {
 function getEventBadge(type: string) {
   switch (type) {
     case "success_login":
-      return <Badge variant="outline" className="text-xs font-normal">Success</Badge>;
+      return (
+        <Badge variant="outline" className="text-xs font-normal">
+          Success
+        </Badge>
+      );
     case "success_signup":
-      return <Badge className="bg-green-100 text-green-700 hover:bg-green-100 text-xs font-normal">New User</Badge>;
+      return (
+        <Badge className="bg-green-100 text-green-700 hover:bg-green-100 text-xs font-normal">
+          New User
+        </Badge>
+      );
     case "failed_login":
-      return <Badge variant="destructive" className="text-xs font-normal">Failed</Badge>;
+      return (
+        <Badge variant="destructive" className="text-xs font-normal">
+          Failed
+        </Badge>
+      );
     case "mfa_challenge":
-      return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 text-xs font-normal">MFA</Badge>;
+      return (
+        <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 text-xs font-normal">
+          MFA
+        </Badge>
+      );
     default:
-      return <Badge variant="secondary" className="text-xs font-normal">Event</Badge>;
+      return (
+        <Badge variant="secondary" className="text-xs font-normal">
+          Event
+        </Badge>
+      );
   }
 }
 
@@ -551,7 +571,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <LogIn className="h-3 w-3" />
-                    <span>{app.logins.toLocaleString()} logins today</span>
+                    <span>{app.logins.toLocaleString("en-US")} logins today</span>
                   </div>
                 </div>
               ))}
