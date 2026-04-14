@@ -571,7 +571,7 @@
       "intellectualTitle": "Droits de Propriété Intellectuelle",
       "intellectualContent": "Le Service et tout le contenu, fonctionnalités et fonctionnalité sont la propriété d'Aether Identity et sont protégés par les lois sur la propriété intellectuelle, les marques de commerce et autres.\n\nVous ne pouvez pas copier, modifier, distribuer, vendre ou louer toute partie du Service sans notre consentement écrit préalable. Le nom Aether Identity, le logo et toutes les marques associées sont la propriété de Sky Genesis Enterprise Inc.\n\nSous réserve de ces Conditions, nous vous accordons une licence limitée, non exclusive, non transférable pour utiliser le Service à des fins commerciales internes.",
       "limitationTitle": "Limitation de Responsabilité",
-      "limitationContent": "DANS LA MESURE MAXIMALE PERMISE PAR LA LOI, AETHER IDENTITY NE SERA PAS RESPONSABLE DE TOUS DOMMAGES INDIRECTS, ACCESSOIRES, SPÉCIAUX, CONSÉCUTIFS OU PUNITIFS, Y COMPRIS MAIS SANS S'Y LIMITER LA PERTE DE PROFITS, DE DONNÉES OU D'OPPORTUNITÉS COMMERCIALES, QUEL QUE SOIT LE CAS OU NOUS AVONS ÉTÉ INFORMÉS DE LA POSSIBILITÉ DE TELS DOMMAGES.\n\nNOTRE RESPONSABILITÉ TOTALE POUR TOUTE RÉCLAMATION DÉCOULANT DE OU LIÉE À CES CONDITIONS OU AU SERVICE NE DÉPASSERA PAS LE MONTANT PAYÉ PAR VOUS POUR LE SERVICE DANS LES DOUZE (12) MOIS PRÉCÉDANT LA RÉCLAMATION.",
+      "limitationContent": "DANS LA MESURE MAXIMALE PERMISE PAR LA LOI, AETHER IDENTITY NE SERA PAS RESPONSABLE DE TOUS DOMMAGES INDIRECTS, ACCESSOIRES, SPÉCIAUX, CONSÉCUTIFS OU PUNITIFS, Y COMPRIS MAIS SANS S'Y LIMITER LA PERTE DE PROFITS, DE DONNÉES OU D'OPPORTUNITÉS COMMERCIALES, QUEL QUE SOIT LE CAS OU NOUS AVONS ÉTÉ INFORMÉS DE LA POSSIBILITÉ DE TELS DOMMAGES.\n\nNOTRE RESPONSABILITÉ TOTALE POUR TOUTE RÉCLAMATION DÉCOULANT DE OU LIÉE À CES CONDITIONS OU AU SERVICE NE DÉPASSERA PAS LE MONTANT PAYÉ PAR VOUS POUR LE SERVICE DANS LES DOUZE (12) MOIS PRÉCÉDENT LA RÉCLAMATION.",
       "indemnificationTitle": "Indemnisation",
       "indemnificationContent": "Vous acceptez d'indemniser, de défendre et de dégager Aether Identity et ses dirigeants, administrateurs, employés et agents de et contre toute réclamation, responsabilité, dommages, pertes ou dépenses découlant de:\n\nVotre utilisation du Service\nVotre violation de ces Conditions\nVotre violation de tout droit tiers\nVotre contenu ou données téléchargées sur le Service",
       "terminationTitle": "Résiliation",
@@ -585,6 +585,55 @@
       "questionsTitle": "Questions Sur Ces Conditions?",
       "questionsDescription": "Si vous avez des questions ou des préoccupations concernant nos Conditions d'Utilisation, veuillez contacter notre équipe juridique.",
       "emailLegal": "Envoyer un Email à l'Équipe Juridique"
+    },
+    "cookies": {
+      "badge": "Politique des Cookies",
+      "heroTitle": "Politique des Cookies",
+      "heroDescription": "Découvrez comment Aether Identity utilise les cookies et technologies similaires pour améliorer votre expérience et sécuriser notre plateforme.",
+      "viewPrivacy": "Voir la Politique de Confidentialité",
+      "viewTerms": "Voir les Conditions d'Utilisation",
+      "categoriesTitle": "Catégories de Cookies",
+      "typesTitle": "Types de Cookies Que Nous Utilisons",
+      "categoriesDescription": "Nous utilisons différents types de cookies pour optimiser votre expérience sur notre plateforme.",
+      "essentialTitle": "Cookies Essentiels",
+      "essentialDesc": "Nécessaires au fonctionnement du site. Ils ne peuvent pas être désactivés.",
+      "functionalTitle": "Cookies Fonctionnels",
+      "functionalDesc": "Permettent des fonctionnalités personnalisées et mémorisent vos préférences.",
+      "analyticsTitle": "Cookies Analytiques",
+      "analyticsDesc": "Nous aident à comprendre comment les visiteurs interagissent avec notre site.",
+      "marketingTitle": "Cookies Marketing",
+      "marketingDesc": "Utilisés pour vous afficher des publicités pertinentes.",
+      "required": "Requis",
+      "optional": "Optionnel",
+      "controlTitle": "Gérer Vos Cookies",
+      "controlDescription": "Vous avez le contrôle sur la façon dont nous utilisons les cookies.",
+      "controlBrowserTitle": "Paramètres du Navigateur",
+      "controlBrowserDesc": "La plupart des navigateurs vous permettent de contrôler les cookies via leurs paramètres.",
+      "controlPreferencesTitle": "Préférences des Cookies",
+      "controlPreferencesDesc": "Vous pouvez mettre à jour vos préférences à tout moment.",
+      "controlRetentionTitle": "Conservation des Données",
+      "controlRetentionDesc": "Nous conservons les données des cookies uniquement le temps nécessaire.",
+      "lastUpdated": "Dernière mise à jour",
+      "lastUpdatedDate": "15 Mars 2026",
+      "introTitle": "Introduction",
+      "introContent": "Cette Politique de Cookies explique comment Aether Identity (\"nous\", \"notre\" ou \"nos\") utilise les cookies et technologies de suivi similaires lorsque vous visitez notre site web ou utilisez notre plateforme.\n\nEn utilisant notre Service, vous consentez à l'utilisation des cookies comme décrit dans cette politique.",
+      "whatAreTitle": "Que Sont les Cookies?",
+      "whatAreContent": "Les cookies sont de petits fichiers texte stockés sur votre appareil lorsque vous visitez des sites web. Ils aident à mémoriser vos préférences, analyser le trafic du site et fournir des expériences personnalisées.\n\nNous utilisons à la fois des cookies de session (qui expirent lorsque vous fermez votre navigateur) et des cookies persistants (qui restent sur votre appareil pour une période définie).",
+      "howWeUseTitle": "Comment Nous Utilisons les Cookies",
+      "howWeUseContent": "Nous utilisons des cookies à plusieurs fins:\n\nAuthentification: Pour vous garder connecté et sécuriser votre session\nPréférences: Pour mémoriser votre langue et les paramètres d'affichage\nAnalytiques: Pour comprendre comment les visiteurs naviguent et utilisent notre site\nSécurité: Pour détecter et prévenir les activités frauduleuses\nMarketing: Pour diffuser du contenu et des publicités pertinents",
+      "cookieTypesTitle": "Types de Cookies Que Nous Utilisons",
+      "categoriesContent": "Cookies Essentiels: Nécessaires au fonctionnement du site. Ils permettent des fonctionnalités de base comme la navigation et l'accès aux zones sécurisées. Le site ne peut pas fonctionner sans ces cookies.\n\nCookies Fonctionnels: Permettent des fonctionnalités améliorées et personnalisées, comme le support de chat en direct et le mémorisation de vos préférences.\n\nCookies Analytiques: Ils nous aident à comprendre comment les visiteurs interagissent avec notre site en collectant et rapportant des informations de manière anonyme.\n\nCookies Marketing: Utilisés pour suivre les visiteurs à travers les sites web pour afficher des publicités pertinentes.",
+      "thirdPartyTitle": "Cookies Tiers",
+      "thirdPartyContent": "Nous pouvons utiliser des services tiers qui définissent également des cookies sur votre appareil. Ceux-ci incluent:\n\nFournisseurs analytiques (ex: Google Analytics) pour nous aider à comprendre l'utilisation du site\nFournisseurs de sécurité pour détecter et prévenir les menaces\nPlateformes marketing pour diffuser du contenu pertinent\n\nNous ne contrôlons pas ces cookies tiers. Veuillez consulter les politiques de confidentialité des tiers respectifs pour plus d'informations.",
+      "preferencesTitle": "Gérer Vos Préférences",
+      "controlContent": "Vous avez le droit de décider si vous acceptez ou rejetez les cookies. Vous pouvez gérer vos préférences de cookies de la manière suivante:\n\nParamètres du Navigateur: La plupart des navigateurs vous permettent de contrôler les cookies via leurs paramètres. Vous pouvez configurer votre navigateur pour bloquer ou vous alerter lorsque des cookies sont installés.\n\nBandeau des Cookies: Lorsque vous visitez notre site pour la première fois, vous pouvez accepter ou rejeter les cookies non essentiels via notre bandeau.\n\nLiens d'Opt-Out: Pour les cookies analytiques et marketing, vous pouvez utiliser les outils d'opt-out industriels comme le Digital Advertising Alliance ou l'opt-out Google Analytics.\n\nVeuillez noter que le blocage des cookies essentiels peut affecter la fonctionnalité de notre site.",
+      "updatesTitle": "Modifications de Cette Politique",
+      "updatesContent": "Nous pouvons mettre à jour cette Politique des Cookies de temps à autre. Nous vous notifierons de tout changement important en affichant la nouvelle politique sur cette page et en mettant à jour la date de \"Dernière mise à jour\".\n\nVotre utilisation continue de notre Service après tout changement constitue l'acceptation des nouveaux termes.",
+      "contactTitle": "Contactez-Nous",
+      "contactContent": "Si vous avez des questions sur notre Politique des Cookies, veuillez nous contacter à:\n\nEmail: privacy@skygenesisenterprise.com\nAdresse: 548 Market St, PMB 12345, San Francisco, CA 94104",
+      "questionsTitle": "Questions Sur les Cookies?",
+      "questionsDescription": "Si vous avez des questions ou des préoccupations concernant nos pratiques en matière de cookies, veuillez contacter notre équipe confidentialité.",
+      "emailPrivacy": "Envoyer un Email à l'Équipe Confidentialité"
     },
     "pgp": {
       "badge": "Clé PGP",
@@ -2095,8 +2144,8 @@
       "title": "Questions Fréquentes",
       "description": "Questions courantes sur les solutions d'identité B2B d'Aether.",
       "multitenant": {
-        "title": "Comment Aether gère-t-il les scénarios B2B multi-tenant?",
-        "answer": "Aether fournit des namespaces dédiés par organisation avec configurations isolées, branding et répertoires utilisateurs. L'accès inter-organisation est contrôlé par des accords de fédération explicites."
+        "title": "Comment Aether Identity gère-t-il les scénarios B2B multi-tenant?",
+        "answer": "Aether Identity fournit des namespaces dédiés par organisation avec configurations isolées, branding et répertoires utilisateurs. L'accès inter-organisation est contrôlé par des accords de fédération explicites."
       },
       "migration": {
         "title": "Puis-je migrer depuis Auth0 ou Okta B2B?",
@@ -2104,15 +2153,15 @@
       },
       "sla": {
         "title": "Que dir des garanties SLA pour l'identité B2B?",
-        "answer": "Aether fournit un SLA 99.99% pour les déploiements entreprise avec support dédié et clauses de compensation."
+        "answer": "Aether Identity fournit un SLA 99.99% pour les déploiements entreprise avec support dédié et clauses de compensation."
       },
       "freeTier": {
         "title": "Y a-t-il un tarif gratuit pour B2B?",
-        "answer": "Oui, Aether Community Edition supporte les scénarios B2B basiques. Pour les fonctionnalités avancées comme la délégation et la fédération partenaire, contactez notre équipe commerciale."
+        "answer": "Oui, Aether Identity Community Edition supporte les scénarios B2B basiques. Pour les fonctionnalités avancées comme la délégation et la fédération partenaire, contactez notre équipe commerciale."
       },
       "gdpr": {
         "title": "Comment gérez-vous les exigences réglementaires comme GDPR?",
-        "answer": "Aether inclut la gestion du consentement intégrée, export de données, workflows de suppression et accords de traitement pour la conformité GDPR."
+        "answer": "Aether Identity inclut la gestion du consentement intégrée, export de données, workflows de suppression et accords de traitement pour la conformité GDPR."
       }
     },
     "resources": {
@@ -2777,7 +2826,7 @@
   },
   "Retail": {
     "hero": {
-      "badge": "Solutions de Retail",
+      "badge": "Solutions de Commerce",
       "title": "Identité Sécurisée pour le Retail Moderne",
       "description": "Protégez les comptes clients, sécurisez les paiements et offrez des expériences omnicanal fluides avec une gestion d'identité de qualité entreprise conçue pour le retail.",
       "ctaContact": "Demander une Démo",
@@ -2887,24 +2936,24 @@
       "title": "Questions Fréquentes",
       "description": "Questions courantes sur la gestion d'identité dans le retail.",
       "pci": {
-        "title": "Comment Aether gère-t-il la conformité PCI-DSS?",
+        "title": "Comment Aether Identity gère-t-il la conformité PCI-DSS?",
         "answer": "Aether Identity est conçu pour répondre aux exigences PCI-DSS pour l'authentification des paiements. Nous fournissons la tokenisation, le chiffrement et les contrôles d'accès qui vous aident à maintenir la conformité. Aether peut également s'intégrer à votre passerelle de paiement existante."
       },
       "ecommerce": {
         "title": "Pouvons-nous nous intégrer à notre plateforme e-commerce existante?",
-        "answer": "Oui, Aether supporte les intégrations OAuth 2.0/OpenID Connect avec toutes les majeures plateformes e-commerce incluant Shopify, Magento, Salesforce Commerce Cloud et les implémentations personnalisées via notre API."
+        "answer": "Oui, Aether Identity supporte les intégrations OAuth 2.0/OpenID Connect avec toutes les majeures plateformes e-commerce incluant Shopify, Magento, Salesforce Commerce Cloud et les implémentations personnalisées via notre API."
       },
       "omnichannel": {
-        "title": "Comment Aether supporte-t-il le retail omnicanal?",
-        "answer": "Aether fournit une identité client unifiée qui fonctionne sur le web, mobile et les magasins physiques. Les clients peuvent s'authentifier une fois et profiter d'expériences fluides sur tous les canaux avec un suivi de fidélité et une personnalisation cohérents."
+        "title": "Comment Aether Identity supporte-t-il le retail omnicanal?",
+        "answer": "Aether Identity fournit une identité client unifiée qui fonctionne sur le web, mobile et les magasins physiques. Les clients peuvent s'authentifier une fois et profiter d'expériences fluides sur tous les canaux avec un suivi de fidélité et une personnalisation cohérents."
       },
       "loyalty": {
         "title": "Pouvons-nous utiliser notre programme de fidélité existant avec Aether?",
-        "answer": "Oui, Aether s'intègre aux programmes de fidélité existants via API. Nous pouvons fédérer les identités de fidélité, lier les comptes clients et synchroniser les préférences sur les canaux."
+        "answer": "Oui, Aether Identity s'intègre aux programmes de fidélité existants via API. Nous pouvons fédérer les identités de fidélité, lier les comptes clients et synchroniser les préférences sur les canaux."
       },
       "fraud": {
         "title": "Quelles fonctionnalités de prévention de fraude sont incluses?",
-        "answer": "Aether inclut l'empreinte digitale de l'appareil, l'analyse comportementale, l'authentification basée sur les risques et la détection de menaces en temps réel. Vous pouvez configurer des politiques adaptatives basées sur le risque de transaction, la géographie et le comportement utilisateur."
+        "answer": "Aether Identity inclut l'empreinte digitale de l'appareil, l'analyse comportementale, l'authentification basée sur les risques et la détection de menaces en temps réel. Vous pouvez configurer des politiques adaptatives basées sur le risque de transaction, la géographie et le comportement utilisateur."
       }
     },
     "resources": {

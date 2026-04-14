@@ -313,7 +313,7 @@ export default async function GdprPage({ params }: { params: Promise<{ locale: s
                 {t("gdpr.questionsDescription")}
               </p>
               <div className="mt-8">
-                <a href="mailto:gdpr@aetheridentity.com">
+                <a href="mailto:gdpr@skygenesisenterprise.com">
                   <Button size="lg" className="gap-2">
                     <Mail className="h-4 w-4" />
                     {t("gdpr.emailDpo")}

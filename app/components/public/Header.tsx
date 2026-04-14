@@ -481,7 +481,7 @@ export async function Header({ locale: initialLocale }: HeaderProps) {
           <div className="flex items-center gap-2">
             <LanguageSwitcher locale={locale} />
 
-            <Link href={getLocaleHref("/login")} className="hidden sm:block">
+            <Link href="/login">
               <Button
                 variant="ghost"
                 size="sm"
@@ -490,7 +490,7 @@ export async function Header({ locale: initialLocale }: HeaderProps) {
                 {t("login")}
               </Button>
             </Link>
-            <Link href={getLocaleHref("/register")}>
+            <Link href="/register">
               <Button size="sm" className="h-9 px-4 font-medium">
                 {t("signUp")}
               </Button>

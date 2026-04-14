@@ -26,15 +26,15 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/etheriatimes.png",
+        url: "/enterprise.png",
         media: "(prefers-color-scheme: light)",
       },
       {
-        url: "/etheriatimes.png",
+        url: "/enterprise.png",
         media: "(prefers-color-scheme: dark)",
       },
       {
-        url: "/etheriatimes.png",
+        url: "/enterprise.png",
         type: "image/svg+xml",
       },
     ],
