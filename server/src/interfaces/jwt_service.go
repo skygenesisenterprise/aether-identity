@@ -7,7 +7,7 @@ import (
 
 // JWTService définit l'interface pour les opérations JWT
 type JWTService interface {
-	GenerateToken(user *model.User) (string, error)
+	GenerateToken(user *models.User) (string, error)
 	GenerateRefreshToken(userID uint) (string, error)
 	ValidateToken(tokenString string) (*jwt.Token, error)
 	ExtractClaims(tokenString string) (jwt.MapClaims, error)

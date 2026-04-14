@@ -12,7 +12,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/skygenesisenterprise/aether-identity/server/src/config"
-	"github.com/skygenesisenterprise/aether-identity/server/src/model"
+	"github.com/skygenesisenterprise/aether-identity/server/src/models"
 	"gorm.io/gorm"
 )
 
@@ -47,13 +47,13 @@ func GenerateCodeChallenge(codeVerifier string) (string, error) {
 }
 
 // CreateClient crée un nouveau client OAuth2
-func (s *OAuthService) CreateClient(client *model.OAuthClient) error {
+func (s *OAuthService) CreateClient(client *models.OAuthClient) error {
 	return s.DB.Create(client).Error
 }
 
 // GetClientByID récupère un client par son ID
-func (s *OAuthService) GetClientByID(clientID string) (*model.OAuthClient, error) {
-	var client model.OAuthClient
+func (s *OAuthService) GetClientByID(clientID string) (*models.OAuthClient, error) {
+	var client models.OAuthClient
 	err := s.DB.Where("client_id = ?", clientID).First(&client).Error
 	if err != nil {
 		return nil, err
@@ -62,8 +62,8 @@ func (s *OAuthService) GetClientByID(clientID string) (*model.OAuthClient, error
 }
 
 // ValidateClient valide un client OAuth2
-func (s *OAuthService) ValidateClient(clientID, clientSecret string) (*model.OAuthClient, error) {
-	var client model.OAuthClient
+func (s *OAuthService) ValidateClient(clientID, clientSecret string) (*models.OAuthClient, error) {
+	var client models.OAuthClient
 	err := s.DB.Where("client_id = ? AND client_secret = ?", clientID, clientSecret).First(&client).Error
 	if err != nil {
 		return nil, err
@@ -72,8 +72,8 @@ func (s *OAuthService) ValidateClient(clientID, clientSecret string) (*model.OAu
 }
 
 // CreateAuthorizationCode crée un code d'autorisation
-func (s *OAuthService) CreateAuthorizationCode(code, clientID string, userID string, redirectURI string, scopes []string) (*model.OAuthAuthorizationCode, error) {
-	authCode := &model.OAuthAuthorizationCode{
+func (s *OAuthService) CreateAuthorizationCode(code, clientID string, userID string, redirectURI string, scopes []string) (*models.OAuthAuthorizationCode, error) {
+	authCode := &models.OAuthAuthorizationCode{
 		Code:        code,
 		ClientID:    clientID,
 		UserID:      userID,
@@ -89,8 +89,8 @@ func (s *OAuthService) CreateAuthorizationCode(code, clientID string, userID str
 }
 
 // GetAuthorizationCodeByCode récupère un code d'autorisation par son code
-func (s *OAuthService) GetAuthorizationCodeByCode(code string) (*model.OAuthAuthorizationCode, error) {
-	var authCode model.OAuthAuthorizationCode
+func (s *OAuthService) GetAuthorizationCodeByCode(code string) (*models.OAuthAuthorizationCode, error) {
+	var authCode models.OAuthAuthorizationCode
 	err := s.DB.Where("code = ? AND expires_at > ?", code, time.Now()).First(&authCode).Error
 	if err != nil {
 		return nil, err
@@ -100,12 +100,12 @@ func (s *OAuthService) GetAuthorizationCodeByCode(code string) (*model.OAuthAuth
 
 // DeleteAuthorizationCode supprime un code d'autorisation
 func (s *OAuthService) DeleteAuthorizationCode(code string) error {
-	return s.DB.Where("code = ?", code).Delete(&model.OAuthAuthorizationCode{}).Error
+	return s.DB.Where("code = ?", code).Delete(&models.OAuthAuthorizationCode{}).Error
 }
 
 // CreateAccessToken crée un token d'accès
-func (s *OAuthService) CreateAccessToken(token, clientID string, userID string, scopes []string) (*model.OAuthAccessToken, error) {
-	accessToken := &model.OAuthAccessToken{
+func (s *OAuthService) CreateAccessToken(token, clientID string, userID string, scopes []string) (*models.OAuthAccessToken, error) {
+	accessToken := &models.OAuthAccessToken{
 		Token:     token,
 		ClientID:  clientID,
 		UserID:    userID,
@@ -120,8 +120,8 @@ func (s *OAuthService) CreateAccessToken(token, clientID string, userID string, 
 }
 
 // GetAccessTokenByToken récupère un token d'accès par son token
-func (s *OAuthService) GetAccessTokenByToken(token string) (*model.OAuthAccessToken, error) {
-	var accessToken model.OAuthAccessToken
+func (s *OAuthService) GetAccessTokenByToken(token string) (*models.OAuthAccessToken, error) {
+	var accessToken models.OAuthAccessToken
 	err := s.DB.Where("token = ? AND expires_at > ?", token, time.Now()).First(&accessToken).Error
 	if err != nil {
 		return nil, err
@@ -131,12 +131,12 @@ func (s *OAuthService) GetAccessTokenByToken(token string) (*model.OAuthAccessTo
 
 // RevokeAccessToken révoque un token d'accès
 func (s *OAuthService) RevokeAccessToken(token string) error {
-	return s.DB.Where("token = ?", token).Delete(&model.OAuthAccessToken{}).Error
+	return s.DB.Where("token = ?", token).Delete(&models.OAuthAccessToken{}).Error
 }
 
 // CreateRefreshToken crée un token de rafraîchissement
-func (s *OAuthService) CreateRefreshToken(token, clientID string, userID string) (*model.OAuthRefreshToken, error) {
-	refreshToken := &model.OAuthRefreshToken{
+func (s *OAuthService) CreateRefreshToken(token, clientID string, userID string) (*models.OAuthRefreshToken, error) {
+	refreshToken := &models.OAuthRefreshToken{
 		Token:     token,
 		ClientID:  clientID,
 		UserID:    userID,
@@ -150,8 +150,8 @@ func (s *OAuthService) CreateRefreshToken(token, clientID string, userID string)
 }
 
 // GetRefreshTokenByToken récupère un token de rafraîchissement par son token
-func (s *OAuthService) GetRefreshTokenByToken(token string) (*model.OAuthRefreshToken, error) {
-	var refreshToken model.OAuthRefreshToken
+func (s *OAuthService) GetRefreshTokenByToken(token string) (*models.OAuthRefreshToken, error) {
+	var refreshToken models.OAuthRefreshToken
 	err := s.DB.Where("token = ? AND expires_at > ?", token, time.Now()).First(&refreshToken).Error
 	if err != nil {
 		return nil, err
@@ -161,12 +161,12 @@ func (s *OAuthService) GetRefreshTokenByToken(token string) (*model.OAuthRefresh
 
 // RevokeRefreshToken révoque un token de rafraîchissement
 func (s *OAuthService) RevokeRefreshToken(token string) error {
-	return s.DB.Where("token = ?", token).Delete(&model.OAuthRefreshToken{}).Error
+	return s.DB.Where("token = ?", token).Delete(&models.OAuthRefreshToken{}).Error
 }
 
 // CreateConsent crée un consentement utilisateur
-func (s *OAuthService) CreateConsent(userID string, clientID string, scopes []string) (*model.OAuthConsent, error) {
-	consent := &model.OAuthConsent{
+func (s *OAuthService) CreateConsent(userID string, clientID string, scopes []string) (*models.OAuthConsent, error) {
+	consent := &models.OAuthConsent{
 		UserID:   userID,
 		ClientID: clientID,
 		Scopes:   scopes,
@@ -179,8 +179,8 @@ func (s *OAuthService) CreateConsent(userID string, clientID string, scopes []st
 }
 
 // GetConsentByUserAndClient récupère un consentement par utilisateur et client
-func (s *OAuthService) GetConsentByUserAndClient(userID string, clientID string) (*model.OAuthConsent, error) {
-	var consent model.OAuthConsent
+func (s *OAuthService) GetConsentByUserAndClient(userID string, clientID string) (*models.OAuthConsent, error) {
+	var consent models.OAuthConsent
 	err := s.DB.Where("user_id = ? AND client_id = ?", userID, clientID).First(&consent).Error
 	if err != nil {
 		return nil, err
@@ -217,7 +217,7 @@ func (s *OAuthService) ValidateScopes(requestedScopes, allowedScopes []string) (
 }
 
 // GenerateIDToken génère un ID token OpenID Connect
-func (s *OAuthService) GenerateIDToken(user *model.User, client *model.OAuthClient, scopes []string, nonce string) (string, error) {
+func (s *OAuthService) GenerateIDToken(user *models.User, client *models.OAuthClient, scopes []string, nonce string) (string, error) {
 	claims := jwt.MapClaims{
 		"sub":            user.ID,
 		"email":          user.Email,
@@ -238,7 +238,7 @@ func (s *OAuthService) GenerateIDToken(user *model.User, client *model.OAuthClie
 }
 
 // GenerateAccessToken génère un token d'accès OAuth2
-func (s *OAuthService) GenerateAccessToken(user *model.User, client *model.OAuthClient, scopes []string) (string, error) {
+func (s *OAuthService) GenerateAccessToken(user *models.User, client *models.OAuthClient, scopes []string) (string, error) {
 	claims := jwt.MapClaims{
 		"sub":            user.ID,
 		"email":          user.Email,

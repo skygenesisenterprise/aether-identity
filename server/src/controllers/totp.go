@@ -39,7 +39,7 @@ func GenerateTOTPSecret(c *gin.Context) {
 		return
 	}
 
-	totpResponse := model.TOTPResponse{
+	totpResponse := models.TOTPResponse{
 		Secret: secretString,
 		QRCode: code,
 		URL:    url,
@@ -58,7 +58,7 @@ func VerifyTOTPCode(c *gin.Context) {
 		return
 	}
 
-	var verifyRequest model.TOTPVerifyRequest
+	var verifyRequest models.TOTPVerifyRequest
 	if err := c.ShouldBindJSON(&verifyRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid request body",
@@ -122,7 +122,7 @@ func DisableTOTP(c *gin.Context) {
 
 // VerifyTOTPLogin vérifie un code TOTP lors de la connexion
 func VerifyTOTPLogin(c *gin.Context) {
-	var loginRequest model.TOTPLoginRequest
+	var loginRequest models.TOTPLoginRequest
 	if err := c.ShouldBindJSON(&loginRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid request body",
@@ -191,7 +191,7 @@ func VerifyTOTPLogin(c *gin.Context) {
 		Expires:  ExpiresRefresh,
 	})
 
-	c.JSON(http.StatusOK, model.JWTTokenResponse{
+	c.JSON(http.StatusOK, models.JWTTokenResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshTokenString,
 		ExpiresIn:    cfg.AccessTokenExp,
@@ -217,7 +217,7 @@ func GetTOTPStatus(c *gin.Context) {
 		return
 	}
 
-	statusResponse := model.TOTPStatusResponse{
+	statusResponse := models.TOTPStatusResponse{
 		Enabled: enabled,
 	}
 

@@ -4,10 +4,10 @@ import "github.com/skygenesisenterprise/aether-identity/server/src/models"
 
 // UserRepository définit l'interface pour les opérations sur les utilisateurs
 type UserRepository interface {
-	CreateUser(user *model.User) error
-	GetUserByID(id uint) (*model.User, error)
-	GetUserByEmail(email string) (*model.User, error)
-	UpdateUser(user *model.User) error
+	CreateUser(user *models.User) error
+	GetUserByID(id uint) (*models.User, error)
+	GetUserByEmail(email string) (*models.User, error)
+	UpdateUser(user *models.User) error
 	DeleteUser(id uint) error
-	AuthenticateUser(email, password string) (*model.User, error)
+	AuthenticateUser(email, password string) (*models.User, error)
 }

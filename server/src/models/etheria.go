@@ -3,17 +3,10 @@ package models
 import "time"
 
 // Enums
-type Role string
 type ArticleStatus string
 type SubscriptionPlan string
 type SubscriptionStatus string
 type NotificationType string
-
-const (
-	RoleUser   Role = "USER"
-	RoleEditor Role = "EDITOR"
-	RoleAdmin  Role = "ADMIN"
-)
 
 const (
 	ArticleStatusDraft     ArticleStatus = "DRAFT"

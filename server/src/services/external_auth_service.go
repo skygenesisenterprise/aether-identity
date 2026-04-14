@@ -17,7 +17,7 @@ import (
 	"time"
 
 	"github.com/skygenesisenterprise/aether-identity/server/src/config"
-	"github.com/skygenesisenterprise/aether-identity/server/src/model"
+	"github.com/skygenesisenterprise/aether-identity/server/src/models"
 	"gorm.io/gorm"
 )
 

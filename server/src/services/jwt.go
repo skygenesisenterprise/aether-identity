@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/skygenesisenterprise/aether-identity/server/src/model"
+	"github.com/skygenesisenterprise/aether-identity/server/src/models"
 )
 
 // JWTService gère la création et la validation des tokens JWT
@@ -24,7 +24,7 @@ func NewJWTService(secretKey string, accessTokenExp, refreshTokenExp int) *JWTSe
 }
 
 // GenerateToken crée un token JWT
-func (s *JWTService) GenerateToken(user *model.User) (string, error) {
+func (s *JWTService) GenerateToken(user *models.User) (string, error) {
 	claims := jwt.MapClaims{
 		"sub":            user.ID,
 		"email":          user.Email,

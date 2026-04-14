@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/skygenesisenterprise/aether-identity/server/src/model"
+	"github.com/skygenesisenterprise/aether-identity/server/src/models"
 	"gorm.io/gorm"
 )
 
@@ -19,12 +19,12 @@ func NewServiceKeyService(db *gorm.DB) *ServiceKeyService {
 }
 
 // CreateServiceKey creates a new service key
-func (s *ServiceKeyService) CreateServiceKey(name, description string, expiresAt *time.Time, createdBy uint) (*model.ServiceKey, error) {
+func (s *ServiceKeyService) CreateServiceKey(name, description string, expiresAt *time.Time, createdBy uint) (*models.ServiceKey, error) {
 	// Generate a new service key
-	generator := model.NewServiceKeyGenerator()
+	generator := models.NewServiceKeyGenerator()
 	key := generator.Generate()
 
-	serviceKey := &model.ServiceKey{
+	serviceKey := &models.ServiceKey{
 		Key:         key,
 		Name:        name,
 		Description: description,
@@ -43,8 +43,8 @@ func (s *ServiceKeyService) CreateServiceKey(name, description string, expiresAt
 }
 
 // GetServiceKey retrieves a service key by ID
-func (s *ServiceKeyService) GetServiceKey(id uint) (*model.ServiceKey, error) {
-	var serviceKey model.ServiceKey
+func (s *ServiceKeyService) GetServiceKey(id uint) (*models.ServiceKey, error) {
+	var serviceKey models.ServiceKey
 	err := s.DB.First(&serviceKey, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -57,8 +57,8 @@ func (s *ServiceKeyService) GetServiceKey(id uint) (*model.ServiceKey, error) {
 }
 
 // GetServiceKeyByKey retrieves a service key by its key
-func (s *ServiceKeyService) GetServiceKeyByKey(key string) (*model.ServiceKey, error) {
-	var serviceKey model.ServiceKey
+func (s *ServiceKeyService) GetServiceKeyByKey(key string) (*models.ServiceKey, error) {
+	var serviceKey models.ServiceKey
 	err := s.DB.Where("key = ?", key).First(&serviceKey).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -71,7 +71,7 @@ func (s *ServiceKeyService) GetServiceKeyByKey(key string) (*model.ServiceKey, e
 }
 
 // UpdateServiceKey updates a service key
-func (s *ServiceKeyService) UpdateServiceKey(id uint, name, description string, isActive bool, expiresAt *time.Time, updatedBy uint) (*model.ServiceKey, error) {
+func (s *ServiceKeyService) UpdateServiceKey(id uint, name, description string, isActive bool, expiresAt *time.Time, updatedBy uint) (*models.ServiceKey, error) {
 	serviceKey, err := s.GetServiceKey(id)
 	if err != nil {
 		return nil, err
@@ -107,11 +107,11 @@ func (s *ServiceKeyService) DeleteServiceKey(id uint) error {
 }
 
 // ListServiceKeys lists all service keys
-func (s *ServiceKeyService) ListServiceKeys(limit, offset int) ([]model.ServiceKey, int64, error) {
-	var serviceKeys []model.ServiceKey
+func (s *ServiceKeyService) ListServiceKeys(limit, offset int) ([]models.ServiceKey, int64, error) {
+	var serviceKeys []models.ServiceKey
 	var count int64
 
-	result := s.DB.Model(&model.ServiceKey{}).Count(&count)
+	result := s.DB.Model(&models.ServiceKey{}).Count(&count)
 	if result.Error != nil {
 		return nil, 0, result.Error
 	}
@@ -146,7 +146,7 @@ func (s *ServiceKeyService) ValidateServiceKey(key string) (bool, error) {
 
 // LogServiceKeyUsage logs the usage of a service key
 func (s *ServiceKeyService) LogServiceKeyUsage(serviceKeyID uint, endpoint, method, ipAddress, userAgent string, statusCode int) error {
-	usage := &model.ServiceKeyUsage{
+	usage := &models.ServiceKeyUsage{
 		ServiceKeyID: serviceKeyID,
 		Endpoint:     endpoint,
 		Method:       method,
@@ -164,12 +164,12 @@ func (s *ServiceKeyService) LogServiceKeyUsage(serviceKeyID uint, endpoint, meth
 }
 
 // ListServiceKeysByUser lists all service keys created by a specific user with pagination
-func (s *ServiceKeyService) ListServiceKeysByUser(userID uint, page, limit int) ([]model.ServiceKey, int64, error) {
-	var serviceKeys []model.ServiceKey
+func (s *ServiceKeyService) ListServiceKeysByUser(userID uint, page, limit int) ([]models.ServiceKey, int64, error) {
+	var serviceKeys []models.ServiceKey
 	var count int64
 
 	// Count total keys for this user
-	result := s.DB.Model(&model.ServiceKey{}).Where("created_by = ?", userID).Count(&count)
+	result := s.DB.Model(&models.ServiceKey{}).Where("created_by = ?", userID).Count(&count)
 	if result.Error != nil {
 		return nil, 0, result.Error
 	}

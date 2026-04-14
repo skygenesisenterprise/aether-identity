@@ -8,7 +8,7 @@ import (
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
 	"github.com/pquerna/otp/totp"
-	"github.com/skygenesisenterprise/aether-identity/server/src/model"
+	"github.com/skygenesisenterprise/aether-identity/server/src/models"
 	"gorm.io/gorm"
 )
 
@@ -92,7 +92,7 @@ func (s *TOTPService) GetTOTPStatus(userID string) (bool, error) {
 }
 
 // VerifyTOTPLogin verifies a TOTP during login
-func (s *TOTPService) VerifyTOTPLogin(email, password, totpCode string) (*model.User, error) {
+func (s *TOTPService) VerifyTOTPLogin(email, password, totpCode string) (*models.User, error) {
 	// Authenticate user
 	user, err := s.userService.AuthenticateUser(email, password)
 	if err != nil {

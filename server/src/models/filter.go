@@ -56,7 +56,7 @@ type Condition struct {
 	Header   string `json:"header,omitempty"`
 }
 
-type Action struct {
+type FilterAction struct {
 	Method    string `json:"method"` // move_to, copy_to, label, star, mark_read, mark_unread, forward, delete, discard, keep
 	Parameter string `json:"parameter,omitempty"`
 }

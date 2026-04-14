@@ -20,9 +20,9 @@ func NewDomainService(db *gorm.DB) *DomainService {
 }
 
 // CreateDomain crée un nouveau domaine
-func (s *DomainService) CreateDomain(domain *model.Domain) error {
+func (s *DomainService) CreateDomain(domain *models.Domain) error {
 	// Vérifier si le domaine existe déjà
-	var existing model.Domain
+	var existing models.Domain
 	if err := s.DB.Where("name = ?", domain.Name).First(&existing).Error; err == nil {
 		return errors.New("domain already exists")
 	}
@@ -37,8 +37,8 @@ func (s *DomainService) CreateDomain(domain *model.Domain) error {
 }
 
 // GetDomainByID récupère un domaine par son ID
-func (s *DomainService) GetDomainByID(id string) (*model.Domain, error) {
-	var domain model.Domain
+func (s *DomainService) GetDomainByID(id string) (*models.Domain, error) {
+	var domain models.Domain
 	err := s.DB.First(&domain, "id = ?", id).Error
 	if err != nil {
 		return nil, err
@@ -47,8 +47,8 @@ func (s *DomainService) GetDomainByID(id string) (*model.Domain, error) {
 }
 
 // GetDomainByName récupère un domaine par son nom
-func (s *DomainService) GetDomainByName(name string) (*model.Domain, error) {
-	var domain model.Domain
+func (s *DomainService) GetDomainByName(name string) (*models.Domain, error) {
+	var domain models.Domain
 	err := s.DB.Where("name = ?", name).First(&domain).Error
 	if err != nil {
 		return nil, err
@@ -57,8 +57,8 @@ func (s *DomainService) GetDomainByName(name string) (*model.Domain, error) {
 }
 
 // ListDomains liste tous les domaines
-func (s *DomainService) ListDomains() ([]model.Domain, error) {
-	var domains []model.Domain
+func (s *DomainService) ListDomains() ([]models.Domain, error) {
+	var domains []models.Domain
 	err := s.DB.Find(&domains).Error
 	if err != nil {
 		return nil, err
@@ -67,8 +67,8 @@ func (s *DomainService) ListDomains() ([]model.Domain, error) {
 }
 
 // ListDomainsByOrganization liste les domaines par organisation
-func (s *DomainService) ListDomainsByOrganization(orgID string) ([]model.Domain, error) {
-	var domains []model.Domain
+func (s *DomainService) ListDomainsByOrganization(orgID string) ([]models.Domain, error) {
+	var domains []models.Domain
 	err := s.DB.Where("organization_id = ?", orgID).Find(&domains).Error
 	if err != nil {
 		return nil, err
@@ -77,13 +77,13 @@ func (s *DomainService) ListDomainsByOrganization(orgID string) ([]model.Domain,
 }
 
 // UpdateDomain met à jour un domaine
-func (s *DomainService) UpdateDomain(domain *model.Domain) error {
+func (s *DomainService) UpdateDomain(domain *models.Domain) error {
 	return s.DB.Save(domain).Error
 }
 
 // DeleteDomain supprime un domaine
 func (s *DomainService) DeleteDomain(id string) error {
-	return s.DB.Delete(&model.Domain{}, "id = ?", id).Error
+	return s.DB.Delete(&models.Domain{}, "id = ?", id).Error
 }
 
 // VerifyDomain vérifie un domaine
@@ -95,7 +95,7 @@ func (s *DomainService) VerifyDomain(domainID string, method string, value strin
 	}
 
 	now := time.Now()
-	verification := &model.DomainVerification{
+	verification := &models.DomainVerification{
 		DomainID:   domainID,
 		Method:     method,
 		Value:      value,
@@ -109,7 +109,7 @@ func (s *DomainService) VerifyDomain(domainID string, method string, value strin
 
 // AddUserToDomain ajoute un utilisateur à un domaine
 func (s *DomainService) AddUserToDomain(domainID string, userID string, isAdmin bool, isOwner bool) error {
-	domainUser := &model.UserDomain{
+	domainUser := &models.UserDomain{
 		DomainID: domainID,
 		UserID:   userID,
 		IsAdmin:  isAdmin,
@@ -122,12 +122,12 @@ func (s *DomainService) AddUserToDomain(domainID string, userID string, isAdmin 
 
 // RemoveUserFromDomain retire un utilisateur d'un domaine
 func (s *DomainService) RemoveUserFromDomain(domainID string, userID string) error {
-	return s.DB.Where("domain_id = ? AND user_id = ?", domainID, userID).Delete(&model.UserDomain{}).Error
+	return s.DB.Where("domain_id = ? AND user_id = ?", domainID, userID).Delete(&models.UserDomain{}).Error
 }
 
 // GetUsersByDomain récupère les utilisateurs d'un domaine
-func (s *DomainService) GetUsersByDomain(domainID string) ([]model.User, error) {
-	var users []model.User
+func (s *DomainService) GetUsersByDomain(domainID string) ([]models.User, error) {
+	var users []models.User
 	err := s.DB.Joins("JOIN user_domains ON user_domains.user_id = users.id").
 		Where("user_domains.domain_id = ?", domainID).Find(&users).Error
 	if err != nil {
@@ -137,8 +137,8 @@ func (s *DomainService) GetUsersByDomain(domainID string) ([]model.User, error) 
 }
 
 // GetDomainsForUser récupère les domaines d'un utilisateur
-func (s *DomainService) GetDomainsForUser(userID string) ([]model.Domain, error) {
-	var domains []model.Domain
+func (s *DomainService) GetDomainsForUser(userID string) ([]models.Domain, error) {
+	var domains []models.Domain
 	err := s.DB.Joins("JOIN user_domains ON user_domains.domain_id = domains.id").
 		Where("user_domains.user_id = ?", userID).Find(&domains).Error
 	if err != nil {
@@ -150,7 +150,7 @@ func (s *DomainService) GetDomainsForUser(userID string) ([]model.Domain, error)
 // IsUserDomainAdmin vérifie si un utilisateur est administrateur d'un domaine
 func (s *DomainService) IsUserDomainAdmin(userID string, domainID string) (bool, error) {
 	var count int64
-	err := s.DB.Model(&model.UserDomain{}).
+	err := s.DB.Model(&models.UserDomain{}).
 		Where("user_id = ? AND domain_id = ? AND is_admin = true", userID, domainID).
 		Count(&count).Error
 	if err != nil {
@@ -162,7 +162,7 @@ func (s *DomainService) IsUserDomainAdmin(userID string, domainID string) (bool,
 // IsUserDomainOwner vérifie si un utilisateur est propriétaire d'un domaine
 func (s *DomainService) IsUserDomainOwner(userID string, domainID string) (bool, error) {
 	var count int64
-	err := s.DB.Model(&model.UserDomain{}).
+	err := s.DB.Model(&models.UserDomain{}).
 		Where("user_id = ? AND domain_id = ? AND is_owner = true", userID, domainID).
 		Count(&count).Error
 	if err != nil {
@@ -174,7 +174,7 @@ func (s *DomainService) IsUserDomainOwner(userID string, domainID string) (bool,
 // GetDomainUserCount récupère le nombre d'utilisateurs d'un domaine
 func (s *DomainService) GetDomainUserCount(domainID string) (int, error) {
 	var count int64
-	err := s.DB.Model(&model.UserDomain{}).
+	err := s.DB.Model(&models.UserDomain{}).
 		Where("domain_id = ?", domainID).
 		Count(&count).Error
 	if err != nil {
@@ -184,13 +184,13 @@ func (s *DomainService) GetDomainUserCount(domainID string) (int, error) {
 }
 
 // CreateDomainSettings crée ou met à jour les paramètres d'un domaine
-func (s *DomainService) CreateDomainSettings(settings *model.DomainSettings) error {
+func (s *DomainService) CreateDomainSettings(settings *models.DomainSettings) error {
 	return s.DB.Save(settings).Error
 }
 
 // GetDomainSettings récupère les paramètres d'un domaine
-func (s *DomainService) GetDomainSettings(domainID string) (*model.DomainSettings, error) {
-	var settings model.DomainSettings
+func (s *DomainService) GetDomainSettings(domainID string) (*models.DomainSettings, error) {
+	var settings models.DomainSettings
 	err := s.DB.Where("domain_id = ?", domainID).First(&settings).Error
 	if err != nil {
 		return nil, err
@@ -200,7 +200,7 @@ func (s *DomainService) GetDomainSettings(domainID string) (*model.DomainSetting
 
 // IsDomainActive vérifie si un domaine est actif
 func (s *DomainService) IsDomainActive(domainName string) (bool, error) {
-	var domain model.Domain
+	var domain models.Domain
 	err := s.DB.Where("name = ? AND is_active = true", domainName).First(&domain).Error
 	if err != nil {
 		return false, err
@@ -209,7 +209,7 @@ func (s *DomainService) IsDomainActive(domainName string) (bool, error) {
 }
 
 // IsEmailFromManagedDomain vérifie si une adresse email appartient à un domaine géré
-func (s *DomainService) IsEmailFromManagedDomain(email string) (bool, *model.Domain, error) {
+func (s *DomainService) IsEmailFromManagedDomain(email string) (bool, *models.Domain, error) {
 	// Extraire le domaine de l'email
 	parts := strings.Split(email, "@")
 	if len(parts) != 2 {
@@ -217,7 +217,7 @@ func (s *DomainService) IsEmailFromManagedDomain(email string) (bool, *model.Dom
 	}
 	domainName := parts[1]
 
-	var domain model.Domain
+	var domain models.Domain
 	err := s.DB.Where("name = ? AND is_active = true", domainName).First(&domain).Error
 	if err != nil {
 		return false, nil, err
@@ -227,7 +227,7 @@ func (s *DomainService) IsEmailFromManagedDomain(email string) (bool, *model.Dom
 }
 
 // GetDomainWithDetails récupère un domaine avec ses informations détaillées
-func (s *DomainService) GetDomainWithDetails(domainID string) (*model.DomainWithDetails, error) {
+func (s *DomainService) GetDomainWithDetails(domainID string) (*models.DomainWithDetails, error) {
 	// Récupérer le domaine
 	domain, err := s.GetDomainByID(domainID)
 	if err != nil {
@@ -241,15 +241,15 @@ func (s *DomainService) GetDomainWithDetails(domainID string) (*model.DomainWith
 	}
 
 	// Récupérer la vérification
-	var verification *model.DomainVerification
+	var verification *models.DomainVerification
 	s.DB.Where("domain_id = ?", domainID).First(&verification)
 
 	// Récupérer les paramètres
-	var settings *model.DomainSettings
+	var settings *models.DomainSettings
 	s.DB.Where("domain_id = ?", domainID).First(&settings)
 
 	// Construire la réponse
-	result := &model.DomainWithDetails{
+	result := &models.DomainWithDetails{
 		Domain:       *domain,
 		UserCount:    userCount,
 		IsVerified:   verification != nil && verification.IsVerified,
@@ -271,7 +271,7 @@ func (s *DomainService) InitializeDefaultDomains() error {
 
 	for _, domainName := range defaultDomains {
 		// Vérifier si le domaine existe déjà
-		var existing model.Domain
+		var existing models.Domain
 		if err := s.DB.Where("name = ?", domainName).First(&existing).Error; err == nil {
 			// Le domaine existe déjà, le mettre à jour
 			existing.IsInternal = true
@@ -282,7 +282,7 @@ func (s *DomainService) InitializeDefaultDomains() error {
 			}
 		} else {
 			// Créer le domaine
-			domain := model.Domain{
+			domain := models.Domain{
 				Name:        domainName,
 				DisplayName: &domainName,
 				IsInternal:  true,

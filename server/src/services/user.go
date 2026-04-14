@@ -3,7 +3,7 @@ package services
 import (
 	"errors"
 
-	"github.com/skygenesisenterprise/aether-identity/server/src/model"
+	"github.com/skygenesisenterprise/aether-identity/server/src/models"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -19,7 +19,7 @@ func NewUserService(db *gorm.DB) *UserService {
 }
 
 // CreateUser crée un nouvel utilisateur avec validation
-func (s *UserService) CreateUser(user *model.User, password string) error {
+func (s *UserService) CreateUser(user *models.User, password string) error {
 	// Vérifier si l'email existe déjà
 	if user.Email != nil {
 		existingUser, _ := s.GetUserByEmail(*user.Email)
@@ -43,13 +43,13 @@ func (s *UserService) CreateUser(user *model.User, password string) error {
 // CheckEmailExists vérifie si un email existe déjà
 func (s *UserService) CheckEmailExists(email string) bool {
 	var count int64
-	s.DB.Model(&model.User{}).Where("email = ?", email).Count(&count)
+	s.DB.Model(&models.User{}).Where("email = ?", email).Count(&count)
 	return count > 0
 }
 
 // GetUserByID récupère un utilisateur par son ID
-func (s *UserService) GetUserByID(id string) (*model.User, error) {
-	var user model.User
+func (s *UserService) GetUserByID(id string) (*models.User, error) {
+	var user models.User
 	if err := s.DB.First(&user, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
@@ -57,8 +57,8 @@ func (s *UserService) GetUserByID(id string) (*model.User, error) {
 }
 
 // GetUserByEmail récupère un utilisateur par son email
-func (s *UserService) GetUserByEmail(email string) (*model.User, error) {
-	var user model.User
+func (s *UserService) GetUserByEmail(email string) (*models.User, error) {
+	var user models.User
 	if err := s.DB.Where("email = ?", email).First(&user).Error; err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (s *UserService) GetUserByEmail(email string) (*model.User, error) {
 }
 
 // UpdateUser met à jour un utilisateur
-func (s *UserService) UpdateUser(user *model.User, newPassword *string) error {
+func (s *UserService) UpdateUser(user *models.User, newPassword *string) error {
 	// Si le mot de passe est fourni, le hacher
 	if newPassword != nil && *newPassword != "" {
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*newPassword), bcrypt.DefaultCost)
@@ -82,11 +82,11 @@ func (s *UserService) UpdateUser(user *model.User, newPassword *string) error {
 
 // DeleteUser supprime un utilisateur
 func (s *UserService) DeleteUser(id string) error {
-	return s.DB.Delete(&model.User{}, "id = ?", id).Error
+	return s.DB.Delete(&models.User{}, "id = ?", id).Error
 }
 
 // AuthenticateUser authentifie un utilisateur
-func (s *UserService) AuthenticateUser(email, password string) (*model.User, error) {
+func (s *UserService) AuthenticateUser(email, password string) (*models.User, error) {
 	user, err := s.GetUserByEmail(email)
 	if err != nil {
 		return nil, err
@@ -105,7 +105,7 @@ func (s *UserService) AuthenticateUser(email, password string) (*model.User, err
 }
 
 // UserToResponse convertit un modèle User en une réponse appropriée
-func (s *UserService) UserToResponse(user *model.User) map[string]interface{} {
+func (s *UserService) UserToResponse(user *models.User) map[string]interface{} {
 	return map[string]interface{}{
 		"id":             user.ID,
 		"email":          user.Email,
@@ -127,11 +127,11 @@ type ListUsersFilter struct {
 
 // ListUsersResponse représente la réponse paginée de la liste des utilisateurs
 type ListUsersResponse struct {
-	Users      []model.User `json:"users"`
-	Total      int64        `json:"total"`
-	Page       int          `json:"page"`
-	Limit      int          `json:"limit"`
-	TotalPages int          `json:"totalPages"`
+	Users      []models.User `json:"users"`
+	Total      int64         `json:"total"`
+	Page       int           `json:"page"`
+	Limit      int           `json:"limit"`
+	TotalPages int           `json:"totalPages"`
 }
 
 // ListUsers récupère la liste des utilisateurs avec pagination et filtres
@@ -146,7 +146,7 @@ func (s *UserService) ListUsers(page, limit int, filter ListUsersFilter) (*ListU
 	offset := (page - 1) * limit
 
 	// Construire la requête de base
-	query := s.DB.Model(&model.User{})
+	query := s.DB.Model(&models.User{})
 
 	// Appliquer les filtres
 	if filter.IsActive != nil {
@@ -179,7 +179,7 @@ func (s *UserService) ListUsers(page, limit int, filter ListUsersFilter) (*ListU
 	orderClause := sortBy + " " + sortOrder
 
 	// Récupérer les utilisateurs
-	var users []model.User
+	var users []models.User
 	if err := query.Order(orderClause).Limit(limit).Offset(offset).Find(&users).Error; err != nil {
 		return nil, err
 	}

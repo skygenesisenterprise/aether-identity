@@ -18,36 +18,6 @@ type NewsletterStatus string
 type SystemLogLevel string
 
 const (
-	SocialPlatformTwitter   SocialPlatform = "TWITTER"
-	SocialPlatformFacebook  SocialPlatform = "FACEBOOK"
-	SocialPlatformInstagram SocialPlatform = "INSTAGRAM"
-	SocialPlatformLinkedin  SocialPlatform = "LINKEDIN"
-	SocialPlatformYoutube   SocialPlatform = "YOUTUBE"
-	SocialPlatformDiscord   SocialPlatform = "DISCORD"
-)
-
-const (
-	AdCampaignStatusActive    AdCampaignStatus = "ACTIVE"
-	AdCampaignStatusPaused    AdCampaignStatus = "PAUSED"
-	AdCampaignStatusDraft     AdCampaignStatus = "DRAFT"
-	AdCampaignStatusCompleted AdCampaignStatus = "COMPLETED"
-)
-
-const (
-	AdCampaignTypeBanner    AdCampaignType = "BANNER"
-	AdCampaignTypeSponsored AdCampaignType = "SPONSORED"
-	AdCampaignTypeVideo     AdCampaignType = "VIDEO"
-	AdCampaignTypeNative    AdCampaignType = "NATIVE"
-)
-
-const (
-	AdPlacementStatusActive   AdPlacementStatus = "ACTIVE"
-	AdPlacementStatusInactive AdPlacementStatus = "INACTIVE"
-)
-
-const (
-	AuditLogStatusSuccess AuditLogStatus = "SUCCESS"
-	AuditLogStatusFailed  AuditLogStatus = "FAILED"
 	AuditLogStatusWarning AuditLogStatus = "WARNING"
 )
 
@@ -170,22 +140,6 @@ type AuditLog struct {
 	Details    string         `json:"details,omitempty"`
 	Status     AuditLogStatus `json:"status"`
 	CreatedAt  time.Time      `json:"createdAt"`
-}
-
-// ApiKey model
-type ApiKey struct {
-	ID          string       `json:"id"`
-	Name        string       `json:"name"`
-	Prefix      string       `json:"prefix"`
-	Key         string       `json:"key"`
-	KeyHash     string       `json:"-"`
-	Type        ApiKeyType   `json:"type"`
-	Permissions []string     `json:"permissions"`
-	LastUsed    *time.Time   `json:"lastUsed,omitempty"`
-	ExpiresAt   *time.Time   `json:"expiresAt,omitempty"`
-	Status      ApiKeyStatus `json:"status"`
-	CreatedAt   time.Time    `json:"createdAt"`
-	UpdatedAt   time.Time    `json:"updatedAt"`
 }
 
 // ScheduledPost model
