@@ -245,7 +245,7 @@ response = requests.get(
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <Header locale={locale as import("@/lib/locale").Locale} />
 
       <main className="flex-1">
         {/* Hero Section */}

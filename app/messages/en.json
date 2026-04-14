@@ -234,7 +234,6 @@
       "cookiePolicy": "Cookie Policy",
       "getStarted": "Get Started",
       "brandDescription": "Secure identity and access management for the modern enterprise. Self-hosted, open-source, and built for scale.",
-      "statusOperational": "All systems operational",
       "verifyKey": "Verify our PGP public key to ensure site authenticity"
     }
   },
@@ -271,6 +270,11 @@
     "new": "New",
     "learnMore": "Learn more",
     "bySkyGenesis": "by Sky Genesis Enterprise",
+    "brandName": "Aether Identity",
+    "languages": {
+      "en": "English",
+      "fr": "Français"
+    },
     "resources": "Resources",
     "documentation": "Documentation",
     "documentationDesc": "Guides and API references",
@@ -494,10 +498,6 @@
       "b2bPartnerDesc": "Enable secure partner authentication via SAML federation. Control partner access without managing external users.",
       "multiRegion": "Multi-Region Deployment",
       "multiRegionDesc": "Deploy SSO nodes across regions with shared session state for global workforce access with low latency."
-    },
-    "faq": {
-      "title": "Frequently Asked Questions",
-      "description": "Common questions about Aether SSO."
     },
     "cta": {
       "title": "Ready to Modernize Your SSO?",

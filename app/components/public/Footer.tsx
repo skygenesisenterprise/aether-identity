@@ -160,19 +160,11 @@ function SocialIcon({ name }: { name: string }) {
   );
 }
 
-const countryNames: Record<string, string> = {
-  FR: "France",
-  BE: "Belgium",
-  CH: "Switzerland",
-};
-
 export async function Footer({ locale: initialLocale }: FooterProps) {
   const locale = initialLocale || "fr";
   const t = await getTranslations({ locale, namespace: "Public.footer" });
 
   const currentLocale = locales.find((l) => l.code === locale);
-  const regionName = currentLocale?.label.split(" ")[0] || "International";
-  const countryName = countryNames[currentLocale?.country || ""] || "International";
 
   const footerLinks = {
     developers: {
@@ -280,16 +272,6 @@ export async function Footer({ locale: initialLocale }: FooterProps) {
                 </Link>
               ))}
             </div>
-            <Link
-              href="https://status.skygenesisenterprise.com"
-              className="text-sm text-footer-link hover:text-footer-link-hover transition-colors duration-150 mt-4 inline-flex items-center gap-2"
-            >
-              <span className="relativeflexh-2w-2">
-                <span className="animate-pingabsoluteinline-flexh-2w-2rounded-fullbg-green-400opacity-75"></span>
-                <span className="relativeinline-flexrounded-fullh-2w-2bg-green-500"></span>
-              </span>
-              {t("statusOperational")}
-            </Link>
           </div>
         </div>
       </div>

@@ -262,7 +262,7 @@ if 'partners:read' in permissions:
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <Header locale={locale as import("@/lib/locale").Locale} />
 
       <main className="flex-1">
         <section className="relative py-24 lg:py-32 border-b border-border">

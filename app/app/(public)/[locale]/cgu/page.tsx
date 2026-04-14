@@ -12,7 +12,7 @@ export default async function CGUPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <Header locale={locale as import("@/lib/locale").Locale} />
       <main className="flex-1">
         <article className="mx-auto max-w-4xl px-4 py-12">
           <h1 className="font-serif text-4xl font-bold text-foreground mb-8">

@@ -85,7 +85,7 @@
     },
     "comparison": {
       "title": "Comment Nous Comparons",
-      "description": "Découvrez pourquoi les organisations leaders choose Aether plutôt que les fournisseurs d'identité traditionnels.",
+      "description": "Découvrez pourquoi les organisations leaders choisit Aether Identity plutôt que les fournisseurs d'identité traditionnels.",
       "feature": "Fonctionnalité",
       "selfHosted": "Auto-hébergé",
       "oauth": "OAuth 2.0 / OIDC",
@@ -137,8 +137,8 @@
       "title": "Questions Fréquentes",
       "description": "Questions courantes sur Aether Identity et nos solutions entreprise.",
       "keycloak": {
-        "title": "Comment Aether se compares-t-il à Keycloak?",
-        "answer": "Aether offre une architecture plus moderne avec de meilleures performances (<15ms validation de token), une configuration plus facile et un support entreprise. Contrairement à Keycloak, Aether fournit des garanties SLA et un support dédié."
+        "title": "Comment Aether Identity se compares-t-il à Keycloak?",
+        "answer": "Aether Identity offre une architecture plus moderne avec de meilleures performances (<15ms validation de token), une configuration plus facile et un support entreprise. Contrairement à Keycloak, Aether fournit des garanties SLA et un support dédié."
       },
       "migrate": {
         "title": "Puis-je migrer depuis Auth0 ou Okta?",
@@ -146,11 +146,11 @@
       },
       "offline": {
         "title": "Que se passe-t-il si je perdu la connectivité internet?",
-        "answer": "Aether support les déploiements air-gapped et peut fonctionner entièrement hors ligne. Vos services d'authentification restent fonctionnels même sans accès internet."
+        "answer": "Aether Identity support les déploiements air-gapped et peut fonctionner entièrement hors ligne. Vos services d'authentification restent fonctionnels même sans accès internet."
       },
       "free": {
         "title": "Y a-t-il un niveau gratuit?",
-        "answer": "Oui, Aether Community Edition est gratuit et open source. Pour les fonctionnalités entreprise, garanties SLA et support, contactez notre équipe commerciale."
+        "answer": "Oui, Aether Identity est gratuit et open source. Pour les fonctionnalités entreprise, garanties SLA et support, contactez notre équipe commerciale."
       },
       "updates": {
         "title": "À quelle fréquenceissez-vous des mises à jour?",
@@ -234,7 +234,6 @@
       "cookiePolicy": "Politique des Cookies",
       "getStarted": "Commencer",
       "brandDescription": "Gestion d'identité et d'accès pour l'entreprise moderne. Auto-hébergement, open-source et conçu pour la mise à l'échelle.",
-      "statusOperational": "Tous les systèmes opérationnels",
       "verifyKey": "Vérifiez notre clé publique PGP pour assurer l'authenticité du site"
     }
   },
@@ -271,6 +270,11 @@
     "new": "Nouveau",
     "learnMore": "En savoir plus",
     "bySkyGenesis": "par Sky Genesis Enterprise",
+    "brandName": "Aether Identity",
+    "languages": {
+      "en": "English",
+      "fr": "Français"
+    },
     "resources": "Ressources",
     "documentation": "Documentation",
     "documentationDesc": "Guides et références API",
