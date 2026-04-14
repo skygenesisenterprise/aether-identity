@@ -1,0 +1,1288 @@
+generator client {
+  provider = "prisma-client-go"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =====================================================
+// USER & AUTHENTICATION
+// =====================================================
+
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  email         String?   @unique
+  username     String?   @unique
+  name         String?
+  passwordHash String?   @map("password_hash")
+  passwordSalt String?   @map("password_salt")
+  emailVerified Boolean  @default(false) @map("email_verified")
+  isActive     Boolean  @default(true) @map("is_active")
+  lastLoginAt  DateTime? @map("last_login_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @default(now()) @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  discordId    String?   @unique @map("discord_id")
+  discordLinked Boolean @default(false) @map("discord_linked")
+
+  totpSecret  String?   @map("totp_secret")
+  totpEnabled Boolean  @default(false) @map("totp_enabled")
+
+  profile        Profile?
+  accounts      Account[]
+  sessions     Session[]
+  userRoles     UserRole[]
+  apiKeys      ApiKey[]
+  passwords    PasswordResetToken[]     @relation("UserPasswordResets")
+  emailVerifs  EmailVerificationToken[]  @relation("UserEmailVerifs")
+  memberships Membership[]
+  externalAccounts ExternalAccount[]
+  ownedOrganizations Organization[] @relation("OrganizationOwner")
+  devices       Device[]
+
+  @@map("users")
+}
+
+model Profile {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @unique @db.Uuid @map("user_id")
+  avatar    String?
+  bio       String?
+  phone    String?
+  address  String?
+  city     String?
+  country  String?
+  timezone String   @default("UTC")
+  locale   String   @default("en")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Session {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid @map("user_id")
+  token    String   @unique
+  deviceId  String?  @db.Uuid @map("device_id")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  expiresAt DateTime @map("expires_at")
+  isValid  Boolean  @default(true) @map("is_valid")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Device {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @db.Uuid @map("user_id")
+  name      String
+  type      String?
+  os        String?
+  browser   String?
+  lastSeen  DateTime? @map("last_seen")
+  isTrusted Boolean  @default(false) @map("is_trusted")
+  ipAddress String?  @map("ip_address")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("devices")
+}
+
+// =====================================================
+// ROLES & PERMISSIONS (RBAC)
+// =====================================================
+
+model Role {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @unique
+  description String?
+  isSystem   Boolean   @default(false) @map("is_system")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @map("updated_at")
+
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  description String?
+  resource   String
+  action     String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  rolePermissions RolePermission[]
+
+  @@map("permissions")
+}
+
+model UserRole {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @db.Uuid @map("user_id")
+  roleId     String   @db.Uuid @map("role_id")
+  assignedBy String?  @db.Uuid @map("assigned_by")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+model RolePermission {
+  id           String   @id @default(uuid()) @db.Uuid
+  roleId       String   @db.Uuid @map("role_id")
+  permissionId String   @db.Uuid @map("permission_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// =====================================================
+// ORGANIZATIONS
+// =====================================================
+
+model Organization {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String    @unique
+  description String?
+  website     String?
+  isActive   Boolean   @default(true) @map("is_active")
+  ownerId    String    @db.Uuid @map("owner_id")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @default(now()) @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  owner      User          @relation(fields: [ownerId], references: [id])
+  memberships Membership[]
+  domains   Domain[]
+
+  @@map("organizations")
+}
+
+model Membership {
+  id             String    @id @default(uuid()) @db.Uuid
+  userId         String    @db.Uuid @map("user_id")
+  organizationId String    @db.Uuid @map("organization_id")
+  roleId        String?   @db.Uuid @map("role_id")
+  status       String    @default("active")
+  joinedAt      DateTime  @default(now()) @map("joined_at")
+  invitedBy    String?   @db.Uuid @map("invited_by")
+  leftAt       DateTime? @map("left_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @default(now()) @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role        Role?         @relation(fields: [roleId], references: [id])
+
+  @@unique([userId, organizationId])
+  @@map("memberships")
+}
+
+// =====================================================
+// DOMAINS
+// =====================================================
+
+model Domain {
+  id           String    @id @default(uuid()) @db.Uuid
+  name         String    @unique
+  displayName  String?   @map("display_name")
+  isVerified  Boolean   @default(false) @map("is_verified")
+  isInternal  Boolean   @default(false) @map("is_internal")
+  is_default  Boolean   @default(false)
+  organizationId String?  @db.Uuid @map("organization_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @map("updated_at")
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  userDomains UserDomain[]
+
+  @@map("domains")
+}
+
+model UserDomain {
+  id       String @id @default(uuid()) @db.Uuid
+  userId   String @db.Uuid @map("user_id")
+  domainId String @db.Uuid @map("domain_id")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  domain Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, domainId])
+  @@map("user_domains")
+}
+
+// =====================================================
+// OAUTH & APPLICATIONS
+// =====================================================
+
+model OAuthClient {
+  id                   String    @id @default(uuid()) @db.Uuid
+  name                 String
+  clientId             String    @unique @map("client_id")
+  clientSecret         String?   @map("client_secret")
+  clientSecretExpiresAt DateTime?  @map("client_secret_expires_at")
+  redirectUris       String[]  @map("redirect_uris")
+  grantTypes         String[]  @map("grant_types")
+  tokenEndpointAuthMethod String?  @map("token_endpoint_auth_method")
+  isConfidential    Boolean   @default(false) @map("is_confidential")
+  isActive         Boolean   @default(true) @map("is_active")
+  logoUri           String?   @map("logo_uri")
+  policyUri         String?   @map("policy_uri")
+  tosUri           String?   @map("tos_uri")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @default(now()) @map("updated_at")
+
+  authorizationCodes OAuthAuthorizationCode[]
+  accessTokens      OAuthAccessToken[]
+  refreshTokens    OAuthRefreshToken[]
+  consents       OAuthConsent[]
+
+  @@map("oauth_clients")
+}
+
+model OAuthAuthorizationCode {
+  id          String   @id @default(uuid()) @db.Uuid
+  clientId    String   @db.Uuid @map("client_id")
+  userId     String   @db.Uuid @map("user_id")
+  code       String   @unique
+  redirectUri String   @map("redirect_uri")
+  nonce      String?
+  codeChallenge String? @map("code_challenge")
+  codeChallengeMethod String? @map("code_challenge_method")
+  expiresAt  DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  client OAuthClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("oauth_authorization_codes")
+}
+
+model OAuthAccessToken {
+  id          String   @id @default(uuid()) @db.Uuid
+  clientId    String   @db.Uuid @map("client_id")
+  userId     String   @db.Uuid @map("user_id")
+  token      String   @unique
+  expiresAt  DateTime @map("expires_at")
+  scope      String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  client OAuthClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("oauth_access_tokens")
+}
+
+model OAuthRefreshToken {
+  id          String    @id @default(uuid()) @db.Uuid
+  clientId    String    @db.Uuid @map("client_id")
+  userId     String    @db.Uuid @map("user_id")
+  token      String    @unique
+  expiresAt  DateTime?  @map("expires_at")
+  scope      String?
+  revoked    Boolean   @default(false)
+  createdAt  DateTime   @default(now()) @map("created_at")
+
+  client OAuthClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("oauth_refresh_tokens")
+}
+
+model OAuthConsent {
+  id        String   @id @default(uuid()) @db.Uuid
+  clientId  String   @db.Uuid @map("client_id")
+  userId   String   @db.Uuid @map("user_id")
+  scope    String[]
+  createdAt DateTime @default(now()) @map("created_at")
+
+  client OAuthClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([clientId, userId])
+  @@map("oauth_consents")
+}
+
+model OAuthState {
+  id        String   @id @default(uuid()) @db.Uuid
+  state    String   @unique
+  provider String
+  nonce    String?
+  redirectUri String? @map("redirect_uri")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("oauth_states")
+}
+
+// =====================================================
+// APPLICATION
+// =====================================================
+
+model Application {
+  id              String    @id @default(uuid()) @db.Uuid
+  name            String
+  description     String?
+  type            ApplicationType @default(Web)
+  clientId       String    @unique @map("client_id")
+  clientSecret   String?   @map("client_secret")
+  clientSecretExpiresAt DateTime? @map("client_secret_expires_at")
+  tokenEndpointAuthMethod String? @map("token_endpoint_auth_method")
+  isConfidential Boolean  @default(false) @map("is_confidential")
+  isActive     Boolean  @default(true) @map("is_active")
+  logoUri       String?  @map("logo_uri")
+  policyUri    String?  @map("policy_uri")
+  tosUri       String?  @map("tos_uri")
+  ownerId      String?  @db.Uuid @map("owner_id")
+  organizationId String? @db.Uuid @map("organization_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  redirectUris ApplicationRedirectURI[]
+  grantTypes ApplicationGrantType[]
+  contacts  ApplicationContact[]
+  stats    ApplicationStats[]
+
+  @@map("applications")
+}
+
+model ApplicationRedirectURI {
+  id            String   @id @default(uuid()) @db.Uuid
+  applicationId  String   @db.Uuid @map("application_id")
+  uri           String
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("application_redirect_uris")
+}
+
+model ApplicationGrantType {
+  id           String   @id @default(uuid()) @db.Uuid
+  applicationId String   @db.Uuid @map("application_id")
+  grantType   String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("application_grant_types")
+}
+
+model ApplicationContact {
+  id           String   @id @default(uuid()) @db.Uuid
+  applicationId String   @db.Uuid @map("application_id")
+  name         String
+  email        String
+  phone        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("application_contacts")
+}
+
+model ApplicationStats {
+  id            String   @id @default(uuid()) @db.Uuid
+  applicationId String   @db.Uuid @map("application_id")
+  date         DateTime  @db.Date
+  loginCount   Int      @default(0) @map("login_count")
+  signUpCount  Int      @default(0) @map("sign_up_count")
+  tokenCount  Int      @default(0) @map("token_count")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("application_stats")
+}
+
+enum ApplicationType {
+  Web
+  Native
+  SPA
+  API
+  M2M
+  External
+}
+
+// =====================================================
+// CONNECTIONS
+// =====================================================
+
+model Connection {
+  id          String         @id @default(uuid()) @db.Uuid
+  name        String         @unique
+  displayName String?        @map("display_name")
+  type        ConnectionType
+  isEnabled   Boolean       @default(false) @map("is_enabled")
+  strategy   String?
+  options    Json?
+  metadata   Json?
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @default(now()) @map("updated_at")
+  deletedAt  DateTime?     @map("deleted_at")
+
+  @@map("connections")
+}
+
+model DatabaseConnection {
+  id               String    @id @default(uuid()) @db.Uuid
+  connectionId     String    @db.Uuid @map("connection_id")
+  databaseType    String?   @map("database_type")
+  host            String?
+  port            Int?
+  database        String?
+  username        String?
+  password       String?
+  sslMode        String?   @map("ssl_mode")
+  minConnections Int      @default(1) @map("min_connections")
+  maxConnections Int      @default(10) @map("max_connections")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @default(now()) @map("updated_at")
+
+  @@map("database_connections")
+}
+
+model DatabaseConnectionUser {
+  id                    String   @id @default(uuid()) @db.Uuid
+  databaseConnectionId   String   @db.Uuid @map("database_connection_id")
+  email                 String
+  username              String?
+  isActive             Boolean  @default(true) @map("is_active")
+  createdAt            DateTime  @default(now()) @map("created_at")
+
+  @@map("database_connection_users")
+}
+
+model SocialProvider {
+  id           String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  displayName String
+  isEnabled  Boolean  @default(false) @map("is_enabled")
+  clientId   String?  @map("client_id")
+  clientSecret String? @map("client_secret")
+  tenantId  String?  @db.Uuid @map("tenant_id")
+  scopes    String[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("social_providers")
+}
+
+model EnterpriseConnection {
+  id                String   @id @default(uuid()) @db.Uuid
+  name              String
+  displayName       String?  @map("display_name")
+  protocol         String
+  isEnabled        Boolean  @default(false) @map("is_enabled")
+  domain           String?
+  issuer           String?
+  ssoURL          String?  @map("sso_url")
+  x509Cert        String?  @map("x509_cert")
+  metadata        Json?
+  attributeMapping Json?   @map("attribute_mapping")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @map("updated_at")
+
+  @@map("enterprise_connections")
+}
+
+model PasswordlessConnection {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String   @unique
+  displayName  String?  @map("display_name")
+  type        String
+  isEnabled   Boolean  @default(false) @map("is_enabled")
+  options     Json?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @map("updated_at")
+
+  @@map("passwordless_connections")
+}
+
+model AuthenticationProfile {
+  id            String   @id @default(uuid()) @db.Uuid
+  name         String   @unique
+  displayName  String?  @map("display_name")
+  description String?
+  connectionIds String[] @map("connection_ids")
+  options     Json?
+  isDefault  Boolean  @default(false) @map("is_default")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+
+  @@map("authentication_profiles")
+}
+
+enum ConnectionType {
+  Database
+  Social
+  Enterprise
+  Passwordless
+}
+
+// =====================================================
+// SECURITY - MFA
+// =====================================================
+
+model MfaMethod {
+  id           String      @id @default(uuid()) @db.Uuid
+  name         MfaMethodType @unique
+  displayName  String
+  description String?
+  isEnabled   Boolean     @default(false) @map("is_enabled")
+  order       Int         @default(0)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @default(now()) @map("updated_at")
+
+  @@map("mfa_methods")
+}
+
+model MfaPolicy {
+  id           String    @id @default(uuid()) @db.Uuid
+  name        String
+  displayName String?   @map("display_name")
+  description String?
+  enrollments String[]  @map("enrollments")
+  allowList  String[]  @map("allow_list")
+  excludeList String[]  @map("exclude_list")
+  action    String
+  isDefault  Boolean   @default(false) @map("is_default")
+  priority  Int       @default(0)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @default(now()) @map("updated_at")
+
+  @@map("mfa_policies")
+}
+
+model MfaEnrollment {
+  id          String       @id @default(uuid()) @db.Uuid
+  userId      String       @db.Uuid @map("user_id")
+  method     MfaMethodType
+  identifier String?
+  secret     String?
+  isVerified Boolean    @default(false) @map("is_verified")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @default(now()) @map("updated_at")
+
+  @@unique([userId, method])
+  @@map("mfa_enrollments")
+}
+
+model MfaChallenge {
+  id         String       @id @default(uuid()) @db.Uuid
+  userId     String       @db.Uuid @map("user_id")
+  method    MfaMethodType
+  code       String?
+  otpauthUri String?     @map("otpauth_uri")
+  expiresAt DateTime?    @map("expires_at")
+  isVerified Boolean    @default(false) @map("is_verified")
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  @@map("mfa_challenges")
+}
+
+model MfaStats {
+  id         String @id @default(uuid()) @db.Uuid
+  date       DateTime @db.Date
+  total     Int     @default(0)
+  active    Int     @default(0)
+  totpCount Int     @default(0) @map("totp_count")
+  smsCount  Int     @default(0) @map("sms_count")
+  emailCount Int    @default(0) @map("email_count")
+
+  @@map("mfa_stats")
+}
+
+enum MfaMethodType {
+  Totp
+  Email
+  SMS
+  WebAuthn
+}
+
+// =====================================================
+// SECURITY - ATTACK PROTECTION
+// =====================================================
+
+model BruteForceConfig {
+  id               String   @id @default(uuid()) @db.Uuid
+  maxAttempts     Int      @default(10) @map("max_attempts")
+  lockoutDuration Int      @default(900) @map("lockout_duration")
+  rateLimitEnabled Boolean @default(true) @map("rate_limit_enabled")
+  ipBlockEnabled  Boolean @default(false) @map("ip_block_enabled")
+  allowList      String[] @map("allow_list")
+  blockList     String[] @map("block_list")
+  updatedAt     DateTime @default(now()) @map("updated_at")
+
+  @@map("brute_force_config")
+}
+
+model BreachedPasswordsConfig {
+  id       String   @id @default(uuid()) @db.Uuid
+  enabled  Boolean  @default(false)
+  mode     String   @default("audit")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("breached_passwords_config")
+}
+
+model SecurityAnalytics {
+  id               String @id @default(uuid()) @db.Uuid
+  date             DateTime @db.Date
+  totalEvents      Int    @default(0) @map("total_events")
+  blockedAttempts Int    @default(0) @map("blocked_attempts")
+  suspectedEvents Int    @default(0) @map("suspected_events")
+
+  @@map("security_analytics")
+}
+
+model ThreatData {
+  id       String   @id @default(uuid()) @db.Uuid
+  date     DateTime @db.Date
+  type     String
+  source   String?
+  target   String?
+  severity String
+  details  String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("threat_data")
+}
+
+// =====================================================
+// BRANDING
+// =====================================================
+
+model Branding {
+  id              String   @id @default(uuid()) @db.Uuid
+  logoUrl         String? @map("logo_url")
+  iconUrl         String? @map("icon_url")
+  primaryColor    String? @map("primary_color")
+  secondaryColor  String? @map("secondary_color")
+  backgroundColor String? @map("background_color")
+  fontColor     String? @map("font_color")
+  fontFamily    String? @map("font_family")
+  bannerText    String? @map("banner_text")
+  tenantId     String? @db.Uuid @map("tenant_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  @@map("branding")
+}
+
+model UniversalLoginConfig {
+  id            String   @id @default(uuid()) @db.Uuid
+  name         String
+  displayName  String?  @map("display_name")
+  isDefault   Boolean  @default(false) @map("is_default")
+  brandingJson String? @map("branding_json")
+  tenantId    String?  @db.Uuid @map("tenant_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @map("updated_at")
+
+  @@map("universal_login_config")
+}
+
+model LoginPage {
+  id                    String   @id @default(uuid()) @db.Uuid
+  universalLoginConfigId String?  @db.Uuid @map("universal_login_config_id")
+  name                 String
+  htmlContent        String?  @map("html_content")
+  cssContent        String?  @map("css_content")
+  isEnabled        Boolean  @default(false) @map("is_enabled")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @default(now()) @map("updated_at")
+
+  @@map("login_pages")
+}
+
+model CustomLoginSettings {
+  id        String   @id @default(uuid()) @db.Uuid
+  enabled  Boolean  @default(false)
+  loginUrl String?  @map("login_url")
+  tenantId String?  @db.Uuid @map("tenant_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("custom_login_settings")
+}
+
+model BrandingTemplate {
+  id           String   @id @default(uuid()) @db.Uuid
+  name        String
+  displayName String?  @map("display_name")
+  description String?
+  brandingJson String? @map("branding_json")
+  isBuiltIn  Boolean  @default(false) @map("is_built_in")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @default(now()) @map("updated_at")
+
+  @@map("branding_templates")
+}
+
+model CustomDomain {
+  id                 String   @id @default(uuid()) @db.Uuid
+  domain              String   @unique
+  status             String   @default("pending")
+  tenantId           String?  @db.Uuid @map("tenant_id")
+  verificationMethod String?  @map("verification_method")
+  verificationToken String?  @map("verification_token")
+  verificationUrl   String?  @map("verification_url")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @map("updated_at")
+
+  @@map("custom_domains")
+}
+
+// =====================================================
+// ACTIONS & EXTENSIONS
+// =====================================================
+
+model Action {
+  id           String    @id @default(uuid()) @db.Uuid
+  name        String
+  displayName String?   @map("display_name")
+  description String?
+  code        String?
+  runtime     String    @default("nodejs")
+  version     Int       @default(1)
+  status      String    @default("draft")
+  deployedAt  DateTime?  @map("deployed_at")
+  secrets     String[]
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @default(now()) @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  triggers ActionTriggerBinding[]
+
+  @@map("actions")
+}
+
+model ActionTrigger {
+  id           String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  displayName String
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  bindings ActionTriggerBinding[]
+
+  @@map("action_triggers")
+}
+
+model ActionTriggerBinding {
+  id        String   @id @default(uuid()) @db.Uuid
+  actionId  String   @db.Uuid @map("action_id")
+  triggerId String   @db.Uuid @map("trigger_id")
+  order     Int      @default(0)
+  isEnabled Boolean  @default(true) @map("is_enabled")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @map("updated_at")
+
+  action  Action       @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  trigger ActionTrigger @relation(fields: [triggerId], references: [id], onDelete: Cascade)
+
+  @@map("action_trigger_bindings")
+}
+
+model ActionLibraryItem {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  displayName  String?  @map("display_name")
+  description String?
+  code       String?
+  runtime    String   @default("nodejs")
+  version    Int      @default(1)
+  category   String?
+  isBuiltIn  Boolean  @default(false) @map("is_built_in")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+
+  @@map("action_library")
+}
+
+model FormAction {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  displayName  String?  @map("display_name")
+  formFields   Json?    @map("form_fields")
+  actionCode  String?  @map("action_code")
+  isEnabled   Boolean  @default(true) @map("is_enabled")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @map("updated_at")
+
+  @@map("form_actions")
+}
+
+model ActionLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  actionId   String   @db.Uuid @map("action_id")
+  triggerId  String?  @db.Uuid @map("trigger_id")
+  status    String
+  startTime DateTime @map("start_time")
+  endTime   DateTime? @map("end_time")
+  duration  Int?     @map("duration_ms")
+  error     String?
+  input     Json?
+  output    Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("action_logs")
+}
+
+model Extension {
+  id           String    @id @default(uuid()) @db.Uuid
+  name         String
+  displayName  String?   @map("display_name")
+  description String?
+  type        String
+  version     String?
+  enabled    Boolean   @default(false)
+  installedAt DateTime?  @map("installed_at")
+  configuration Json?   @map("configuration")
+  tenantId    String?   @db.Uuid @map("tenant_id")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @default(now()) @map("updated_at")
+  deletedAt   DateTime?  @map("deleted_at")
+
+  @@map("extensions")
+}
+
+model MarketplaceIntegration {
+  id            String   @id @default(uuid()) @db.Uuid
+  name          String   @unique
+  displayName   String?  @map("display_name")
+  description  String?
+  iconUrl      String?  @map("icon_url")
+  category     String?
+  provider    String?
+  homepageUrl String?  @map("homepage_url")
+  version     String?
+  isInstalled Boolean  @default(false) @map("is_installed")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  @@map("marketplace_integrations")
+}
+
+// =====================================================
+// LOGS & MONITORING
+// =====================================================
+
+model Log {
+  id          String   @id @default(uuid()) @db.Uuid
+  level       String
+  event       String
+  message     String
+  details     String?
+  userEmail   String?  @map("user_email")
+  userId      String?  @db.Uuid @map("user_id")
+  ipAddress   String?  @map("ip_address")
+  connection String?
+  location   String?
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([level])
+  @@index([event])
+  @@index([userId])
+  @@map("logs")
+}
+
+model LogStats {
+  id          String @id @default(uuid()) @db.Uuid
+  date       DateTime @db.Date
+  totalCount Int     @default(0) @map("total_count")
+  errorCount Int     @default(0) @map("error_count")
+  warnCount  Int     @default(0) @map("warn_count")
+  infoCount  Int     @default(0) @map("info_count")
+
+  @@map("log_stats")
+}
+
+model MonitoringStatus {
+  id        String   @id @default(uuid()) @db.Uuid
+  service  String
+  status   String
+  isEnabled Boolean @default(true) @map("is_enabled")
+  lastCheck DateTime? @map("last_check")
+  details  String?
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@unique([service])
+  @@map("monitoring_status")
+}
+
+model HealthMetrics {
+  id               String  @id @default(uuid()) @db.Uuid
+  date             DateTime @db.Date
+  cpuUsage         Float   @default(0) @map("cpu_usage")
+  memoryUsage     Float    @default(0) @map("memory_usage")
+  diskUsage       Float    @default(0) @map("disk_usage")
+  responseTime    Float?   @map("response_time")
+  requestCount    Int      @default(0) @map("request_count")
+  activeConnections Int  @default(0) @map("active_connections")
+
+  @@map("health_metrics")
+}
+
+// =====================================================
+// ACTIVITY & ANALYTICS
+// =====================================================
+
+model ActivityOverview {
+  id          String @id @default(uuid()) @db.Uuid
+  date        DateTime @db.Date
+  totalUsers  Int    @default(0) @map("total_users")
+  activeUsers Int    @default(0) @map("active_users")
+  logins     Int    @default(0)
+  signups    Int    @default(0)
+
+  @@map("activity_overview")
+}
+
+model UserStats {
+  id         String @id @default(uuid()) @db.Uuid
+  date       DateTime @db.Date
+  total      Int     @default(0)
+  active    Int     @default(0)
+  blocked   Int     @default(0)
+  pending   Int     @default(0)
+  withMfa   Int     @default(0) @map("with_mfa")
+
+  @@map("user_stats")
+}
+
+model SessionStats {
+  id     String  @id @default(uuid()) @db.Uuid
+  date   DateTime @db.Date
+  total  Int     @default(0)
+  active Int     @default(0)
+  expired Int    @default(0)
+
+  @@map("session_stats")
+}
+
+model LoginStats {
+  id      String  @id @default(uuid()) @db.Uuid
+  date    DateTime @db.Date
+  success Int     @default(0)
+  failed  Int     @default(0)
+  mfaUsed Int     @default(0) @map("mfa_used")
+
+  @@map("login_stats")
+}
+
+// =====================================================
+// SETTINGS
+// =====================================================
+
+model SystemSettings {
+  id            String   @id @default(uuid()) @db.Uuid
+  tenantId      String?  @db.Uuid @map("tenant_id")
+  settingsJson String? @map("settings_json")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  @@map("system_settings")
+}
+
+model GeneralSettings {
+  id           String   @id @default(uuid()) @db.Uuid
+  tenantId    String?  @db.Uuid @map("tenant_id")
+  appName    String?  @map("app_name")
+  appUrl     String?  @map("app_url")
+  supportEmail String?  @map("support_email")
+  supportUrl String?  @map("support_url")
+  logoUrl    String?  @map("logo_url")
+  faviconUrl String?  @map("favicon_url")
+  privacyUrl String?  @map("privacy_url")
+  tosUrl     String?  @map("tos_url")
+  language   String   @default("en")
+  timezone   String   @default("UTC")
+  dateFormat String   @default("yyyy-MM-dd")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("general_settings")
+}
+
+model DockerSettings {
+  id              String   @id @default(uuid()) @db.Uuid
+  tenantId        String?  @db.Uuid @map("tenant_id")
+  enabled        Boolean  @default(false)
+  hostPath      String?  @map("host_path")
+  containerPath String?  @map("container_path")
+  port         Int?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  @@map("docker_settings")
+}
+
+model EmailSettings {
+  id          String   @id @default(uuid()) @db.Uuid
+  tenantId    String?  @db.Uuid @map("tenant_id")
+  enabled    Boolean  @default(false)
+  smtpHost   String?  @map("smtp_host")
+  smtpPort   Int?     @map("smtp_port")
+  smtpUser   String?  @map("smtp_user")
+  smtpPass   String?  @map("smtp_pass")
+  fromEmail  String?  @map("from_email")
+  fromName  String?   @map("from_name")
+  useTls    Boolean  @default(true) @map("use_tls")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @default(now()) @map("updated_at")
+
+  @@map("email_settings")
+}
+
+model FeatureFlag {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  description String?
+  isEnabled   Boolean  @default(false) @map("is_enabled")
+  tenantId   String?  @db.Uuid @map("tenant_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+
+  @@map("feature_flags")
+}
+
+// =====================================================
+// TENANT & BILLING
+// =====================================================
+
+model Tenant {
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String
+  slug          String    @unique
+  isActive     Boolean   @default(true) @map("is_active")
+  plan          String?
+  environment  String?
+  region       String?
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @default(now()) @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  usage  TenantUsage[]
+  billing BillingInfo[]
+
+  @@map("tenants")
+}
+
+model TenantUsage {
+  id              String  @id @default(uuid()) @db.Uuid
+  tenantId        String  @db.Uuid @map("tenant_id")
+  periodStart    DateTime @map("period_start")
+  periodEnd    DateTime @map("period_end")
+  usersUsed    Int     @default(0) @map("users_used")
+  usersLimit   Int     @default(0) @map("users_limit")
+  sessionsUsed Int     @default(0) @map("sessions_used")
+  sessionsLimit Int    @default(0) @map("sessions_limit")
+  apiCallsUsed Int     @default(0) @map("api_calls_used")
+  apiCallsLimit Int    @default(0) @map("api_calls_limit")
+  storageUsedMb Int    @default(0) @map("storage_used_mb")
+  storageLimitMb Int   @default(0) @map("storage_limit_mb")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("tenant_usage")
+}
+
+model BillingInfo {
+  id               String   @id @default(uuid()) @db.Uuid
+  tenantId         String   @db.Uuid @map("tenant_id")
+  plan             String
+  status          String
+  paymentMethod   String?  @map("payment_method")
+  cardLast4      String?  @map("card_last4")
+  cardBrand      String?  @map("card_brand")
+  billingEmail  String?  @map("billing_email")
+  nextBillingDate DateTime? @map("next_billing_date")
+  amount        Float?
+  currency      String   @default("USD")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("billing_info")
+}
+
+// =====================================================
+// AGENTS & EVENTS
+// =====================================================
+
+model Agent {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String
+  type      String
+  status    String    @default("offline")
+  version   String?
+  endpoint  String?
+  lastSeenAt DateTime? @map("last_seen_at")
+  tenantId  String?   @db.Uuid @map("tenant_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("agents")
+}
+
+model Event {
+  id        String    @id @default(uuid()) @db.Uuid
+  type      String
+  source    String?
+  subject   String?
+  data      Json?
+  userId    String?   @db.Uuid @map("user_id")
+  tenantId  String?   @db.Uuid @map("tenant_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@index([type])
+  @@map("events")
+}
+
+// =====================================================
+// EMAIL VERIFICATION & PASSWORD RESET
+// =====================================================
+
+model EmailVerificationToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid @map("user_id")
+  email    String
+  token    String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation("UserEmailVerifs", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("email_verification_tokens")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation("UserPasswordResets", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
+
+model Account {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @db.Uuid @map("user_id")
+  provider     String
+  providerId   String   @map("provider_id")
+  accessToken String?  @map("access_token")
+  refreshToken String? @map("refresh_token")
+  expiresAt  DateTime? @map("expires_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @default(now()) @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider])
+  @@map("accounts")
+}
+
+model ApiKey {
+  id         String    @id @default(uuid()) @db.Uuid
+  key        String    @unique
+  name       String
+  userId     String    @db.Uuid @map("user_id")
+  scopes     String[]
+  isActive   Boolean   @default(true) @map("is_active")
+  lastUsedAt DateTime? @map("last_used_at")
+  expiresAt  DateTime? @map("expires_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @default(now()) @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("api_keys")
+}
+
+model ExternalAccount {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId     String   @db.Uuid @map("user_id")
+  provider   String
+  providerId String   @map("provider_id")
+  profile   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider])
+  @@map("external_accounts")
+}
+
+model ServiceKey {
+  id          String   @id @default(uuid()) @db.Uuid
+  key        String   @unique
+  name       String
+  serviceId   String   @db.Uuid @map("service_id")
+  expiresAt  DateTime? @map("expires_at")
+  lastUsedAt DateTime? @map("last_used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  createdBy String?  @db.Uuid @map("created_by")
+  updatedAt DateTime  @default(now()) @map("updated_at")
+  updatedBy String?  @db.Uuid @map("updated_by")
+
+  usages     ServiceKeyUsage[]
+
+  @@map("service_keys")
+}
+
+model ServiceKeyUsage {
+  id          String      @id @default(uuid()) @db.Uuid
+  serviceKeyId String      @db.Uuid @map("service_key_id")
+  endpoint    String
+  ipAddress   String?     @map("ip_address")
+  userAgent  String?     @map("user_agent")
+  createdAt  DateTime    @default(now()) @map("created_at")
+
+  serviceKey ServiceKey @relation(fields: [serviceKeyId], references: [id], onDelete: Cascade)
+
+  @@map("service_key_usages")
+}
+
+// =====================================================
+// DATABASE BACKUP
+// =====================================================
+
+model DatabaseBackup {
+  id         String   @id @default(uuid()) @db.Uuid
+  name      String
+  fileName   String   @map("file_name")
+  fileSize   BigInt
+  status    String
+  createdAt DateTime @default(now()) @map("created_at")
+  userId    String?  @db.Uuid @map("user_id")
+
+  @@map("database_backups")
+}

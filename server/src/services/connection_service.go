@@ -156,3 +156,27 @@ func (s *ConnectionService) UpdateAuthenticationProfile(profile *models.Authenti
 func (s *ConnectionService) DeleteAuthenticationProfile(id string) error {
 	return s.DB.Delete(&models.AuthenticationProfile{}, "id = ?", id).Error
 }
+
+func (s *ConnectionService) ListDatabaseConnectionUsers(connectionID string) ([]models.DatabaseConnectionUser, error) {
+	var users []models.DatabaseConnectionUser
+	if err := s.DB.Where("database_connection_id = ?", connectionID).Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+func (s *ConnectionService) ListEnterpriseConnections() ([]models.EnterpriseConnection, error) {
+	var conns []models.EnterpriseConnection
+	if err := s.DB.Find(&conns).Error; err != nil {
+		return nil, err
+	}
+	return conns, nil
+}
+
+func (s *ConnectionService) ListPasswordlessConnections() ([]models.PasswordlessConnection, error) {
+	var conns []models.PasswordlessConnection
+	if err := s.DB.Find(&conns).Error; err != nil {
+		return nil, err
+	}
+	return conns, nil
+}

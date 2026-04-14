@@ -49,7 +49,7 @@ func CreateDomain(c *gin.Context) {
 	// Créer le domaine
 	displayName := req.DisplayName
 	notes := req.Notes
-	domain := &model.Domain{
+	domain := &models.Domain{
 		Name:           req.Name,
 		DisplayName:    &displayName,
 		IsInternal:     req.IsInternal,

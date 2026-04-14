@@ -56,7 +56,7 @@ func (m *ServiceKeyAuthMiddleware) Authenticate(c *gin.Context) {
 	// First check if this is the system key
 	if serviceKey == m.systemKey {
 		// Create a system key object to attach to the context
-		systemKeyDetails := &model.ServiceKey{
+		systemKeyDetails := &models.ServiceKey{
 			Key:         m.systemKey,
 			Name:        "System Key (Application)",
 			Description: "System key used by the application for internal requests",

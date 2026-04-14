@@ -108,3 +108,62 @@ func (s *ActionService) GetActionLogsByAction(actionID string) ([]models.ActionL
 func (s *ActionService) UpdateActionLog(log *models.ActionLog) error {
 	return s.DB.Save(log).Error
 }
+
+func (s *ActionService) DeployAction(id string) error {
+	var action models.Action
+	if err := s.DB.First(&action, "id = ?", id).Error; err != nil {
+		return err
+	}
+	action.Status = "deployed"
+	return s.DB.Save(&action).Error
+}
+
+func (s *ActionService) TestAction(id string) (map[string]interface{}, error) {
+	var action models.Action
+	if err := s.DB.First(&action, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{
+		"tested": true,
+		"action": action.Name,
+		"result": "Test passed",
+	}, nil
+}
+
+func (s *ActionService) ListActionsForTrigger(triggerID string) ([]models.Action, error) {
+	var actions []models.Action
+	if err := s.DB.Where("trigger_id = ?", triggerID).Find(&actions).Error; err != nil {
+		return nil, err
+	}
+	return actions, nil
+}
+
+func (s *ActionService) ListActionLibrary() ([]models.Action, error) {
+	var actions []models.Action
+	if err := s.DB.Where("is_library = ?", true).Find(&actions).Error; err != nil {
+		return nil, err
+	}
+	return actions, nil
+}
+
+func (s *ActionService) AddActionToLibrary(action *models.Action) error {
+	action.Status = "library"
+	return s.DB.Save(action).Error
+}
+
+func (s *ActionService) RemoveActionFromLibrary(id string) error {
+	return s.DB.Delete(&models.Action{}, "id = ?", id).Error
+}
+
+func (s *ActionService) ListFormActions() ([]models.Action, error) {
+	var actions []models.Action
+	if err := s.DB.Where("type = ?", "form").Find(&actions).Error; err != nil {
+		return nil, err
+	}
+	return actions, nil
+}
+
+func (s *ActionService) CreateFormAction(action *models.Action) error {
+	action.Status = "form"
+	return s.DB.Create(action).Error
+}

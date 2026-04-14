@@ -68,7 +68,7 @@ func (s *ExternalAuthService) GenerateOAuthURL(provider, action string, userID *
 
 	// Sauvegarder le state en base
 	actionStr := action
-	oauthState := &model.OAuthState{
+	oauthState := &models.OAuthState{
 		State:     state,
 		Provider:  provider,
 		UserID:    userIDStr,
@@ -94,8 +94,8 @@ func (s *ExternalAuthService) GenerateOAuthURL(provider, action string, userID *
 }
 
 // ValidateOAuthState valide et récupère un state OAuth
-func (s *ExternalAuthService) ValidateOAuthState(state string) (*model.OAuthState, error) {
-	var oauthState model.OAuthState
+func (s *ExternalAuthService) ValidateOAuthState(state string) (*models.OAuthState, error) {
+	var oauthState models.OAuthState
 	if err := s.DB.Where("state = ?", state).First(&oauthState).Error; err != nil {
 		return nil, errors.New("invalid state")
 	}
@@ -163,7 +163,7 @@ type TokenExchangeResult struct {
 }
 
 // GetUserInfo récupère les informations utilisateur d'un provider
-func (s *ExternalAuthService) GetUserInfo(provider, accessToken string) (*model.ProviderUserInfo, error) {
+func (s *ExternalAuthService) GetUserInfo(provider, accessToken string) (*models.ProviderUserInfo, error) {
 	switch provider {
 	case "github":
 		return s.getGitHubUserInfo(accessToken)
@@ -179,7 +179,7 @@ func (s *ExternalAuthService) GetUserInfo(provider, accessToken string) (*model.
 }
 
 // getGitHubUserInfo récupère les infos utilisateur GitHub
-func (s *ExternalAuthService) getGitHubUserInfo(accessToken string) (*model.ProviderUserInfo, error) {
+func (s *ExternalAuthService) getGitHubUserInfo(accessToken string) (*models.ProviderUserInfo, error) {
 	req, err := http.NewRequest("GET", "https://api.github.com/user", nil)
 	if err != nil {
 		return nil, err
@@ -217,7 +217,7 @@ func (s *ExternalAuthService) getGitHubUserInfo(accessToken string) (*model.Prov
 		email, _ = s.getGitHubPrimaryEmail(accessToken)
 	}
 
-	return &model.ProviderUserInfo{
+	return &models.ProviderUserInfo{
 		ID:       fmt.Sprintf("%d", data.ID),
 		Email:    email,
 		Name:     data.Name,
@@ -263,7 +263,7 @@ func (s *ExternalAuthService) getGitHubPrimaryEmail(accessToken string) (string,
 }
 
 // getGoogleUserInfo récupère les infos utilisateur Google
-func (s *ExternalAuthService) getGoogleUserInfo(accessToken string) (*model.ProviderUserInfo, error) {
+func (s *ExternalAuthService) getGoogleUserInfo(accessToken string) (*models.ProviderUserInfo, error) {
 	req, err := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo", nil)
 	if err != nil {
 		return nil, err
@@ -296,7 +296,7 @@ func (s *ExternalAuthService) getGoogleUserInfo(accessToken string) (*model.Prov
 		return nil, err
 	}
 
-	return &model.ProviderUserInfo{
+	return &models.ProviderUserInfo{
 		ID:       data.ID,
 		Email:    data.Email,
 		Name:     data.Name,
@@ -306,7 +306,7 @@ func (s *ExternalAuthService) getGoogleUserInfo(accessToken string) (*model.Prov
 }
 
 // getMicrosoftUserInfo récupère les infos utilisateur Microsoft
-func (s *ExternalAuthService) getMicrosoftUserInfo(accessToken string) (*model.ProviderUserInfo, error) {
+func (s *ExternalAuthService) getMicrosoftUserInfo(accessToken string) (*models.ProviderUserInfo, error) {
 	req, err := http.NewRequest("GET", "https://graph.microsoft.com/v1.0/me", nil)
 	if err != nil {
 		return nil, err
@@ -343,7 +343,7 @@ func (s *ExternalAuthService) getMicrosoftUserInfo(accessToken string) (*model.P
 		email = data.UserPrincipalName
 	}
 
-	return &model.ProviderUserInfo{
+	return &models.ProviderUserInfo{
 		ID:     data.ID,
 		Email:  email,
 		Name:   data.DisplayName,
@@ -352,7 +352,7 @@ func (s *ExternalAuthService) getMicrosoftUserInfo(accessToken string) (*model.P
 }
 
 // getDiscordUserInfo récupère les infos utilisateur Discord
-func (s *ExternalAuthService) getDiscordUserInfo(accessToken string) (*model.ProviderUserInfo, error) {
+func (s *ExternalAuthService) getDiscordUserInfo(accessToken string) (*models.ProviderUserInfo, error) {
 	req, err := http.NewRequest("GET", "https://discord.com/api/users/@me", nil)
 	if err != nil {
 		return nil, err
@@ -394,7 +394,7 @@ func (s *ExternalAuthService) getDiscordUserInfo(accessToken string) (*model.Pro
 		avatarURL = fmt.Sprintf("https://cdn.discordapp.com/avatars/%s/%s.png", data.ID, data.Avatar)
 	}
 
-	return &model.ProviderUserInfo{
+	return &models.ProviderUserInfo{
 		ID:       data.ID,
 		Email:    data.Email,
 		Name:     name,
@@ -405,14 +405,14 @@ func (s *ExternalAuthService) getDiscordUserInfo(accessToken string) (*model.Pro
 }
 
 // FindOrCreateUser trouve ou crée un utilisateur à partir des infos OAuth
-func (s *ExternalAuthService) FindOrCreateUser(provider string, userInfo *model.ProviderUserInfo) (*model.User, bool, error) {
+func (s *ExternalAuthService) FindOrCreateUser(provider string, userInfo *models.ProviderUserInfo) (*models.User, bool, error) {
 	// Chercher si un compte externe existe déjà
-	var externalAccount model.ExternalAccount
+	var externalAccount models.ExternalAccount
 	err := s.DB.Where("provider = ? AND provider_user_id = ?", provider, userInfo.ID).First(&externalAccount).Error
 
 	if err == nil {
 		// Compte externe trouvé, récupérer l'utilisateur
-		var user model.User
+		var user models.User
 		if err := s.DB.First(&user, externalAccount.UserID).Error; err != nil {
 			return nil, false, err
 		}
@@ -426,7 +426,7 @@ func (s *ExternalAuthService) FindOrCreateUser(provider string, userInfo *model.
 	}
 
 	// Chercher un utilisateur avec le même email
-	var existingUser model.User
+	var existingUser models.User
 	if userInfo.Email != "" {
 		err = s.DB.Where("email = ?", userInfo.Email).First(&existingUser).Error
 		if err == nil {
@@ -440,7 +440,7 @@ func (s *ExternalAuthService) FindOrCreateUser(provider string, userInfo *model.
 	}
 
 	// Créer un nouvel utilisateur
-	newUser := &model.User{
+	newUser := &models.User{
 		Name:     &userInfo.Name,
 		Email:    &userInfo.Email,
 		IsActive: true,
@@ -469,9 +469,9 @@ func (s *ExternalAuthService) FindOrCreateUser(provider string, userInfo *model.
 }
 
 // LinkExternalAccount lie un compte externe à un utilisateur existant
-func (s *ExternalAuthService) LinkExternalAccount(userID string, provider string, userInfo *model.ProviderUserInfo, tokenData *TokenExchangeResult) error {
+func (s *ExternalAuthService) LinkExternalAccount(userID string, provider string, userInfo *models.ProviderUserInfo, tokenData *TokenExchangeResult) error {
 	// Vérifier si le compte n'est pas déjà lié
-	var existing model.ExternalAccount
+	var existing models.ExternalAccount
 	err := s.DB.Where("user_id = ? AND provider = ?", userID, provider).First(&existing).Error
 	if err == nil {
 		return errors.New("account already linked for this provider")
@@ -496,7 +496,7 @@ func (s *ExternalAuthService) LinkExternalAccount(userID string, provider string
 	}
 
 	// Créer le compte externe
-	externalAccount := &model.ExternalAccount{
+	externalAccount := &models.ExternalAccount{
 		UserID:            fmt.Sprint(userID),
 		Provider:          provider,
 		ProviderAccountID: userInfo.ID,
@@ -518,12 +518,12 @@ func (s *ExternalAuthService) LinkExternalAccount(userID string, provider string
 // UnlinkExternalAccount supprime le lien avec un compte externe
 func (s *ExternalAuthService) UnlinkExternalAccount(userID string, provider string) error {
 	// Vérifier que l'utilisateur a d'autres moyens d'authentification
-	var externalAccounts []model.ExternalAccount
+	var externalAccounts []models.ExternalAccount
 	if err := s.DB.Where("user_id = ?", userID).Find(&externalAccounts).Error; err != nil {
 		return err
 	}
 
-	var user model.User
+	var user models.User
 	if err := s.DB.First(&user, userID).Error; err != nil {
 		return err
 	}
@@ -534,7 +534,7 @@ func (s *ExternalAuthService) UnlinkExternalAccount(userID string, provider stri
 	}
 
 	// Supprimer le compte externe
-	result := s.DB.Where("user_id = ? AND provider = ?", userID, provider).Delete(&model.ExternalAccount{})
+	result := s.DB.Where("user_id = ? AND provider = ?", userID, provider).Delete(&models.ExternalAccount{})
 	if result.Error != nil {
 		return result.Error
 	}
@@ -547,13 +547,13 @@ func (s *ExternalAuthService) UnlinkExternalAccount(userID string, provider stri
 }
 
 // GetUserExternalAccounts récupère tous les comptes externes d'un utilisateur
-func (s *ExternalAuthService) GetUserExternalAccounts(userID uint) ([]*model.ExternalAccountResponse, error) {
-	var accounts []model.ExternalAccount
+func (s *ExternalAuthService) GetUserExternalAccounts(userID uint) ([]*models.ExternalAccountResponse, error) {
+	var accounts []models.ExternalAccount
 	if err := s.DB.Where("user_id = ?", userID).Find(&accounts).Error; err != nil {
 		return nil, err
 	}
 
-	responses := make([]*model.ExternalAccountResponse, len(accounts))
+	responses := make([]*models.ExternalAccountResponse, len(accounts))
 	for i, account := range accounts {
 		responses[i] = account.ToResponse()
 	}
@@ -632,7 +632,7 @@ func (s *ExternalAuthService) decrypt(ciphertext string) string {
 
 // RefreshAccessToken rafraîchit le token d'accès si possible
 func (s *ExternalAuthService) RefreshAccessToken(userID string, provider string) (string, error) {
-	var account model.ExternalAccount
+	var account models.ExternalAccount
 	if err := s.DB.Where("user_id = ? AND provider = ?", userID, provider).First(&account).Error; err != nil {
 		return "", err
 	}
@@ -697,5 +697,5 @@ func (s *ExternalAuthService) RefreshAccessToken(userID string, provider string)
 
 // CleanupExpiredStates nettoie les states OAuth expirés
 func (s *ExternalAuthService) CleanupExpiredStates() error {
-	return s.DB.Where("expires_at < ?", time.Now()).Delete(&model.OAuthState{}).Error
+	return s.DB.Where("expires_at < ?", time.Now()).Delete(&models.OAuthState{}).Error
 }

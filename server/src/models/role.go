@@ -6,6 +6,14 @@ import (
 	"gorm.io/gorm"
 )
 
+type RoleType string
+
+const (
+	RoleUser   RoleType = "USER"
+	RoleAdmin  RoleType = "ADMIN"
+	RoleEditor RoleType = "EDITOR"
+)
+
 // Role représente un rôle dans le système RBAC
 type Role struct {
 	ID          string    `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`

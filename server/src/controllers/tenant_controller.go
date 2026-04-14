@@ -124,3 +124,19 @@ func UpdateBillingInfo(c *gin.Context) {
 
 	c.JSON(http.StatusOK, billing)
 }
+
+func GetTenantInfo(c *gin.Context) {
+	tenantID := c.Query("tenant_id")
+	tenantService := services.NewTenantService(services.DB)
+	tenant, err := tenantService.GetTenant(tenantID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Tenant not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, tenant)
+}
+
+func UpdateTenantSettings(c *gin.Context) {
+	UpdateTenant(c)
+}

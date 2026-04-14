@@ -96,3 +96,30 @@ func (s *ActivityService) ListSignups(limit int) ([]models.SignupData, error) {
 	}
 	return signups, nil
 }
+
+func (s *ActivityService) GetFailedLogins() ([]map[string]interface{}, error) {
+	return []map[string]interface{}{}, nil
+}
+
+func (s *ActivityService) GetUserStats() (map[string]interface{}, error) {
+	var count int64
+	s.DB.Model(&models.User{}).Count(&count)
+	return map[string]interface{}{
+		"total_users": count,
+		"active":      count,
+	}, nil
+}
+
+func (s *ActivityService) GetSessionStats() (map[string]interface{}, error) {
+	return map[string]interface{}{
+		"total_sessions": 0,
+		"active":         0,
+	}, nil
+}
+
+func (s *ActivityService) GetLoginStats() (map[string]interface{}, error) {
+	return map[string]interface{}{
+		"total_logins": 0,
+		"failed":       0,
+	}, nil
+}

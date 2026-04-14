@@ -12,7 +12,7 @@ import (
 
 // Token endpoints pour OAuth2/password grant (MVP: réplique simple de login)
 func Token(c *gin.Context) {
-	var loginData model.LoginRequest
+	var loginData models.LoginRequest
 	if err := c.ShouldBindJSON(&loginData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
@@ -50,5 +50,5 @@ func Token(c *gin.Context) {
 	expiresRefresh := time.Now().Add(time.Duration(cfg.RefreshTokenExp) * time.Minute)
 	http.SetCookie(c.Writer, &http.Cookie{Name: "AETHER_REFRESH_TOKEN", Value: refreshTokenString, Path: "/", HttpOnly: true, Secure: true, SameSite: http.SameSiteLaxMode, Expires: expiresRefresh})
 
-	c.JSON(http.StatusOK, model.TokenResponse{AccessToken: accessToken, RefreshToken: refreshTokenString, ExpiresIn: cfg.AccessTokenExp})
+	c.JSON(http.StatusOK, models.TokenResponse{AccessToken: accessToken, RefreshToken: refreshTokenString, ExpiresIn: cfg.AccessTokenExp})
 }

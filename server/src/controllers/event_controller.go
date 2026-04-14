@@ -61,3 +61,7 @@ func GetEventsByType(c *gin.Context) {
 
 	c.JSON(http.StatusOK, events)
 }
+
+func GetEventDetails(c *gin.Context) {
+	GetEvent(c)
+}

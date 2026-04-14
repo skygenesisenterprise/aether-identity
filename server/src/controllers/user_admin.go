@@ -90,7 +90,7 @@ func CreateUserAdmin(c *gin.Context) {
 	// Créer l'utilisateur
 	name := req.Name
 	email := req.Email
-	user := &model.User{
+	user := &models.User{
 		Name:     &name,
 		Email:    &email,
 		IsActive: req.IsActive,

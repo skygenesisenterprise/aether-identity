@@ -67,3 +67,67 @@ func ListSignups(c *gin.Context) {
 
 	c.JSON(http.StatusOK, signups)
 }
+
+func GetActivityOverview(c *gin.Context) {
+	GetActivityStats(c)
+}
+
+func GetDailyActiveUsers(c *gin.Context) {
+	ListDAU(c)
+}
+
+func GetUserRetention(c *gin.Context) {
+	ListRetentions(c)
+}
+
+func GetSignupData(c *gin.Context) {
+	ListSignups(c)
+}
+
+func GetFailedLoginData(c *gin.Context) {
+	activityService := services.NewActivityService(services.DB)
+	data, err := activityService.GetFailedLogins()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, data)
+}
+
+func GetDashboardStats(c *gin.Context) {
+	GetActivityStats(c)
+}
+
+func GetUserStats(c *gin.Context) {
+	activityService := services.NewActivityService(services.DB)
+	stats, err := activityService.GetUserStats()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, stats)
+}
+
+func GetSessionStats(c *gin.Context) {
+	activityService := services.NewActivityService(services.DB)
+	stats, err := activityService.GetSessionStats()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, stats)
+}
+
+func GetLoginStats(c *gin.Context) {
+	activityService := services.NewActivityService(services.DB)
+	stats, err := activityService.GetLoginStats()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, stats)
+}

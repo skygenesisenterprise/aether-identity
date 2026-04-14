@@ -79,5 +79,6 @@
   "[go]": {
     "editor.defaultFormatter": "golang.go"
   },
-  "prisma.showPrismaDataPlatformNotification": false
+  "prisma.showPrismaDataPlatformNotification": false,
+  "prisma.pinToPrisma6": true
 }

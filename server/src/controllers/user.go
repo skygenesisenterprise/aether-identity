@@ -151,7 +151,7 @@ func ListUsers(c *gin.Context) {
 	}
 
 	// Convertir les utilisateurs en réponses
-	var userResponses []*model.UserResponse
+	var userResponses []*models.UserResponse
 	for _, user := range result.Users {
 		userResponses = append(userResponses, user.ToResponse())
 	}

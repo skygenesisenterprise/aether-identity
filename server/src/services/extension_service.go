@@ -48,3 +48,26 @@ func (s *ExtensionService) UpdateExtension(ext *models.Extension) error {
 func (s *ExtensionService) DeleteExtension(id string) error {
 	return s.DB.Delete(&models.Extension{}, "id = ?", id).Error
 }
+
+func (s *ExtensionService) InstallExtension(ext *models.Extension) error {
+	return s.DB.Save(ext).Error
+}
+
+func (s *ExtensionService) UninstallExtension(id string) error {
+	return s.DB.Delete(&models.Extension{}, "id = ?", id).Error
+}
+
+func (s *ExtensionService) GetExtensionConfig(id string) (map[string]interface{}, error) {
+	ext, err := s.GetExtension(id)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{
+		"extension_id": ext.ID,
+		"name":         ext.Name,
+	}, nil
+}
+
+func (s *ExtensionService) UpdateExtensionConfig(id string, config map[string]interface{}) error {
+	return nil
+}

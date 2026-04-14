@@ -146,7 +146,7 @@ func (ctrl *ExternalAuthController) HandleOAuthCallback(c *gin.Context) {
 }
 
 // handleLoginOAuth gère la connexion via OAuth
-func (ctrl *ExternalAuthController) handleLoginOAuth(c *gin.Context, provider string, userInfo *model.ProviderUserInfo, tokenResult *services.TokenExchangeResult) {
+func (ctrl *ExternalAuthController) handleLoginOAuth(c *gin.Context, provider string, userInfo *models.ProviderUserInfo, tokenResult *services.TokenExchangeResult) {
 	// Chercher ou créer l'utilisateur
 	user, isNew, err := ctrl.externalAuthService.FindOrCreateUser(provider, userInfo)
 	if err != nil {
@@ -155,7 +155,7 @@ func (ctrl *ExternalAuthController) handleLoginOAuth(c *gin.Context, provider st
 	}
 
 	// Générer les tokens JWT
-	client := &model.OAuthClient{
+	client := &models.OAuthClient{
 		ClientID: "external_auth",
 	}
 
@@ -204,7 +204,7 @@ func (ctrl *ExternalAuthController) handleLoginOAuth(c *gin.Context, provider st
 }
 
 // handleLinkOAuth gère le liaison d'un compte externe
-func (ctrl *ExternalAuthController) handleLinkOAuth(c *gin.Context, provider string, userID *uint, userInfo *model.ProviderUserInfo, tokenResult *services.TokenExchangeResult) {
+func (ctrl *ExternalAuthController) handleLinkOAuth(c *gin.Context, provider string, userID *uint, userInfo *models.ProviderUserInfo, tokenResult *services.TokenExchangeResult) {
 	if userID == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID required for linking"})
 		return

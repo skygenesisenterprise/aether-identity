@@ -10,7 +10,7 @@ import (
 // Cette fonction peut être appelée au démarrage de l'application ou via une route admin
 func (s *ExternalAuthService) MigrateDiscordAccounts() error {
 	// Récupérer tous les utilisateurs avec DiscordLinked=true
-	var users []model.User
+	var users []models.User
 	if err := s.DB.Where("discord_linked = ?", true).Find(&users).Error; err != nil {
 		return fmt.Errorf("failed to fetch users with Discord linked: %w", err)
 	}
@@ -21,7 +21,7 @@ func (s *ExternalAuthService) MigrateDiscordAccounts() error {
 
 	for _, user := range users {
 		// Vérifier si un compte externe Discord existe déjà
-		var existing model.ExternalAccount
+		var existing models.ExternalAccount
 		err := s.DB.Where("user_id = ? AND provider = ?", user.ID, "discord").First(&existing).Error
 		if err == nil {
 			// Déjà migré
@@ -30,7 +30,7 @@ func (s *ExternalAuthService) MigrateDiscordAccounts() error {
 		}
 
 		// Créer le compte externe
-		externalAccount := &model.ExternalAccount{
+		externalAccount := &models.ExternalAccount{
 			UserID:            user.ID,
 			Provider:          "discord",
 			ProviderAccountID: *user.DiscordID,
@@ -60,10 +60,10 @@ func (s *ExternalAuthService) GetMigrationStatus() map[string]interface{} {
 	var unmigratedCount int64
 
 	// Compter les utilisateurs avec DiscordLinked=true
-	s.DB.Model(&model.User{}).Where("discord_linked = ?", true).Count(&totalDiscordUsers)
+	s.DB.Model(&models.User{}).Where("discord_linked = ?", true).Count(&totalDiscordUsers)
 
 	// Compter les comptes externes Discord
-	s.DB.Model(&model.ExternalAccount{}).Where("provider = ?", "discord").Count(&migratedCount)
+	s.DB.Model(&models.ExternalAccount{}).Where("provider = ?", "discord").Count(&migratedCount)
 
 	unmigratedCount = totalDiscordUsers - migratedCount
 

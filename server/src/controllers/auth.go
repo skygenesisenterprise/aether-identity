@@ -17,7 +17,7 @@ type LoginResponse struct {
 	AccessToken  string      `json:"accessToken,omitempty"`
 	RefreshToken string      `json:"refreshToken,omitempty"`
 	ExpiresIn    int         `json:"expiresIn,omitempty"`
-	User         *model.User `json:"user,omitempty"`
+	User         *models.User `json:"user,omitempty"`
 	Redirect     string      `json:"redirect,omitempty"`
 }
 
@@ -28,7 +28,7 @@ type RegisterResponse struct {
 	AccessToken  string              `json:"accessToken,omitempty"`
 	RefreshToken string              `json:"refreshToken,omitempty"`
 	ExpiresIn    int                 `json:"expiresIn,omitempty"`
-	User         *model.UserResponse `json:"user,omitempty"`
+	User         *models.UserResponse `json:"user,omitempty"`
 }
 
 // ValidationErrorResponse représente une erreur de validation
@@ -40,7 +40,7 @@ type ValidationErrorResponse struct {
 
 // Login gère la connexion des utilisateurs avec support des redirections personnalisées
 func Login(c *gin.Context) {
-	var loginData model.LoginRequest
+	var loginData models.LoginRequest
 
 	if err := c.ShouldBindJSON(&loginData); err != nil {
 		c.JSON(http.StatusBadRequest, ValidationErrorResponse{
@@ -155,7 +155,7 @@ func Login(c *gin.Context) {
 }
 
 // determineRedirectURL calcule l'URL de redirection post-login
-func determineRedirectURL(loginData model.LoginRequest, cfg *config.Config) string {
+func determineRedirectURL(loginData models.LoginRequest, cfg *config.Config) string {
 	// Priorité 1: RedirectURI spécifié explicitement
 	if loginData.RedirectURI != "" {
 		return loginData.RedirectURI
@@ -219,7 +219,7 @@ func isLocalhostRequest(origin string) bool {
 
 // Register gère l'inscription des nouveaux utilisateurs avec validation complète
 func Register(c *gin.Context) {
-	var registerData model.RegisterRequest
+	var registerData models.RegisterRequest
 
 	if err := c.ShouldBindJSON(&registerData); err != nil {
 		c.JSON(http.StatusBadRequest, ValidationErrorResponse{
@@ -280,7 +280,7 @@ func Register(c *gin.Context) {
 	// Créer l'utilisateur
 	name := registerData.Name
 	email := registerData.Email
-	user := &model.User{
+	user := &models.User{
 		Name:     &name,
 		Email:    &email,
 		IsActive: true,
@@ -365,7 +365,7 @@ func Register(c *gin.Context) {
 
 // Logout gère la déconnexion
 func Logout(c *gin.Context) {
-	var request model.RefreshTokenRequest
+	var request models.RefreshTokenRequest
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -414,7 +414,7 @@ func Logout(c *gin.Context) {
 
 // RefreshToken rafraîchit le token JWT
 func RefreshToken(c *gin.Context) {
-	var refreshData model.RefreshTokenRequest
+	var refreshData models.RefreshTokenRequest
 
 	if err := c.ShouldBindJSON(&refreshData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -477,7 +477,7 @@ func RefreshToken(c *gin.Context) {
 		Expires:  ExpiresAccess,
 	})
 
-	c.JSON(http.StatusOK, model.TokenResponse{
+	c.JSON(http.StatusOK, models.TokenResponse{
 		AccessToken:  newAccessToken,
 		RefreshToken: refreshData.RefreshToken,
 		ExpiresIn:    cfg.AccessTokenExp,

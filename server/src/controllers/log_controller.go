@@ -73,3 +73,64 @@ func GetLogStats(c *gin.Context) {
 
 	c.JSON(http.StatusOK, stats)
 }
+
+func GetLogDetails(c *gin.Context) {
+	id := c.Param("id")
+	logService := services.NewLogService(services.DB)
+	logEntry, err := logService.GetLog(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Log not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, logEntry)
+}
+
+func ExportLogs(c *gin.Context) {
+	logService := services.NewLogService(services.DB)
+	logs, err := logService.ListLogs(1000, 0)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"logs": logs, "count": len(logs)})
+}
+
+func GetLogStream(c *gin.Context) {
+	logService := services.NewLogService(services.DB)
+	logs, err := logService.ListLogs(50, 0)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"logs": logs, "stream": true})
+}
+
+func GetActionLogDetails(c *gin.Context) {
+	id := c.Param("id")
+	actionService := services.NewActionService(services.DB)
+	logEntry, err := actionService.GetActionLog(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Action log not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, logEntry)
+}
+
+func GetSystemStatus(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "healthy",
+		"version": "1.0.0",
+	})
+}
+
+func GetHealthMetrics(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"cpu":    0.0,
+		"memory": 0.0,
+		"disk":   0.0,
+	})
+}

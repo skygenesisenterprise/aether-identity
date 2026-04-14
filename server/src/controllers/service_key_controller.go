@@ -263,7 +263,7 @@ func GetServiceKeyUsage(ctx *gin.Context) {
 		"data": gin.H{
 			"service_key_id": uint(id),
 			"total_requests": 0,
-			"recent_requests": []model.ServiceKeyUsage{},
+			"recent_requests": []models.ServiceKeyUsage{},
 		},
 		"message": "Service key usage retrieved successfully",
 	})

@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
+	_ "github.com/jackc/pgx/v5"
 	"github.com/skygenesisenterprise/aether-identity/server/src/config"
 	"github.com/skygenesisenterprise/aether-identity/server/src/models"
-	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -26,7 +26,7 @@ func NewPrismaService(cfg *config.Config) (*PrismaService, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	db, err := sql.Open("postgres", cfg.Database.URL)
+	db, err := sql.Open("postgres", cfg.DatabaseURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}

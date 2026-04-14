@@ -26,7 +26,7 @@ type OAuthTokenResponse struct {
 
 // AuthorizationHandler gère les requêtes d'autorisation OAuth2
 func AuthorizationHandler(c *gin.Context) {
-	var authReq model.AuthorizationRequest
+	var authReq models.AuthorizationRequest
 
 	if err := c.ShouldBindQuery(&authReq); err != nil {
 		c.Redirect(http.StatusFound, buildErrorRedirect(authReq.RedirectURI, "invalid_request", "Invalid request parameters"))
@@ -107,7 +107,7 @@ func AuthorizationHandler(c *gin.Context) {
 
 // TokenHandler gère les requêtes de token OAuth2
 func TokenHandler(c *gin.Context) {
-	var tokenReq model.TokenRequest
+	var tokenReq models.TokenRequest
 
 	if err := c.ShouldBind(&tokenReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -197,7 +197,7 @@ func UserInfoHandler(c *gin.Context) {
 
 	// Construire la réponse
 	familyName := ""
-	userInfo := model.UserInfoResponse{
+	userInfo := models.UserInfoResponse{
 		Sub:           user.ID,
 		Name:          user.Name,
 		Email:         user.Email,
@@ -265,7 +265,7 @@ func RevokeHandler(c *gin.Context) {
 }
 
 // handleAuthorizationCodeGrant gère le flux d'autorisation code
-func handleAuthorizationCodeGrant(c *gin.Context, tokenReq model.TokenRequest, client *model.OAuthClient, oauthService *services.OAuthService) {
+func handleAuthorizationCodeGrant(c *gin.Context, tokenReq models.TokenRequest, client *models.OAuthClient, oauthService *services.OAuthService) {
 	if tokenReq.Code == "" || tokenReq.RedirectURI == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":             "invalid_request",
@@ -369,7 +369,7 @@ func handleAuthorizationCodeGrant(c *gin.Context, tokenReq model.TokenRequest, c
 }
 
 // handleRefreshTokenGrant gère le flux de rafraîchissement de token
-func handleRefreshTokenGrant(c *gin.Context, tokenReq model.TokenRequest, client *model.OAuthClient, oauthService *services.OAuthService) {
+func handleRefreshTokenGrant(c *gin.Context, tokenReq models.TokenRequest, client *models.OAuthClient, oauthService *services.OAuthService) {
 	if tokenReq.RefreshToken == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":             "invalid_request",
@@ -443,7 +443,7 @@ func handleRefreshTokenGrant(c *gin.Context, tokenReq model.TokenRequest, client
 }
 
 // handlePasswordGrant gère le flux de mot de passe
-func handlePasswordGrant(c *gin.Context, tokenReq model.TokenRequest, client *model.OAuthClient, oauthService *services.OAuthService) {
+func handlePasswordGrant(c *gin.Context, tokenReq models.TokenRequest, client *models.OAuthClient, oauthService *services.OAuthService) {
 	if tokenReq.Username == "" || tokenReq.Password == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":             "invalid_request",
@@ -525,7 +525,7 @@ func handlePasswordGrant(c *gin.Context, tokenReq model.TokenRequest, client *mo
 }
 
 // handleClientCredentialsGrant gère le flux client credentials
-func handleClientCredentialsGrant(c *gin.Context, tokenReq model.TokenRequest, client *model.OAuthClient, oauthService *services.OAuthService) {
+func handleClientCredentialsGrant(c *gin.Context, tokenReq models.TokenRequest, client *models.OAuthClient, oauthService *services.OAuthService) {
 	// Générer un token d'accès pour le client
 	accessToken, err := oauthService.GenerateAccessToken(nil, client, []string{"api"})
 	if err != nil {
@@ -563,7 +563,7 @@ func buildErrorRedirect(redirectURI, errorType, errorDescription string) string 
 }
 
 // buildImplicitFlowRedirect construit une URL de redirection pour le flux implicite
-func buildImplicitFlowRedirect(authReq model.AuthorizationRequest, userID uint, client *model.OAuthClient, scopes []string) string {
+func buildImplicitFlowRedirect(authReq models.AuthorizationRequest, userID uint, client *models.OAuthClient, scopes []string) string {
 	cfg := config.LoadConfig()
 	oauthService := services.NewOAuthService(services.DB, services.NewJWTService(cfg.JWTSecret, cfg.AccessTokenExp, cfg.RefreshTokenExp))
 

@@ -67,3 +67,29 @@ func CreateMarketplaceIntegration(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, integration)
 }
+
+func GetIntegrationDetails(c *gin.Context) {
+	GetMarketplaceIntegration(c)
+}
+
+func InstallIntegration(c *gin.Context) {
+	InstallMarketplaceIntegration(c)
+}
+
+func UninstallIntegration(c *gin.Context) {
+	id := c.Param("id")
+	marketplaceService := services.NewMarketplaceService(services.DB)
+	integration, err := marketplaceService.GetMarketplaceIntegration(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Integration not found"})
+		return
+	}
+
+	integration.IsInstalled = false
+	if err := marketplaceService.UpdateMarketplaceIntegration(integration); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Integration uninstalled"})
+}

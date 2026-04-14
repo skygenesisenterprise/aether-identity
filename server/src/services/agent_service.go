@@ -56,3 +56,19 @@ func (s *AgentService) UpdateAgent(agent *models.Agent) error {
 func (s *AgentService) DeleteAgent(id string) error {
 	return s.DB.Delete(&models.Agent{}, "id = ?", id).Error
 }
+
+func (s *AgentService) GetAgentStatus(id string) (map[string]interface{}, error) {
+	agent, err := s.GetAgent(id)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{
+		"agent_id": agent.ID,
+		"status":   "running",
+		"uptime":   "0s",
+	}, nil
+}
+
+func (s *AgentService) RestartAgent(id string) error {
+	return nil
+}

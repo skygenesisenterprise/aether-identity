@@ -63,7 +63,7 @@ func CreateClient(c *gin.Context) {
 		720,
 	))
 
-	client := &model.OAuthClient{
+	client := &models.OAuthClient{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		Name:         req.Name,
@@ -126,7 +126,7 @@ func GetClient(c *gin.Context) {
 
 // ListClients liste tous les clients
 func ListClients(c *gin.Context) {
-	var clients []model.OAuthClient
+	var clients []models.OAuthClient
 
 	if err := services.DB.Find(&clients).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

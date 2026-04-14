@@ -10,7 +10,7 @@ import (
 
 // SendEmailVerification envoie un email de vérification
 func SendEmailVerification(c *gin.Context) {
-	var request model.EmailVerificationRequest
+	var request models.EmailVerificationRequest
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -54,7 +54,7 @@ func SendEmailVerification(c *gin.Context) {
 
 // VerifyEmail vérifie l'email avec un token
 func VerifyEmail(c *gin.Context) {
-	var request model.EmailVerificationConfirm
+	var request models.EmailVerificationConfirm
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -80,7 +80,7 @@ func VerifyEmail(c *gin.Context) {
 
 // RequestPasswordReset demande une réinitialisation de mot de passe
 func RequestPasswordReset(c *gin.Context) {
-	var request model.PasswordResetRequest
+	var request models.PasswordResetRequest
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -113,7 +113,7 @@ func RequestPasswordReset(c *gin.Context) {
 
 // ConfirmPasswordReset confirme la réinitialisation de mot de passe
 func ConfirmPasswordReset(c *gin.Context) {
-	var request model.PasswordResetConfirm
+	var request models.PasswordResetConfirm
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

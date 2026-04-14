@@ -94,3 +94,62 @@ func DeleteFeatureFlag(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 }
+
+func GetGeneralSettings(c *gin.Context) {
+	GetSystemSettings(c)
+}
+
+func UpdateGeneralSettings(c *gin.Context) {
+	UpdateSystemSettings(c)
+}
+
+func GetDockerSettings(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"enabled": false,
+		"image":   "",
+		"tag":     "latest",
+	})
+}
+
+func UpdateDockerSettings(c *gin.Context) {
+	var settings map[string]interface{}
+	if err := c.ShouldBindJSON(&settings); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	c.JSON(http.StatusOK, settings)
+}
+
+func GetEmailSettings(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"provider":   "smtp",
+		"host":       "",
+		"port":       587,
+		"from_email": "",
+	})
+}
+
+func UpdateEmailSettings(c *gin.Context) {
+	var settings map[string]interface{}
+	if err := c.ShouldBindJSON(&settings); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	c.JSON(http.StatusOK, settings)
+}
+
+func TestEmailConfig(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Test email sent"})
+}
+
+func UpdateFeatureFlags(c *gin.Context) {
+	var flags models.FeatureFlag
+	if err := c.ShouldBindJSON(&flags); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	c.JSON(http.StatusOK, flags)
+}

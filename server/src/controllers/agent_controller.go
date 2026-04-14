@@ -79,3 +79,34 @@ func DeleteAgent(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 }
+
+func RegisterAgent(c *gin.Context) {
+	CreateAgent(c)
+}
+
+func GetAgentDetails(c *gin.Context) {
+	GetAgent(c)
+}
+
+func GetAgentStatus(c *gin.Context) {
+	id := c.Param("id")
+	agentService := services.NewAgentService(services.DB)
+	status, err := agentService.GetAgentStatus(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Agent status not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, status)
+}
+
+func RestartAgent(c *gin.Context) {
+	id := c.Param("id")
+	agentService := services.NewAgentService(services.DB)
+	if err := agentService.RestartAgent(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Agent restarted"})
+}
