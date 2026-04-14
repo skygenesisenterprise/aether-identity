@@ -509,13 +509,13 @@ export default async function HealthcarePage({ params }: { params: Promise<{ loc
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href={`/${locale}/contact`}>
+                <Link href={`/${locale}/company/contact`}>
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
                     {t("cta.contact")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href={`/${locale}/docs`}>
+                <Link href={"/docs"}>
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
                     {t("cta.docs")}
                   </Button>

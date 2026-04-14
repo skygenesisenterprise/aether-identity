@@ -478,13 +478,13 @@ export default async function UserManagementPage({
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href={`/${locale}/docs`}>
+                <Link href={`/docs`}>
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
                     {t("cta.getStarted")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href={`/${locale}/contact`}>
+                <Link href={`/${locale}/company/contact`}>
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
                     {t("cta.contactSales")}
                   </Button>

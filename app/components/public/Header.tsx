@@ -266,7 +266,6 @@ function LanguageSwitcher({ locale }: { locale: string }) {
         aria-label="Select language"
       >
         <Languages className="h-4 w-4" />
-        <span className="hidden sm:inline">{currentLang.flag}</span>
       </button>
       <div className="absolute right-0 top-full mt-1 w-40 bg-background border border-border rounded-lg shadow-lg overflow-hidden z-50 hidden group-hover:block">
         {languages.map((lang) => (
@@ -480,7 +479,6 @@ export async function Header({ locale: initialLocale }: HeaderProps) {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
-
             <LanguageSwitcher locale={locale} />
 
             <Link href={getLocaleHref("/login")} className="hidden sm:block">

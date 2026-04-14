@@ -1,119 +1,236 @@
+import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Shield, Key, CheckCircle2, Download, Mail, AlertTriangle } from "lucide-react";
 
-export default function PGPPage() {
+export default async function PGPPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Public" });
+
+  const steps = [t("pgp.step1"), t("pgp.step2"), t("pgp.step3"), t("pgp.step4"), t("pgp.step5")];
+
+  const uses = [
+    { title: t("pgp.useVerifyTitle"), description: t("pgp.useVerifyDesc") },
+    { title: t("pgp.useEncryptTitle"), description: t("pgp.useEncryptDesc") },
+    { title: t("pgp.useSignTitle"), description: t("pgp.useSignDesc") },
+    { title: t("pgp.useConfirmTitle"), description: t("pgp.useConfirmDesc") },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <Header locale={locale as import("@/lib/locale").Locale} />
+
       <main className="flex-1">
-        <article className="mx-auto max-w-4xl px-4 py-12">
-          <h1 className="font-serif text-4xl font-bold text-foreground mb-8">
-            Clé PGP - Vérification d&apos;Authenticité
-          </h1>
-
-          <div className="prose prose-lg max-w-none text-foreground/80 space-y-6">
-            <p className="text-sm text-muted-foreground">Dernière mise à jour : Avril 2026</p>
-
-            <section>
-              <h2 className="font-serif text-2xl font-bold text-foreground mb-4">
-                Pourquoi vérifier notre clé PGP ?
-              </h2>
-              <p>
-                Dans un contexte où les fausses informations et les sites frauduleux sont de plus en
-                plus courants, il est essentiel de vérifier l&apos;authenticité du site d&apos;Aether Identity
-                Notre clé PGP vous permet de confirmer que vous êtes bien sur notre site
-                officiel et non sur une copie malicious.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-serif text-2xl font-bold text-foreground mb-4">Notre clé PGP</h2>
-              <div className="bg-muted p-4 rounded-lg overflow-x-auto">
-                <pre className="text-sm whitespace-pre-wrap break-all">
-                  {`-----BEGIN PGP PUBLIC KEY BLOCK-----
-Comment: This is a comment
-Version: GPG v2
-
-mQINBGVjbW0BEADGhQk4x+3q3aL2F3kY7H8xX5P9vK2mN4qR8T6wL1jF3H7
-YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9
-H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9
-kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7
-YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9
-H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9
-kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7
-YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9
-H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9
-kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7
-YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9
-H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9
-kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7
-YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9
-H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9
-kN5mR8T6wL1jF3H7YmQINBVjbW0BEAC9H4qW8xF2Y3L7pT9kN5mR8T6wL1jF3H7
-=XXXX
------END PGP PUBLIC KEY BLOCK-----`}
-                </pre>
+        {/* Hero Section */}
+        <section className="relative py-24 lg:py-32 border-b border-border">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+                <Key className="h-4 w-4 text-emerald-500" />
+                <span className="font-medium">{t("pgp.badge")}</span>
               </div>
-            </section>
-
-            <section>
-              <h2 className="font-serif text-2xl font-bold text-foreground mb-4">
-                Empreinte de la clé (Fingerprint)
-              </h2>
-              <div className="bg-muted p-4 rounded-lg">
-                <code className="text-sm break-all">
-                  4A5B 6C7D 8E9F 0ABC 1DEF 2345 6789 ABCD EF01 2345
-                </code>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
+                {t("pgp.heroTitle")}
+              </h1>
+              <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
+                {t("pgp.heroDescription")}
+              </p>
+              <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
+                <Link href={`/${locale}/security`}>
+                  <Button size="lg" className="gap-2 h-12 px-6 text-base">
+                    {t("pgp.viewSecurity")}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href={`/${locale}/contact`}>
+                  <Button variant="outline" size="lg" className="gap-2 h-12 px-6 text-base">
+                    {t("pgp.contactUs")}
+                  </Button>
+                </Link>
               </div>
-            </section>
-
-            <section>
-              <h2 className="font-serif text-2xl font-bold text-foreground mb-4">
-                Comment vérifier ?
-              </h2>
-              <ol className="list-decimal pl-6 space-y-3">
-                <li>Téléchargez notre clé PGP depuis cette page</li>
-                <li>Importez la clé dans votre logiciel GPG (GnuPG, Kleopatra, etc.)</li>
-                <li>Vérifiez l&apos;empreinte avec celle affichée ci-dessus</li>
-                <li>Comparez avec les informations officielles sur nos réseaux sociaux</li>
-                <li>Si les empreintes correspondent, vous êtes bien sur le site officiel</li>
-              </ol>
-            </section>
-
-            <section>
-              <h2 className="font-serif text-2xl font-bold text-foreground mb-4">Utilisation</h2>
-              <p>Vous pouvez utiliser notre clé PGP pour :</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Vérifier l&apos;authenticité de nos communiqués de presse</li>
-                <li>Chiffrer vos communications avec notre rédaction</li>
-                <li>Signer numériquement des documents officiaux</li>
-                <li>Confirmer l&apos;origine de nos publications</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="font-serif text-2xl font-bold text-foreground mb-4">Contact</h2>
-              <p>
-                Pour toute question concernant notre clé PGP ou pour nous envoyer un message
-                chiffré, contactez-nous à :{" "}
-                <a href="mailto:pgp@skygenesisenterprise.com" className="text-primary hover:underline">
-                  security@skygenesisenterprise.com
-                </a>
-              </p>
-            </section>
-
-            <section className="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg border border-yellow-200 dark:border-yellow-800">
-              <h2 className="font-serif text-xl font-bold text-foreground mb-4">⚠️ Attention</h2>
-              <p className="text-foreground/80">
-                Nous ne vous demanderons jamais vos clés privées ou vos phrases de passe. Ne
-                partagez jamais ces informations avec quiconque, même quelqu&apos;un se prétendant
-                être membre de notre équipe.
-              </p>
-            </section>
+            </div>
           </div>
-        </article>
+        </section>
+
+        {/* Why Verify Section */}
+        <section className="py-20 lg:py-28 border-b border-border">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mb-16">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("pgp.whyTitle")}
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                {t("pgp.whyDescription")}
+              </p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="p-6 rounded-lg border border-border bg-card">
+                <Shield className="h-8 w-8 text-foreground mb-4" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {t("pgp.whyAuthTitle")}
+                </h3>
+                <p className="text-sm text-muted-foreground">{t("pgp.whyAuthDesc")}</p>
+              </div>
+              <div className="p-6 rounded-lg border border-border bg-card">
+                <CheckCircle2 className="h-8 w-8 text-foreground mb-4" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {t("pgp.whyTrustTitle")}
+                </h3>
+                <p className="text-sm text-muted-foreground">{t("pgp.whyTrustDesc")}</p>
+              </div>
+              <div className="p-6 rounded-lg border border-border bg-card">
+                <Key className="h-8 w-8 text-foreground mb-4" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {t("pgp.whySecureTitle")}
+                </h3>
+                <p className="text-sm text-muted-foreground">{t("pgp.whySecureDesc")}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* PGP Key Section */}
+        <section className="py-20 lg:py-28 border-b border-border bg-muted/30">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mb-16">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("pgp.publicKeyTitle")}
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                {t("pgp.publicKeyDescription")}
+              </p>
+            </div>
+            <div className="grid lg:grid-cols-2 gap-8">
+              <div className="p-6 rounded-lg border border-border bg-card">
+                <h3 className="text-lg font-semibold text-foreground mb-4">
+                  {t("pgp.keyBlockTitle")}
+                </h3>
+                <div className="bg-muted p-4 rounded-lg overflow-x-auto">
+                  <pre className="text-xs sm:text-sm whitespace-pre-wrap break-all text-muted-foreground">
+                    {t("pgp.keyBlock")}
+                  </pre>
+                </div>
+                <div className="mt-4">
+                  <Button variant="outline" className="gap-2">
+                    <Download className="h-4 w-4" />
+                    {t("pgp.downloadKey")}
+                  </Button>
+                </div>
+              </div>
+              <div className="p-6 rounded-lg border border-border bg-card">
+                <h3 className="text-lg font-semibold text-foreground mb-4">
+                  {t("pgp.fingerprintTitle")}
+                </h3>
+                <div className="bg-muted p-4 rounded-lg">
+                  <code className="text-sm break-all text-foreground font-mono">
+                    {t("pgp.fingerprint")}
+                  </code>
+                </div>
+                <p className="mt-4 text-sm text-muted-foreground">{t("pgp.fingerprintDesc")}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* How to Verify Section */}
+        <section className="py-20 lg:py-28 border-b border-border">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mb-16">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("pgp.howVerifyTitle")}
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                {t("pgp.howVerifyDescription")}
+              </p>
+            </div>
+            <div className="max-w-3xl">
+              <ol className="space-y-4">
+                {steps.map((step, index) => (
+                  <li
+                    key={index}
+                    className="flex items-start gap-4 p-4 rounded-lg border border-border bg-card"
+                  >
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-foreground text-background font-semibold shrink-0">
+                      {index + 1}
+                    </div>
+                    <span className="text-muted-foreground">{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        {/* Usage Section */}
+        <section className="py-20 lg:py-28 border-b border-border bg-muted/30">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mb-16">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("pgp.usageTitle")}
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                {t("pgp.usageDescription")}
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 gap-6">
+              {uses.map((use) => (
+                <div key={use.title} className="p-6 rounded-lg border border-border bg-card">
+                  <div className="flex items-center gap-3 mb-3">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                    <h3 className="text-base font-semibold text-foreground">{use.title}</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{use.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Section */}
+        <section className="py-20 lg:py-28 border-b border-border">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl mx-auto">
+              <div className="p-6 rounded-lg border border-yellow-500/50 bg-yellow-500/10">
+                <div className="flex items-start gap-4">
+                  <AlertTriangle className="h-6 w-6 text-yellow-500 shrink-0 mt-1" />
+                  <div>
+                    <h2 className="text-xl font-semibold text-foreground mb-2">
+                      {t("pgp.warningTitle")}
+                    </h2>
+                    <p className="text-muted-foreground">{t("pgp.warningContent")}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact CTA */}
+        <section className="py-20 lg:py-28">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mx-auto text-center">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("pgp.questionsTitle")}
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                {t("pgp.questionsDescription")}
+              </p>
+              <div className="mt-8">
+                <a href="mailto:security@skygenesisenterprise.com">
+                  <Button size="lg" className="gap-2">
+                    <Mail className="h-4 w-4" />
+                    {t("pgp.emailSecurity")}
+                  </Button>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
-      <Footer />
+
+      <Footer locale={locale as "fr" | "be_fr" | "be_nl" | "ch_fr"} />
     </div>
   );
 }

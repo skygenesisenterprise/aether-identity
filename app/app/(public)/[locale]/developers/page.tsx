@@ -406,7 +406,7 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Why Developers Choose Aether
+                Why Developers Choose Identity
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
                 Built by developers, for developers. Every SDK is designed with developer experience
@@ -465,7 +465,7 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
                 Deployment Options
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Choose your preferred deployment method. Aether runs anywhere from bare metal to
+                Choose your preferred deployment method. Aether Identity runs anywhere from bare metal to
                 serverless.
               </p>
             </div>
@@ -623,7 +623,7 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
                 minutes.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/docs/quickstarts">
+                <Link href={`/${locale}/company/contact`}>
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
                     Start Building
                     <ArrowRight className="h-4 w-4" />

@@ -289,7 +289,7 @@ export async function Footer({ locale: initialLocale }: FooterProps) {
                 rel="noopener noreferrer"
                 className="hover:text-footer-link-hover transition-colors duration-150"
               >
-                A Sky Genesis Enterprise Product
+                {t("enterpriseproprietary")}
               </Link>
             </p>
             <p className="text-xs text-footer-muted">
