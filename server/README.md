@@ -1,236 +1,126 @@
 <div align="center">
 
-# 🚀 Aether Identity Server
+# 🚀 Aether Identity API
 
-[![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](https://github.com/skygenesisenterprise/aether-identity/blob/main/LICENSE) [![Go](https://img.shields.io/badge/Go-1.21+-blue?style=for-the-badge&logo=go)](https://golang.org/) [![Gin](https://img.shields.io/badge/Gin-1.9+-lightgrey?style=for-the-badge&logo=go)](https://gin-gonic.com/)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](https://github.com/skygenesisenterprise/aether-identity/blob/main/LICENSE) [![Go](https://img.shields.io/badge/Go-1.21+-blue?style=for-the-badge&logo=go)](https://golang.org/) [![Gin](https://img.shields.io/badge/Gin-1.9+-lightgrey?style=for-the-badge&logo=go)](https://gin-gonic.com/) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/) [![Prisma](https://img.shields.io/badge/Prisma-5+-2D3748?style=for-the-badge)](https://prisma.io/)
 
-**🔐 Enterprise-Grade Identity Management Server**
+**🔐 Enterprise Identity & Access Management - Complete OAuth 2.0 / OIDC Platform**
 
-A high-performance, secure identity management server built with Go, featuring JWT authentication, OAuth2 support, RBAC, and comprehensive API endpoints for user management, authentication, and authorization.
+Aether Identity is a comprehensive **identity management platform** built with Go, providing complete authentication, authorization, multi-tenancy, and enterprise features with OAuth 2.0 / OIDC compliance.
 
-[🚀 Quick Start](#-quick-start) • [📋 Features](#-features) • [🛠️ Tech Stack](#️-tech-stack) • [📁 Architecture](#-architecture) • [💻 Development](#-development)
+[🚀 Quick Start](#-quick-start) • [📋 Features](#-features) • [🛠️ Tech Stack](#-tech-stack) • [📁 Architecture](#-architecture) • [🔐 Authentication](#-authentication) • [📊 API Reference](#-api-reference) • [🤝 Contributing](#-contributing)
 
-[![GitHub stars](https://img.shields.io/github/stars/skygenesisenterprise/aether-identity?style=social)](https://github.com/skygenesisenterprise/aether-identity/stargazers) [![GitHub forks](https://img.shields.io/github/forks/skygenesisenterprise/aether-identity?style=social)](https://github.com/skygenesisenterprise/aether-identity/network)
+[![GitHub stars](https://img.shields.io/github/stars/skygenesisenterprise/aether-identity?style=social)](https://github.com/skygenesisenterprise/aether-identity/stargazers) [![GitHub forks](https://img.shields.io/github/forks/skygenesisenterprise/aether-identity?style=social)](https://github.com/skygenesisenterprise/aether-identity/network) [![GitHub issues](https://img.shields.io/github/issues/github/skygenesisenterprise/aether-identity)](https://github.com/skygenesisenterprise/aether-identity/issues)
 
 </div>
 
 ---
 
-## 🌟 What is Aether Identity Server?
+## 🌟 What is Aether Identity?
 
-**Aether Identity Server** is the core authentication and identity management component of the Aether ecosystem. Built with Go and the Gin framework, it provides:
+**Aether Identity** is an enterprise-grade identity and access management platform that provides complete authentication, authorization, and user management capabilities with OAuth 2.0 / OIDC compliance.
 
-- **🔐 Complete Authentication System** - JWT-based authentication with refresh tokens
-- **🛡️ Enterprise Security** - RBAC, input validation, rate limiting, and security middleware
-- **🔄 OAuth2 Support** - Userinfo, introspect, and authorization endpoints
-- **⚡ High Performance** - Go backend with GORM and PostgreSQL integration
-- **📊 Comprehensive API** - RESTful endpoints for user management and identity operations
-- **🏗️ Modular Architecture** - Clean separation of concerns with controllers, services, and repositories
-- **🔑 System Key Authentication** - Dedicated `sk_` key system for application-to-server communication
+### 🎯 Core Vision
 
-### 🎯 Our Vision
-
-- **🚀 High-Performance Backend** - Go 1.21+ with Gin framework for maximum throughput
-- **🔐 Complete Security** - JWT authentication, RBAC, input validation, and security headers
-- **🔄 OAuth2 Compliance** - Full OAuth2 specification implementation
-- **📊 RESTful API** - Well-documented, versioned API endpoints
-- **🗄️ Database Integration** - GORM ORM with PostgreSQL for data persistence
-- **🛠️ Developer-Friendly** - Comprehensive Makefile, hot reload, and testing support
-- **🔑 System Key Management** - Secure internal communication between application and server
+- **🔐 Complete Authentication** - JWT-based system with login/register, MFA, social login
+- **🏢 Enterprise Multi-Tenancy** - Organization, domain, and tenant management
+- **🔗 OAuth 2.0 / OIDC** - Full compliance with authorization code, client credentials, refresh token flows
+- **🛡️ Advanced Security** - MFA (TOTP, Email, SMS), attack protection, brute-force detection
+- **📱 Social Connections** - Google, GitHub, Microsoft, Discord, Apple, Facebook integration
+- **🏗️ Enterprise Connections** - SAML 2.0, OIDC, passwordless authentication
+- **📊 Analytics** - Activity tracking, user stats, security monitoring
 
 ---
 
-## 🆕 What's New
+## 📋 Features
 
-### 🎯 **Major Features**
+### 🔐 Authentication & Security
 
-#### 🔐 **Authentication System**
+- ✅ **JWT Authentication** - Access tokens with refresh token mechanism
+- ✅ **Multi-Factor Authentication (MFA)** - TOTP, Email, SMS support
+- ✅ **Social Login** - Google, GitHub, Microsoft, Discord, Apple, Facebook
+- ✅ **Enterprise Connections** - SAML 2.0, OIDC, passwordless
+- ✅ **Attack Protection** - Brute-force detection, rate limiting
+- ✅ **Password Policies** - Strength validation, breach detection
 
-- ✅ **JWT Tokens** - Secure token-based authentication with refresh mechanism
-- ✅ **OAuth2 Support** - Userinfo, introspect, and authorization endpoints
-- ✅ **Password Security** - bcrypt hashing for secure password storage
-- ✅ **Session Management** - HTTP-only cookies for secure token handling
-- ✅ **Email Verification** - Complete email verification workflow
-- ✅ **Password Reset** - Secure password recovery mechanism
+### 👥 User Management
 
-#### 🛡️ **Security Enhancements**
+- ✅ **User CRUD** - Create, read, update, delete users
+- ✅ **User Blocking** - Block/unblock, force logout
+- ✅ **Password Reset** - Email-based reset flow
+- ✅ **Email Verification** - Email confirmation
+- ✅ **Session Management** - Active sessions, force logout
 
-- ✅ **RBAC Middleware** - Role-based access control for API endpoints
-- ✅ **Input Validation** - Comprehensive validation middleware
-- ✅ **Rate Limiting** - Protection against brute force attacks
-- ✅ **CORS Configuration** - Secure cross-origin resource sharing
-- ✅ **Security Headers** - HTTP security headers for all responses
-- ✅ **System Key Authentication** - Dedicated `sk_` key for application-to-server communication
+### 🏢 Organizations & Domains
 
-#### 📊 **API Endpoints**
+- ✅ **Organization Management** - Create, update, delete organizations
+- ✅ **Member Management** - Add, remove, update roles
+- ✅ **Domain Management** - Custom domains, verification
+- ✅ **Multi-Tenancy** - Tenant isolation, billing
 
-- ✅ **Authentication** - Login, register, logout, refresh token
-- ✅ **User Management** - CRUD operations for users
-- ✅ **OAuth2** - Userinfo, introspect, authorize, discovery endpoints
-- ✅ **Health Checks** - Database health and maintenance endpoints
-- ✅ **Organization** - Organization and membership management
-- ✅ **Roles** - Role and permission management
-- ✅ **Domain Management** - Domain registration and verification
-- ✅ **Email Service** - Email sending and verification
-- ✅ **Client Management** - OAuth2 client registration
-- ✅ **Discord Integration** - Discord OAuth2 integration
-- ✅ **Service Keys** - API key management with `sk_` prefix for service authentication
-- ✅ **System Key Routes** - Dedicated endpoints for application-to-server communication
+### 🔗 Connections & Applications
 
-#### 🗄️ **Database Layer**
+- ✅ **OAuth 2.0 Clients** - Client credentials, redirect URIs
+- ✅ **Applications** - SPA, web, native, API, M2M applications
+- ✅ **Database Connections** - Custom database authentication
+- ✅ **Social Providers** - Configure social login providers
+- ✅ **Authentication Profiles** - Customizable auth flows
 
-- ✅ **GORM Integration** - Type-safe database operations
-- ✅ **PostgreSQL Support** - Production-ready database backend
-- ✅ **Auto-migrations** - Schema management with Prisma
-- ✅ **Connection Pooling** - Performance optimization
-- ✅ **Seed Scripts** - Development data initialization
+### 📊 Security & Monitoring
 
----
+- ✅ **MFA Policies** - Per-connection MFA requirements
+- ✅ **Security Analytics** - Threat detection, breach monitoring
+- ✅ **Activity Logs** - Comprehensive audit trail
+- ✅ **Health Monitoring** - System status, metrics
 
-## 📊 Current Status
+### 🎨 Branding & Customization
 
-> **✅ Production-Ready**: Complete authentication system with enterprise security features and system key authentication.
+- ✅ **Universal Login** - Custom login pages
+- ✅ **Branding** - Colors, logos, custom CSS
+- ✅ **Custom Domains** - Full domain customization
+- ✅ **Templates** - Pre-built branding templates
 
-### ✅ **Currently Implemented**
+### ⚡ Actions & Extensions
 
-#### 🏗️ **Core Foundation**
-
-- ✅ **Go Backend Server** - High-performance Gin API
-- ✅ **Authentication System** - JWT with refresh tokens and OAuth2 support
-- ✅ **Database Layer** - GORM with PostgreSQL and complete identity models
-- ✅ **Security Middleware** - RBAC, validation, rate limiting, CORS
-- ✅ **API Endpoints** - Complete RESTful API for identity management
-- ✅ **System Key Authentication** - Dedicated `sk_` key system for application communication
-
-#### 🔐 **Security Implementation**
-
-- ✅ **JWT Authentication** - Secure token-based authentication
-- ✅ **RBAC Middleware** - Role-based access control
-- ✅ **Input Validation** - Comprehensive request validation
-- ✅ **Rate Limiting** - Protection against brute force attacks
-- ✅ **Security Headers** - HTTP security headers
-- ✅ **System Key Middleware** - `AppAuthMiddleware` for application-to-server authentication
-
-#### 📊 **API Features**
-
-- ✅ **Authentication** - Login, register, logout, refresh token
-- ✅ **User Management** - CRUD operations with proper authorization
-- ✅ **OAuth2** - Userinfo, introspect, authorize, discovery endpoints
-- ✅ **Health Checks** - Database health monitoring
-- ✅ **Organization** - Organization and membership management
-- ✅ **Roles** - Role and permission management
-- ✅ **Domain Management** - Domain registration and verification
-- ✅ **Email Service** - Email sending and verification
-- ✅ **Client Management** - OAuth2 client registration
-- ✅ **Discord Integration** - Discord OAuth2 integration
-- ✅ **Service Keys** - API key management with `sk_` prefix
-- ✅ **System Key Routes** - Protected endpoints for application communication
-
-#### 🛠️ **Development Infrastructure**
-
-- ✅ **Development Environment** - Hot reload, Go modules
-- ✅ **Docker Deployment** - Production-ready containerization
-- ✅ **Makefile** - Comprehensive build and development commands
-- ✅ **Testing Suite** - Unit and integration tests
-- ✅ **Structured Logging** - Zerolog-based logging
-- ✅ **System Key Generation** - Script for secure key generation
-
-### 🔄 **In Development**
-
-- **Advanced Security** - Enhanced rate limiting and input validation
-- **API Documentation** - Comprehensive Swagger/OpenAPI documentation
-- **Testing Suite** - Expanded unit and integration tests
-- **Performance Optimization** - Caching and query optimization
-
-### 📋 **Planned Features**
-
-- **Multi-Factor Authentication** - TOTP and hardware key support
-- **Advanced Auditing** - Comprehensive logging and monitoring
-- **Single Sign-On** - SAML and OAuth2 federation
-- **Identity Federation** - Social login integration
-- **Advanced Analytics** - Usage metrics and reporting
+- ✅ **Actions** - Custom code execution on triggers
+- ✅ **Action Library** - Reusable action components
+- ✅ **Extensions** - Third-party integrations
+- ✅ **Marketplace** - Integration plugins
 
 ---
 
-## 🔑 System Key Authentication
+## 🛠️ Tech Stack
 
-### 🎯 **Overview**
-
-The **System Key** is a special authentication key designed for secure communication between the application web (`app/app/`) and the Aether Identity Server. This key follows the format `sk_<15_random_characters>` and is considered a "system" key that should only be used by the application itself.
-
-### 🔐 **Key Features**
-
-- **Dedicated Authentication** - Separate from regular service keys
-- **Application-Only** - Reserved for application-to-server communication
-- **15-Character Randomness** - Secure random generation for production
-- **Environment-Specific** - Different keys for dev, staging, and production
-- **No Database Storage** - System key is configured via environment variables
-
-### 📋 **System Key Format**
+### ⚙️ Backend Layer
 
 ```
-sk_<15_characters>
+Go 1.21+ + Gin Framework
+├── 🗄️ GORM + PostgreSQL (Database)
+├── 🔐 JWT Authentication (OAuth 2.0 / OIDC)
+├── 🛡️ Middleware (Security, CORS, Logging)
+├── 🌐 HTTP Router (Gin Router)
+├── 📦 JSON Serialization (Native Go)
+└── 🔒 Password Security (bcrypt)
 ```
 
-Where:
-- `sk_` is the fixed prefix
-- `<15_characters>` are 15 alphanumeric characters generated randomly
-
-### 🔧 **Configuration**
-
-1. **Generate a System Key**
-
-   ```bash
-   ./scripts/generate_system_key.sh
-   ```
-
-2. **Add to Environment Variables**
-
-   ```bash
-   # In .env file
-   SYSTEM_KEY=sk_your_random_key_here
-   ```
-
-3. **Use in Application**
-
-   ```javascript
-   // In Next.js application
-   const response = await fetch('http://localhost:8080/api/v1/app/health', {
-     headers: {
-       'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SYSTEM_KEY}`
-     }
-   });
-   ```
-
-### 🛡️ **Security Best Practices**
-
-- **Never commit** the system key to version control
-- **Rotate regularly** (every 3-6 months in production)
-- **Use different keys** for different environments
-- **Limit access** to the key to authorized team members only
-- **Monitor usage** of system key endpoints
-
-### 📚 **System Key Middleware**
-
-The server provides two middleware components for system key authentication:
-
-1. **`AppAuthMiddleware`** - Specifically for application routes
-   - Validates the system key
-   - Attaches `is_app_request` flag to context
-   - Used for dedicated application endpoints
-
-2. **`ServiceKeyAuthMiddleware`** - For general service key authentication
-   - Checks for system key first
-   - Falls back to database lookup for regular service keys
-   - Attaches `is_system_key` flag when system key is used
-
-### 🌐 **Protected Routes**
-
-System key-protected endpoints are available at:
+### 🗄️ Data Layer
 
 ```
-GET    /api/v1/app/health          - Health check for application
-GET    /api/v1/app/userinfo        - User info with system key auth
+PostgreSQL 14+ + GORM + Prisma
+├── 🏗️ Schema Management (Auto-migration)
+├── 🔍 Query Builder (Type-Safe Queries)
+├── 🔄 Connection Pooling (Performance)
+├── 👤 User Models (Complete Implementation)
+└── 📈 Seed Scripts (Development Data)
+```
+
+### 📦 Infrastructure
+
+```
+Make + Go Modules + Docker
+├── 🐳 Docker Deployment
+├── 📦 Prisma ORM (Database)
+└── 🔧 CLI Tools (Management)
 ```
 
 ---
@@ -239,11 +129,10 @@ GET    /api/v1/app/userinfo        - User info with system key auth
 
 ### 📋 Prerequisites
 
-- **Go** 1.21.0 or higher (for backend)
-- **Node.js** 18.0.0 or higher (for database migrations)
-- **PostgreSQL** 14.0 or higher (for database)
-- **Docker** (optional, for containerized deployment)
-- **Make** (for command shortcuts - included with most systems)
+- **Go** 1.21.0 or higher
+- **PostgreSQL** 14.0 or higher
+- **Docker** (optional, for container deployment)
+- **Make** (for command shortcuts)
 
 ### 🔧 Installation & Setup
 
@@ -254,46 +143,35 @@ GET    /api/v1/app/userinfo        - User info with system key auth
    cd aether-identity
    ```
 
-2. **Navigate to server directory**
-
-   ```bash
-   cd server
-   ```
-
-3. **Install Go dependencies**
-
-   ```bash
-   go mod download
-   ```
-
-4. **Environment setup**
+2. **Environment setup**
 
    ```bash
    cp .env.example .env
-   # Edit .env with your configuration
-   # Generate a system key:
-   cd ..
-   ./scripts/generate_system_key.sh
-   cd server
+   # Edit .env with your database credentials
    ```
 
-5. **Database initialization**
+3. **Quick start (recommended)**
 
    ```bash
-   # From project root
+   # Install dependencies and start server
+   make install
+   make dev
+   ```
+
+4. **Manual setup**
+
+   ```bash
+   # Install Go dependencies
+   go mod download
+
+   # Generate Prisma client
+   make db-generate
+
+   # Run database migrations
    make db-migrate
-   ```
 
-6. **Start the server**
-
-   ```bash
-   go run main.go
-   ```
-
-   Or using Makefile:
-
-   ```bash
-   make go-server
+   # Start development server
+   make server
    ```
 
 ### 🌐 Access Points
@@ -301,372 +179,329 @@ GET    /api/v1/app/userinfo        - User info with system key auth
 Once running, you can access:
 
 - **API Server**: [http://localhost:8080](http://localhost:8080)
-- **Health Check**: [http://localhost:8080/health](http://localhost:8080/health)
-- **Database Health**: [http://localhost:8080/health/database](http://localhost:8080/health/database)
-- **System Key Health**: [http://localhost:8080/api/v1/app/health](http://localhost:8080/api/v1/app/health) (with system key auth)
+- **Health Check**: [http://localhost:8080/health](http://localhost:8080/api/v1/health)
+- **OAuth Endpoints**: [http://localhost:8080/oauth](http://localhost:8080/oauth)
 
 ### 🎯 **Make Commands**
 
 ```bash
-# 🚀 Development
-make go-server           # Start Go server
-make go-build            # Build Go binary
-make go-test             # Run Go tests
-make go-mod-tidy         # Clean Go dependencies
-make go-fmt              # Format Go code
-
-# 🏗️ Building & Production
-make build               # Build production binary
-make docker-build        # Build Docker image
-make docker-run          # Run with Docker Compose
-
-# 🔧 Code Quality & Testing
-make lint                # Lint Go code
-make test                # Run all tests
-make test-coverage       # Run tests with coverage
+# 🚀 Server Management
+make server           # Start development server
+make server-prod      # Start production server
+make build            # Build binary
 
 # 🗄️ Database
-make db-migrate          # Run database migrations
-make db-studio           # Open Prisma Studio (from project root)
+make db-generate     # Generate Prisma client
+make db-migrate      # Run migrations
+make db-studio       # Open Prisma Studio
+make db-seed         # Seed development data
+make db-reset        # Reset database
 
-# 🔧 Utilities
-make clean               # Clean build artifacts
-make help                # Show all available commands
+# 🔧 Code Quality
+make lint            # Lint code
+make format          # Format code
+
+# 🐳 Docker
+make docker-build    # Build Docker image
+make docker-run      # Run with Docker
+make docker-stop    # Stop Docker services
+
+# 🛠️ Utilities
+make help            # Show all commands
+make status          # Show project status
+make health          # Check service health
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## ���� Architecture
 
-### ⚙️ **Backend Layer**
-
-```
-Go 1.21+ + Gin Framework
-├── 🗄️ GORM + PostgreSQL (Database Layer)
-├── 🔐 JWT Authentication (Complete Implementation)
-├── 🛡️ Middleware (Security, CORS, Logging, RBAC, System Key Auth)
-├── 🌐 HTTP Router (Gin Router)
-├── 📦 JSON Serialization (Native Go)
-└── 📊 Structured Logging (Zerolog)
-```
-
-### 🗄️ **Data Layer**
+### 🏗️ Server Structure
 
 ```
-PostgreSQL + GORM
-├── 🏗️ Schema Management (Auto-migration with Prisma)
-├── 🔍 Query Builder (Type-Safe Queries)
-├── 🔄 Connection Pooling (Performance)
-├── 👤 User Models (Complete Implementation)
-├── 🏢 Organization Models (Enterprise Features)
-├── 🎭 Role Models (RBAC Implementation)
-├── 🔗 Membership Models (Organization Membership)
-├── 🌐 Domain Models (Domain Management)
-├── 🔐 Token Models (JWT and Refresh Tokens)
-├── 🔄 OAuth2 Models (OAuth2 Integration)
-├── 🔑 Service Key Models (sk_ prefix for API keys)
-└── 📈 Seed Scripts (Development Data)
-```
-
-### 🏗️ **Server Architecture**
-
-```
-aether-identity/server/
-├── cmd/                    # Command-line entry points
-│   └── server/            # Main server application
-│       └── main.go       # Server entry point
-├── src/                    # Main source code
-│   ├── config/           # Configuration management
-│   │   ├── config.go     # Server configuration (includes SystemKey)
-│   │   └── oauth_config.go # OAuth2 configuration
-│   ├── controllers/      # HTTP request handlers
-│   │   ├── auth.go       # Authentication endpoints
-│   │   ├── client_controller.go # Client management endpoints
-│   │   ├── database.go   # Database controller
-│   │   ├── discord.go    # Discord integration endpoints
-│   │   ├── discovery_controller.go # Discovery endpoints
-│   │   ├── domain_controller.go # Domain management endpoints
-│   │   ├── email.go      # Email service endpoints
-│   │   ├── health.go     # Health check endpoints
-│   │   ├── introspect.go # Token introspection endpoints
-│   │   ├── oauth_controller.go # OAuth2 endpoints
-│   │   ├── service_key_controller.go # Service key management endpoints
-│   │   ├── token.go      # Token management endpoints
-│   │   ├── user.go       # User management endpoints
-│   │   └── userinfo.go   # Userinfo endpoints
+server/
+├── main.go                 # Main entry point
+├── Makefile               # Build & development commands
+├── prisma/
+│   └── schema.prisma      # Database schema (60+ models)
+├── src/
+│   ├── config/           # Configuration
+│   │   ├── config.go     # Main configuration
+│   │   ├── oauth_config.go
+│   │   └── oauth_providers_config.go
+│   ├── controllers/      # HTTP handlers (18 controllers)
+│   │   ├── auth.go
+│   │   ├── user.go
+│   │   ├── oauth_controller.go
+│   │   ├── application_controller.go
+│   │   ├── organization_controller.go
+│   │   ├── connection_controller.go
+│   │   ├── security_controller.go
+│   │   ├── branding_controller.go
+│   │   ├── action_controller.go
+│   │   ├── extension_controller.go
+│   │   ├── log_controller.go
+│   │   ├── activity_controller.go
+│   │   ├── settings_controller.go
+│   │   ├── agent_controller.go
+│   │   ├── event_controller.go
+│   │   ├── marketplace_controller.go
+│   │   └── tenant_controller.go
+│   ├── middleware/       # Gin middleware (10 middlewares)
+│   │   ├── auth.go
+│   │   ├── cors.go
+│   │   ├── admin_middleware.go
+│   │   ├── app_auth.go
+│   │   ├── service_key_auth.go
+│   │   ├── oauth_middleware.go
+│   │   ├── totp.go
+│   │   ├── rbac.go
+│   │   ├── database.go
+│   │   └── validation.go
+│   ├── models/           # Data models (27 models)
+│   │   ├── user.go
+│   │   ├── organization.go
+│   │   ├── application.go
+│   │   ├── connection.go
+│   │   ├── security.go
+│   │   ├── oauth.go
+│   │   ├── role.go
+│   │   ├── domain.go
+│   │   ├── branding.go
+│   │   ├── action.go
+│   │   ├── extension.go
+│   │   └── ...
+│   ├── routes/           # API routes
+│   │   └── routes.go    # All route definitions
+│   ├── services/         # Business logic (22 services)
+│   │   ├── user.go
+│   │   ├── auth_service.go
+│   │   ├── jwt.go
+│   │   ├── oauth.go
+│   │   ├── application_service.go
+│   │   ├── organization_service.go
+│   │   ├── connection_service.go
+│   │   ├── security_service.go
+│   │   └── ...
 │   ├── interfaces/       # Interface definitions
-│   │   ├── jwt_service.go # JWT service interface
-│   │   └── user_repository.go # User repository interface
-│   ├── middleware/       # HTTP middleware
-│   │   ├── admin_middleware.go # Admin role middleware
-│   │   ├── app_auth.go  # System key authentication middleware
-│   │   ├── auth.go       # Authentication middleware
-│   │   ├── database.go   # Database connection middleware
-│   │   ├── oauth_middleware.go # OAuth2 middleware
-│   │   ├── rbac.go       # RBAC middleware
-│   │   └── validation.go # Input validation middleware
-│   ├── model/            # Data models
-│   │   ├── auth.go       # Authentication models
-│   │   ├── database.go   # Database models
-│   │   ├── domain.go     # Domain models
-│   │   ├── membership.go # Membership models
-│   │   ├── oauth.go      # OAuth2 models
-│   │   ├── organization.go # Organization models
-│   │   ├── role.go       # Role models
-│   │   ├── service_key.go # Service key models (sk_ prefix)
-│   │   ├── token.go      # Token models
-│   │   └── user.go       # User models
-│   ├── routes/           # API route definitions
-│   │   └── routes.go     # Route configuration (includes system key routes)
-│   └── services/         # Business logic
-│       ├── database.go   # Database service
-│       ├── domain_service.go # Domain service
-│       ├── email.go      # Email service
-│       ├── jwt.go        # JWT service implementation
-│       ├── oauth.go      # OAuth2 service
-│       ├── service_key.go # Service key service
-│       └── user.go       # User service
-├── main.go               # Main entry point
-├── go.mod                # Go modules file
-├── go.sum                # Go modules checksum
-└── Makefile              # Build and development commands
+│   └── utils/            # Utility functions
+├── LICENSE
+└── README.md
 ```
+
+### 🔄 **Data Flow Architecture**
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Client App    │    │   Gin API        │    │   PostgreSQL    │
+│   (Frontend)    │◄──►│   (Backend)      │◄──►│   (Database)    │
+│  Port 3000      │    │  Port 8080       │    │  Port 5432      │
+│  TypeScript     │    │  Go              │    │                 │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                      │                       │
+         ▼                      ▼                       ▼
+    JWT Tokens            API Endpoints         User/Org Data
+    OAuth 2.0            Authentication         GORM ORM
+    React Context        Business Logic        Prisma ORM
+         │                      │
+         ▼                      ▼
+    ┌─────────────────┐    ┌──────────────────┐
+    │  Social Login   │    │  Security        │
+    │  Google        │    │  MFA, Brute-force│
+    │  GitHub        │    │  Protection      │
+    │  Discord       │    │                  │
+    └─────────────────┘    └──────────────────┘
+```
+
+---
+
+## 🔐 Authentication
+
+### 🎯 **OAuth 2.0 flows**
+
+The API supports multiple OAuth 2.0 grant types:
+
+- **Authorization Code** - Standard web applications
+- **Authorization Code + PKCE** - Mobile/SPA applications
+- **Client Credentials** - M2M (machine-to-machine)
+- **Refresh Token** - Token refresh
+- **Password Grant** - Legacy support (deprecated)
+
+### 🔑 **Token Endpoints**
+
+```
+POST /oauth/token          # Token endpoint
+POST /oauth/revoke         # Token revocation
+GET  /oauth/userinfo       # User info endpoint
+GET  /oauth/authorize      # Authorization endpoint
+GET  /oauth/.well-known/openid-configuration  # OIDC Discovery
+GET  /oauth/jwks           # JSON Web Key Set
+```
+
+### 🛡️ **Security Implementation**
+
+- JWT tokens with RS256 signing
+- Token expiration (access: 15min, refresh: 7 days)
+- Scope-based authorization
+  -Rate limiting per endpoint
+- CORS configuration
+- Input validation
 
 ---
 
 ## 📊 API Reference
 
-### 🎯 **Base URL**
+### 📋 **Core Endpoints**
 
-```
-http://localhost:8080/api/v1
-```
+#### Authentication (`/api/v1/auth`)
 
-All API endpoints are versioned and follow RESTful conventions.
+| Method | Endpoint               | Description            |
+| ------ | ---------------------- | ---------------------- |
+| POST   | /auth/login            | User login             |
+| POST   | /auth/register         | User registration      |
+| POST   | /auth/logout           | User logout            |
+| POST   | /auth/refresh          | Refresh token          |
+| POST   | /auth/token            | OAuth token            |
+| GET    | /auth/authorize        | Authorization endpoint |
+| GET    | /auth/discord/callback | Discord OAuth callback |
 
-### 🔐 **Authentication**
+#### Users (`/api/v1/users`)
 
-Most endpoints require authentication using JWT tokens. Include the token in the `Authorization` header:
+| Method | Endpoint   | Description  |
+| ------ | ---------- | ------------ |
+| GET    | /users     | List users   |
+| POST   | /users     | Create user  |
+| GET    | /users/:id | Get user     |
+| PUT    | /users/:id | Update user  |
+| DELETE | /users/:id | Delete user  |
+| GET    | /users/me  | Current user |
 
-```bash
-Authorization: Bearer <your_jwt_token>
-```
+#### Organizations (`/api/v1/organizations`)
 
-### 📋 **Response Format**
+| Method | Endpoint                   | Description         |
+| ------ | -------------------------- | ------------------- |
+| GET    | /organizations             | List organizations  |
+| POST   | /organizations             | Create organization |
+| GET    | /organizations/:id         | Get organization    |
+| PUT    | /organizations/:id         | Update organization |
+| DELETE | /organizations/:id         | Delete organization |
+| GET    | /organizations/:id/members | List members        |
 
-All responses follow this structure:
+#### Applications (`/api/v1/applications`)
 
-```json
-{
-  "success": true,
-  "data": { ... },
-  "message": "Operation successful"
-}
-```
+| Method | Endpoint                        | Description        |
+| ------ | ------------------------------- | ------------------ |
+| GET    | /applications                   | List applications  |
+| POST   | /applications                   | Create application |
+| GET    | /applications/:id               | Get application    |
+| PATCH  | /applications/:id               | Update application |
+| DELETE | /applications/:id               | Delete application |
+| POST   | /applications/:id/rotate-secret | Rotate secret      |
 
-Error responses:
+#### Connections (`/api/v1/connections`)
 
-```json
-{
-  "success": false,
-  "error": "Invalid credentials",
-  "message": "Authentication failed"
-}
-```
+| Method | Endpoint                 | Description        |
+| ------ | ------------------------ | ------------------ |
+| GET    | /connections             | List connections   |
+| POST   | /connections             | Create connection  |
+| GET    | /connections/:id         | Get connection     |
+| PATCH  | /connections/:id         | Update connection  |
+| DELETE | /connections/:id         | Delete connection  |
+| POST   | /connections/:id/enable  | Enable connection  |
+| POST   | /connections/:id/disable | Disable connection |
 
-### 🔑 **System Key Authentication**
+#### MFA (`/api/v1/security/mfa`)
 
-For system key-protected endpoints, use the system key in the Authorization header:
+| Method | Endpoint                  | Description            |
+| ------ | ------------------------- | ---------------------- |
+| GET    | /security/mfa/methods     | List MFA methods       |
+| PATCH  | /security/mfa/methods/:id | Enable/disable MFA     |
+| GET    | /security/mfa/policies    | List MFA policies      |
+| POST   | /security/mfa/policies    | Create MFA policy      |
+| POST   | /security/mfa/challenge   | Initiate MFA challenge |
+| POST   | /security/mfa/verify      | Verify MFA code        |
 
-```bash
-Authorization: Bearer sk_your_system_key_here
-```
+#### Settings (`/api/v1/settings`)
 
-Or without the Bearer prefix:
+| Method | Endpoint        | Description           |
+| ------ | --------------- | --------------------- |
+| GET    | /settings       | Get system settings   |
+| PATCH  | /settings       | Update settings       |
+| GET    | /settings/email | Get email settings    |
+| PATCH  | /settings/email | Update email settings |
 
-```bash
-Authorization: sk_your_system_key_here
-```
+### 📋 **OAuth Endpoints**
 
----
-
-## 📁 Architecture
-
-### 🏗️ **Server Structure**
-
-The server follows a clean, modular architecture with clear separation of concerns:
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     HTTP Request                           │
-└─────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     Middleware Layer                        │
-│  (Auth, RBAC, Validation, Database, Logging, System Key)   │
-└─────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     Controller Layer                        │
-│  (Request handling, validation, response formatting)       │
-└─────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     Service Layer                           │
-│  (Business logic, domain operations)                        │
-└─────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     Repository Layer                        │
-│  (Database operations, GORM integration)                    │
-└─────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     Database (PostgreSQL)                   │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### 🔄 **Data Flow**
-
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   HTTP Client   │    │   Gin API        │    │   PostgreSQL    │
-│  (Frontend)     │◄──►│   (Backend)      │◄──►│   (Database)    │
-│  Port 3000      │    │  Port 8080       │    │  Port 5432      │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-           │                       │                       │
-           ▼                       ▼                       ▼
-     HTTP Requests           API Endpoints         User/Data
-           │                       │                       │
-           ▼                       ▼                       ▼
-    ┌─────────────────┐    ┌──────────────────┐
-    │  Middleware     │    │  Controllers     │
-    │  (Auth, RBAC,   │    │  (Request        │
-    │   Validation)   │    │   Handling)      │
-    └─────────────────┘    └──────────────────┘
-           │                       │
-           ▼                       ▼
-    ┌─────────────────┐    ┌──────────────────┐
-    │  Services       │    │  Repositories    │
-    │  (Business      │    │  (Database       │
-    │   Logic)        │    │   Operations)    │
-    └─────────────────┘    └──────────────────┘
-```
+| Method | Endpoint                                | Description            |
+| ------ | --------------------------------------- | ---------------------- |
+| GET    | /oauth/authorize                        | Authorization endpoint |
+| POST   | /oauth/token                            | Token endpoint         |
+| GET    | /oauth/userinfo                         | User info endpoint     |
+| POST   | /oauth/revoke                           | Revoke endpoint        |
+| GET    | /oauth/.well-known/openid-configuration | OIDC Discovery         |
+| GET    | /oauth/jwks                             | JWKS endpoint          |
 
 ---
 
-## 💻 Development
+## 🗺️ Development Roadmap
 
-### 🎯 **Development Workflow**
+### 🎯 **Phase 1: Core Identity (✅ Complete)**
 
-```bash
-# New developer setup
-cd server
-go mod download
+- ✅ User CRUD + blocking/reset password
+- ✅ JWT Authentication with refresh tokens
+- ✅ Login/Signup flows
+- ✅ Basic logging
 
-# Daily development
-go run main.go          # Start server
-go test ./...           # Run tests
-go fmt ./...            # Format code
-go mod tidy             # Clean dependencies
+### 🚀 **Phase 2: Security (✅ Complete)**
 
-# Before committing
-make lint               # Check code quality
-make test               # Run tests
-go fmt ./...            # Format code
+- ✅ MFA methods (TOTP, Email, SMS)
+- ✅ MFA policies
+- ✅ Attack protection
+- ✅ Security analytics
 
-# Production deployment
-make build              # Build production binary
-make docker-build       # Create Docker image
-make docker-run         # Deploy
-```
+### 🏢 **Phase 3: Enterprise Features (✅ Complete)**
 
-### 📋 **Development Guidelines**
+- ✅ Organizations + members
+- ✅ Domain management
+- ✅ Custom domains
+- ✅ Enterprise connections
 
-- **Go Best Practices** - Follow Go conventions for backend code
-- **Clean Architecture** - Maintain separation of concerns
-- **Interface-Based Design** - Use interfaces for dependencies
-- **Error Handling** - Comprehensive error handling and logging
-- **Security First** - Validate all inputs and implement proper authentication
-- **Testing** - Write unit tests for all business logic
-- **Documentation** - Document all public APIs and functions
+### 📦 **Phase 4: Extensions (🔄 In Progress)**
 
-### 🎯 **Advanced Commands**
+- ⏳ Actions CRUD + deployment
+- ⏳ Extensions management
+- ⏳ Marketplace integrations
+- 📋 Webhooks
 
-```bash
-# Performance & Monitoring
-make perf-build         # Build with performance analysis
+### 🎨 **Phase 5: Advanced Features (📋 Planned)**
 
-# Environment Management
-make env-dev            # Setup development environment
-make env-prod           # Setup production environment
-
-# CI/CD Helpers
-make ci-build           # Build for CI
-make ci-test            # Test for CI
-
-# Project Information
-make help               # Show all commands
-```
+- 📋 Branding customization
+- 📋 Real-time logs stream
+- 📋 Activity analytics
+- 📋 Agent management
 
 ---
 
-## 🔐 Authentication System
+## 🤝 Contributing
 
-### 🎯 **Complete Implementation**
+We're looking for contributors to help build this identity platform!
 
-The authentication system is fully implemented with JWT tokens and OAuth2 support:
+### 🏗️ Areas Needing Help
 
-- **JWT Tokens** - Secure token-based authentication with refresh mechanism
-- **OAuth2 Support** - Userinfo, introspect, and authorization endpoints
-- **Password Security** - bcrypt hashing for secure password storage
-- **Session Management** - HTTP-only cookies for secure token handling
-- **Email Verification** - Complete email verification workflow
-- **Password Reset** - Secure password recovery mechanism
-- **System Key Authentication** - Dedicated `sk_` key for application-to-server communication
+- **Go Backend Development** - API endpoints, business logic
+- **Security** - Authentication, encryption, MFA
+- **Database Design** - Schema, migrations, optimization
+- **Frontend Development** - Admin dashboard
+- **DevOps** - Docker, deployment, CI/CD
+- **Documentation** - API docs, guides
 
-### 🔄 **Authentication Flow**
+### 📝 **Contribution Process**
 
-```go
-// Registration Process
-1. User submits registration → API validation
-2. Password hashing with bcrypt → Database storage
-3. JWT tokens generated → Client receives tokens
-4. User logged in
-
-// Login Process
-1. User submits credentials → API validation
-2. Password verification → JWT token generation
-3. Tokens stored → User authenticated
-4. Redirect to protected routes
-
-// Token Refresh
-1. Background token refresh → Automatic renewal
-2. Invalid tokens → Redirect to login
-3. Session expiration → Clean logout
-
-// System Key Authentication
-1. Application includes system key in Authorization header
-2. Server validates system key
-3. Request processed with system key privileges
-4. Response returned to application
-```
-
-### 🛡️ **Security Features**
-
-- **RBAC Middleware** - Role-based access control for all endpoints
-- **Input Validation** - Comprehensive request validation
-- **Rate Limiting** - Protection against brute force attacks
-- **CORS Configuration** - Secure cross-origin resource sharing
-- **Security Headers** - HTTP security headers for all responses
-- **CSRF Protection** - Cross-site request forgery prevention
-- **XSS Protection** - Cross-site scripting prevention
-- **System Key Isolation** - System key is separate from regular service keys
+1. **Fork the repository** and create a feature branch
+2. **Check the issues** for tasks that need help
+3. **Implement your changes** following our guidelines
+4. **Test thoroughly** before submitting
+5. **Submit a pull request** with clear description
 
 ---
 
@@ -674,36 +509,26 @@ The authentication system is fully implemented with JWT tokens and OAuth2 suppor
 
 ### 💬 **Get Help**
 
-- 📖 **[Documentation](https://github.com/skygenesisenterprise/aether-identity/docs/)** - Comprehensive guides and API docs
-- 🐛 **[GitHub Issues](https://github.com/skygenesisenterprise/aether-identity/issues)** - Bug reports and feature requests
-- 💡 **[GitHub Discussions](https://github.com/skygenesisenterprise/aether-identity/discussions)** - General questions and ideas
-
-### 🐛 **Reporting Issues**
-
-When reporting bugs, please include:
-
-- Clear description of the problem
-- Steps to reproduce
-- Environment information (Go version, PostgreSQL version, OS, etc.)
-- Error logs or screenshots
-- Expected vs actual behavior
+- 📖 **[Documentation](docs/)** - Comprehensive guides
+- 🐛 **[GitHub Issues](https://github.com/skygenesisenterprise/aether-identity/issues)** - Bug reports
+- 💡 **[GitHub Discussions](https://github.com/skygenesisenterprise/aether-identity/discussions)** - Questions
 
 ---
 
 ## 📊 Project Status
 
-| Component                 | Status         | Technology                | Notes                             |
-| ------------------------- | -------------- | ------------------------- | --------------------------------- |
-| **Go Backend API**        | ✅ Working     | Gin + GORM                | High-performance with PostgreSQL  |
-| **Authentication System** | ✅ Working     | JWT + OAuth2              | Complete implementation          |
-| **Security Middleware**   | ✅ Working     | RBAC + Validation         | Enterprise-grade security       |
-| **Database Layer**        | ✅ Working     | GORM + PostgreSQL         | Auto-migrations + user models    |
-| **API Endpoints**         | ✅ Working     | RESTful API              | Complete identity management     |
-| **OAuth2 Support**        | ✅ Working     | Userinfo + Introspect     | Full OAuth2 specification        |
-| **Testing Suite**         | 🔄 In Progress | Go Testing Framework      | Unit and integration tests       |
-| **API Documentation**     | 📋 Planned     | Swagger/OpenAPI          | Comprehensive API docs          |
-| **Performance Optimization** | 📋 Planned | Caching + Optimization  | Query and caching optimization  |
-| **System Key Authentication** | ✅ Working | System Key Middleware | Application-to-server auth |
+| Component            | Status         | Technology | Notes                    |
+| -------------------- | -------------- | ---------- | ------------------------ |
+| **Authentication**   | ✅ Working     | JWT + Go   | Complete implementation  |
+| **OAuth 2.0 / OIDC** | ✅ Working     | Go + Gin   | Full compliance          |
+| **User Management**  | ✅ Working     | Go + GORM  | CRUD operations          |
+| **Organization**     | ✅ Working     | Go + GORM  | Multi-tenant support     |
+| **MFA**              | ✅ Working     | Go         | TOTP, Email, SMS         |
+| **Security**         | ✅ Working     | Go         | Attack protection        |
+| **Connections**      | ✅ Working     | Go + GORM  | Database, Social, SAML   |
+| **Actions**          | 🔄 In Progress | Go         | Custom code execution    |
+| **Extensions**       | 🔄 In Progress | Go         | Third-party integrations |
+| **Admin Dashboard**  | 📋 Planned     | React      | User management UI       |
 
 ---
 
@@ -731,27 +556,27 @@ copies or substantial portions of the Software.
 
 ## 🙏 Acknowledgments
 
-- **Sky Genesis Enterprise** - Project leadership and development
-- **Go Community** - High-performance programming language and ecosystem
+- **Go Community** - High-performance programming language
 - **Gin Framework** - Lightweight HTTP web framework
 - **GORM Team** - Modern Go database library
-- **PostgreSQL Team** - Reliable database backend
-- **JWT Community** - JSON Web Token specification and libraries
-- **OAuth2 Community** - OAuth2 specification and best practices
+- **Prisma Team** - Database ORM
+- **Sky Genesis Enterprise** - Project leadership
 - **Open Source Community** - Tools, libraries, and inspiration
 
 ---
 
 <div align="center">
 
-### 🚀 **Join Us in Building the Future of Enterprise Identity Management!**
+### 🚀 **Join Us in Building the Future of Identity Management!**
 
 [⭐ Star This Repo](https://github.com/skygenesisenterprise/aether-identity) • [🐛 Report Issues](https://github.com/skygenesisenterprise/aether-identity/issues) • [💡 Start a Discussion](https://github.com/skygenesisenterprise/aether-identity/discussions)
 
-**🔐 Enterprise-Grade Identity Management with Go and Gin**
+---
+
+**🔐 Complete Enterprise Identity Platform with OAuth 2.0 / OIDC Support!**
 
 **Made with ❤️ by the [Sky Genesis Enterprise](https://skygenesisenterprise.com) team**
 
-_Building secure, high-performance identity management solutions for enterprises_
+_Building the future of enterprise identity management_
 
 </div>
