@@ -106,11 +106,11 @@ export default function LoginPage() {
           <div className="max-w-md mx-auto text-center text-sm text-muted-foreground space-y-2">
             <p>
               By signing in, you agree to our{" "}
-              <a href="#" className="text-primary hover:underline">
+              <a href="${locale}/legal/terms" className="text-primary hover:underline">
                 Terms of Service
               </a>{" "}
               and{" "}
-              <a href="#" className="text-primary hover:underline">
+              <a href="${locale}/legal/privacy" className="text-primary hover:underline">
                 Privacy Policy
               </a>
             </p>

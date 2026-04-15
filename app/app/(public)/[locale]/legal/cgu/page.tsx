@@ -162,7 +162,7 @@ export default async function CGUPage({ params }: PageProps) {
               <h2 className="font-serif text-2xl font-bold text-foreground mb-4">12. Contact</h2>
               <p>
                 Pour toute question concernant les présentes CGU, vous pouvez nous contacter à
-                l&apos;adresse : contact@etheriatimes.com
+                l&apos;adresse : contact@skygenesisenterprise.com
               </p>
             </section>
           </div>

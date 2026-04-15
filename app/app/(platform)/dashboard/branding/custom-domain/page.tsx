@@ -600,7 +600,7 @@ export default function CustomDomainPage() {
                   <div className="flex items-center gap-2">
                     <Input
                       readOnly
-                      value="https://auth.example.com/u/login"
+                      value="https://sso.skygenesisenterprise.com/login"
                       className="text-xs font-mono"
                     />
                     <Button variant="ghost" size="icon" className="h-8 w-8">

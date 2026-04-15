@@ -743,7 +743,7 @@ export default function UniversalLoginPage() {
                       <div className="flex items-center gap-2">
                         <Input
                           readOnly
-                          value="https://auth.aetheridentity.dev/u/login"
+                          value="https://sso.skygenesisenterprise.com/login"
                           className="text-xs font-mono"
                         />
                         <Button variant="ghost" size="icon" className="h-8 w-8">
