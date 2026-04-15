@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Shield,
@@ -18,6 +18,8 @@ import {
   Ban,
   Eye,
   Skull,
+  Loader2,
+  XCircle,
 } from "lucide-react";
 import {
   Area,
@@ -42,8 +44,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { securityDashboardApi } from "@/lib/api/client";
+import type { SecurityAnalytics, ThreatData } from "@/lib/api/types";
 
-const securityActivityData = [
+interface ActivityData {
+  time: string;
+  blocked: number;
+  failed: number;
+  suspicious: number;
+  mfa: number;
+}
+
+const defaultActivityData: ActivityData[] = [
   { time: "00:00", blocked: 12, failed: 3, suspicious: 1, mfa: 8 },
   { time: "04:00", blocked: 8, failed: 2, suspicious: 0, mfa: 5 },
   { time: "08:00", blocked: 45, failed: 18, suspicious: 5, mfa: 32 },
@@ -52,7 +64,7 @@ const securityActivityData = [
   { time: "20:00", blocked: 34, failed: 8, suspicious: 3, mfa: 25 },
 ];
 
-const threatData = [
+const defaultThreatData: ThreatData[] = [
   { type: "Brute Force", count: 234, severity: "high" },
   { type: "Credential Stuffing", count: 89, severity: "critical" },
   { type: "Suspicious IP", count: 156, severity: "medium" },
@@ -212,6 +224,64 @@ function getEventIcon(type: string) {
 export default function SecurityAnalyticsPage() {
   const [timeRange, setTimeRange] = useState("24h");
   const [threatType, setThreatType] = useState("all");
+  const [analytics, setAnalytics] = useState<SecurityAnalytics | null>(null);
+  const [threats, setThreats] = useState<ThreatData[]>(defaultThreatData);
+  const [activityData] = useState<ActivityData[]>(defaultActivityData);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [analyticsRes, threatsRes] = await Promise.all([
+          securityDashboardApi.getSecurityAnalytics(),
+          securityDashboardApi.getThreats(),
+        ]);
+
+        if (analyticsRes.success && analyticsRes.data) {
+          setAnalytics(analyticsRes.data);
+        }
+        if (threatsRes.success && threatsRes.data) {
+          setThreats(threatsRes.data);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load analytics data");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Card className="w-96">
+          <CardContent className="p-6">
+            <div className="text-center text-red-500">
+              <XCircle className="h-8 w-8 mx-auto mb-2" />
+              <p>{error}</p>
+              <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -352,10 +422,7 @@ export default function SecurityAnalyticsPage() {
                 </div>
               </div>
               <ChartContainer config={chartConfig} className="h-64 w-full">
-                <AreaChart
-                  data={securityActivityData}
-                  margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-                >
+                <AreaChart data={activityData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="fillBlocked" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="var(--color-blocked)" stopOpacity={0.2} />
@@ -415,7 +482,7 @@ export default function SecurityAnalyticsPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {threatData.map((threat) => (
+                {threats.map((threat) => (
                   <div key={threat.type} className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm">{threat.type}</span>

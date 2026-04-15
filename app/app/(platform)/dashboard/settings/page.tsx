@@ -13,6 +13,8 @@ import {
   CheckCircle2,
   Info,
   GitBranch,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -65,6 +67,9 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [dockerLoading, setDockerLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [testingEmail, setTestingEmail] = useState(false);
+  const [emailTestResult, setEmailTestResult] = useState<"success" | "error" | null>(null);
 
   useEffect(() => {
     loadSettings();
@@ -72,12 +77,14 @@ export default function SettingsPage() {
 
   const loadSettings = async () => {
     try {
+      setError(null);
       const response = await settingsApi.get();
       if (response.data) {
         setSettings(response.data);
       }
-    } catch (error) {
-      console.error("Failed to load settings:", error);
+    } catch (err) {
+      console.error("Failed to load settings:", err);
+      setError("Failed to load settings. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -86,12 +93,14 @@ export default function SettingsPage() {
   const handleSave = async () => {
     setSaving(true);
     setSaved(false);
+    setError(null);
     try {
       await settingsApi.update(settings);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch (error) {
-      console.error("Failed to save settings:", error);
+    } catch (err) {
+      console.error("Failed to save settings:", err);
+      setError("Failed to save settings. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -99,14 +108,32 @@ export default function SettingsPage() {
 
   const handleUpdateDockerImage = async () => {
     setDockerLoading(true);
+    setError(null);
     try {
       await settingsApi.update({ dockerImage: settings.dockerImage });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch (error) {
-      console.error("Failed to update Docker image:", error);
+    } catch (err) {
+      console.error("Failed to update Docker image:", err);
+      setError("Failed to update Docker image. Please try again.");
     } finally {
       setDockerLoading(false);
+    }
+  };
+
+  const handleTestEmail = async () => {
+    setTestingEmail(true);
+    setEmailTestResult(null);
+    setError(null);
+    try {
+      await settingsApi.testEmail();
+      setEmailTestResult("success");
+    } catch (err) {
+      console.error("Failed to test email:", err);
+      setEmailTestResult("error");
+      setError("Failed to send test email. Please check your SMTP configuration.");
+    } finally {
+      setTestingEmail(false);
     }
   };
 
@@ -114,7 +141,7 @@ export default function SettingsPage() {
     return (
       <div className="min-h-screen bg-muted/30 flex items-center justify-center">
         <div className="flex items-center gap-2">
-          <RefreshCw className="h-5 w-5 animate-spin" />
+          <Loader2 className="h-5 w-5 animate-spin" />
           <span>Loading settings...</span>
         </div>
       </div>
@@ -138,6 +165,13 @@ export default function SettingsPage() {
       </div>
 
       <div className="p-6">
+        {error && (
+          <div className="mb-6 flex items-center gap-2 p-4 rounded-lg bg-red-50 border border-red-200">
+            <AlertCircle className="h-5 w-5 text-red-600" />
+            <span className="text-sm text-red-700">{error}</span>
+          </div>
+        )}
+
         <Tabs defaultValue="general" className="space-y-6">
           <TabsList className="bg-background">
             <TabsTrigger value="general" className="gap-2">
@@ -409,10 +443,31 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <Button variant="outline" className="gap-2">
-                  <Mail className="h-4 w-4" />
-                  Test Email Configuration
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={handleTestEmail}
+                  disabled={testingEmail}
+                >
+                  {testingEmail ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Mail className="h-4 w-4" />
+                  )}
+                  {testingEmail ? "Sending..." : "Test Email Configuration"}
                 </Button>
+                {emailTestResult === "success" && (
+                  <div className="flex items-center gap-2 text-green-600 text-sm">
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span>Test email sent successfully!</span>
+                  </div>
+                )}
+                {emailTestResult === "error" && (
+                  <div className="flex items-center gap-2 text-red-600 text-sm">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>Failed to send test email</span>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

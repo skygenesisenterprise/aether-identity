@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Bot,
@@ -15,25 +16,15 @@ import {
   AlertCircle,
   LogIn,
   TrendingUp,
+  Loader2,
 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-
-const agentStats = [
-  { label: "Active Agents", value: "24", change: "+3", trend: "up", icon: Bot },
-  { label: "Total Requests", value: "8,432", change: "+18%", trend: "up", icon: Users },
-  { label: "Auth Success Rate", value: "99.7%", change: "+0.2%", trend: "up", icon: Shield },
-  {
-    label: "Failed Authentications",
-    value: "12",
-    change: "-23%",
-    trend: "down",
-    icon: AlertCircle,
-  },
-];
+import { agentsApi } from "@/lib/api/client";
+import type { Agent } from "@/lib/api/types";
 
 const features = [
   {
@@ -91,44 +82,6 @@ const quickLinks = [
   },
 ];
 
-const recentAgentActivity = [
-  {
-    agent: "customer-support-bot",
-    action: "User authentication completed",
-    user: "john.doe@example.com",
-    status: "success",
-    time: "2 minutes ago",
-  },
-  {
-    agent: "data-sync-worker",
-    action: "API token refreshed",
-    user: "system",
-    status: "success",
-    time: "5 minutes ago",
-  },
-  {
-    agent: "notification-agent",
-    action: "Auth challenge failed - retrying",
-    user: "unknown",
-    status: "warning",
-    time: "12 minutes ago",
-  },
-  {
-    agent: "analysis-bot",
-    action: "Fine-grained access check passed",
-    user: "jane.smith@company.co",
-    status: "success",
-    time: "18 minutes ago",
-  },
-];
-
-const configuredAgents = [
-  { name: "Customer Support Bot", type: "Interactive", status: "active", requests: 342 },
-  { name: "Data Sync Worker", type: "Background", status: "active", requests: 1250 },
-  { name: "Notification Agent", type: "Event-driven", status: "inactive", requests: 0 },
-  { name: "Analysis Bot", type: "Scheduled", status: "active", requests: 89 },
-];
-
 function getStatusBadge(status: string) {
   switch (status) {
     case "success":
@@ -170,6 +123,18 @@ function getStatusBadge(status: string) {
           Coming Soon
         </Badge>
       );
+    case "error":
+      return (
+        <Badge className="bg-red-100 text-red-700 hover:bg-red-100 text-xs font-normal">
+          Error
+        </Badge>
+      );
+    case "pending":
+      return (
+        <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 text-xs font-normal">
+          Pending
+        </Badge>
+      );
     default:
       return (
         <Badge variant="secondary" className="text-xs font-normal">
@@ -180,6 +145,43 @@ function getStatusBadge(status: string) {
 }
 
 export default function AgentsPage() {
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const activeAgents = agents.filter((a) => a.status === "active").length;
+  const totalRequests = agents.reduce((sum, a) => sum + a.requestCount, 0);
+
+  useEffect(() => {
+    loadAgents();
+  }, []);
+
+  const loadAgents = async () => {
+    try {
+      setError(null);
+      const response = await agentsApi.list();
+      if (response.data) {
+        setAgents(response.data);
+      }
+    } catch (err) {
+      console.error("Failed to load agents:", err);
+      setError("Failed to load agents. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          <span>Loading agents...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-muted/30">
       <div className="border-b bg-background">
@@ -203,34 +205,101 @@ export default function AgentsPage() {
       </div>
 
       <div className="p-6 space-y-6">
+        {error && (
+          <div className="flex items-center gap-2 p-4 rounded-lg bg-red-50 border border-red-200">
+            <AlertCircle className="h-5 w-5 text-red-600" />
+            <span className="text-sm text-red-700">{error}</span>
+          </div>
+        )}
+
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {agentStats.map((stat) => (
-            <Card key={stat.label}>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                    <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
-                  </div>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                    <stat.icon className="h-6 w-6 text-foreground" />
-                  </div>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">Active Agents</p>
+                  <p className="text-3xl font-bold tracking-tight">{activeAgents}</p>
                 </div>
-                <div className="mt-4 flex items-center gap-2 text-sm">
-                  <div
-                    className={cn(
-                      "flex items-center gap-1",
-                      stat.trend === "up" ? "text-green-600" : "text-green-600"
-                    )}
-                  >
-                    <TrendingUp className="h-4 w-4" />
-                    <span className="font-medium">{stat.change}</span>
-                  </div>
-                  <span className="text-muted-foreground">from last month</span>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                  <Bot className="h-6 w-6 text-foreground" />
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-sm">
+                <div className="flex items-center gap-1 text-green-600">
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="font-medium">{agents.length}</span>
+                </div>
+                <span className="text-muted-foreground">total configured</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">Total Requests</p>
+                  <p className="text-3xl font-bold tracking-tight">
+                    {totalRequests.toLocaleString()}
+                  </p>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                  <Users className="h-6 w-6 text-foreground" />
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-sm">
+                <div className="flex items-center gap-1 text-green-600">
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="font-medium">+18%</span>
+                </div>
+                <span className="text-muted-foreground">from last month</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">Auth Success Rate</p>
+                  <p className="text-3xl font-bold tracking-tight">99.7%</p>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                  <Shield className="h-6 w-6 text-foreground" />
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-sm">
+                <div className="flex items-center gap-1 text-green-600">
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="font-medium">+0.2%</span>
+                </div>
+                <span className="text-muted-foreground">from last month</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Failed Authentications
+                  </p>
+                  <p className="text-3xl font-bold tracking-tight">12</p>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                  <AlertCircle className="h-6 w-6 text-foreground" />
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-sm">
+                <div className="flex items-center gap-1 text-green-600">
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="font-medium">-23%</span>
+                </div>
+                <span className="text-muted-foreground">from last month</span>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <Card className="border-primary/20 bg-primary/5">
@@ -304,31 +373,35 @@ export default function AgentsPage() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y">
-                {recentAgentActivity.map((event, index) => (
-                  <div key={index} className="flex items-start gap-3 px-6 py-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted mt-0.5">
-                      {event.status === "success" ? (
-                        <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      ) : (
-                        <AlertCircle className="h-4 w-4 text-yellow-600" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0 space-y-1">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium truncate">{event.agent}</p>
-                        {getStatusBadge(event.status)}
+                {agents.length > 0 ? (
+                  agents.slice(0, 4).map((agent) => (
+                    <div key={agent.id} className="flex items-start gap-3 px-6 py-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted mt-0.5">
+                        {agent.status === "active" ? (
+                          <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <AlertCircle className="h-4 w-4 text-yellow-600" />
+                        )}
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span>{event.action}</span>
-                        <span>-</span>
-                        <span>{event.user}</span>
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium truncate">{agent.name}</p>
+                          {getStatusBadge(agent.status)}
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span>{agent.type}</span>
+                        </div>
                       </div>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                        {agent.lastActivity || agent.createdAt}
+                      </span>
                     </div>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {event.time}
-                    </span>
+                  ))
+                ) : (
+                  <div className="flex items-center justify-center py-8 text-muted-foreground text-sm">
+                    No recent activity
                   </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>
@@ -350,29 +423,39 @@ export default function AgentsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {configuredAgents.map((agent) => (
-                <div
-                  key={agent.name}
-                  className="flex flex-col gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                      <Bot className="h-5 w-5 text-foreground" />
+            {agents.length > 0 ? (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {agents.map((agent) => (
+                  <div
+                    key={agent.id}
+                    className="flex flex-col gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                        <Bot className="h-5 w-5 text-foreground" />
+                      </div>
+                      {getStatusBadge(agent.status)}
                     </div>
-                    {getStatusBadge(agent.status)}
+                    <div>
+                      <p className="text-sm font-medium">{agent.name}</p>
+                      <p className="text-xs text-muted-foreground">{agent.type}</p>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <LogIn className="h-3 w-3" />
+                      <span>{agent.requestCount.toLocaleString()} requests</span>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium">{agent.name}</p>
-                    <p className="text-xs text-muted-foreground">{agent.type}</p>
-                  </div>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <LogIn className="h-3 w-3" />
-                    <span>{agent.requests.toLocaleString()} requests</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                <Bot className="h-12 w-12 mb-4 opacity-50" />
+                <p className="text-sm">No agents configured yet</p>
+                <Button variant="outline" size="sm" className="mt-4" asChild>
+                  <Link href="/dashboard/agents/configure">Configure your first agent</Link>
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 

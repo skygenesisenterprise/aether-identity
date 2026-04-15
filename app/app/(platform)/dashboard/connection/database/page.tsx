@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Database,
@@ -12,6 +12,7 @@ import {
   LogIn,
   ArrowUpRight,
   ExternalLink,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +29,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import { connectionsApi } from "@/lib/api/client";
+import type { DatabaseConnection, DatabaseConnectionResponse } from "@/lib/api/types";
 
 const features = [
   {
@@ -91,13 +94,35 @@ const authMethods = [
 ];
 
 export default function DatabasePage() {
+  const [connections, setConnections] = useState<DatabaseConnection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [connectionName, setConnectionName] = useState("");
   const [identifiers, setIdentifiers] = useState<string[]>(["email"]);
   const [authMethodsEnabled, setAuthMethodsEnabled] = useState<string[]>(["password"]);
   const [allowNonUniqueEmail, setAllowNonUniqueEmail] = useState(false);
   const [disableSignUps, setDisableSignUps] = useState(false);
   const [promoteToDomain, setPromoteToDomain] = useState(false);
+
+  useEffect(() => {
+    fetchConnections();
+  }, []);
+
+  const fetchConnections = async () => {
+    try {
+      setLoading(true);
+      const response = await connectionsApi.listDatabase();
+      if (response.success && response.data) {
+        setConnections(response.data);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load connections");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleIdentifierToggle = (id: string) => {
     setIdentifiers((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
@@ -109,17 +134,52 @@ export default function DatabasePage() {
     );
   };
 
-  const handleCreate = () => {
-    console.log("Creating connection:", {
-      connectionName,
-      identifiers,
-      authMethods: authMethodsEnabled,
-      allowNonUniqueEmail,
-      disableSignUps,
-      promoteToDomain,
-    });
-    setDialogOpen(false);
+  const handleCreate = async () => {
+    try {
+      setCreating(true);
+      await connectionsApi.createDatabase({
+        name: connectionName,
+        identifiers,
+        authMethods: authMethodsEnabled,
+        allowNonUniqueEmail,
+        disableSignUps,
+        promoteToDomain,
+      });
+      setDialogOpen(false);
+      setConnectionName("");
+      setIdentifiers(["email"]);
+      setAuthMethodsEnabled(["password"]);
+      setAllowNonUniqueEmail(false);
+      setDisableSignUps(false);
+      setPromoteToDomain(false);
+      fetchConnections();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create connection");
+    } finally {
+      setCreating(false);
+    }
   };
+
+  const handleToggleConnection = async (conn: DatabaseConnection) => {
+    try {
+      if (conn.enabled) {
+        await connectionsApi.updateDatabase(conn.id, { disableSignUps: true });
+      } else {
+        await connectionsApi.updateDatabase(conn.id, { disableSignUps: false });
+      }
+      fetchConnections();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update connection");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -131,7 +191,9 @@ export default function DatabasePage() {
                 <Database className="h-5 w-5 text-primary" />
               </div>
               <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Identity Database Connections</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  Identity Database Connections
+                </h1>
                 <p className="text-muted-foreground">
                   Securely store and manage your customer&apos;s authorization credentials.
                 </p>
@@ -146,6 +208,45 @@ export default function DatabasePage() {
       </div>
 
       <div className="p-6 space-y-6">
+        {connections.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Your Connections</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {connections.map((conn) => (
+                <Card key={conn.id} className="border-primary/20">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                          <Database className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">{conn.name}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {conn.options?.identifiers?.join(", ") || "Username-Password"}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={conn.enabled ? "default" : "secondary"}>
+                          {conn.enabled ? "Enabled" : "Disabled"}
+                        </Badge>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleToggleConnection(conn)}
+                        >
+                          {conn.enabled ? "Disable" : "Enable"}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
@@ -381,8 +482,15 @@ export default function DatabasePage() {
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleCreate} disabled={!connectionName}>
-              Create
+            <Button onClick={handleCreate} disabled={!connectionName || creating}>
+              {creating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

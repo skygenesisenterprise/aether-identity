@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Store,
@@ -24,6 +25,8 @@ import {
   TrendingUp,
   ExternalLink,
   Sparkles,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +36,8 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { marketplaceApi } from "@/lib/api/client";
+import type { MarketplaceExtension, InstalledExtension, TrendingExtension } from "@/lib/api/types";
 
 const categories = [
   { id: "all", name: "All", icon: Store },
@@ -182,9 +187,60 @@ function getCategoryBadgeVariant(category: string) {
   }
 }
 
+function getIconByName(iconName: string) {
+  const icons: Record<string, React.ComponentType<{ className?: string }>> = {
+    Store,
+    Mail,
+    Globe,
+    Zap,
+    Lock,
+    Users,
+    Shield,
+    Palette,
+    HardDrive,
+    Code2,
+  };
+  return icons[iconName] || Store;
+}
+
 export default function MarketplacePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [extensions, setExtensions] = useState<MarketplaceExtension[]>([]);
+  const [installedExtensions, setInstalledExtensions] = useState<InstalledExtension[]>([]);
+  const [trendingExtensions, setTrendingExtensions] = useState<TrendingExtension[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [extRes, installedRes, trendingRes] = await Promise.all([
+          marketplaceApi.list(),
+          marketplaceApi.getInstalled(),
+          marketplaceApi.getTrending(),
+        ]);
+
+        if (extRes.success && extRes.data) {
+          setExtensions(extRes.data);
+        }
+        if (installedRes.success && installedRes.data) {
+          setInstalledExtensions(installedRes.data);
+        }
+        if (trendingRes.success && trendingRes.data) {
+          setTrendingExtensions(trendingRes.data);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load marketplace data");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   const filteredExtensions = extensions.filter((ext) => {
     const matchesSearch =
@@ -195,6 +251,49 @@ export default function MarketplacePage() {
   });
 
   const featuredExtensions = extensions.filter((ext) => ext.featured);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted/30">
+        <div className="border-b bg-background">
+          <div className="px-6 py-6">
+            <div className="flex flex-col gap-1">
+              <h1 className="text-2xl font-semibold tracking-tight">Identity Marketplace</h1>
+              <p className="text-muted-foreground">
+                Discover extensions, integrations, and templates for your identity platform.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-center p-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-muted/30">
+        <div className="border-b bg-background">
+          <div className="px-6 py-6">
+            <div className="flex flex-col gap-1">
+              <h1 className="text-2xl font-semibold tracking-tight">Identity Marketplace</h1>
+              <p className="text-muted-foreground">
+                Discover extensions, integrations, and templates for your identity platform.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-center p-12">
+          <div className="flex items-center gap-2 text-destructive">
+            <AlertCircle className="h-4 w-4" />
+            <span>{error}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -266,7 +365,9 @@ export default function MarketplacePage() {
                           className="flex gap-4 rounded-lg border p-4 transition-colors hover:bg-muted/50"
                         >
                           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted shrink-0">
-                            <ext.icon className="h-6 w-6 text-foreground" />
+                            {React.createElement(getIconByName(ext.icon), {
+                              className: "h-6 w-6 text-foreground",
+                            })}
                           </div>
                           <div className="flex-1 min-w-0 space-y-1">
                             <div className="flex items-center gap-2">
@@ -343,7 +444,9 @@ export default function MarketplacePage() {
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                          <ext.icon className="h-5 w-5 text-foreground" />
+                          {React.createElement(getIconByName(ext.icon), {
+                            className: "h-5 w-5 text-foreground",
+                          })}
                         </div>
                         <Badge variant={getCategoryBadgeVariant(ext.category)} className="text-xs">
                           {ext.category}

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Users, AppWindow, Key, ArrowUpRight, Activity } from "lucide-react";
+import { Users, AppWindow, Key, ArrowUpRight, Activity, Loader2, AlertCircle } from "lucide-react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import { StatsCard } from "@/components/admin/stats-card";
@@ -16,6 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { activityApi, statsApi } from "@/lib/api/client";
+import type { ActivityData, StatsData } from "@/lib/api/types";
 
 const dailyActiveUsersData = [
   { date: "Mar 26", users: 0 },
@@ -87,6 +89,91 @@ const failedChartConfig = {
 
 export default function ActivityPage() {
   const [timeRange, setTimeRange] = useState("30d");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [dailyActiveUsersData, setDailyActiveUsersData] = useState<ActivityData[]>([]);
+  const [retentionData, setRetentionData] = useState<ActivityData[]>([]);
+  const [signupsData, setSignupsData] = useState<ActivityData[]>([]);
+  const [stats, setStats] = useState<StatsData>({});
+  const [failedLoginsData, setFailedLoginsData] = useState<ActivityData[]>([]);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [dauRes, retentionRes, signupsRes, statsRes] = await Promise.all([
+          activityApi.getDau({ timeRange }),
+          activityApi.getRetention({ timeRange }),
+          activityApi.getSignups({ timeRange }),
+          statsApi.get(),
+        ]);
+
+        if (dauRes.success && dauRes.data) {
+          setDailyActiveUsersData(dauRes.data);
+        }
+        if (retentionRes.success && retentionRes.data) {
+          setRetentionData(retentionRes.data);
+        }
+        if (signupsRes.success && signupsRes.data) {
+          setSignupsData(signupsRes.data);
+        }
+        if (statsRes.success && statsRes.data) {
+          setStats(statsRes.data);
+        }
+
+        const failedRes = await activityApi.getActivity({ timeRange });
+        if (failedRes.success && failedRes.data) {
+          setFailedLoginsData(failedRes.data);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load activity data");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [timeRange]);
+
+  if (loading) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Identity Activity</h1>
+            <p className="text-sm text-muted-foreground">
+              Monitor events, logs and system activity
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center justify-center p-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Identity Activity</h1>
+            <p className="text-sm text-muted-foreground">
+              Monitor events, logs and system activity
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center justify-center p-12">
+          <div className="flex items-center gap-2 text-destructive">
+            <AlertCircle className="h-4 w-4" />
+            <span>{error}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -112,7 +199,7 @@ export default function ActivityPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Total Users"
-          value="0"
+          value={String(stats.totalUsers ?? 0)}
           change="0%"
           changeType="neutral"
           description="vs last period"
@@ -120,7 +207,7 @@ export default function ActivityPage() {
         />
         <StatsCard
           title="Applications"
-          value="2"
+          value={String(stats.applications ?? 0)}
           change="+0"
           changeType="neutral"
           description="vs last period"
@@ -128,7 +215,7 @@ export default function ActivityPage() {
         />
         <StatsCard
           title="APIs"
-          value="0"
+          value={String(stats.apis ?? 0)}
           change="0%"
           changeType="neutral"
           description="vs last period"
@@ -136,7 +223,7 @@ export default function ActivityPage() {
         />
         <StatsCard
           title="Connections"
-          value="0"
+          value={String(stats.connections ?? 0)}
           change="0%"
           changeType="neutral"
           description="vs last period"

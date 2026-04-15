@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Download,
@@ -16,6 +16,7 @@ import {
   ChevronUp,
   Copy,
   Eye,
+  Loader2,
 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,93 +40,8 @@ import {
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-
-type LogLevel = "info" | "success" | "warning" | "error";
-type LogEvent = "login" | "signup" | "logout" | "mfa" | "password_reset" | "api_call";
-
-interface LogEntry {
-  id: string;
-  timestamp: Date;
-  level: LogLevel;
-  event: LogEvent;
-  user: string;
-  email: string;
-  ip: string;
-  userAgent: string;
-  connection: string;
-  details: string;
-  metadata?: Record<string, string>;
-}
-
-const generateMockLogs = (): LogEntry[] => {
-  const events: LogEvent[] = ["login", "signup", "logout", "mfa", "password_reset", "api_call"];
-  const levels: LogLevel[] = ["info", "success", "warning", "error"];
-  const users = [
-    { name: "john.doe", email: "john.doe@example.com" },
-    { name: "jane.smith", email: "jane.smith@company.co" },
-    { name: "admin", email: "admin@etheriatimes.com" },
-    { name: "secure.user", email: "secure@company.org" },
-    { name: "api_client", email: "api-client@service.com" },
-  ];
-  const connections = ["Username-Password", "Google OAuth", "GitHub", "SAML Enterprise", "API Key"];
-  const ips = ["192.168.1.45", "10.0.0.123", "203.45.67.89", "172.16.0.55", "192.168.2.100"];
-  const userAgents = [
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0",
-    "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Safari/604.1",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Firefox/121.0",
-  ];
-
-  const logs: LogEntry[] = [];
-  for (let i = 0; i < 50; i++) {
-    const user = users[Math.floor(Math.random() * users.length)];
-    const event = events[Math.floor(Math.random() * events.length)];
-    const level =
-      event === "login" && Math.random() > 0.8
-        ? "error"
-        : levels[Math.floor(Math.random() * levels.length)];
-    const minutesAgo = Math.floor(Math.random() * 1440);
-
-    logs.push({
-      id: `log-${i + 1}`,
-      timestamp: new Date(Date.now() - minutesAgo * 60 * 1000),
-      level,
-      event,
-      user: user.name,
-      email: user.email,
-      ip: ips[Math.floor(Math.random() * ips.length)],
-      userAgent: userAgents[Math.floor(Math.random() * userAgents.length)],
-      connection: connections[Math.floor(Math.random() * connections.length)],
-      details: getEventDetails(event, level),
-      metadata: {
-        sessionId: `sess-${Math.random().toString(36).substr(2, 9)}`,
-        requestId: `req-${Math.random().toString(36).substr(2, 9)}`,
-      },
-    });
-  }
-
-  return logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-};
-
-function getEventDetails(event: LogEvent, level: LogLevel): string {
-  switch (event) {
-    case "login":
-      return level === "error" ? "Invalid credentials" : "Successfully authenticated";
-    case "signup":
-      return "New user account created";
-    case "logout":
-      return "User logged out";
-    case "mfa":
-      return "MFA challenge completed successfully";
-    case "password_reset":
-      return "Password reset email sent";
-    case "api_call":
-      return "API request authenticated";
-    default:
-      return "Event processed";
-  }
-}
-
-const logEntries = generateMockLogs();
+import { logsApi, type LogsParams } from "@/lib/api/client";
+import type { LogEntry, LogLevel, LogEvent, LogStats } from "@/lib/api/types";
 
 const levelConfig = {
   info: { label: "Info", color: "bg-blue-500", text: "text-blue-600", bg: "bg-blue-50" },
@@ -148,7 +64,8 @@ const eventConfig = {
   api_call: { icon: CheckCircle2, label: "API Call" },
 };
 
-function formatTimestamp(date: Date): string {
+function formatTimestamp(dateStr: string): string {
+  const date = new Date(dateStr);
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const minutes = Math.floor(diff / 60000);
@@ -171,32 +88,91 @@ export default function LogsPage() {
   const [eventFilter, setEventFilter] = useState<string>("all");
   const [expandedLog, setExpandedLog] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [stats, setStats] = useState<LogStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [total, setTotal] = useState(0);
 
   const logsPerPage = 15;
 
-  const filteredLogs = logEntries.filter((log) => {
-    const matchesSearch =
-      search === "" ||
-      log.email.toLowerCase().includes(search.toLowerCase()) ||
-      log.ip.includes(search) ||
-      log.user.toLowerCase().includes(search.toLowerCase());
-    const matchesLevel = levelFilter === "all" || log.level === levelFilter;
-    const matchesEvent = eventFilter === "all" || log.event === eventFilter;
-    return matchesSearch && matchesLevel && matchesEvent;
-  });
-
-  const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
-  const paginatedLogs = filteredLogs.slice(
-    (currentPage - 1) * logsPerPage,
-    currentPage * logsPerPage
-  );
-
-  const logStats = {
-    total: logEntries.length,
-    success: logEntries.filter((l) => l.level === "success" || l.event === "login").length,
-    errors: logEntries.filter((l) => l.level === "error").length,
-    warnings: logEntries.filter((l) => l.level === "warning").length,
+  const fetchLogs = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params: LogsParams = {
+        page: currentPage,
+        pageSize: logsPerPage,
+        search: search || undefined,
+        level: levelFilter !== "all" ? levelFilter : undefined,
+        event: eventFilter !== "all" ? eventFilter : undefined,
+      };
+      const response = await logsApi.list(params);
+      if (response.success && response.data) {
+        setLogs(response.data);
+        setTotal(response.total || 0);
+      } else {
+        setError(response.error || "Failed to fetch logs");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const fetchStats = async () => {
+    try {
+      const response = await logsApi.getStats();
+      if (response.success && response.data) {
+        setStats(response.data);
+      }
+    } catch {
+      // Stats are optional, don't show error
+    }
+  };
+
+  useEffect(() => {
+    fetchLogs();
+  }, [currentPage, levelFilter, eventFilter]);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const handleSearch = () => {
+    setCurrentPage(1);
+    fetchLogs();
+  };
+
+  const handleExport = async () => {
+    try {
+      const response = await logsApi.export({
+        level: levelFilter !== "all" ? levelFilter : undefined,
+        event: eventFilter !== "all" ? eventFilter : undefined,
+      });
+      if (response.success && response.data) {
+        const blob = new Blob([JSON.stringify(response.data, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `logs-${new Date().toISOString()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error("Export failed:", err);
+    }
+  };
+
+  const handleRefresh = () => {
+    fetchLogs();
+    fetchStats();
+  };
+
+  const logStats = stats || { total: 0, success: 0, errors: 0, warnings: 0 };
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -219,7 +195,11 @@ export default function LogsPage() {
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Total Events</p>
                   <p className="text-3xl font-bold tracking-tight">
-                    {logStats.total.toLocaleString()}
+                    {loading ? (
+                      <Loader2 className="h-8 w-8 animate-spin" />
+                    ) : (
+                      logStats.total.toLocaleString()
+                    )}
                   </p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
@@ -235,7 +215,7 @@ export default function LogsPage() {
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Successful</p>
                   <p className="text-3xl font-bold tracking-tight text-green-600">
-                    {logStats.success}
+                    {loading ? <Loader2 className="h-8 w-8 animate-spin" /> : logStats.success}
                   </p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-50">
@@ -251,7 +231,7 @@ export default function LogsPage() {
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Errors</p>
                   <p className="text-3xl font-bold tracking-tight text-red-600">
-                    {logStats.errors}
+                    {loading ? <Loader2 className="h-8 w-8 animate-spin" /> : logStats.errors}
                   </p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
@@ -267,7 +247,7 @@ export default function LogsPage() {
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Warnings</p>
                   <p className="text-3xl font-bold tracking-tight text-yellow-600">
-                    {logStats.warnings}
+                    {loading ? <Loader2 className="h-8 w-8 animate-spin" /> : logStats.warnings}
                   </p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-50">
@@ -286,12 +266,18 @@ export default function LogsPage() {
                 <CardDescription>Authentication events and activities</CardDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="gap-2">
+                <Button variant="outline" size="sm" className="gap-2" onClick={handleExport}>
                   <Download className="h-4 w-4" />
                   Export
                 </Button>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <RefreshCw className="h-4 w-4" />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={handleRefresh}
+                  disabled={loading}
+                >
+                  <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
                   Refresh
                 </Button>
               </div>
@@ -306,6 +292,7 @@ export default function LogsPage() {
                     placeholder="Search by email, IP, or user..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     className="pl-9"
                   />
                 </div>
@@ -340,6 +327,10 @@ export default function LogsPage() {
               </div>
             </div>
 
+            {error && (
+              <div className="mb-4 p-4 text-sm text-red-600 bg-red-50 rounded-md">{error}</div>
+            )}
+
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
@@ -356,134 +347,138 @@ export default function LogsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedLogs.map((log) => (
-                    <React.Fragment key={log.id}>
-                      <TableRow
-                        className="cursor-pointer"
-                        onClick={() => setExpandedLog(expandedLog === log.id ? null : log.id)}
-                      >
-                        <TableCell>
-                          {expandedLog === log.id ? (
-                            <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                          ) : (
-                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                          )}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {formatTimestamp(log.timestamp)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            className={cn(
-                              "text-xs font-normal",
-                              levelConfig[log.level].bg,
-                              levelConfig[log.level].text
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={9} className="h-24 text-center">
+                        <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                      </TableCell>
+                    </TableRow>
+                  ) : logs.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
+                        No logs found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    logs.map((log) => (
+                      <React.Fragment key={log.id}>
+                        <TableRow
+                          className="cursor-pointer"
+                          onClick={() => setExpandedLog(expandedLog === log.id ? null : log.id)}
+                        >
+                          <TableCell>
+                            {expandedLog === log.id ? (
+                              <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4 text-muted-foreground" />
                             )}
-                          >
-                            {levelConfig[log.level].label}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {(() => {
-                              const Icon = eventConfig[log.event].icon;
-                              return <Icon className="h-4 w-4 text-muted-foreground" />;
-                            })()}
-                            <span className="text-sm">{eventConfig[log.event].label}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium">{log.user}</span>
-                            <span className="text-xs text-muted-foreground">{log.email}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-sm">{log.connection}</TableCell>
-                        <TableCell className="text-sm font-mono text-muted-foreground">
-                          {log.ip}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {log.details}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <Copy className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                      {expandedLog === log.id && (
-                        <TableRow>
-                          <TableCell colSpan={9} className="bg-muted/30">
-                            <div className="p-4 space-y-4">
-                              <div className="grid gap-4 md:grid-cols-2">
-                                <div className="space-y-3">
-                                  <h4 className="text-sm font-semibold">Request Information</h4>
-                                  <div className="space-y-2 text-sm">
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">Session ID:</span>
-                                      <span className="font-mono text-xs">
-                                        {log.metadata?.sessionId}
-                                      </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">Request ID:</span>
-                                      <span className="font-mono text-xs">
-                                        {log.metadata?.requestId}
-                                      </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">User Agent:</span>
-                                      <span className="font-mono text-xs truncate max-w-50">
-                                        {log.userAgent}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="space-y-3">
-                                  <h4 className="text-sm font-semibold">Security Context</h4>
-                                  <div className="space-y-2 text-sm">
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">
-                                        Authentication Method:
-                                      </span>
-                                      <span>{log.connection}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">IP Address:</span>
-                                      <span className="font-mono">{log.ip}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">Timestamp:</span>
-                                      <span>{log.timestamp.toISOString()}</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <Separator />
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  <Badge variant="outline">Raw Log</Badge>
-                                  <span className="text-xs text-muted-foreground">
-                                    {log.timestamp.toISOString()} {log.level.toUpperCase()}{" "}
-                                    {log.event}: {log.details}
-                                  </span>
-                                </div>
-                                <Button variant="outline" size="sm" className="gap-2">
-                                  <Copy className="h-3 w-3" />
-                                  Copy JSON
-                                </Button>
-                              </div>
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {formatTimestamp(log.timestamp)}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              className={cn(
+                                "text-xs font-normal",
+                                levelConfig[log.level]?.bg,
+                                levelConfig[log.level]?.text
+                              )}
+                            >
+                              {levelConfig[log.level]?.label || log.level}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {(() => {
+                                const Icon = eventConfig[log.event]?.icon || LogIn;
+                                return <Icon className="h-4 w-4 text-muted-foreground" />;
+                              })()}
+                              <span className="text-sm">
+                                {eventConfig[log.event]?.label || log.event}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-col">
+                              <span className="text-sm font-medium">{log.user}</span>
+                              <span className="text-xs text-muted-foreground">{log.email}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm">{log.connection}</TableCell>
+                          <TableCell className="text-sm font-mono text-muted-foreground">
+                            {log.ip}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {log.details}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <Copy className="h-4 w-4" />
+                              </Button>
                             </div>
                           </TableCell>
                         </TableRow>
-                      )}
-                    </React.Fragment>
-                  ))}
+                        {expandedLog === log.id && (
+                          <TableRow>
+                            <TableCell colSpan={9} className="bg-muted/30">
+                              <div className="p-4 space-y-4">
+                                <div className="grid gap-4 md:grid-cols-2">
+                                  <div className="space-y-3">
+                                    <h4 className="text-sm font-semibold">Request Information</h4>
+                                    <div className="space-y-2 text-sm">
+                                      <div className="flex justify-between">
+                                        <span className="text-muted-foreground">User Agent:</span>
+                                        <span className="font-mono text-xs truncate max-w-50">
+                                          {log.userAgent || "N/A"}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="space-y-3">
+                                    <h4 className="text-sm font-semibold">Security Context</h4>
+                                    <div className="space-y-2 text-sm">
+                                      <div className="flex justify-between">
+                                        <span className="text-muted-foreground">
+                                          Authentication Method:
+                                        </span>
+                                        <span>{log.connection}</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-muted-foreground">IP Address:</span>
+                                        <span className="font-mono">{log.ip}</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Timestamp:</span>
+                                        <span>{log.timestamp}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <Separator />
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <Badge variant="outline">Raw Log</Badge>
+                                    <span className="text-xs text-muted-foreground">
+                                      {log.timestamp} {log.level.toUpperCase()} {log.event}:{" "}
+                                      {log.details}
+                                    </span>
+                                  </div>
+                                  <Button variant="outline" size="sm" className="gap-2">
+                                    <Copy className="h-3 w-3" />
+                                    Copy JSON
+                                  </Button>
+                                </div>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </React.Fragment>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </div>
@@ -491,19 +486,18 @@ export default function LogsPage() {
             <div className="flex items-center justify-between mt-4">
               <p className="text-sm text-muted-foreground">
                 Showing {(currentPage - 1) * logsPerPage + 1} to{" "}
-                {Math.min(currentPage * logsPerPage, filteredLogs.length)} of {filteredLogs.length}{" "}
-                entries
+                {Math.min(currentPage * logsPerPage, total)} of {total} entries
               </p>
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
+                  disabled={currentPage === 1 || loading}
                 >
                   Previous
                 </Button>
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                {Array.from({ length: Math.min(5, Math.ceil(total / logsPerPage)) }, (_, i) => {
                   const page = i + 1;
                   return (
                     <Button
@@ -511,6 +505,7 @@ export default function LogsPage() {
                       variant={currentPage === page ? "default" : "outline"}
                       size="sm"
                       onClick={() => setCurrentPage(page)}
+                      disabled={loading}
                     >
                       {page}
                     </Button>
@@ -519,8 +514,10 @@ export default function LogsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(Math.ceil(total / logsPerPage), p + 1))
+                  }
+                  disabled={currentPage >= Math.ceil(total / logsPerPage) || loading}
                 >
                   Next
                 </Button>
@@ -538,8 +535,8 @@ export default function LogsPage() {
             <CardContent>
               <div className="space-y-4">
                 {Object.entries(eventConfig).map(([key, config]) => {
-                  const count = logEntries.filter((l) => l.event === key).length;
-                  const percentage = (count / logEntries.length) * 100;
+                  const count = logs.filter((l) => l.event === key).length;
+                  const percentage = total > 0 ? (count / total) * 100 : 0;
                   return (
                     <div key={key} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -572,8 +569,8 @@ export default function LogsPage() {
             <CardContent>
               <div className="space-y-4">
                 {Object.entries(levelConfig).map(([key, config]) => {
-                  const count = logEntries.filter((l) => l.level === key).length;
-                  const percentage = (count / logEntries.length) * 100;
+                  const count = logs.filter((l) => l.level === key).length;
+                  const percentage = total > 0 ? (count / total) * 100 : 0;
                   return (
                     <div key={key} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">

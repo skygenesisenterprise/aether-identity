@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Palette,
   LayoutTemplate,
@@ -12,6 +12,7 @@ import {
   Smartphone,
   Tablet,
   Check,
+  Loader2,
 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { brandingApi } from "@/lib/api/client";
 
 const colorThemes = [
   { id: "default", name: "Default", primary: "#000000", accent: "#3b82f6" },
@@ -76,6 +78,11 @@ const previewDevices = [
 ];
 
 export default function CustomLoginPage() {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
   const [activeTab, setActiveTab] = useState("branding");
   const [selectedTheme, setSelectedTheme] = useState("default");
   const [selectedPattern, setSelectedPattern] = useState("gradient");
@@ -86,6 +93,71 @@ export default function CustomLoginPage() {
   const [socialButtons, setSocialButtons] = useState(true);
   const [rememberDevice, setRememberDevice] = useState(true);
   const [customCss, setCustomCss] = useState("");
+  const [isEnabled, setIsEnabled] = useState(true);
+
+  const [stats, setStats] = useState({
+    templates: 0,
+    lastUpdated: "Just now",
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await brandingApi.getCustomLogin();
+
+        if (response.data) {
+          const data = response.data;
+          setSelectedTheme(data.theme || "default");
+          setSelectedPattern(data.pattern || "gradient");
+          setSelectedFont(data.font || "inter");
+          setLogoUrl(data.logoUrl || "");
+          setShowPoweredBy(data.showPoweredBy ?? true);
+          setSocialButtons(data.showSocialButtons ?? true);
+          setRememberDevice(data.showRememberDevice ?? true);
+          setCustomCss(data.customCss || "");
+          setIsEnabled(data.isEnabled ?? true);
+        }
+
+        setStats((prev) => ({ ...prev, lastUpdated: "Just now" }));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load custom login settings");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+      setSuccess(null);
+
+      await brandingApi.updateCustomLogin({
+        theme: selectedTheme,
+        pattern: selectedPattern,
+        font: selectedFont,
+        logoUrl,
+        showSocialButtons: socialButtons,
+        showRememberDevice: rememberDevice,
+        showPoweredBy: showPoweredBy,
+        customCss,
+        isEnabled,
+      });
+
+      setSuccess("Settings saved successfully!");
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save settings");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const currentTheme = colorThemes.find((t) => t.id === selectedTheme);
   const currentPattern = backgroundPatterns.find((p) => p.id === selectedPattern);
@@ -98,16 +170,37 @@ export default function CustomLoginPage() {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      <div className="border-b bg-background">
-        <div className="px-6 py-6">
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Identity Custom Login</h1>
-            <p className="text-muted-foreground">Customize the appearance of your login pages.</p>
+      {loading && (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      )}
+      {!loading && error && (
+        <div className="px-6 pt-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            {error}
           </div>
         </div>
-      </div>
+      )}
+      {!loading && success && (
+        <div className="px-6 pt-6">
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+            {success}
+          </div>
+        </div>
+      )}
+      {!loading && (
+        <>
+          <div className="border-b bg-background">
+            <div className="px-6 py-6">
+              <div className="flex flex-col gap-1">
+                <h1 className="text-2xl font-semibold tracking-tight">Identity Custom Login</h1>
+                <p className="text-muted-foreground">Customize the appearance of your login pages.</p>
+              </div>
+            </div>
+          </div>
 
-      <div className="p-6 space-y-6">
+          <div className="p-6 space-y-6">
         <div className="grid gap-4 md:grid-cols-4">
           <Card>
             <CardContent className="p-6">
@@ -525,7 +618,8 @@ export default function CustomLoginPage() {
             </Card>
           </div>
         </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }

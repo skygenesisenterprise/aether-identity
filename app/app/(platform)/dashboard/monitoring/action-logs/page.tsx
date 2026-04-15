@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Download,
@@ -20,6 +20,7 @@ import {
   Lock,
   UserCheck,
   Database,
+  Loader2,
 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,100 +45,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-
-type ActionStatus = "success" | "failed" | "running" | "timeout";
-type ActionTrigger =
-  | "login"
-  | "pre-user-registration"
-  | "post-user-registration"
-  | "pre-login"
-  | "post-login"
-  | "password-change"
-  | "token-exchange"
-  | "custom-actor";
-
-interface ActionLogEntry {
-  id: string;
-  timestamp: Date;
-  status: ActionStatus;
-  trigger: ActionTrigger;
-  actionName: string;
-  actionId: string;
-  user: string;
-  email: string;
-  ip: string;
-  duration: number;
-  result?: string;
-  error?: string;
-  version: string;
-}
-
-const generateMockActionLogs = (): ActionLogEntry[] => {
-  const triggers: ActionTrigger[] = [
-    "login",
-    "pre-user-registration",
-    "post-user-registration",
-    "pre-login",
-    "post-login",
-    "password-change",
-    "token-exchange",
-    "custom-actor",
-  ];
-  const statuses: ActionStatus[] = ["success", "failed", "running", "timeout"];
-  const users = [
-    { name: "john.doe", email: "john.doe@example.com" },
-    { name: "jane.smith", email: "jane.smith@company.co" },
-    { name: "admin", email: "admin@etheriatimes.com" },
-    { name: "secure.user", email: "secure@company.org" },
-    { name: "api_client", email: "api-client@service.com" },
-  ];
-  const ips = ["192.168.1.45", "10.0.0.123", "203.45.67.89", "172.16.0.55", "192.168.2.100"];
-
-  const actions = [
-    { name: "Add Custom Claims", id: "act_abc123" },
-    { name: "Set Session Timeout", id: "act_def456" },
-    { name: "Enforce MFA", id: "act_ghi789" },
-    { name: "Log Authentication", id: "act_jkl012" },
-    { name: "Transform User Metadata", id: "act_mno345" },
-    { name: "Rate Limit Check", id: "act_pqr678" },
-    { name: "Validate Email Domain", id: "act_stu901" },
-  ];
-
-  const logs: ActionLogEntry[] = [];
-  for (let i = 0; i < 50; i++) {
-    const user = users[Math.floor(Math.random() * users.length)];
-    const trigger = triggers[Math.floor(Math.random() * triggers.length)];
-    const status =
-      Math.random() > 0.15 ? "success" : statuses[Math.floor(Math.random() * statuses.length)];
-    const action = actions[Math.floor(Math.random() * actions.length)];
-    const minutesAgo = Math.floor(Math.random() * 1440);
-
-    logs.push({
-      id: `action-${i + 1}`,
-      timestamp: new Date(Date.now() - minutesAgo * 60 * 1000),
-      status,
-      trigger,
-      actionName: action.name,
-      actionId: action.id,
-      user: user.name,
-      email: user.email,
-      ip: ips[Math.floor(Math.random() * ips.length)],
-      duration: Math.floor(Math.random() * 500) + 10,
-      result: status === "success" ? "Action executed successfully" : undefined,
-      error:
-        status === "failed"
-          ? "Action execution failed: Invalid configuration"
-          : status === "timeout"
-            ? "Action timed out after 30s"
-            : undefined,
-      version: `v${Math.floor(Math.random() * 3) + 1}.0.0`,
-    });
-  }
-
-  return logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-};
-
-const actionLogEntries = generateMockActionLogs();
+import { actionLogsApi } from "@/lib/api/client";
+import type { ActionLogEntry, ActionStatus, ActionTrigger, ActionLogStats } from "@/lib/api/types";
 
 const statusConfig = {
   success: {
@@ -185,7 +94,8 @@ const triggerConfig = {
   "custom-actor": { label: "Custom Actor", icon: Code, color: "text-gray-500" },
 };
 
-function formatTimestamp(date: Date): string {
+function formatTimestamp(dateStr: string): string {
+  const date = new Date(dateStr);
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const minutes = Math.floor(diff / 60000);
@@ -213,39 +123,96 @@ export default function ActionLogsPage() {
   const [triggerFilter, setTriggerFilter] = useState<string>("all");
   const [expandedLog, setExpandedLog] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [logs, setLogs] = useState<ActionLogEntry[]>([]);
+  const [stats, setStats] = useState<ActionLogStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [total, setTotal] = useState(0);
 
   const logsPerPage = 15;
 
-  const filteredLogs = actionLogEntries.filter((log) => {
-    const matchesSearch =
-      search === "" ||
-      log.email.toLowerCase().includes(search.toLowerCase()) ||
-      log.ip.includes(search) ||
-      log.user.toLowerCase().includes(search.toLowerCase()) ||
-      log.actionName.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = statusFilter === "all" || log.status === statusFilter;
-    const matchesTrigger = triggerFilter === "all" || log.trigger === triggerFilter;
-    return matchesSearch && matchesStatus && matchesTrigger;
-  });
+  const fetchLogs = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await actionLogsApi.list({
+        page: currentPage,
+        pageSize: logsPerPage,
+        search: search || undefined,
+        status: statusFilter !== "all" ? statusFilter : undefined,
+        trigger: triggerFilter !== "all" ? triggerFilter : undefined,
+      });
+      if (response.success && response.data) {
+        setLogs(response.data);
+        setTotal(response.total || 0);
+      } else {
+        setError(response.error || "Failed to fetch action logs");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
-  const paginatedLogs = filteredLogs.slice(
-    (currentPage - 1) * logsPerPage,
-    currentPage * logsPerPage
-  );
+  const fetchStats = async () => {
+    try {
+      const response = await actionLogsApi.getStats();
+      if (response.success && response.data) {
+        setStats(response.data);
+      }
+    } catch {
+      // Stats are optional, don't show error
+    }
+  };
 
-  const logStats = {
-    total: actionLogEntries.length,
-    success: actionLogEntries.filter((l) => l.status === "success").length,
-    failed: actionLogEntries.filter((l) => l.status === "failed").length,
-    running: actionLogEntries.filter((l) => l.status === "running").length,
-    avgDuration: Math.round(
-      actionLogEntries.reduce((acc, l) => acc + l.duration, 0) / actionLogEntries.length
-    ),
-    successRate: Math.round(
-      (actionLogEntries.filter((l) => l.status === "success").length / actionLogEntries.length) *
-        100
-    ),
+  useEffect(() => {
+    fetchLogs();
+  }, [currentPage, statusFilter, triggerFilter]);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const handleSearch = () => {
+    setCurrentPage(1);
+    fetchLogs();
+  };
+
+  const handleExport = async () => {
+    try {
+      const response = await actionLogsApi.list({
+        status: statusFilter !== "all" ? statusFilter : undefined,
+        trigger: triggerFilter !== "all" ? triggerFilter : undefined,
+      });
+      if (response.success && response.data) {
+        const blob = new Blob([JSON.stringify(response.data, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `action-logs-${new Date().toISOString()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error("Export failed:", err);
+    }
+  };
+
+  const handleRefresh = () => {
+    fetchLogs();
+    fetchStats();
+  };
+
+  const logStats = stats || {
+    total: 0,
+    success: 0,
+    failed: 0,
+    running: 0,
+    avgDuration: 0,
+    successRate: 0,
   };
 
   return (
@@ -269,7 +236,11 @@ export default function ActionLogsPage() {
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Total Executions</p>
                   <p className="text-3xl font-bold tracking-tight">
-                    {logStats.total.toLocaleString()}
+                    {loading ? (
+                      <Loader2 className="h-8 w-8 animate-spin" />
+                    ) : (
+                      logStats.total.toLocaleString()
+                    )}
                   </p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
@@ -285,7 +256,7 @@ export default function ActionLogsPage() {
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Successful</p>
                   <p className="text-3xl font-bold tracking-tight text-green-600">
-                    {logStats.success}
+                    {loading ? <Loader2 className="h-8 w-8 animate-spin" /> : logStats.success}
                   </p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-50">
@@ -306,7 +277,7 @@ export default function ActionLogsPage() {
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Failed</p>
                   <p className="text-3xl font-bold tracking-tight text-red-600">
-                    {logStats.failed}
+                    {loading ? <Loader2 className="h-8 w-8 animate-spin" /> : logStats.failed}
                   </p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
@@ -322,7 +293,7 @@ export default function ActionLogsPage() {
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Running</p>
                   <p className="text-3xl font-bold tracking-tight text-blue-600">
-                    {logStats.running}
+                    {loading ? <Loader2 className="h-8 w-8 animate-spin" /> : logStats.running}
                   </p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50">
@@ -338,7 +309,11 @@ export default function ActionLogsPage() {
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Avg Duration</p>
                   <p className="text-3xl font-bold tracking-tight">
-                    {formatDuration(logStats.avgDuration)}
+                    {loading ? (
+                      <Loader2 className="h-8 w-8 animate-spin" />
+                    ) : (
+                      formatDuration(logStats.avgDuration)
+                    )}
                   </p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
@@ -357,12 +332,18 @@ export default function ActionLogsPage() {
                 <CardDescription>Detailed log of Actions trigger executions</CardDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="gap-2">
+                <Button variant="outline" size="sm" className="gap-2" onClick={handleExport}>
                   <Download className="h-4 w-4" />
                   Export
                 </Button>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <RefreshCw className="h-4 w-4" />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={handleRefresh}
+                  disabled={loading}
+                >
+                  <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
                   Refresh
                 </Button>
               </div>
@@ -377,6 +358,7 @@ export default function ActionLogsPage() {
                     placeholder="Search by user, action, or IP..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     className="pl-9"
                   />
                 </div>
@@ -413,6 +395,10 @@ export default function ActionLogsPage() {
               </div>
             </div>
 
+            {error && (
+              <div className="mb-4 p-4 text-sm text-red-600 bg-red-50 rounded-md">{error}</div>
+            )}
+
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
@@ -429,166 +415,183 @@ export default function ActionLogsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedLogs.map((log) => (
-                    <React.Fragment key={log.id}>
-                      <TableRow
-                        className="cursor-pointer"
-                        onClick={() => setExpandedLog(expandedLog === log.id ? null : log.id)}
-                      >
-                        <TableCell>
-                          {expandedLog === log.id ? (
-                            <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                          ) : (
-                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                          )}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {formatTimestamp(log.timestamp)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            className={cn(
-                              "text-xs font-normal",
-                              statusConfig[log.status].bg,
-                              statusConfig[log.status].text
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={9} className="h-24 text-center">
+                        <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                      </TableCell>
+                    </TableRow>
+                  ) : logs.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
+                        No action logs found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    logs.map((log) => (
+                      <React.Fragment key={log.id}>
+                        <TableRow
+                          className="cursor-pointer"
+                          onClick={() => setExpandedLog(expandedLog === log.id ? null : log.id)}
+                        >
+                          <TableCell>
+                            {expandedLog === log.id ? (
+                              <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4 text-muted-foreground" />
                             )}
-                          >
-                            {statusConfig[log.status].label}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {(() => {
-                              const Icon = triggerConfig[log.trigger].icon;
-                              return (
-                                <Icon className={cn("h-4 w-4", triggerConfig[log.trigger].color)} />
-                              );
-                            })()}
-                            <span className="text-sm">{triggerConfig[log.trigger].label}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium">{log.actionName}</span>
-                            <span className="text-xs text-muted-foreground font-mono">
-                              {log.actionId}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {formatTimestamp(log.timestamp)}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              className={cn(
+                                "text-xs font-normal",
+                                statusConfig[log.status]?.bg,
+                                statusConfig[log.status]?.text
+                              )}
+                            >
+                              {statusConfig[log.status]?.label || log.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {(() => {
+                                const config = triggerConfig[log.trigger];
+                                const Icon = config?.icon || Code;
+                                return <Icon className={cn("h-4 w-4", config?.color)} />;
+                              })()}
+                              <span className="text-sm">
+                                {triggerConfig[log.trigger]?.label || log.trigger}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-col">
+                              <span className="text-sm font-medium">{log.actionName}</span>
+                              <span className="text-xs text-muted-foreground font-mono">
+                                {log.actionId}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-col">
+                              <span className="text-sm font-medium">{log.user}</span>
+                              <span className="text-xs text-muted-foreground">{log.email}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <span
+                              className={cn(
+                                "text-sm font-mono",
+                                log.duration > 300
+                                  ? "text-yellow-600"
+                                  : log.duration > 500
+                                    ? "text-red-600"
+                                    : "text-muted-foreground"
+                              )}
+                            >
+                              {formatDuration(log.duration)}
                             </span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium">{log.user}</span>
-                            <span className="text-xs text-muted-foreground">{log.email}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <span
-                            className={cn(
-                              "text-sm font-mono",
-                              log.duration > 300
-                                ? "text-yellow-600"
-                                : log.duration > 500
-                                  ? "text-red-600"
-                                  : "text-muted-foreground"
-                            )}
-                          >
-                            {formatDuration(log.duration)}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-sm font-mono text-muted-foreground">
-                          {log.ip}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <Copy className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                      {expandedLog === log.id && (
-                        <TableRow>
-                          <TableCell colSpan={9} className="bg-muted/30">
-                            <div className="p-4 space-y-4">
-                              <div className="grid gap-4 md:grid-cols-2">
-                                <div className="space-y-3">
-                                  <h4 className="text-sm font-semibold">Action Details</h4>
-                                  <div className="space-y-2 text-sm">
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">Action ID:</span>
-                                      <span className="font-mono text-xs">{log.actionId}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">Version:</span>
-                                      <span className="font-mono text-xs">{log.version}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">Trigger:</span>
-                                      <span>{triggerConfig[log.trigger].label}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">Duration:</span>
-                                      <span className="font-mono">
-                                        {formatDuration(log.duration)}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="space-y-3">
-                                  <h4 className="text-sm font-semibold">Result</h4>
-                                  <div className="space-y-2 text-sm">
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">Status:</span>
-                                      <Badge
-                                        className={cn(
-                                          "text-xs font-normal",
-                                          statusConfig[log.status].bg,
-                                          statusConfig[log.status].text
-                                        )}
-                                      >
-                                        {statusConfig[log.status].label}
-                                      </Badge>
-                                    </div>
-                                    {log.result && (
-                                      <div className="flex justify-between">
-                                        <span className="text-muted-foreground">Result:</span>
-                                        <span>{log.result}</span>
-                                      </div>
-                                    )}
-                                    {log.error && (
-                                      <div className="flex flex-col items-end gap-1">
-                                        <span className="text-muted-foreground">Error:</span>
-                                        <span className="text-xs text-red-600 text-right max-w-48">
-                                          {log.error}
-                                        </span>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                              <Separator />
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  <Badge variant="outline">Action Log</Badge>
-                                  <span className="text-xs text-muted-foreground">
-                                    {log.timestamp.toISOString()} {log.status.toUpperCase()}{" "}
-                                    {log.trigger}: {log.actionName} ({formatDuration(log.duration)})
-                                  </span>
-                                </div>
-                                <Button variant="outline" size="sm" className="gap-2">
-                                  <Copy className="h-3 w-3" />
-                                  Copy JSON
-                                </Button>
-                              </div>
+                          </TableCell>
+                          <TableCell className="text-sm font-mono text-muted-foreground">
+                            {log.ip}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <Copy className="h-4 w-4" />
+                              </Button>
                             </div>
                           </TableCell>
                         </TableRow>
-                      )}
-                    </React.Fragment>
-                  ))}
+                        {expandedLog === log.id && (
+                          <TableRow>
+                            <TableCell colSpan={9} className="bg-muted/30">
+                              <div className="p-4 space-y-4">
+                                <div className="grid gap-4 md:grid-cols-2">
+                                  <div className="space-y-3">
+                                    <h4 className="text-sm font-semibold">Action Details</h4>
+                                    <div className="space-y-2 text-sm">
+                                      <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Action ID:</span>
+                                        <span className="font-mono text-xs">{log.actionId}</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Version:</span>
+                                        <span className="font-mono text-xs">{log.version}</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Trigger:</span>
+                                        <span>
+                                          {triggerConfig[log.trigger]?.label || log.trigger}
+                                        </span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Duration:</span>
+                                        <span className="font-mono">
+                                          {formatDuration(log.duration)}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="space-y-3">
+                                    <h4 className="text-sm font-semibold">Result</h4>
+                                    <div className="space-y-2 text-sm">
+                                      <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Status:</span>
+                                        <Badge
+                                          className={cn(
+                                            "text-xs font-normal",
+                                            statusConfig[log.status]?.bg,
+                                            statusConfig[log.status]?.text
+                                          )}
+                                        >
+                                          {statusConfig[log.status]?.label || log.status}
+                                        </Badge>
+                                      </div>
+                                      {log.result && (
+                                        <div className="flex justify-between">
+                                          <span className="text-muted-foreground">Result:</span>
+                                          <span>{log.result}</span>
+                                        </div>
+                                      )}
+                                      {log.error && (
+                                        <div className="flex flex-col items-end gap-1">
+                                          <span className="text-muted-foreground">Error:</span>
+                                          <span className="text-xs text-red-600 text-right max-w-48">
+                                            {log.error}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                                <Separator />
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <Badge variant="outline">Action Log</Badge>
+                                    <span className="text-xs text-muted-foreground">
+                                      {log.timestamp} {log.status.toUpperCase()} {log.trigger}:{" "}
+                                      {log.actionName} ({formatDuration(log.duration)})
+                                    </span>
+                                  </div>
+                                  <Button variant="outline" size="sm" className="gap-2">
+                                    <Copy className="h-3 w-3" />
+                                    Copy JSON
+                                  </Button>
+                                </div>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </React.Fragment>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </div>
@@ -596,19 +599,18 @@ export default function ActionLogsPage() {
             <div className="flex items-center justify-between mt-4">
               <p className="text-sm text-muted-foreground">
                 Showing {(currentPage - 1) * logsPerPage + 1} to{" "}
-                {Math.min(currentPage * logsPerPage, filteredLogs.length)} of {filteredLogs.length}{" "}
-                entries
+                {Math.min(currentPage * logsPerPage, total)} of {total} entries
               </p>
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
+                  disabled={currentPage === 1 || loading}
                 >
                   Previous
                 </Button>
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                {Array.from({ length: Math.min(5, Math.ceil(total / logsPerPage)) }, (_, i) => {
                   const page = i + 1;
                   return (
                     <Button
@@ -616,6 +618,7 @@ export default function ActionLogsPage() {
                       variant={currentPage === page ? "default" : "outline"}
                       size="sm"
                       onClick={() => setCurrentPage(page)}
+                      disabled={loading}
                     >
                       {page}
                     </Button>
@@ -624,8 +627,10 @@ export default function ActionLogsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(Math.ceil(total / logsPerPage), p + 1))
+                  }
+                  disabled={currentPage >= Math.ceil(total / logsPerPage) || loading}
                 >
                   Next
                 </Button>
@@ -643,8 +648,8 @@ export default function ActionLogsPage() {
             <CardContent>
               <div className="space-y-4">
                 {Object.entries(triggerConfig).map(([key, config]) => {
-                  const count = actionLogEntries.filter((l) => l.trigger === key).length;
-                  const percentage = (count / actionLogEntries.length) * 100;
+                  const count = logs.filter((l) => l.trigger === key).length;
+                  const percentage = total > 0 ? (count / total) * 100 : 0;
                   return (
                     <div key={key} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -684,8 +689,8 @@ export default function ActionLogsPage() {
               </div>
               <div className="space-y-4">
                 {Object.entries(statusConfig).map(([key, config]) => {
-                  const count = actionLogEntries.filter((l) => l.status === key).length;
-                  const percentage = (count / actionLogEntries.length) * 100;
+                  const count = logs.filter((l) => l.status === key).length;
+                  const percentage = total > 0 ? (count / total) * 100 : 0;
                   return (
                     <div key={key} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Plus,
@@ -12,6 +12,7 @@ import {
   ArrowRight,
   ExternalLink,
   Cpu,
+  Loader2,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -53,7 +54,7 @@ interface Api {
   isEarlyAccess: boolean;
 }
 
-const apis: Api[] = [
+const defaultApis: Api[] = [
   {
     id: "api_1",
     name: "My Account API",
@@ -86,13 +87,32 @@ const apis: Api[] = [
 ];
 
 export default function ApisPage() {
+  const [apis, setApis] = useState<Api[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [apiName, setApiName] = useState("");
   const [apiIdentifier, setApiIdentifier] = useState("");
   const [tokenProfile, setTokenProfile] = useState("jwt");
   const [tokenAlgorithm, setTokenAlgorithm] = useState("RS256");
   const [accessPolicy, setAccessPolicy] = useState("allow");
-  const [createdApis, setCreatedApis] = useState(apis);
+
+  useEffect(() => {
+    loadApis();
+  }, []);
+
+  const loadApis = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setApis(defaultApis);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreate = () => {
     if (!apiName || !apiIdentifier) return;
@@ -107,7 +127,7 @@ export default function ApisPage() {
       isEarlyAccess: false,
     };
 
-    setCreatedApis([...createdApis, newApi]);
+    setApis([...apis, newApi]);
     setDialogOpen(false);
     setApiName("");
     setApiIdentifier("");
@@ -132,7 +152,7 @@ export default function ApisPage() {
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            {createdApis.length} API{createdApis.length !== 1 ? "s" : ""}
+            {apis.length} API{apis.length !== 1 ? "s" : ""}
           </p>
           <Button onClick={() => setDialogOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
@@ -141,93 +161,110 @@ export default function ApisPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {createdApis.map((api) => (
-            <Card key={api.id} className="hover:border-primary/30 transition-colors cursor-pointer">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={cn(
-                        "flex h-10 w-10 items-center justify-center rounded-lg",
-                        api.isSystem ? "bg-amber-500/10" : "bg-primary/10"
-                      )}
-                    >
-                      {api.isSystem ? (
-                        <Zap className="h-5 w-5 text-amber-600" />
-                      ) : api.isEarlyAccess ? (
-                        <Shield className="h-5 w-5 text-primary" />
-                      ) : (
-                        <Key className="h-5 w-5 text-primary" />
-                      )}
+          {loading ? (
+            <div className="col-span-full flex items-center justify-center p-8">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : error ? (
+            <div className="col-span-full flex items-center justify-center p-8 text-red-500">
+              {error}
+            </div>
+          ) : (
+            <>
+              {apis.map((api) => (
+                <Card
+                  key={api.id}
+                  className="hover:border-primary/30 transition-colors cursor-pointer"
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={cn(
+                            "flex h-10 w-10 items-center justify-center rounded-lg",
+                            api.isSystem ? "bg-amber-500/10" : "bg-primary/10"
+                          )}
+                        >
+                          {api.isSystem ? (
+                            <Zap className="h-5 w-5 text-amber-600" />
+                          ) : api.isEarlyAccess ? (
+                            <Shield className="h-5 w-5 text-primary" />
+                          ) : (
+                            <Key className="h-5 w-5 text-primary" />
+                          )}
+                        </div>
+                        <div>
+                          <CardTitle className="text-base flex items-center gap-2">
+                            {api.name}
+                            {api.isSystem && (
+                              <Badge variant="outline" className="text-xs">
+                                System API
+                              </Badge>
+                            )}
+                            {api.isEarlyAccess && (
+                              <Badge variant="secondary" className="text-xs">
+                                Early Access
+                              </Badge>
+                            )}
+                          </CardTitle>
+                          <p className="text-sm text-muted-foreground">{api.scopes} scopes</p>
+                        </div>
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link href={`/dashboard/applications/apis/${api.id}`}>
+                              View Details
+                            </Link>
+                          </DropdownMenuItem>
+                          {!api.isSystem && (
+                            <DropdownMenuItem asChild>
+                              <Link href={`/dashboard/applications/apis/${api.id}/settings`}>
+                                Settings
+                              </Link>
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
-                    <div>
-                      <CardTitle className="text-base flex items-center gap-2">
-                        {api.name}
-                        {api.isSystem && (
-                          <Badge variant="outline" className="text-xs">
-                            System API
-                          </Badge>
-                        )}
-                        {api.isEarlyAccess && (
-                          <Badge variant="secondary" className="text-xs">
-                            Early Access
-                          </Badge>
-                        )}
-                      </CardTitle>
-                      <p className="text-sm text-muted-foreground">{api.scopes} scopes</p>
-                    </div>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                  </CardHeader>
+                  <CardContent>
+                    {api.description && (
+                      <p className="text-sm text-muted-foreground mb-3">{api.description}</p>
+                    )}
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-muted-foreground">API Audience:</span>
+                      <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
+                        {api.identifier}
+                      </code>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8"
-                        onClick={(e) => e.stopPropagation()}
+                        className="h-6 w-6"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText(api.identifier);
+                        }}
                       >
-                        <MoreHorizontal className="h-4 w-4" />
+                        <Copy className="h-3.5 w-3.5" />
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/dashboard/applications/apis/${api.id}`}>View Details</Link>
-                      </DropdownMenuItem>
-                      {!api.isSystem && (
-                        <DropdownMenuItem asChild>
-                          <Link href={`/dashboard/applications/apis/${api.id}/settings`}>
-                            Settings
-                          </Link>
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {api.description && (
-                  <p className="text-sm text-muted-foreground mb-3">{api.description}</p>
-                )}
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-muted-foreground">API Audience:</span>
-                  <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
-                    {api.identifier}
-                  </code>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigator.clipboard.writeText(api.identifier);
-                    }}
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </>
+          )}
         </div>
 
         <Card>

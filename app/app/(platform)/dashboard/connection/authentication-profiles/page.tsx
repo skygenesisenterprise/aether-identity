@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ShieldCheck,
@@ -13,6 +13,7 @@ import {
   Smartphone,
   Mail,
   Clock,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +30,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import { connectionsApi } from "@/lib/api/client";
+import type { AuthenticationProfile } from "@/lib/api/types";
 
 const features = [
   {
@@ -103,10 +106,32 @@ const authMethods = [
 ];
 
 export default function AuthenticationProfilesPage() {
+  const [profiles, setProfiles] = useState<AuthenticationProfile[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [profileName, setProfileName] = useState("");
   const [selectedMethods, setSelectedMethods] = useState<string[]>([]);
   const [requireMfa, setRequireMfa] = useState(false);
+
+  useEffect(() => {
+    fetchProfiles();
+  }, []);
+
+  const fetchProfiles = async () => {
+    try {
+      setLoading(true);
+      const response = await connectionsApi.listAuthenticationProfiles();
+      if (response.success && response.data) {
+        setProfiles(response.data);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load profiles");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleMethodToggle = (id: string) => {
     setSelectedMethods((prev) =>
@@ -114,14 +139,33 @@ export default function AuthenticationProfilesPage() {
     );
   };
 
-  const handleCreate = () => {
-    console.log("Creating authentication profile:", {
-      profileName,
-      methods: selectedMethods,
-      requireMfa,
-    });
-    setDialogOpen(false);
+  const handleCreate = async () => {
+    try {
+      setCreating(true);
+      await connectionsApi.createAuthenticationProfile({
+        name: profileName,
+        methods: selectedMethods,
+        requireMfa,
+      });
+      setDialogOpen(false);
+      setProfileName("");
+      setSelectedMethods([]);
+      setRequireMfa(false);
+      fetchProfiles();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create profile");
+    } finally {
+      setCreating(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -133,7 +177,9 @@ export default function AuthenticationProfilesPage() {
                 <ShieldCheck className="h-5 w-5 text-primary" />
               </div>
               <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Identity Authentication Profiles</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  Identity Authentication Profiles
+                </h1>
                 <p className="text-muted-foreground">
                   Configure passwordless and MFA authentication methods for your users.
                 </p>
@@ -148,6 +194,39 @@ export default function AuthenticationProfilesPage() {
       </div>
 
       <div className="p-6 space-y-6">
+        {profiles.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Your Profiles</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {profiles.map((profile) => (
+                <Card key={profile.id} className="border-primary/20">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                          <ShieldCheck className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">{profile.name}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {profile.methods.join(", ")}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={profile.enabled ? "default" : "secondary"}>
+                          {profile.enabled ? "Enabled" : "Disabled"}
+                        </Badge>
+                        {profile.requireMfa && <Badge variant="outline">MFA Required</Badge>}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
@@ -305,8 +384,18 @@ export default function AuthenticationProfilesPage() {
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleCreate} disabled={!profileName || selectedMethods.length === 0}>
-              Create
+            <Button
+              onClick={handleCreate}
+              disabled={!profileName || selectedMethods.length === 0 || creating}
+            >
+              {creating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Building2,
@@ -16,6 +16,7 @@ import {
   FileKey,
   Link as LinkIcon,
   ArrowDownLeft,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,6 +32,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { connectionsApi } from "@/lib/api/client";
+import type { EnterpriseConnection } from "@/lib/api/types";
 
 const features = [
   {
@@ -87,19 +90,110 @@ const enterpriseTypes = [
 ];
 
 export default function EnterprisePage() {
+  const [connections, setConnections] = useState<EnterpriseConnection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [selectedType, setSelectedType] = useState<string>("");
   const [connectionName, setConnectionName] = useState("");
+  const [idpMetadata, setIdpMetadata] = useState("");
+  const [issuer, setIssuer] = useState("");
+  const [clientIdOidc, setClientIdOidc] = useState("");
+  const [clientSecretOidc, setClientSecretOidc] = useState("");
+  const [adConnection, setAdConnection] = useState("");
+  const [baseDn, setBaseDn] = useState("");
+  const [bindDn, setBindDn] = useState("");
+  const [bindPassword, setBindPassword] = useState("");
 
-  const handleCreate = () => {
-    console.log("Creating enterprise connection:", {
-      type: selectedType,
-      name: connectionName,
-    });
-    setDialogOpen(false);
+  useEffect(() => {
+    fetchConnections();
+  }, []);
+
+  const fetchConnections = async () => {
+    try {
+      setLoading(true);
+      const response = await connectionsApi.listEnterprise();
+      if (response.success && response.data) {
+        setConnections(response.data);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load connections");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreate = async () => {
+    try {
+      setCreating(true);
+      if (selectedType === "saml") {
+        await connectionsApi.createSaml({
+          name: connectionName,
+          type: "saml",
+          metadataUrl: idpMetadata,
+        });
+      } else if (selectedType === "oidc") {
+        await connectionsApi.createOidc({
+          name: connectionName,
+          type: "oidc",
+          issuer,
+          clientId: clientIdOidc,
+          clientSecret: clientSecretOidc,
+        });
+      } else if (selectedType === "ad") {
+        await connectionsApi.createAd({
+          name: connectionName,
+          type: "ad",
+          connectionString: adConnection,
+          baseDn,
+          bindDn,
+          bindPassword,
+        });
+      }
+      setDialogOpen(false);
+      resetForm();
+      fetchConnections();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create connection");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const resetForm = () => {
     setSelectedType("");
     setConnectionName("");
+    setIdpMetadata("");
+    setIssuer("");
+    setClientIdOidc("");
+    setClientSecretOidc("");
+    setAdConnection("");
+    setBaseDn("");
+    setBindDn("");
+    setBindPassword("");
   };
+
+  const handleToggleConnection = async (conn: EnterpriseConnection) => {
+    try {
+      if (conn.enabled) {
+        await connectionsApi.disable(conn.id);
+      } else {
+        await connectionsApi.enable(conn.id);
+      }
+      fetchConnections();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update connection");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -111,7 +205,9 @@ export default function EnterprisePage() {
                 <Building2 className="h-5 w-5 text-primary" />
               </div>
               <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Identity Enterprise Connections</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  Identity Enterprise Connections
+                </h1>
                 <p className="text-muted-foreground">
                   Enable Single Sign-On (SSO) for your enterprise with SAML, OIDC, AD/LDAP and more.
                 </p>
@@ -126,6 +222,45 @@ export default function EnterprisePage() {
       </div>
 
       <div className="p-6 space-y-6">
+        {connections.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Your Connections</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {connections.map((conn) => (
+                <Card key={conn.id} className="border-primary/20">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                          <Globe className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">{conn.name}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {conn.type?.toUpperCase()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={conn.enabled ? "default" : "secondary"}>
+                          {conn.enabled ? "Enabled" : "Disabled"}
+                        </Badge>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleToggleConnection(conn)}
+                        >
+                          {conn.enabled ? "Disable" : "Enable"}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
@@ -288,7 +423,12 @@ export default function EnterprisePage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="idp-metadata">IdP Metadata URL (optional)</Label>
-                  <Input id="idp-metadata" placeholder="https://your-idp.com/metadata" />
+                  <Input
+                    id="idp-metadata"
+                    placeholder="https://your-idp.com/metadata"
+                    value={idpMetadata}
+                    onChange={(e) => setIdpMetadata(e.target.value)}
+                  />
                 </div>
               </div>
             )}
@@ -301,11 +441,21 @@ export default function EnterprisePage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="issuer">Issuer</Label>
-                  <Input id="issuer" placeholder="https://your-idp.com" />
+                  <Input
+                    id="issuer"
+                    placeholder="https://your-idp.com"
+                    value={issuer}
+                    onChange={(e) => setIssuer(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="client-id-oidc">Client ID</Label>
-                  <Input id="client-id-oidc" placeholder="Enter the client ID" />
+                  <Input
+                    id="client-id-oidc"
+                    placeholder="Enter the client ID"
+                    value={clientIdOidc}
+                    onChange={(e) => setClientIdOidc(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="client-secret-oidc">Client Secret</Label>
@@ -313,6 +463,8 @@ export default function EnterprisePage() {
                     id="client-secret-oidc"
                     type="password"
                     placeholder="Enter the client secret"
+                    value={clientSecretOidc}
+                    onChange={(e) => setClientSecretOidc(e.target.value)}
                   />
                 </div>
               </div>
@@ -326,20 +478,41 @@ export default function EnterprisePage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="ad-connection">Connection String</Label>
-                  <Input id="ad-connection" placeholder="ldap://your-dc-server:389" />
+                  <Input
+                    id="ad-connection"
+                    placeholder="ldap://your-dc-server:389"
+                    value={adConnection}
+                    onChange={(e) => setAdConnection(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="base-dn">Base DN</Label>
-                  <Input id="base-dn" placeholder="dc=example,dc=com" />
+                  <Input
+                    id="base-dn"
+                    placeholder="dc=example,dc=com"
+                    value={baseDn}
+                    onChange={(e) => setBaseDn(e.target.value)}
+                  />
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="bind-dn">Bind DN</Label>
-                    <Input id="bind-dn" placeholder="cn=admin,dc=example,dc=com" />
+                    <Input
+                      id="bind-dn"
+                      placeholder="cn=admin,dc=example,dc=com"
+                      value={bindDn}
+                      onChange={(e) => setBindDn(e.target.value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="bind-password">Bind Password</Label>
-                    <Input id="bind-password" type="password" placeholder="Enter bind password" />
+                    <Input
+                      id="bind-password"
+                      type="password"
+                      placeholder="Enter bind password"
+                      value={bindPassword}
+                      onChange={(e) => setBindPassword(e.target.value)}
+                    />
                   </div>
                 </div>
               </div>
@@ -350,8 +523,15 @@ export default function EnterprisePage() {
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleCreate} disabled={!selectedType || !connectionName}>
-              Create
+            <Button onClick={handleCreate} disabled={!selectedType || !connectionName || creating}>
+              {creating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

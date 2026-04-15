@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Play,
   Pause,
@@ -15,6 +15,7 @@ import {
   Clock,
   Zap,
   Filter,
+  Loader2,
 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,81 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-
-type LogLevel = "info" | "success" | "warning" | "error";
-type LogEvent = "login" | "signup" | "logout" | "mfa" | "password_reset" | "api_call";
-
-interface LogEntry {
-  id: string;
-  timestamp: Date;
-  level: LogLevel;
-  event: LogEvent;
-  user: string;
-  email: string;
-  ip: string;
-  connection: string;
-  details: string;
-}
-
-const users = [
-  { name: "john.doe", email: "john.doe@example.com" },
-  { name: "jane.smith", email: "jane.smith@company.co" },
-  { name: "admin", email: "admin@etheriatimes.com" },
-  { name: "secure.user", email: "secure@company.org" },
-  { name: "api_client", email: "api-client@service.com" },
-  { name: "new.user", email: "new@startup.io" },
-];
-
-const connections = ["Username-Password", "Google OAuth", "GitHub", "SAML Enterprise", "API Key"];
-const ips = ["192.168.1.45", "10.0.0.123", "203.45.67.89", "172.16.0.55", "192.168.2.100"];
-
-const events: LogEvent[] = ["login", "signup", "logout", "mfa", "password_reset", "api_call"];
-const levels: LogLevel[] = ["info", "success", "warning", "error"];
-
-function generateLogEntry(seed: number, timestamp: Date): LogEntry {
-  const index = seed % 1000;
-  const user = users[index % users.length];
-  const event = events[index % events.length];
-  const level: LogLevel =
-    event === "login" && index % 100 > 85
-      ? "error"
-      : event === "login" && index % 100 > 70
-        ? "warning"
-        : levels[index % levels.length];
-
-  return {
-    id: `log-${timestamp.getTime()}-${(index * 7).toString(36)}`,
-    timestamp,
-    level,
-    event,
-    user: user.name,
-    email: user.email,
-    ip: ips[index % ips.length],
-    connection: connections[index % connections.length],
-    details: getEventDetails(event, level),
-  };
-}
-
-function getEventDetails(event: LogEvent, level: LogLevel): string {
-  switch (event) {
-    case "login":
-      if (level === "error") return "Invalid credentials";
-      if (level === "warning") return "Suspicious IP detected";
-      return "Successfully authenticated";
-    case "signup":
-      return "New user account created";
-    case "logout":
-      return "User logged out";
-    case "mfa":
-      return "MFA challenge completed";
-    case "password_reset":
-      return "Password reset email sent";
-    case "api_call":
-      return "API request authenticated";
-    default:
-      return "Event processed";
-  }
-}
+import type { LogEntry, LogLevel, LogEvent } from "@/lib/api/types";
 
 const levelConfig = {
   info: { label: "Info", color: "text-blue-600", bg: "bg-blue-50", dot: "bg-blue-500" },
@@ -125,7 +52,8 @@ const eventConfig = {
   api_call: { icon: CheckCircle2, label: "API Call" },
 };
 
-function formatTime(date: Date): string {
+function formatTime(dateStr: string): string {
+  const date = new Date(dateStr);
   return date.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
@@ -139,33 +67,93 @@ export default function LogsStreamPage() {
   const [maxLogs, setMaxLogs] = useState(100);
   const [levelFilter, setLevelFilter] = useState<string>("all");
   const [eventFilter, setEventFilter] = useState<string>("all");
+  const [connected, setConnected] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const eventSourceRef = useRef<InstanceType<typeof EventSource> | null>(null);
+  const logsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const initialLogs: LogEntry[] = [];
-    const now = Date.now();
-    for (let i = 0; i < 15; i++) {
-      initialLogs.push(generateLogEntry(i, new Date(now - (15 - i) * 2000)));
+    if (!isStreaming) {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+      setConnected(false);
+      return;
     }
-    setLogs(initialLogs);
-  }, []);
+
+    const connectSSE = () => {
+      setError(null);
+      const params = new URLSearchParams();
+      if (levelFilter !== "all") params.set("level", levelFilter);
+      if (eventFilter !== "all") params.set("event", eventFilter);
+
+      const baseUrl =
+        typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+      const url = `${baseUrl}/api/v1/logs/stream?${params.toString()}`;
+
+      const eventSource = new EventSource(url);
+
+      eventSource.onopen = () => {
+        setConnected(true);
+      };
+
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          const newLog: LogEntry = {
+            id: data.id || `log-${Date.now()}`,
+            timestamp: data.timestamp || new Date().toISOString(),
+            level: data.level || "info",
+            event: data.event || "api_call",
+            user: data.user || "unknown",
+            email: data.email || "",
+            ip: data.ip || "0.0.0.0",
+            connection: data.connection || "Unknown",
+            details: data.details || "Event received",
+            ...data,
+          };
+          setLogs((prev) => {
+            const updated = [...prev, newLog];
+            if (updated.length > maxLogs) {
+              return updated.slice(-maxLogs);
+            }
+            return updated;
+          });
+        } catch (err) {
+          console.error("Failed to parse log:", err);
+        }
+      };
+
+      eventSource.onerror = () => {
+        setConnected(false);
+        setError("Connection lost. Reconnecting...");
+        eventSource.close();
+        setTimeout(() => {
+          if (isStreaming) {
+            connectSSE();
+          }
+        }, 3000);
+      };
+    };
+
+    connectSSE();
+    eventSourceRef.current = eventSource;
+
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+      setConnected(false);
+    };
+  }, [isStreaming, levelFilter, eventFilter, maxLogs]);
 
   useEffect(() => {
-    if (!isStreaming) return;
-
-    let seed = 0;
-    const interval = setInterval(() => {
-      const newLog = generateLogEntry(seed++, new Date());
-      setLogs((prev) => {
-        const updated = [...prev, newLog];
-        if (updated.length > maxLogs) {
-          return updated.slice(-maxLogs);
-        }
-        return updated;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isStreaming, maxLogs]);
+    if (logsEndRef.current && isStreaming && connected) {
+      logsEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [logs, isStreaming, connected]);
 
   const filteredLogs = logs.filter((log) => {
     const matchesLevel = levelFilter === "all" || log.level === levelFilter;
@@ -281,13 +269,18 @@ export default function LogsStreamPage() {
               <div className="flex items-center gap-3">
                 <CardTitle className="text-base font-semibold">Live Stream</CardTitle>
                 <div className="flex items-center gap-2">
-                  {isStreaming ? (
+                  {isStreaming && connected ? (
                     <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
                       <span className="relative flex h-2 w-2 mr-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                       </span>
-                      Streaming
+                      Connected
+                    </Badge>
+                  ) : isStreaming ? (
+                    <Badge variant="secondary">
+                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                      Connecting...
                     </Badge>
                   ) : (
                     <Badge variant="secondary">Paused</Badge>
@@ -364,6 +357,10 @@ export default function LogsStreamPage() {
               </Select>
             </div>
 
+            {error && (
+              <div className="mb-4 p-4 text-sm text-red-600 bg-red-50 rounded-md">{error}</div>
+            )}
+
             <div className="rounded-md border bg-muted/20 max-h-125 overflow-y-auto">
               {filteredLogs.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
@@ -373,16 +370,17 @@ export default function LogsStreamPage() {
                 </div>
               ) : (
                 <div className="divide-y">
+                  <div ref={logsEndRef} />
                   {[...filteredLogs].reverse().map((log, index) => (
                     <div
                       key={log.id}
                       className={cn(
                         "flex items-center gap-4 px-4 py-3 transition-colors hover:bg-muted/50",
-                        index === 0 && isStreaming && "bg-muted/30"
+                        index === 0 && isStreaming && connected && "bg-muted/30"
                       )}
                     >
                       <div className="flex items-center gap-3 w-24 shrink-0">
-                        <div className={cn("h-2 w-2 rounded-full", levelConfig[log.level].dot)} />
+                        <div className={cn("h-2 w-2 rounded-full", levelConfig[log.level]?.dot)} />
                         <span className="text-xs font-mono text-muted-foreground">
                           {formatTime(log.timestamp)}
                         </span>
@@ -391,20 +389,22 @@ export default function LogsStreamPage() {
                         <Badge
                           className={cn(
                             "text-xs font-normal",
-                            levelConfig[log.level].bg,
-                            levelConfig[log.level].color
+                            levelConfig[log.level]?.bg,
+                            levelConfig[log.level]?.color
                           )}
                         >
-                          {levelConfig[log.level].label}
+                          {levelConfig[log.level]?.label || log.level}
                         </Badge>
                       </div>
                       <div className="w-24 shrink-0">
                         <div className="flex items-center gap-2">
                           {(() => {
-                            const Icon = eventConfig[log.event].icon;
+                            const Icon = eventConfig[log.event]?.icon || LogIn;
                             return <Icon className="h-4 w-4 text-muted-foreground" />;
                           })()}
-                          <span className="text-sm">{eventConfig[log.event].label}</span>
+                          <span className="text-sm">
+                            {eventConfig[log.event]?.label || log.event}
+                          </span>
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">

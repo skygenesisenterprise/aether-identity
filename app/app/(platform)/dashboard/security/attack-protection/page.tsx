@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Shield,
@@ -19,6 +20,8 @@ import {
   Zap,
   TrendingUp,
   Ban,
+  Loader2,
+  XCircle,
 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,8 +40,10 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { securityDashboardApi } from "@/lib/api/client";
+import type { AttackProtection, ProtectionRule, BlockedIp, AttackEvent } from "@/lib/api/types";
 
-const protectionStats = {
+const defaultProtectionStats: AttackProtection = {
   blockedToday: 1247,
   blockedThisWeek: 8934,
   activeRules: 12,
@@ -48,7 +53,7 @@ const protectionStats = {
   threatLevel: "moderate",
 };
 
-const protectionRules = [
+const defaultProtectionRules: ProtectionRule[] = [
   {
     id: "brute-force",
     name: "Brute Force Protection",
@@ -99,7 +104,7 @@ const protectionRules = [
   },
 ];
 
-const blockedIPs = [
+const defaultBlockedIPs: BlockedIp[] = [
   {
     ip: "192.168.1.100",
     country: "Unknown",
@@ -142,7 +147,7 @@ const blockedIPs = [
   },
 ];
 
-const attackEvents = [
+const defaultAttackEvents: AttackEvent[] = [
   {
     type: "blocked",
     source: "192.168.1.100",
@@ -185,7 +190,7 @@ const attackEvents = [
   },
 ];
 
-const suspiciousCountries = [
+const defaultSuspiciousCountries = [
   { code: "RU", name: "Russia", attempts: 234, blocked: true },
   { code: "CN", name: "China", attempts: 189, blocked: true },
   { code: "KP", name: "North Korea", attempts: 89, blocked: true },
@@ -271,21 +276,93 @@ function getSeverityBadge(severity: string) {
 }
 
 export default function AttackProtectionPage() {
-  const [rules, setRules] = useState(protectionRules);
+  const [rules, setRules] = useState<ProtectionRule[]>(defaultProtectionRules);
+  const [stats, setStats] = useState<AttackProtection>(defaultProtectionStats);
+  const [blockedIPs] = useState<BlockedIp[]>(defaultBlockedIPs);
+  const [attackEvents] = useState<AttackEvent[]>(defaultAttackEvents);
+  const [suspiciousCountries] = useState(defaultSuspiciousCountries);
   const [isAllEnabled, setIsAllEnabled] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const toggleRule = (id: string) => {
-    setRules(rules.map((r) => (r.id === id ? { ...r, enabled: !r.enabled } : r)));
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [protectionRes, rulesRes] = await Promise.all([
+          securityDashboardApi.getAttackProtection(),
+          securityDashboardApi.getBruteForce(),
+        ]);
+
+        if (protectionRes.success && protectionRes.data) {
+          setStats(protectionRes.data);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load attack protection data");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  const toggleRule = async (id: string) => {
+    const rule = rules.find((r) => r.id === id);
+    if (!rule) return;
+
+    const newEnabled = !rule.enabled;
+    setRules(rules.map((r) => (r.id === id ? { ...r, enabled: newEnabled } : r)));
+
+    try {
+      if (id === "brute-force") {
+        await securityDashboardApi.updateBruteForce({ enabled: newEnabled });
+      } else {
+        await securityDashboardApi.updateAttackProtection({
+          activeRules: rules.filter((r) => r.enabled).length,
+        });
+      }
+    } catch {
+      setRules(rules.map((r) => (r.id === id ? { ...r, enabled: !newEnabled } : r)));
+    }
   };
 
-  const activeRules = rules.filter((r) => r.enabled).length;
+  const activeRulesCount = rules.filter((r) => r.enabled).length;
   const totalBan = rules.reduce((acc, r) => acc + r.blockedCount, 0);
   const threatLevelColor =
-    protectionStats.threatLevel === "high"
+    stats.threatLevel === "high"
       ? "text-red-600"
-      : protectionStats.threatLevel === "moderate"
+      : stats.threatLevel === "moderate"
         ? "text-yellow-600"
         : "text-green-600";
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Card className="w-96">
+          <CardContent className="p-6">
+            <div className="text-center text-red-500">
+              <XCircle className="h-8 w-8 mx-auto mb-2" />
+              <p>{error}</p>
+              <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -318,7 +395,7 @@ export default function AttackProtectionPage() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">Ban Today</p>
                       <p className="text-3xl font-bold tracking-tight">
-                        {protectionStats.blockedToday.toLocaleString()}
+                        {stats.blockedToday.toLocaleString()}
                       </p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
@@ -340,7 +417,7 @@ export default function AttackProtectionPage() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">Active Rules</p>
-                      <p className="text-3xl font-bold tracking-tight">{activeRules}</p>
+                      <p className="text-3xl font-bold tracking-tight">{activeRulesCount}</p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                       <ShieldCheck className="h-6 w-6 text-foreground" />
@@ -348,7 +425,7 @@ export default function AttackProtectionPage() {
                   </div>
                   <div className="mt-4 text-sm">
                     <span className="text-muted-foreground">
-                      {rules.length - activeRules} rules disabled
+                      {rules.length - activeRulesCount} rules disabled
                     </span>
                   </div>
                 </CardContent>
@@ -359,9 +436,7 @@ export default function AttackProtectionPage() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">Suspicious IPs</p>
-                      <p className="text-3xl font-bold tracking-tight">
-                        {protectionStats.suspiciousIPs}
-                      </p>
+                      <p className="text-3xl font-bold tracking-tight">{stats.suspiciousIPs}</p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                       <Server className="h-6 w-6 text-foreground" />
@@ -381,15 +456,15 @@ export default function AttackProtectionPage() {
                       <p
                         className={`text-3xl font-bold tracking-tight capitalize ${threatLevelColor}`}
                       >
-                        {protectionStats.threatLevel}
+                        {stats.threatLevel}
                       </p>
                     </div>
                     <div
                       className={cn(
                         "flex h-12 w-12 items-center justify-center rounded-full",
-                        protectionStats.threatLevel === "high"
+                        stats.threatLevel === "high"
                           ? "bg-red-100"
-                          : protectionStats.threatLevel === "moderate"
+                          : stats.threatLevel === "moderate"
                             ? "bg-yellow-100"
                             : "bg-green-100"
                       )}
@@ -397,9 +472,9 @@ export default function AttackProtectionPage() {
                       <ShieldAlert
                         className={cn(
                           "h-6 w-6",
-                          protectionStats.threatLevel === "high"
+                          stats.threatLevel === "high"
                             ? "text-red-600"
-                            : protectionStats.threatLevel === "moderate"
+                            : stats.threatLevel === "moderate"
                               ? "text-yellow-600"
                               : "text-green-600"
                         )}
@@ -451,18 +526,14 @@ export default function AttackProtectionPage() {
                       <span className="text-muted-foreground">Protection Coverage</span>
                       <span className="font-medium">
                         {Math.round(
-                          (protectionStats.normalTraffic /
-                            (protectionStats.normalTraffic + protectionStats.attackAttempts)) *
-                            100
+                          (stats.normalTraffic / (stats.normalTraffic + stats.attackAttempts)) * 100
                         )}
                         % of traffic
                       </span>
                     </div>
                     <Progress
                       value={
-                        (protectionStats.normalTraffic /
-                          (protectionStats.normalTraffic + protectionStats.attackAttempts)) *
-                        100
+                        (stats.normalTraffic / (stats.normalTraffic + stats.attackAttempts)) * 100
                       }
                       className="h-2"
                     />
@@ -572,7 +643,7 @@ export default function AttackProtectionPage() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">Active Protection</p>
-                      <p className="text-3xl font-bold tracking-tight">{activeRules}</p>
+                      <p className="text-3xl font-bold tracking-tight">{activeRulesCount}</p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
                       <ShieldCheck className="h-6 w-6 text-green-600" />
@@ -603,7 +674,7 @@ export default function AttackProtectionPage() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">Threat Level</p>
                       <p className={`text-3xl font-bold tracking-tight ${threatLevelColor}`}>
-                        {protectionStats.threatLevel}
+                        {stats.threatLevel}
                       </p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
@@ -918,9 +989,7 @@ export default function AttackProtectionPage() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">Total Events</p>
-                      <p className="text-3xl font-bold tracking-tight">
-                        {protectionStats.attackAttempts}
-                      </p>
+                      <p className="text-3xl font-bold tracking-tight">{stats.attackAttempts}</p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                       <Activity className="h-6 w-6 text-foreground" />
@@ -935,7 +1004,7 @@ export default function AttackProtectionPage() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">Ban</p>
                       <p className="text-3xl font-bold tracking-tight">
-                        {Math.round(protectionStats.attackAttempts * 0.85).toLocaleString()}
+                        {Math.round(stats.attackAttempts * 0.85).toLocaleString()}
                       </p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
@@ -951,7 +1020,7 @@ export default function AttackProtectionPage() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">Challenged</p>
                       <p className="text-3xl font-bold tracking-tight">
-                        {Math.round(protectionStats.attackAttempts * 0.1).toLocaleString()}
+                        {Math.round(stats.attackAttempts * 0.1).toLocaleString()}
                       </p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100">
@@ -967,7 +1036,7 @@ export default function AttackProtectionPage() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">Allowed</p>
                       <p className="text-3xl font-bold tracking-tight">
-                        {Math.round(protectionStats.attackAttempts * 0.05).toLocaleString()}
+                        {Math.round(stats.attackAttempts * 0.05).toLocaleString()}
                       </p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">

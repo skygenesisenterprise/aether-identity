@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Shield,
   Search,
@@ -15,6 +15,7 @@ import {
   ChevronRight,
   CheckCircle2,
   ArrowUpDown,
+  Loader2,
 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -169,11 +170,31 @@ function getStatusBadge(status: string) {
 }
 
 export default function RolesPage() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [roles, setRoles] = useState(mockRoles);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
 
-  const filteredRoles = mockRoles.filter((role) => {
+  useEffect(() => {
+    loadRoles();
+  }, []);
+
+  const loadRoles = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setRoles(mockRoles);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredRoles = roles.filter((role) => {
     const matchesSearch =
       role.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       role.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -181,11 +202,11 @@ export default function RolesPage() {
     return matchesSearch && matchesStatus;
   });
 
-  const activeRoles = mockRoles.filter((r) => r.status === "active").length;
-  const totalUsers = mockRoles.reduce((acc, r) => acc + r.users, 0);
-  const totalPermissions = mockRoles.reduce((acc, r) => acc + r.permissions, 0);
+  const activeRoles = roles.filter((r) => r.status === "active").length;
+  const totalUsers = roles.reduce((acc, r) => acc + r.users, 0);
+  const totalPermissions = roles.reduce((acc, r) => acc + r.permissions, 0);
 
-  const selectedRoleData = mockRoles.find((r) => r.id === selectedRole);
+  const selectedRoleData = roles.find((r) => r.id === selectedRole);
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -207,7 +228,9 @@ export default function RolesPage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Total Roles</p>
-                  <p className="text-3xl font-bold tracking-tight">{mockRoles.length}</p>
+                  <p className="text-3xl font-bold tracking-tight">
+                    {loading ? "-" : roles.length}
+                  </p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                   <Shield className="h-6 w-6 text-foreground" />
@@ -336,78 +359,97 @@ export default function RolesPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredRoles.map((role) => (
-                      <TableRow
-                        key={role.id}
-                        className={cn("cursor-pointer", selectedRole === role.id && "bg-muted/50")}
-                        onClick={() => setSelectedRole(role.id)}
-                      >
-                        <TableCell className="py-3">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                              <Shield className="h-5 w-5 text-foreground" />
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="text-sm font-medium">{role.name}</span>
-                              <span className="text-xs text-muted-foreground">
-                                Created {role.createdAt}
-                              </span>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-3">
-                          <span className="text-sm text-muted-foreground line-clamp-1">
-                            {role.description}
-                          </span>
-                        </TableCell>
-                        <TableCell className="py-3 text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            <Users className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">{role.users}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-3 text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            <Key className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">{role.permissions}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-3">{getStatusBadge(role.status)}</TableCell>
-                        <TableCell className="py-3">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem>
-                                <Settings className="mr-2 h-4 w-4" />
-                                Edit Role
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Users className="mr-2 h-4 w-4" />
-                                Manage Users
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Copy className="mr-2 h-4 w-4" />
-                                Duplicate
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-red-600 focus:text-red-600">
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete Role
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                    {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="h-24 text-center">
+                          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mx-auto" />
                         </TableCell>
                       </TableRow>
-                    ))}
+                    ) : error ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="h-24 text-center text-red-500">
+                          {error}
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      <>
+                        {filteredRoles.map((role) => (
+                          <TableRow
+                            key={role.id}
+                            className={cn(
+                              "cursor-pointer",
+                              selectedRole === role.id && "bg-muted/50"
+                            )}
+                            onClick={() => setSelectedRole(role.id)}
+                          >
+                            <TableCell className="py-3">
+                              <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                                  <Shield className="h-5 w-5 text-foreground" />
+                                </div>
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium">{role.name}</span>
+                                  <span className="text-xs text-muted-foreground">
+                                    Created {role.createdAt}
+                                  </span>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="py-3">
+                              <span className="text-sm text-muted-foreground line-clamp-1">
+                                {role.description}
+                              </span>
+                            </TableCell>
+                            <TableCell className="py-3 text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                <Users className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium">{role.users}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="py-3 text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                <Key className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium">{role.permissions}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="py-3">{getStatusBadge(role.status)}</TableCell>
+                            <TableCell className="py-3">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem>
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    Edit Role
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem>
+                                    <Users className="mr-2 h-4 w-4" />
+                                    Manage Users
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem>
+                                    <Copy className="mr-2 h-4 w-4" />
+                                    Duplicate
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem className="text-red-600 focus:text-red-600">
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete Role
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </>
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>

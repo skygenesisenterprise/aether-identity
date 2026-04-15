@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   AppWindow,
   Plus,
@@ -15,6 +15,7 @@ import {
   TrendingUp,
   LogIn,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,36 +39,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-
-const applications = [
-  {
-    id: "app_1",
-    name: "Default App",
-    type: "Generic",
-    clientId: "P31f0AMfZNKU086N4CjbEnVPmIANmk5Z",
-    status: "active",
-    isDefault: true,
-    logins: 1234,
-  },
-  {
-    id: "app_2",
-    name: "My App",
-    type: "Regular Web Application",
-    clientId: "EAC2A3r64I15SuyR5Qy6xtNf9HgfAcfK",
-    status: "active",
-    isDefault: false,
-    logins: 567,
-  },
-  {
-    id: "app_3",
-    name: "Legacy Backend",
-    type: "Machine to Machine",
-    clientId: "LEGACY1234567890ABCDEF",
-    status: "inactive",
-    isDefault: false,
-    logins: 0,
-  },
-];
+import { applicationsApi } from "@/lib/api";
+import type { ApplicationType } from "@/lib/api/types";
 
 const applicationTypes = [
   {
@@ -101,22 +74,55 @@ const applicationTypes = [
 ];
 
 export default function ApplicationsPage() {
+  const [applications, setApplications] = useState<ApplicationType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [appName, setAppName] = useState("");
   const [appDescription, setAppDescription] = useState("");
   const [selectedType, setSelectedType] = useState<string | null>(null);
-  const [createdApps] = useState(applications);
 
-  const activeApps = createdApps.filter((app) => app.status === "active").length;
-  const totalLogins = createdApps.reduce((acc, app) => acc + app.logins, 0);
+  useEffect(() => {
+    loadApplications();
+  }, []);
 
-  const handleCreate = () => {
-    if (!appName || !selectedType) return;
-    setDialogOpen(false);
-    setAppName("");
-    setAppDescription("");
-    setSelectedType(null);
+  const loadApplications = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await applicationsApi.list();
+      if (response.success && response.data) {
+        setApplications(response.data);
+      } else {
+        setError(response.error || "Failed to load applications");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleCreate = async () => {
+    if (!appName || !selectedType) return;
+    try {
+      await applicationsApi.create({
+        name: appName,
+        description: appDescription,
+        type: selectedType,
+      });
+      setDialogOpen(false);
+      setAppName("");
+      setAppDescription("");
+      setSelectedType(null);
+      loadApplications();
+    } catch (err) {
+      console.error("Failed to create application:", err);
+    }
+  };
+
+  const activeApps = applications.filter((app) => app.status === "active").length;
+  const totalLogins = applications.reduce((acc, app) => acc + app.logins, 0);
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -138,7 +144,7 @@ export default function ApplicationsPage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Total Applications</p>
-                  <p className="text-3xl font-bold tracking-tight">{createdApps.length}</p>
+                  <p className="text-3xl font-bold tracking-tight">{applications.length}</p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                   <AppWindow className="h-6 w-6 text-foreground" />
@@ -167,7 +173,10 @@ export default function ApplicationsPage() {
               </div>
               <div className="mt-4 flex items-center gap-2 text-sm">
                 <span className="text-muted-foreground">
-                  {Math.round((activeApps / createdApps.length) * 100)}% of total
+                  {applications.length > 0
+                    ? Math.round((activeApps / applications.length) * 100)
+                    : 0}
+                  % of total
                 </span>
               </div>
             </CardContent>
@@ -211,87 +220,95 @@ export default function ApplicationsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {createdApps.map((app) => (
-                <div
-                  key={app.id}
-                  className="group flex flex-col gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                      <AppWindow className="h-5 w-5 text-foreground" />
+            {loading ? (
+              <div className="flex items-center justify-center p-8">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : error ? (
+              <div className="flex items-center justify-center p-8 text-red-500">{error}</div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {applications.map((app) => (
+                  <div
+                    key={app.id}
+                    className="group flex flex-col gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                        <AppWindow className="h-5 w-5 text-foreground" />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant={app.status === "active" ? "outline" : "secondary"}
+                          className={cn(
+                            "text-xs",
+                            app.status === "active" && "border-green-200 bg-green-50 text-green-700"
+                          )}
+                        >
+                          {app.status}
+                        </Badge>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                              <Link href={`/dashboard/applications/${app.id}`}>View Details</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/dashboard/applications/${app.id}/settings`}>
+                                Settings
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant={app.status === "active" ? "outline" : "secondary"}
-                        className={cn(
-                          "text-xs",
-                          app.status === "active" && "border-green-200 bg-green-50 text-green-700"
-                        )}
-                      >
-                        {app.status}
-                      </Badge>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem asChild>
-                            <Link href={`/dashboard/applications/${app.id}`}>View Details</Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
-                            <Link href={`/dashboard/applications/${app.id}/settings`}>
-                              Settings
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    <div>
+                      <p className="text-sm font-medium">{app.name}</p>
+                      <p className="text-xs text-muted-foreground">{app.type}</p>
                     </div>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">{app.name}</p>
-                    <p className="text-xs text-muted-foreground">{app.type}</p>
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
+                    <Separator />
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <span className="text-muted-foreground">Client ID:</span>
+                        <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono">
+                          {app.clientId.slice(0, 8)}...
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigator.clipboard.writeText(app.clientId);
+                          }}
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <span className="text-muted-foreground">Client ID:</span>
-                      <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono">
-                        {app.clientId.slice(0, 8)}...
-                      </code>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigator.clipboard.writeText(app.clientId);
-                        }}
-                      >
-                        <Copy className="h-3.5 w-3.5" />
-                      </Button>
+                      <LogIn className="h-3 w-3" />
+                      <span>{app.logins.toLocaleString()} logins today</span>
                     </div>
+                    {app.isDefault && (
+                      <Badge variant="secondary" className="w-fit text-xs">
+                        Default
+                      </Badge>
+                    )}
                   </div>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <LogIn className="h-3 w-3" />
-                    <span>{app.logins.toLocaleString()} logins today</span>
-                  </div>
-                  {app.isDefault && (
-                    <Badge variant="secondary" className="w-fit text-xs">
-                      Default
-                    </Badge>
-                  )}
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
+import { useState, useEffect } from "react";
 import {
   Shield,
   Key,
@@ -17,6 +18,7 @@ import {
   ChevronRight,
   ShieldCheck,
   ShieldAlert,
+  Loader2,
 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,13 +36,14 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { securityDashboardApi } from "@/lib/api/client";
+import type { MfaMethod, MfaPolicy, MfaStats, MfaActivity } from "@/lib/api/types";
 
-const mfaMethods = [
+const defaultMethods: MfaMethod[] = [
   {
     id: "totp",
     name: "Authenticator App",
     description: "Time-based one-time password (TOTP)",
-    icon: Smartphone,
     enabled: true,
     users: 842,
     status: "active",
@@ -49,7 +52,6 @@ const mfaMethods = [
     id: "sms",
     name: "SMS",
     description: "One-time code via text message",
-    icon: MessageSquare,
     enabled: true,
     users: 423,
     status: "active",
@@ -58,7 +60,6 @@ const mfaMethods = [
     id: "email",
     name: "Email",
     description: "One-time code via email",
-    icon: Mail,
     enabled: true,
     users: 312,
     status: "active",
@@ -67,7 +68,6 @@ const mfaMethods = [
     id: "webauthn",
     name: "WebAuthn / Passkey",
     description: "Hardware key or device biometrics",
-    icon: Fingerprint,
     enabled: true,
     users: 156,
     status: "beta",
@@ -76,14 +76,13 @@ const mfaMethods = [
     id: "backup",
     name: "Backup Codes",
     description: "Single-use backup codes",
-    icon: Key,
     enabled: false,
     users: 0,
     status: "disabled",
   },
 ];
 
-const mfaPolicies = [
+const defaultPolicies: MfaPolicy[] = [
   {
     id: "enforce-mfa",
     name: "Enforce MFA",
@@ -114,7 +113,7 @@ const mfaPolicies = [
   },
 ];
 
-const recentMfaEvents = [
+const defaultMfaEvents: MfaActivity[] = [
   {
     type: "mfa_success",
     user: "john.doe@example.com",
@@ -158,12 +157,20 @@ const recentMfaEvents = [
   },
 ];
 
-const mfaStats = {
+const defaultMfaStats: MfaStats = {
   totalUsers: 12847,
   mfaEnabled: 4234,
   mfaPending: 892,
   challengesToday: 892,
   challengeRate: 98.2,
+};
+
+const methodIcons: Record<string, React.ElementType> = {
+  totp: Smartphone,
+  sms: MessageSquare,
+  email: Mail,
+  webauthn: Fingerprint,
+  backup: Key,
 };
 
 function getMfaEventIcon(type: string) {
@@ -225,17 +232,103 @@ function getMfaEventBadge(type: string) {
 }
 
 export default function MfaPage() {
-  const [methods, setMethods] = useState(mfaMethods);
-  const [policies, setPolicies] = useState(mfaPolicies);
-  const mfaEnabledPercent = (mfaStats.mfaEnabled / mfaStats.totalUsers) * 100;
+  const [methods, setMethods] = useState<MfaMethod[]>(defaultMethods);
+  const [policies, setPolicies] = useState<MfaPolicy[]>(defaultPolicies);
+  const [activity, setActivity] = useState<MfaActivity[]>(defaultMfaEvents);
+  const [stats, setStats] = useState<MfaStats>(defaultMfaStats);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const toggleMethod = (id: string) => {
-    setMethods(methods.map((m) => (m.id === id ? { ...m, enabled: !m.enabled } : m)));
+  const mfaEnabledPercent = (stats.mfaEnabled / stats.totalUsers) * 100;
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [methodsRes, policiesRes, statsRes, activityRes] = await Promise.all([
+          securityDashboardApi.getMfaMethods(),
+          securityDashboardApi.getMfaPolicies(),
+          securityDashboardApi.getMfaStats(),
+          securityDashboardApi.getMfaActivity(),
+        ]);
+
+        if (methodsRes.success && methodsRes.data) {
+          setMethods(methodsRes.data);
+        }
+        if (policiesRes.success && policiesRes.data) {
+          setPolicies(policiesRes.data);
+        }
+        if (statsRes.success && statsRes.data) {
+          setStats(statsRes.data);
+        }
+        if (activityRes.success && activityRes.data) {
+          setActivity(activityRes.data);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load MFA data");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  const toggleMethod = async (id: string) => {
+    const method = methods.find((m) => m.id === id);
+    if (!method) return;
+
+    const newEnabled = !method.enabled;
+    setMethods(methods.map((m) => (m.id === id ? { ...m, enabled: newEnabled } : m)));
+
+    try {
+      await securityDashboardApi.updateMfaMethod(id, { enabled: newEnabled });
+    } catch {
+      setMethods(methods.map((m) => (m.id === id ? { ...m, enabled: !newEnabled } : m)));
+    }
   };
 
-  const togglePolicy = (id: string) => {
-    setPolicies(policies.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p)));
+  const togglePolicy = async (id: string) => {
+    const policy = policies.find((p) => p.id === id);
+    if (!policy) return;
+
+    const newEnabled = !policy.enabled;
+    setPolicies(policies.map((p) => (p.id === id ? { ...p, enabled: newEnabled } : p)));
+
+    try {
+      await securityDashboardApi.updateMfaPolicy(id, { enabled: newEnabled });
+    } catch {
+      setPolicies(policies.map((p) => (p.id === id ? { ...p, enabled: !newEnabled } : p)));
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Card className="w-96">
+          <CardContent className="p-6">
+            <div className="text-center text-red-500">
+              <XCircle className="h-8 w-8 mx-auto mb-2" />
+              <p>{error}</p>
+              <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -266,7 +359,7 @@ export default function MfaPage() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">Total Users</p>
                       <p className="text-3xl font-bold tracking-tight">
-                        {mfaStats.totalUsers.toLocaleString()}
+                        {stats.totalUsers.toLocaleString()}
                       </p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
@@ -282,7 +375,7 @@ export default function MfaPage() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">MFA Enabled</p>
                       <p className="text-3xl font-bold tracking-tight">
-                        {mfaStats.mfaEnabled.toLocaleString()}
+                        {stats.mfaEnabled.toLocaleString()}
                       </p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
@@ -305,7 +398,7 @@ export default function MfaPage() {
                       <p className="text-sm font-medium text-muted-foreground">
                         Pending Enrollment
                       </p>
-                      <p className="text-3xl font-bold tracking-tight">{mfaStats.mfaPending}</p>
+                      <p className="text-3xl font-bold tracking-tight">{stats.mfaPending}</p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                       <Clock className="h-6 w-6 text-yellow-600" />
@@ -319,7 +412,7 @@ export default function MfaPage() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">Challenge Rate</p>
-                      <p className="text-3xl font-bold tracking-tight">{mfaStats.challengeRate}%</p>
+                      <p className="text-3xl font-bold tracking-tight">{stats.challengeRate}%</p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                       <Activity className="h-6 w-6 text-foreground" />
@@ -327,7 +420,7 @@ export default function MfaPage() {
                   </div>
                   <div className="mt-4 text-sm">
                     <span className="text-muted-foreground">
-                      {mfaStats.challengesToday} challenges today
+                      {stats.challengesToday} challenges today
                     </span>
                   </div>
                 </CardContent>
@@ -355,7 +448,9 @@ export default function MfaPage() {
                     <div key={method.id} className="flex items-center justify-between px-6 py-4">
                       <div className="flex items-center gap-4">
                         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                          <method.icon className="h-5 w-5 text-foreground" />
+                          {React.createElement(methodIcons[method.id] || Key, {
+                            className: "h-5 w-5 text-foreground",
+                          })}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
@@ -648,9 +743,7 @@ export default function MfaPage() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">Challenges Today</p>
-                      <p className="text-3xl font-bold tracking-tight">
-                        {mfaStats.challengesToday}
-                      </p>
+                      <p className="text-3xl font-bold tracking-tight">{stats.challengesToday}</p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                       <Key className="h-6 w-6 text-foreground" />
@@ -665,7 +758,7 @@ export default function MfaPage() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">Successful</p>
                       <p className="text-3xl font-bold tracking-tight">
-                        {Math.round(mfaStats.challengesToday * (mfaStats.challengeRate / 100))}
+                        {Math.round(stats.challengesToday * (stats.challengeRate / 100))}
                       </p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
@@ -681,9 +774,7 @@ export default function MfaPage() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">Failed</p>
                       <p className="text-3xl font-bold tracking-tight">
-                        {Math.round(
-                          mfaStats.challengesToday * ((100 - mfaStats.challengeRate) / 100)
-                        )}
+                        {Math.round(stats.challengesToday * ((100 - stats.challengeRate) / 100))}
                       </p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
@@ -725,7 +816,7 @@ export default function MfaPage() {
               </CardHeader>
               <CardContent className="p-0">
                 <div className="divide-y">
-                  {recentMfaEvents.map((event, index) => (
+                  {activity.map((event, index) => (
                     <div key={index} className="flex items-start gap-3 px-6 py-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted mt-0.5">
                         {getMfaEventIcon(event.type)}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Shield,
   ShieldAlert,
@@ -19,6 +19,8 @@ import {
   Key,
   Ban,
   Flag,
+  Loader2,
+  XCircle,
 } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
@@ -36,8 +38,10 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
+import { securityDashboardApi } from "@/lib/api/client";
+import type { SecurityMonitoring } from "@/lib/api/types";
 
-const securityMetrics = {
+const defaultMetrics: SecurityMonitoring = {
   totalEvents: 12847,
   blockedAttempts: 234,
   failedLogins: 156,
@@ -46,7 +50,14 @@ const securityMetrics = {
   mfaChallenges: 892,
 };
 
-const threatData = [
+interface MonitoringThreatData {
+  time: string;
+  blocked: number;
+  failed: number;
+  suspicious: number;
+}
+
+const defaultThreatData: MonitoringThreatData[] = [
   { time: "00:00", blocked: 12, failed: 8, suspicious: 2 },
   { time: "04:00", blocked: 8, failed: 5, suspicious: 1 },
   { time: "08:00", blocked: 25, failed: 18, suspicious: 3 },
@@ -186,6 +197,57 @@ function getEventIcon(type: string) {
 export default function SecurityMonitoringPage() {
   const [timeRange, setTimeRange] = useState("24h");
   const [eventFilter, setEventFilter] = useState("all");
+  const [metrics, setMetrics] = useState<SecurityMonitoring>(defaultMetrics);
+  const [monitoringThreatData] = useState<MonitoringThreatData[]>(defaultThreatData);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await securityDashboardApi.getSecurityMonitoring();
+
+        if (response.success && response.data) {
+          setMetrics(response.data);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load monitoring data");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Card className="w-96">
+          <CardContent className="p-6">
+            <div className="text-center text-red-500">
+              <XCircle className="h-8 w-8 mx-auto mb-2" />
+              <p>{error}</p>
+              <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -210,7 +272,7 @@ export default function SecurityMonitoringPage() {
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Total Events</p>
                   <p className="text-2xl font-bold tracking-tight">
-                    {securityMetrics.totalEvents.toLocaleString()}
+                    {metrics.totalEvents.toLocaleString()}
                   </p>
                 </div>
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
@@ -226,7 +288,7 @@ export default function SecurityMonitoringPage() {
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Blocked Attempts</p>
                   <p className="text-2xl font-bold tracking-tight text-red-600">
-                    {securityMetrics.blockedAttempts}
+                    {metrics.blockedAttempts}
                   </p>
                 </div>
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
@@ -241,9 +303,7 @@ export default function SecurityMonitoringPage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Failed Logins</p>
-                  <p className="text-2xl font-bold tracking-tight">
-                    {securityMetrics.failedLogins}
-                  </p>
+                  <p className="text-2xl font-bold tracking-tight">{metrics.failedLogins}</p>
                 </div>
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
                   <LogIn className="h-5 w-5 text-foreground" />
@@ -258,7 +318,7 @@ export default function SecurityMonitoringPage() {
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Suspicious</p>
                   <p className="text-2xl font-bold tracking-tight text-yellow-600">
-                    {securityMetrics.suspiciousActivity}
+                    {metrics.suspiciousActivity}
                   </p>
                 </div>
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100">
@@ -273,9 +333,7 @@ export default function SecurityMonitoringPage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Active Blocks</p>
-                  <p className="text-2xl font-bold tracking-tight">
-                    {securityMetrics.activeBlocks}
-                  </p>
+                  <p className="text-2xl font-bold tracking-tight">{metrics.activeBlocks}</p>
                 </div>
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
                   <Lock className="h-5 w-5 text-foreground" />
@@ -289,9 +347,7 @@ export default function SecurityMonitoringPage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">MFA Challenges</p>
-                  <p className="text-2xl font-bold tracking-tight">
-                    {securityMetrics.mfaChallenges}
-                  </p>
+                  <p className="text-2xl font-bold tracking-tight">{metrics.mfaChallenges}</p>
                 </div>
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
                   <ShieldCheck className="h-5 w-5 text-foreground" />
@@ -343,7 +399,10 @@ export default function SecurityMonitoringPage() {
                 </div>
               </div>
               <ChartContainer config={chartConfig} className="h-64 w-full">
-                <AreaChart data={threatData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <AreaChart
+                  data={monitoringThreatData}
+                  margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                >
                   <defs>
                     <linearGradient id="fillBlocked" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="var(--color-blocked)" stopOpacity={0.2} />

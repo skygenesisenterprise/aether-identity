@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Zap,
@@ -23,9 +23,9 @@ import {
   ChevronRight,
   Search,
   Filter,
+  Loader2,
 } from "lucide-react";
 
-import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -40,136 +40,80 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { actionsApi } from "@/lib/api/client";
+import type { Action, ActionTemplate, DashboardActionLogEntry } from "@/lib/api/types";
 
-const actionTemplates = [
-  {
-    id: "post-login",
-    name: "Post Login",
-    description: "Execute custom logic after a user logs in",
-    icon: LogIn,
-    category: "Authentication",
-    triggers: ["Login"],
-    popularity: "popular",
-  },
-  {
-    id: "pre-register",
-    name: "Pre User Registration",
-    description: "Validate or modify user data before signup",
-    icon: UserPlus,
-    category: "Authentication",
-    triggers: ["Sign Up"],
-    popularity: "popular",
-  },
-  {
-    id: "add-claims",
-    name: "Add Custom Claims",
-    description: "Add custom claims to the ID and access tokens",
-    icon: Plus,
-    category: "Tokens",
-    triggers: ["Login", "Token Exchange"],
-    popularity: "popular",
-  },
-  {
-    id: "mfa-enrollment",
-    name: "MFA Enrollment",
-    description: "Control when users enroll in MFA",
-    icon: Shield,
-    category: "Security",
-    triggers: ["Login"],
-    popularity: "common",
-  },
-  {
-    id: "send-email",
-    name: "Custom Email",
-    description: "Send custom emails on authentication events",
-    icon: Mail,
-    category: "Notifications",
-    triggers: ["Login", "Sign Up", "Password Change"],
-    popularity: "common",
-  },
-  {
-    id: "sync-user",
-    name: "User Sync",
-    description: "Sync user data to external systems",
-    icon: Users,
-    category: "Integration",
-    triggers: ["Login", "Sign Up", "Profile Update"],
-    popularity: "advanced",
-  },
-];
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  LogIn,
+  UserPlus,
+  Shield,
+  Mail,
+  Users,
+};
 
-const deployedActions = [
-  {
-    id: "1",
-    name: "Add Partner Claims",
-    description: "Add partner-specific claims to tokens",
-    status: "active",
-    version: "1.2.0",
-    lastModified: "2 hours ago",
-    triggers: ["Login"],
-    runs: 12450,
-    errors: 0,
-  },
-  {
-    id: "2",
-    name: "Slack Notification",
-    description: "Send login notifications to Slack",
-    status: "active",
-    version: "2.0.1",
-    lastModified: "1 day ago",
-    triggers: ["Login"],
-    runs: 8432,
-    errors: 2,
-  },
-  {
-    id: "3",
-    name: "Session Extension",
-    description: "Extend session based on user tier",
-    status: "active",
-    version: "1.0.0",
-    lastModified: "3 days ago",
-    triggers: ["Login"],
-    runs: 5200,
-    errors: 0,
-  },
-  {
-    id: "4",
-    name: "Legacy Migration Hook",
-    description: "Migrate users from legacy system",
-    status: "disabled",
-    version: "0.9.5",
-    lastModified: "1 week ago",
-    triggers: ["Sign Up"],
-    runs: 156,
-    errors: 12,
-  },
-  {
-    id: "5",
-    name: "Audit Logger",
-    description: "Log all authentication events",
-    status: "active",
-    version: "3.1.0",
-    lastModified: "5 hours ago",
-    triggers: ["Login", "Sign Up", "Logout", "Password Change"],
-    runs: 45200,
-    errors: 0,
-  },
-];
-
-const actionStats = [
-  { label: "Total Actions", value: "12", change: "+3", trend: "up" },
-  { label: "Active Actions", value: "8", change: "+1", trend: "up" },
-  { label: "Total Executions", value: "71.4K", change: "+12.3%", trend: "up" },
-  { label: "Error Rate", value: "0.02%", change: "-0.01%", trend: "down" },
-];
+const getIcon = (name: string) => iconMap[name] || Zap;
 
 export default function ActionsLibraryPage() {
-  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [activeTab, setActiveTab] = useState("deployed");
 
-  const filteredTemplates = actionTemplates.filter((template) => {
+  const [actions, setActions] = useState<Action[]>([]);
+  const [templates, setTemplates] = useState<ActionTemplate[]>([]);
+  const [actionLogs, setActionLogs] = useState<DashboardActionLogEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [stats, setStats] = useState({
+    totalActions: 0,
+    activeActions: 0,
+    totalExecutions: 0,
+    errorRate: "0%",
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [actionsRes, templatesRes, triggersRes] = await Promise.all([
+          actionsApi.list(),
+          actionsApi.getLibrary(),
+          actionsApi.getTriggerEvents(),
+        ]);
+
+        if (actionsRes.success && actionsRes.data) {
+          setActions(actionsRes.data);
+          const active = actionsRes.data.filter((a) => a.status === "active").length;
+          const totalRuns = actionsRes.data.reduce((sum, a) => sum + (a.runs || 0), 0);
+          const totalErrors = actionsRes.data.reduce((sum, a) => sum + (a.errors || 0), 0);
+          const errorRate = totalRuns > 0 ? ((totalErrors / totalRuns) * 100).toFixed(2) : "0";
+          setStats({
+            totalActions: actionsRes.data.length,
+            activeActions: active,
+            totalExecutions: totalRuns,
+            errorRate: `${errorRate}%`,
+          });
+        }
+
+        if (templatesRes.success && templatesRes.data) {
+          setTemplates(templatesRes.data);
+        }
+
+        if (triggersRes.success && triggersRes.data) {
+          setActionLogs(triggersRes.data as unknown as DashboardActionLogEntry[]);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load actions data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const filteredTemplates = templates.filter((template) => {
     const matchesSearch =
       template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       template.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -177,7 +121,7 @@ export default function ActionsLibraryPage() {
     return matchesSearch && matchesCategory;
   });
 
-  const filteredActions = deployedActions.filter((action) => {
+  const filteredActions = actions.filter((action) => {
     const matchesSearch =
       action.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       action.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -187,6 +131,70 @@ export default function ActionsLibraryPage() {
       (selectedCategory === "disabled" && action.status === "disabled");
     return matchesSearch && matchesCategory;
   });
+
+  const handleToggleAction = async (id: string, currentStatus: string) => {
+    try {
+      if (currentStatus === "active") {
+        await actionsApi.update(id, { triggers: [] });
+      } else {
+        await actionsApi.deploy(id);
+      }
+      const res = await actionsApi.list();
+      if (res.success && res.data) {
+        setActions(res.data);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update action");
+    }
+  };
+
+  const handleDeleteAction = async (id: string) => {
+    try {
+      await actionsApi.delete(id);
+      setActions(actions.filter((a) => a.id !== id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete action");
+    }
+  };
+
+  const handleTestAction = async (id: string) => {
+    try {
+      await actionsApi.test(id);
+      alert("Action test executed successfully");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to test action");
+    }
+  };
+
+  const actionStats = [
+    {
+      label: "Total Actions",
+      value: String(stats.totalActions),
+      change: "+3",
+      trend: "up" as const,
+    },
+    {
+      label: "Active Actions",
+      value: String(stats.activeActions),
+      change: "+1",
+      trend: "up" as const,
+    },
+    {
+      label: "Total Executions",
+      value: formatNumber(stats.totalExecutions),
+      change: "+12.3%",
+      trend: "up" as const,
+    },
+    { label: "Error Rate", value: stats.errorRate, change: "-0.01%", trend: "down" as const },
+  ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -202,6 +210,12 @@ export default function ActionsLibraryPage() {
       </div>
 
       <div className="p-6 space-y-6">
+        {error && (
+          <div className="rounded-md bg-red-50 p-4 text-sm text-red-600 border border-red-200">
+            {error}
+          </div>
+        )}
+
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {actionStats.map((stat) => (
             <Card key={stat.label}>
@@ -222,11 +236,7 @@ export default function ActionsLibraryPage() {
                       stat.trend === "up" ? "text-green-600" : "text-red-600"
                     )}
                   >
-                    {stat.trend === "up" ? (
-                      <ChevronRight className="h-4 w-4 rotate-90" />
-                    ) : (
-                      <ChevronRight className="h-4 w-4 rotate-90" />
-                    )}
+                    <ChevronRight className={cn("h-4 w-4", stat.trend === "down" && "rotate-90")} />
                     <span className="font-medium">{stat.change}</span>
                   </div>
                   <span className="text-muted-foreground">from last week</span>
@@ -274,67 +284,93 @@ export default function ActionsLibraryPage() {
 
             <Card>
               <CardContent className="p-0">
-                <div className="divide-y">
-                  {filteredActions.map((action) => (
-                    <div
-                      key={action.id}
-                      className="flex items-center gap-4 px-6 py-4 transition-colors hover:bg-muted/50"
-                    >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                        <Zap className="h-5 w-5 text-foreground" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium">{action.name}</p>
-                          <Badge
-                            variant={action.status === "active" ? "outline" : "secondary"}
-                            className={cn(
-                              "text-xs",
-                              action.status === "active" &&
-                                "border-green-200 bg-green-50 text-green-700"
-                            )}
+                {filteredActions.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Zap className="h-12 w-12 text-muted-foreground" />
+                    <p className="mt-4 text-sm font-medium">No actions found</p>
+                    <p className="text-sm text-muted-foreground">
+                      Create your first action or adjust your search
+                    </p>
+                  </div>
+                ) : (
+                  <div className="divide-y">
+                    {filteredActions.map((action) => (
+                      <div
+                        key={action.id}
+                        className="flex items-center gap-4 px-6 py-4 transition-colors hover:bg-muted/50"
+                      >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                          <Zap className="h-5 w-5 text-foreground" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium">{action.name}</p>
+                            <Badge
+                              variant={action.status === "active" ? "outline" : "secondary"}
+                              className={cn(
+                                "text-xs",
+                                action.status === "active" &&
+                                  "border-green-200 bg-green-50 text-green-700"
+                              )}
+                            >
+                              {action.status}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {action.description}
+                          </p>
+                        </div>
+                        <div className="hidden flex-col items-end gap-1 md:flex">
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Clock className="h-3 w-3" />
+                            <span>{action.lastModified}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span>v{action.version}</span>
+                            <span>-</span>
+                            <span>{action.runs?.toLocaleString() || 0} runs</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleToggleAction(action.id, action.status)}
                           >
-                            {action.status}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {action.description}
-                        </p>
-                      </div>
-                      <div className="hidden flex-col items-end gap-1 md:flex">
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Clock className="h-3 w-3" />
-                          <span>{action.lastModified}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span>v{action.version}</span>
-                          <span>-</span>
-                          <span>{action.runs.toLocaleString()} runs</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        {action.status === "active" ? (
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Pause className="h-4 w-4" />
+                            {action.status === "active" ? (
+                              <Pause className="h-4 w-4" />
+                            ) : (
+                              <Play className="h-4 w-4" />
+                            )}
                           </Button>
-                        ) : (
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleTestAction(action.id)}
+                          >
                             <Play className="h-4 w-4" />
                           </Button>
-                        )}
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive"
+                            onClick={() => handleDeleteAction(action.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -366,64 +402,67 @@ export default function ActionsLibraryPage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredTemplates.map((template) => (
-                <Card
-                  key={template.id}
-                  className="group cursor-pointer transition-all hover:shadow-md"
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
-                        <template.icon className="h-6 w-6 text-foreground" />
-                      </div>
-                      <Badge variant="outline" className="text-xs">
-                        {template.category}
-                      </Badge>
-                    </div>
-                    <div className="mt-4">
-                      <p className="font-medium">{template.name}</p>
-                      <p className="mt-1 text-sm text-muted-foreground">{template.description}</p>
-                    </div>
-                    <div className="mt-4 flex items-center gap-2">
-                      {template.triggers.map((trigger) => (
-                        <Badge key={trigger} variant="secondary" className="text-xs">
-                          {trigger}
+              {filteredTemplates.map((template) => {
+                const Icon = getIcon(template.category);
+                return (
+                  <Card
+                    key={template.id}
+                    className="group cursor-pointer transition-all hover:shadow-md"
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
+                          <Icon className="h-6 w-6 text-foreground" />
+                        </div>
+                        <Badge variant="outline" className="text-xs">
+                          {template.category}
                         </Badge>
-                      ))}
-                    </div>
-                    <div className="mt-4 flex items-center justify-between">
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        {template.popularity === "popular" && (
-                          <>
-                            <CheckCircle2 className="h-3 w-3 text-green-600" />
-                            <span>Popular</span>
-                          </>
-                        )}
-                        {template.popularity === "common" && (
-                          <>
-                            <Users className="h-3 w-3 text-blue-600" />
-                            <span>Common</span>
-                          </>
-                        )}
-                        {template.popularity === "advanced" && (
-                          <>
-                            <AlertTriangle className="h-3 w-3 text-orange-600" />
-                            <span>Advanced</span>
-                          </>
-                        )}
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="gap-1 opacity-0 group-hover:opacity-100"
-                      >
-                        Create
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      <div className="mt-4">
+                        <p className="font-medium">{template.name}</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{template.description}</p>
+                      </div>
+                      <div className="mt-4 flex items-center gap-2">
+                        {template.triggers.map((trigger) => (
+                          <Badge key={trigger} variant="secondary" className="text-xs">
+                            {trigger}
+                          </Badge>
+                        ))}
+                      </div>
+                      <div className="mt-4 flex items-center justify-between">
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          {template.popularity === "popular" && (
+                            <>
+                              <CheckCircle2 className="h-3 w-3 text-green-600" />
+                              <span>Popular</span>
+                            </>
+                          )}
+                          {template.popularity === "common" && (
+                            <>
+                              <Users className="h-3 w-3 text-blue-600" />
+                              <span>Common</span>
+                            </>
+                          )}
+                          {template.popularity === "advanced" && (
+                            <>
+                              <AlertTriangle className="h-3 w-3 text-orange-600" />
+                              <span>Advanced</span>
+                            </>
+                          )}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="gap-1 opacity-0 group-hover:opacity-100"
+                        >
+                          Create
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </TabsContent>
 
@@ -442,18 +481,17 @@ export default function ActionsLibraryPage() {
                 </div>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="divide-y">
-                  {deployedActions
-                    .flatMap((action) =>
-                      Array.from({ length: Math.min(2, action.runs / 5000) }).map((_, i) => ({
-                        id: `${action.id}-${i}`,
-                        actionName: action.name,
-                        status: i === 0 && action.errors > 0 ? "error" : "success",
-                        timestamp: `${i + 1 * 5} minutes ago`,
-                        duration: `${Math.floor(Math.random() * 500) + 50}ms`,
-                      }))
-                    )
-                    .map((log, index) => (
+                {actionLogs.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Clock className="h-12 w-12 text-muted-foreground" />
+                    <p className="mt-4 text-sm font-medium">No execution logs</p>
+                    <p className="text-sm text-muted-foreground">
+                      Action execution logs will appear here
+                    </p>
+                  </div>
+                ) : (
+                  <div className="divide-y">
+                    {actionLogs.map((log, index) => (
                       <div key={index} className="flex items-start gap-3 px-6 py-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted mt-0.5">
                           {log.status === "success" ? (
@@ -481,7 +519,8 @@ export default function ActionsLibraryPage() {
                         </div>
                       </div>
                     ))}
-                </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -506,4 +545,10 @@ export default function ActionsLibraryPage() {
       </div>
     </div>
   );
+}
+
+function formatNumber(num: number): string {
+  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+  return String(num);
 }

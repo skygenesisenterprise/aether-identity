@@ -49,4 +49,7 @@ export {
   mediaApi,
   settingsApi,
   adminUsersApi,
+  usersApi,
+  applicationsApi,
+  organizationsApi,
 } from "./client";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Network,
@@ -11,6 +11,7 @@ import {
   LogIn,
   ArrowUpRight,
   ExternalLink,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +27,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { connectionsApi } from "@/lib/api/client";
+import type { SocialConnection } from "@/lib/api/types";
 
 const features = [
   {
@@ -75,7 +78,74 @@ const quickLinks = [
 ];
 
 export default function SocialPage() {
+  const [connections, setConnections] = useState<SocialConnection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [provider, setProvider] = useState("");
+  const [clientId, setClientId] = useState("");
+  const [clientSecret, setClientSecret] = useState("");
+
+  useEffect(() => {
+    fetchConnections();
+  }, []);
+
+  const fetchConnections = async () => {
+    try {
+      setLoading(true);
+      const response = await connectionsApi.listSocial();
+      if (response.success && response.data) {
+        setConnections(response.data);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load connections");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreate = async () => {
+    try {
+      setCreating(true);
+      await connectionsApi.createSocial({
+        name: provider,
+        provider,
+        clientId,
+        clientSecret,
+      });
+      setDialogOpen(false);
+      setProvider("");
+      setClientId("");
+      setClientSecret("");
+      fetchConnections();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create connection");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleToggleConnection = async (conn: SocialConnection) => {
+    try {
+      if (conn.enabled) {
+        await connectionsApi.disable(conn.id);
+      } else {
+        await connectionsApi.enable(conn.id);
+      }
+      fetchConnections();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update connection");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -87,7 +157,9 @@ export default function SocialPage() {
                 <Network className="h-5 w-5 text-primary" />
               </div>
               <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Identity Social Connections</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  Identity Social Connections
+                </h1>
                 <p className="text-muted-foreground">
                   Configure social connections so that you can let your users login with them.
                 </p>
@@ -102,6 +174,43 @@ export default function SocialPage() {
       </div>
 
       <div className="p-6 space-y-6">
+        {connections.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Your Connections</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {connections.map((conn) => (
+                <Card key={conn.id} className="border-primary/20">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                          <Globe className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">{conn.name}</h3>
+                          <p className="text-sm text-muted-foreground">{conn.type}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={conn.enabled ? "default" : "secondary"}>
+                          {conn.enabled ? "Enabled" : "Disabled"}
+                        </Badge>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleToggleConnection(conn)}
+                        >
+                          {conn.enabled ? "Disable" : "Enable"}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
@@ -196,7 +305,12 @@ export default function SocialPage() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="provider">Identity Provider</Label>
-              <Input id="provider" placeholder="e.g., google-oauth2, facebook" />
+              <Input
+                id="provider"
+                placeholder="e.g., google-oauth2, facebook"
+                value={provider}
+                onChange={(e) => setProvider(e.target.value)}
+              />
               <p className="text-xs text-muted-foreground">
                 Enter the identity provider name for the social connection.
               </p>
@@ -204,7 +318,12 @@ export default function SocialPage() {
 
             <div className="space-y-2">
               <Label htmlFor="client-id">Client ID</Label>
-              <Input id="client-id" placeholder="Enter the client ID from the provider" />
+              <Input
+                id="client-id"
+                placeholder="Enter the client ID from the provider"
+                value={clientId}
+                onChange={(e) => setClientId(e.target.value)}
+              />
             </div>
 
             <div className="space-y-2">
@@ -213,6 +332,8 @@ export default function SocialPage() {
                 id="client-secret"
                 type="password"
                 placeholder="Enter the client secret from the provider"
+                value={clientSecret}
+                onChange={(e) => setClientSecret(e.target.value)}
               />
             </div>
           </div>
@@ -221,7 +342,19 @@ export default function SocialPage() {
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={() => setDialogOpen(false)}>Create</Button>
+            <Button
+              onClick={handleCreate}
+              disabled={!provider || !clientId || !clientSecret || creating}
+            >
+              {creating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create"
+              )}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

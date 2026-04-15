@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Key,
@@ -14,6 +14,7 @@ import {
   Fingerprint,
   QrCode,
   MessageSquare,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,6 +31,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import { connectionsApi } from "@/lib/api/client";
+import type { PasswordlessConnection } from "@/lib/api/types";
 
 const features = [
   {
@@ -114,25 +117,80 @@ const passwordlessTypes = [
 ];
 
 export default function PasswordlessPage() {
+  const [connections, setConnections] = useState<PasswordlessConnection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [connectionName, setConnectionName] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>(["email"]);
   const [disableSignUps, setDisableSignUps] = useState(false);
   const [brandingEnabled, setBrandingEnabled] = useState(true);
 
+  useEffect(() => {
+    fetchConnections();
+  }, []);
+
+  const fetchConnections = async () => {
+    try {
+      setLoading(true);
+      const response = await connectionsApi.listPasswordless();
+      if (response.success && response.data) {
+        setConnections(response.data);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load connections");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleTypeToggle = (id: string) => {
     setSelectedTypes((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
   };
 
-  const handleCreate = () => {
-    console.log("Creating passwordless connection:", {
-      connectionName,
-      types: selectedTypes,
-      disableSignUps,
-      brandingEnabled,
-    });
-    setDialogOpen(false);
+  const handleCreate = async () => {
+    try {
+      setCreating(true);
+      await connectionsApi.createPasswordless({
+        name: connectionName,
+        types: selectedTypes,
+        disableSignUps,
+        brandingEnabled,
+      });
+      setDialogOpen(false);
+      setConnectionName("");
+      setSelectedTypes(["email"]);
+      setDisableSignUps(false);
+      setBrandingEnabled(true);
+      fetchConnections();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create connection");
+    } finally {
+      setCreating(false);
+    }
   };
+
+  const handleToggleConnection = async (conn: PasswordlessConnection) => {
+    try {
+      if (conn.enabled) {
+        await connectionsApi.disable(conn.id);
+      } else {
+        await connectionsApi.enable(conn.id);
+      }
+      fetchConnections();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update connection");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -144,7 +202,9 @@ export default function PasswordlessPage() {
                 <Key className="h-5 w-5 text-primary" />
               </div>
               <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Identity Passwordless Connections</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  Identity Passwordless Connections
+                </h1>
                 <p className="text-muted-foreground">
                   Enable passwordless authentication for your users.
                 </p>
@@ -159,6 +219,45 @@ export default function PasswordlessPage() {
       </div>
 
       <div className="p-6 space-y-6">
+        {connections.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Your Connections</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {connections.map((conn) => (
+                <Card key={conn.id} className="border-primary/20">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                          <Fingerprint className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">{conn.name}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {conn.options?.types?.join(", ") || conn.type}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={conn.enabled ? "default" : "secondary"}>
+                          {conn.enabled ? "Enabled" : "Disabled"}
+                        </Badge>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleToggleConnection(conn)}
+                        >
+                          {conn.enabled ? "Disable" : "Enable"}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
@@ -334,8 +433,15 @@ export default function PasswordlessPage() {
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleCreate} disabled={!connectionName}>
-              Create
+            <Button onClick={handleCreate} disabled={!connectionName || creating}>
+              {creating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

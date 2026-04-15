@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Eye,
   MoreHorizontal,
+  Loader2,
 } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts";
 
@@ -31,6 +32,8 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { eventsApi } from "@/lib/api/client";
+import type { EventLog, EventStats, ActivityData } from "@/lib/api/types";
 
 const eventTypeData = [
   { time: "00:00", logins: 120, signups: 8, failures: 3 },
@@ -223,6 +226,95 @@ export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [eventType, setEventType] = useState("all");
   const [connection, setConnection] = useState("all");
+  const [events, setEvents] = useState<EventLog[]>([]);
+  const [eventStats, setEventStats] = useState<EventStats>({
+    totalEvents: 0,
+    logins: 0,
+    signups: 0,
+    failures: 0,
+    mfaChallenges: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [eventsRes, statsRes] = await Promise.all([
+          eventsApi.list({ limit: "50" }),
+          eventsApi.getStats(),
+        ]);
+
+        if (eventsRes.success && eventsRes.data) {
+          setEvents(eventsRes.data);
+        }
+        if (statsRes.success && statsRes.data) {
+          setEventStats(statsRes.data);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load events data");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  const filteredEvents = events.filter((event) => {
+    const matchesSearch =
+      searchQuery === "" ||
+      event.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = eventType === "all" || event.type === eventType;
+    const matchesConnection = connection === "all" || event.connection === connection;
+    return matchesSearch && matchesType && matchesConnection;
+  });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted/30">
+        <div className="border-b bg-background">
+          <div className="px-6 py-6">
+            <div className="flex flex-col gap-1">
+              <h1 className="text-2xl font-semibold tracking-tight">Identity Event Logs</h1>
+              <p className="text-muted-foreground">
+                Monitor authentication events and troubleshoot issues.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-center p-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-muted/30">
+        <div className="border-b bg-background">
+          <div className="px-6 py-6">
+            <div className="flex flex-col gap-1">
+              <h1 className="text-2xl font-semibold tracking-tight">Identity Event Logs</h1>
+              <p className="text-muted-foreground">
+                Monitor authentication events and troubleshoot issues.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-center p-12">
+          <div className="flex items-center gap-2 text-destructive">
+            <AlertCircle className="h-4 w-4" />
+            <span>{error}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -475,7 +567,7 @@ export default function EventsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {events.map((event) => (
+                  {filteredEvents.map((event) => (
                     <tr key={event.id} className="hover:bg-muted/50 transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">

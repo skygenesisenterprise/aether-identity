@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Key,
@@ -14,6 +15,7 @@ import {
   Settings,
   Trash2,
   MoreHorizontal,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +29,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-const ssoIntegrations = [
+const defaultSsoIntegrations = [
   {
     id: "sso_1",
     name: "Office 365",
@@ -108,6 +110,25 @@ const quickLinks = [
 ];
 
 export default function ExternalAppsPage() {
+  const [loading, setLoading] = useState(true);
+  const [ssoIntegrations, setSsoIntegrations] = useState(defaultSsoIntegrations);
+
+  useEffect(() => {
+    loadIntegrations();
+  }, []);
+
+  const loadIntegrations = async () => {
+    try {
+      setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setSsoIntegrations(defaultSsoIntegrations);
+    } catch (err) {
+      console.error("Failed to load integrations:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const activeIntegrations = ssoIntegrations.filter((i) => i.status === "active").length;
   const totalUsers = ssoIntegrations.reduce((acc, i) => acc + i.users, 0);
 
@@ -131,7 +152,9 @@ export default function ExternalAppsPage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Total Integrations</p>
-                  <p className="text-3xl font-bold tracking-tight">{ssoIntegrations.length}</p>
+                  <p className="text-3xl font-bold tracking-tight">
+                    {loading ? "-" : ssoIntegrations.length}
+                  </p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                   <Globe className="h-6 w-6 text-foreground" />
@@ -156,7 +179,10 @@ export default function ExternalAppsPage() {
               </div>
               <div className="mt-4 flex items-center gap-2 text-sm">
                 <span className="text-muted-foreground">
-                  {Math.round((activeIntegrations / ssoIntegrations.length) * 100)}% of total
+                  {ssoIntegrations.length > 0
+                    ? Math.round((activeIntegrations / ssoIntegrations.length) * 100)
+                    : 0}
+                  % of total
                 </span>
               </div>
             </CardContent>
@@ -200,74 +226,80 @@ export default function ExternalAppsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {ssoIntegrations.map((integration) => (
-                <div
-                  key={integration.id}
-                  className="group flex flex-col gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                      <Globe className="h-5 w-5 text-foreground" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant={integration.status === "active" ? "outline" : "secondary"}
-                        className={cn(
-                          "text-xs",
-                          integration.status === "active" &&
-                            "border-green-200 bg-green-50 text-green-700"
-                        )}
-                      >
-                        {integration.status}
-                      </Badge>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem asChild>
-                            <Link href={`/dashboard/applications/externalapps/${integration.id}`}>
-                              View Details
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
-                            <Link
-                              href={`/dashboard/applications/externalapps/${integration.id}/settings`}
+            {loading ? (
+              <div className="flex items-center justify-center p-8">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {ssoIntegrations.map((integration) => (
+                  <div
+                    key={integration.id}
+                    className="group flex flex-col gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                        <Globe className="h-5 w-5 text-foreground" />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant={integration.status === "active" ? "outline" : "secondary"}
+                          className={cn(
+                            "text-xs",
+                            integration.status === "active" &&
+                              "border-green-200 bg-green-50 text-green-700"
+                          )}
+                        >
+                          {integration.status}
+                        </Badge>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => e.stopPropagation()}
                             >
-                              Settings
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                              <Link href={`/dashboard/applications/externalapps/${integration.id}`}>
+                                View Details
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link
+                                href={`/dashboard/applications/externalapps/${integration.id}/settings`}
+                              >
+                                Settings
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-destructive">
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{integration.name}</p>
+                      <p className="text-xs text-muted-foreground">{integration.type}</p>
+                    </div>
+                    <Separator />
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Users className="h-3 w-3" />
+                        <span>{integration.users} users</span>
+                      </div>
+                      <span>Synced {integration.lastSync}</span>
                     </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium">{integration.name}</p>
-                    <p className="text-xs text-muted-foreground">{integration.type}</p>
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Users className="h-3 w-3" />
-                      <span>{integration.users} users</span>
-                    </div>
-                    <span>Synced {integration.lastSync}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
