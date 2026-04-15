@@ -1,5 +1,5 @@
-import { RegisterForm } from "@/components/auth/register-form"
-import { Shield, Lock, Clock, CheckCircle } from "lucide-react"
+import { RegisterForm } from "@/components/auth/register-form";
+import { Shield, Lock, Clock, CheckCircle } from "lucide-react";
 
 export default function RegisterPage() {
   return (
@@ -16,11 +16,11 @@ export default function RegisterPage() {
           <div className="space-y-8">
             <div>
               <h2 className="text-3xl font-bold leading-tight text-balance">
-                Rejoindre le Portail Officiel
+                Join the Official Portal
               </h2>
               <p className="mt-4 text-primary-foreground/80 leading-relaxed">
-                Créez votre compte pour accéder à l&apos;ensemble des services enterprise.
-                Votre inscription sera vérifiée par nos équipes de sécurité.
+                Create your account to access all enterprise services. Your registration will be
+                verified by our security team.
               </p>
             </div>
 
@@ -30,8 +30,10 @@ export default function RegisterPage() {
                   <Shield className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">Protection Avancée</h3>
-                  <p className="text-sm text-primary-foreground/70">Chiffrement de bout en bout conforme aux normes gouvernementales</p>
+                  <h3 className="font-semibold">Advanced Protection</h3>
+                  <p className="text-sm text-primary-foreground/70">
+                    End-to-end encryption compliant with government standards
+                  </p>
                 </div>
               </div>
 
@@ -40,8 +42,10 @@ export default function RegisterPage() {
                   <Lock className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">Conformité Réglementaire</h3>
-                  <p className="text-sm text-primary-foreground/70">Certifié ISO 27001 et conforme RGPD</p>
+                  <h3 className="font-semibold">Regulatory Compliance</h3>
+                  <p className="text-sm text-primary-foreground/70">
+                    ISO 27001 certified and GDPR compliant
+                  </p>
                 </div>
               </div>
 
@@ -50,8 +54,10 @@ export default function RegisterPage() {
                   <Clock className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">Disponibilité 24/7</h3>
-                  <p className="text-sm text-primary-foreground/70">Infrastructure redondante et support technique continu</p>
+                  <h3 className="font-semibold">24/7 Availability</h3>
+                  <p className="text-sm text-primary-foreground/70">
+                    Redundant infrastructure and continuous technical support
+                  </p>
                 </div>
               </div>
             </div>
@@ -59,8 +65,8 @@ export default function RegisterPage() {
         </div>
 
         <div className="text-sm text-primary-foreground/60">
-          <p>&copy; 2026 Sky Genesis Enterprise. Tous droits réservés.</p>
-          <p className="mt-1">Version 1.0.0 | Dernière mise à jour : Avril 2026</p>
+          <p>&copy; 2026 Sky Genesis Enterprise. All rights reserved.</p>
+          <p className="mt-1">Version 1.0.0 | Last updated: April 2026</p>
         </div>
       </div>
 
@@ -71,7 +77,7 @@ export default function RegisterPage() {
           <div className="flex items-center gap-3">
             <div>
               <h1 className="text-lg font-bold">Sky Genesis Enterprise</h1>
-              <p className="text-primary-foreground/70 text-xs">Portail Institutionnel</p>
+              <p className="text-primary-foreground/70 text-xs">Institutional Portal</p>
             </div>
           </div>
         </div>
@@ -79,9 +85,9 @@ export default function RegisterPage() {
         <div className="flex-1 flex flex-col items-center justify-center p-4 lg:p-6 bg-background overflow-y-auto">
           <div className="w-full max-w-md space-y-4">
             <div className="text-center lg:text-left">
-              <h2 className="text-lg lg:text-xl font-bold text-foreground">Créer un compte</h2>
+              <h2 className="text-lg lg:text-xl font-bold text-foreground">Create Account</h2>
               <p className="mt-1 text-xs lg:text-sm text-muted-foreground">
-                Inscrivez-vous pour accéder à votre espace sécurisé
+                Sign up to access your secure space
               </p>
             </div>
 
@@ -90,7 +96,7 @@ export default function RegisterPage() {
             <div className="pt-3 border-t border-border">
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <CheckCircle className="h-4 w-4 text-green-600" />
-                <span>Connexion sécurisée SSL/TLS</span>
+                <span>Secure SSL/TLS Connection</span>
               </div>
             </div>
           </div>
@@ -99,17 +105,22 @@ export default function RegisterPage() {
         <footer className="p-4 bg-muted/50 border-t border-border shrink-0">
           <div className="max-w-md mx-auto text-center text-xs lg:text-sm text-muted-foreground space-y-1">
             <p>
-              En vous inscrivant, vous acceptez nos{" "}
-              <a href="#" className="text-primary hover:underline">Conditions d&apos;utilisation</a>
-              {" "}et notre{" "}
-              <a href="#" className="text-primary hover:underline">Politique de confidentialité</a>
+              By registering, you agree to our{" "}
+              <a href="#" className="text-primary hover:underline">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="#" className="text-primary hover:underline">
+                Privacy Policy
+              </a>
             </p>
             <p className="text-xs">
-              Toute tentative d&apos;accès non autorisé est strictement interdite et sera signalée aux autorités compétentes.
+              Any unauthorized access attempt is strictly prohibited and will be reported to the
+              proper authorities.
             </p>
           </div>
         </footer>
       </div>
     </div>
-  )
+  );
 }
