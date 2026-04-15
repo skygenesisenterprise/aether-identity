@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { authApi } from "@/lib/api/auth";
 import { Eye, EyeOff, Lock, Mail, User, AlertCircle, CheckCircle } from "lucide-react";
 
 export function RegisterForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -25,7 +28,6 @@ export function RegisterForm() {
     setSuccess(false);
     setIsLoading(true);
 
-    // Validation
     if (!fullName || !email || !password || !confirmPassword) {
       setError("Please fill in all required fields.");
       setIsLoading(false);
@@ -50,18 +52,30 @@ export function RegisterForm() {
       return;
     }
 
-    // Simulation de connexion
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      const response = await authApi.register(email, password, fullName);
 
-    // Ici vous ajouteriez votre logique d'authentification
-    console.log("Registration attempt:", { fullName, email });
-    setSuccess(true);
-    setFullName("");
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-    setAcceptTerms(false);
-    setIsLoading(false);
+      if (!response.success) {
+        setError(response.error || "Registration failed");
+        setIsLoading(false);
+        return;
+      }
+
+      setSuccess(true);
+      setFullName("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      setAcceptTerms(false);
+
+      setTimeout(() => {
+        router.push("/login?registered=true");
+      }, 2000);
+    } catch (err) {
+      setError("Network error. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

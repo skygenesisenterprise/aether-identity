@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   InputOTP,
@@ -8,13 +9,18 @@ import {
   InputOTPSlot,
   InputOTPSeparator,
 } from "@/components/ui/input-otp";
+import { authApi } from "@/lib/api/auth";
 import { Shield, Lock, AlertCircle, ArrowLeft } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export default function MfaPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const email = searchParams.get("email") || "";
+  const method = searchParams.get("method") || "totp";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,10 +34,28 @@ export default function MfaPage() {
     setIsLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log("MFA code submitted:", code);
+      const response = await fetch("/api/v1/auth/totp/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, totpCode: code }),
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "The entered code is invalid or has expired.");
+        setIsLoading(false);
+        return;
+      }
+
+      if (data.accessToken) {
+        authApi.storeTokens(data.accessToken, data.refreshToken || "");
+      }
+
+      router.push("/dashboard");
     } catch {
-      setError("The entered code is invalid or has expired.");
+      setError("Network error. Please try again.");
     } finally {
       setIsLoading(false);
     }

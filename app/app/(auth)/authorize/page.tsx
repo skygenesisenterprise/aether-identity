@@ -1,39 +1,66 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Shield, Lock, Globe, AlertCircle, ArrowLeft } from "lucide-react";
 
-interface AuthorizeParams {
-  clientName?: string;
-  clientLogo?: string;
-  scopes?: string[];
-  redirectUri?: string;
-}
-
 export default function AuthorizePage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(false);
   const [error, setError] = useState("");
 
-  const clientName = "External Application";
-  const clientLogo = "";
-  const scopes = ["read:profile", "write:profile", "read:email"];
-  const redirectUri = "https://app.example.com/callback";
+  const clientId = searchParams.get("client_id") || "";
+  const redirectUri = searchParams.get("redirect_uri") || "";
+  const responseType = searchParams.get("response_type") || "code";
+  const scope = searchParams.get("scope") || "openid profile email";
+  const state = searchParams.get("state") || "";
+
+  const scopesArray = scope.split(" ");
+
+  useEffect(() => {
+    if (!clientId || !redirectUri) {
+      setError("Invalid authorization request parameters");
+    }
+  }, [clientId, redirectUri]);
 
   const handleAuthorize = async () => {
     setIsLoading(true);
     setError("");
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Authorization granted:", {
-        clientName,
-        scopes,
-        rememberDevice,
+      const response = await fetch("/api/v1/auth/authorize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientId,
+          redirectUri,
+          responseType,
+          scope,
+          state,
+          approved: true,
+          rememberDevice,
+        }),
+        credentials: "include",
       });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Authorization failed");
+        setIsLoading(false);
+        return;
+      }
+
+      if (data.redirectUri) {
+        window.location.href = data.redirectUri;
+      } else {
+        router.push("/dashboard");
+      }
     } catch {
       setError("Error during authorization. Please try again.");
     } finally {
@@ -44,15 +71,15 @@ export default function AuthorizePage() {
   const handleDeny = async () => {
     setIsLoading(true);
 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      console.log("Authorization denied:", { clientName, scopes });
-    } finally {
-      setIsLoading(false);
-    }
+    const errorUrl = new URL(redirectUri);
+    errorUrl.searchParams.set("error", "access_denied");
+    errorUrl.searchParams.set("error_description", "The user denied the authorization request");
+    if (state) errorUrl.searchParams.set("state", state);
+
+    window.location.href = errorUrl.toString();
   };
 
-  const formatScope = (scope: string) => {
+  const formatScope = (s: string) => {
     const scopeLabels: Record<string, string> = {
       "read:profile": "Read profile",
       "write:profile": "Modify profile",
@@ -61,7 +88,7 @@ export default function AuthorizePage() {
       profile: "Profile information",
       email: "Email address",
     };
-    return scopeLabels[scope] || scope;
+    return scopeLabels[s] || s;
   };
 
   return (
@@ -167,7 +194,7 @@ export default function AuthorizePage() {
                     <Globe className="h-6 w-6 text-muted-foreground" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg">{clientName}</h3>
+                    <h3 className="font-semibold text-lg">External Application</h3>
                     <p className="text-sm text-muted-foreground">{redirectUri}</p>
                   </div>
                 </div>
@@ -177,14 +204,14 @@ export default function AuthorizePage() {
                     This application is requesting the following permissions:
                   </p>
                   <ul className="space-y-2">
-                    {scopes.map((scope) => (
-                      <li key={scope} className="flex items-center gap-2 text-sm">
+                    {scopesArray.map((s: string) => (
+                      <li key={s} className="flex items-center gap-2 text-sm">
                         <Checkbox
                           checked
                           disabled
                           className="border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                         />
-                        <span className="text-muted-foreground">{formatScope(scope)}</span>
+                        <span className="text-muted-foreground">{formatScope(s)}</span>
                       </li>
                     ))}
                   </ul>

@@ -74,6 +74,34 @@ class AuthApiService {
     });
   }
 
+  async register(email: string, password: string, name: string): Promise<AuthResponse> {
+    return this.request<AuthResponse>("/api/v1/auth/register", {
+      method: "POST",
+      body: JSON.stringify({ email, password, name }),
+    });
+  }
+
+  async verifyEmail(token: string): Promise<AuthResponse> {
+    return this.request<AuthResponse>("/api/v1/auth/verify-email", {
+      method: "POST",
+      body: JSON.stringify({ token }),
+    });
+  }
+
+  async requestPasswordReset(email: string): Promise<AuthResponse> {
+    return this.request<AuthResponse>("/api/v1/auth/request-password-reset", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  async confirmPasswordReset(token: string, newPassword: string): Promise<AuthResponse> {
+    return this.request<AuthResponse>("/api/v1/auth/confirm-password-reset", {
+      method: "POST",
+      body: JSON.stringify({ token, newPassword }),
+    });
+  }
+
   async resetPassword(email: string): Promise<AuthResponse> {
     return this.request<AuthResponse>("/api/v1/auth/reset-password", {
       method: "POST",

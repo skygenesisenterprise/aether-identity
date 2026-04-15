@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { authApi } from "@/lib/api/auth";
 import { Eye, EyeOff, Lock, Mail, AlertCircle } from "lucide-react";
 
 export function LoginForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,18 +23,36 @@ export function LoginForm() {
     setError("");
     setIsLoading(true);
 
-    // Simulation de connexion
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
     if (!email || !password) {
       setError("Please fill in all required fields.");
       setIsLoading(false);
       return;
     }
 
-    // Ici vous ajouteriez votre logique d'authentification
-    console.log("Sign in attempt:", { email, rememberMe });
-    setIsLoading(false);
+    try {
+      const response = await authApi.login(email, password);
+
+      if (!response.success) {
+        if ((response as { requiresMfa?: boolean }).requiresMfa) {
+          router.push(`/mfa?email=${encodeURIComponent(email)}`);
+          return;
+        }
+        setError(response.error || "Authentication failed");
+        setIsLoading(false);
+        return;
+      }
+
+      if (response.data) {
+        authApi.storeTokens(response.data.accessToken, response.data.refreshToken);
+        authApi.storeUser(response.data.user);
+      }
+
+      router.push("/dashboard");
+    } catch (err) {
+      setError("Network error. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

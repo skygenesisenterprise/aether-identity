@@ -23,6 +23,8 @@ export interface AuthResponse {
   data?: TokenResponse;
   error?: string;
   message?: string;
+  requiresMfa?: boolean;
+  mfaMethod?: string;
 }
 
 export interface ProfileData {
