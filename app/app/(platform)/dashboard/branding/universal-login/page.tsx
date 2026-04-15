@@ -308,6 +308,7 @@ export default function UniversalLoginPage() {
                               type="color"
                               value="#6366f1"
                               className="w-12 h-10 p-1 rounded-md"
+                              readOnly
                             />
                             <Input value="#6366f1" className="flex-1 font-mono" readOnly />
                           </div>
@@ -319,6 +320,7 @@ export default function UniversalLoginPage() {
                               type="color"
                               value="#ffffff"
                               className="w-12 h-10 p-1 rounded-md"
+                              readOnly
                             />
                             <Input value="#ffffff" className="flex-1 font-mono" readOnly />
                           </div>

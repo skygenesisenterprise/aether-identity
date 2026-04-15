@@ -119,6 +119,9 @@ importers:
       framer-motion:
         specifier: ^12.34.2
         version: 12.34.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      google:
+        specifier: link:next/fond/google
+        version: link:next/fond/google
       input-otp:
         specifier: 1.4.2
         version: 1.4.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)

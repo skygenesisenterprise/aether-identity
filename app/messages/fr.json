@@ -2111,9 +2111,9 @@
     },
     "compare": {
       "title": "Comparer les Solutions",
-      "description": "Découvrez comment Aether se compare aux autres fournisseurs d'identité B2B.",
+      "description": "Découvrez comment Aether Identity se compare aux autres fournisseurs d'identité B2B.",
       "feature": "Fonctionnalité",
-      "aether": "Aether",
+      "aether": "Identity",
       "keycloak": "Keycloak",
       "auth0": "Auth0",
       "okta": "Okta"
@@ -2190,7 +2190,7 @@
     },
     "cta": {
       "title": "Sécurisez Chaque Relation Commerciale",
-      "description": "Déployez l'Identité B2B d'Aether aujourd'hui et unifiez tous vos accès externes sous une seule plateforme.",
+      "description": "Déployez l'Identité B2B d'Aether Identity aujourd'hui et unifiez tous vos accès externes sous une seule plateforme.",
       "getStarted": "Commencer",
       "contactSales": "Contacter les Ventes"
     }
