@@ -231,11 +231,11 @@ export async function Footer({ locale: initialLocale }: FooterProps) {
   ];
 
   const legalLinks = [
-    { name: t("privacy"), href: `${prefix}/privacy` },
-    { name: t("terms"), href: `${prefix}/terms` },
-    { name: t("cookiePolicy"), href: `${prefix}/cookies` },
-    { name: "GDPR", href: `${prefix}/gdpr` },
-    { name: t("security"), href: `${prefix}/security` },
+    { name: t("privacy"), href: `${prefix}/legal/privacy` },
+    { name: t("terms"), href: `${prefix}/legal/terms` },
+    { name: t("cookiePolicy"), href: `${prefix}/legal/cookies` },
+    { name: "GDPR", href: `${prefix}/legal/gdpr` },
+    { name: t("security"), href: `${prefix}/legal/security` },
   ];
 
   const socialLinks = [

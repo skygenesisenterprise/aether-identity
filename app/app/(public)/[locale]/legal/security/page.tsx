@@ -115,7 +115,7 @@ export default async function SecurityPage({ params }: { params: Promise<{ local
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header locale={locale as import("@/lib/locale").Locale} />
+      <Header locale={locale as "fr" | "be_fr" | "be_nl" | "ch_fr"} />
 
       <main className="flex-1">
         {/* Hero Section */}
