@@ -256,7 +256,7 @@ export default async function SSOPage({ params }: { params: Promise<{ locale: st
                       Feature
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-semibold text-foreground">
-                      Aether SSO
+                      Identity
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-medium text-muted-foreground">
                       Okta

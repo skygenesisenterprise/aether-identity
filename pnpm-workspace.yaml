@@ -8,7 +8,7 @@ packages:
   - "package/node"
   - "package/github"
   - "package/vscode"
-  - "package/cli/web"
+  - "package/cli"
   - "docs"
 
 ignoredBuiltDependencies:

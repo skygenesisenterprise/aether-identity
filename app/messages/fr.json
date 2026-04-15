@@ -1148,7 +1148,7 @@
     },
     "comparison": {
       "title": "Comment Nous Comparons",
-      "description": "Découvrez pourquoi les organisations choisissent Aether SSO plutôt que les alternatives cloud uniquement.",
+      "description": "Découvrez pourquoi les organisations choisissent Aether Identity plutôt que les alternatives cloud uniquement.",
       "feature": "Fonctionnalité",
       "selfHosted": "SSO Auto-hébergé",
       "saml": "Support SAML 2.0",
@@ -1177,17 +1177,17 @@
     },
     "faq": {
       "title": "Questions Fréquentes",
-      "description": "Questions courantes sur Aether SSO.",
+      "description": "Questions courantes sur Aether Identity.",
       "diff": {
-        "title": "En quoi Aether SSO diffère-t-il des solutions SSO traditionnelles?",
-        "answer": "Aether SSO offre une flexibilité supérieure avec un déploiement auto-hébergé qui vous donne le contrôle complet de vos données. Contrairement aux solutions cloud-only, il n'y a pas de limitation par utilisateur et vos données ne quittent jamais votre infrastructure."
+        "title": "En quoi Aether Identity diffère-t-il des solutions SSO traditionnelles?",
+        "answer": "Aether Identity offre une flexibilité supérieure avec un déploiement auto-hébergé qui vous donne le contrôle complet de vos données. Contrairement aux solutions cloud-only, il n'y a pas de limitation par utilisateur et vos données ne quittent jamais votre infrastructure."
       },
       "multiIdp": {
         "title": "Peut-on connecter plusieurs fournisseurs d'identité?",
-        "answer": "Oui, Aether SSO supporte la connexion simultanée de plusieurs IdPs (Azure AD, Okta, Google Workspace, etc.). Les utilisateurs peuvent s'authentifier avec leur fournisseur préféré tout en ayant accès à toutes les applications."
+        "answer": "Oui, Aether Identity supporte la connexion simultanée de plusieurs IdPs (Azure AD, Okta, Google Workspace, etc.). Les utilisateurs peuvent s'authentifier avec leur fournisseur préféré tout en ayant accès à toutes les applications."
       },
       "legacy": {
-        "title": "Les applications legacy peuvent-elles utiliser Aether SSO?",
+        "title": "Les applications legacy peuvent-elles utiliser Aether Identity?",
         "answer": "Absolument. La passerelle d'application intégrée permet d'ajouter l'authentification SSO à n'importe quelle application sans modification de code, via un proxy reverse configuré."
       },
       "migration": {
@@ -1196,7 +1196,7 @@
       },
       "limits": {
         "title": "Y a-t-il des limites sur le nombre d'applications ou d'utilisateurs?",
-        "answer": "Non. Aether SSO est conçu pour évoluer horizontalement. Il n'y a pas de limites arbitraires sur les applications ou les utilisateurs."
+        "answer": "Non. Aether Identity est conçu pour évoluer horizontalement. Il n'y a pas de limites arbitraires sur les applications ou les utilisateurs."
       }
     },
     "cta": {
@@ -1502,7 +1502,7 @@
     },
     "comparison": {
       "title": "Comment Nous Comparons",
-      "description": "Voyez pourquoi les organisations choisissent Identity MFA plutôt que les alternatives cloud uniquement.",
+      "description": "Voyez pourquoi les organisations choisissent Aether Identity plutôt que les alternatives cloud uniquement.",
       "feature": "Fonctionnalité"
     },
     "code": {
@@ -1511,7 +1511,7 @@
       "cta": "Guides de Démarrage"
     },
     "benefits": {
-      "title": "Pourquoi Choisir Identity MFA?",
+      "title": "Pourquoi Choisir Aether Identity?",
       "description": "Solution MFA la plus sécurisée et flexible pour les entreprises modernes.",
       "vendorLockin": "Zéro Vendor Lock-In",
       "vendorLockinDesc": "Solution auto-hébergée signifie que vous possédez votre infrastructure d'authentification. Migrez à tout moment avec des protocoles standard.",
@@ -1524,38 +1524,38 @@
     },
     "faq": {
       "title": "Questions Fréquentes",
-      "description": "Questions courantes sur Identity MFA.",
+      "description": "Questions courantes sur Aether Identity.",
       "duo": {
-        "title": "Comment Identity MFA se compare-t-il à Duo Security?",
-        "answer": "Identity MFA offre toutes les fonctionnalités de Duo avec déploiement auto-hébergé, pas de tarification par utilisateur et souveraineté complète des données. Vous conservez un contrôle total sur votre infrastructure d'authentification."
+        "title": "Comment Aether Identity se compare-t-il à Duo Security?",
+        "answer": "Aether Identity offre toutes les fonctionnalités de Duo avec déploiement auto-hébergé, pas de tarification par utilisateur et souveraineté complète des données. Vous conservez un contrôle total sur votre infrastructure d'authentification."
       },
       "idp": {
-        "title": "Identity MFA peut-il s'intégrer avec notre IdP existant?",
-        "answer": "Oui, Identity MFA s'intègre avec tout fournisseur OAuth 2.0/OIDC, SAML IdP, ou peut fonctionner comme solution MFA autonome. Il fonctionne avec Okta, Azure AD, Keycloak, etc."
+        "title": "Aether Identity peut-il s'intégrer avec notre IdP existant?",
+        "answer": "Oui, Aether Identity s'intègre avec tout fournisseur OAuth 2.0/OIDC, SAML IdP, ou peut fonctionner comme solution MFA autonome. Il fonctionne avec Okta, Azure AD, Keycloak, etc."
       },
       "loss": {
         "title": "Que se passe-t-il si un utilisateur perd son second facteur?",
-        "answer": "Identity MFA fournit plusieurs options de récupération incluant codes de sauvegarde, récupération d'appareil de confiance et récupération initiée par admin avec vérification d'identité. La récupération est journalisée pour la conformité."
+        "answer": "Aether Identity fournit plusieurs options de récupération incluant codes de sauvegarde, récupération d'appareil de confiance et récupération initiée par admin avec vérification d'identité. La récupération est journalisée pour la conformité."
       },
       "passwordless": {
         "title": "L'authentification sans mot de passe est-elle supportée?",
-        "answer": "Oui, Identity MFA supporte entièrement WebAuthn/FIDO2 pour l'authentification sans mot de passe. Les utilisateurs peuvent s'authentifier avec des clés matérielles, capteurs biométriques ou identifiants basés sur l'appareil."
+        "answer": "Oui, Aether Identity supporte entièrement WebAuthn/FIDO2 pour l'authentification sans mot de passe. Les utilisateurs peuvent s'authentifier avec des clés matérielles, capteurs biométriques ou identifiants basés sur l'appareil."
       },
       "enforce": {
         "title": "Peut-on appliquer MFA pour des utilisateurs ou groupes spécifiques?",
-        "answer": "Oui, le moteur de politiques d'Identity MFA permet des règles granulaires basées sur les attributs utilisateur, groupes, plages IP, scores de risque ou toutes conditions personnalisées."
+        "answer": "Oui, le moteur de politiques d'Aether Identity permet des règles granulaires basées sur les attributs utilisateur, groupes, plages IP, scores de risque ou toutes conditions personnalisées."
       }
     },
     "cta": {
       "title": "Sécurisez Votre Authentification Aujourd'hui",
-      "description": "Déployez Identity MFA et gagnez un contrôle complet sur votre sécurité d'authentification. Open source, auto-hébergé, enterprise-ready.",
+      "description": "Déployez Aether Identity et gagnez un contrôle complet sur votre sécurité d'authentification. Open source, auto-hébergé, enterprise-ready.",
       "getStarted": "Commencer",
       "contactSales": "Contacter les Ventes"
     }
   },
   "FGA": {
     "hero": {
-      "badge": "Produit: Autorisation Fine",
+      "badge": "Autorisation Fine",
       "title": "Une Autorisation Qui S'adapte à Vos Exigences Complexes",
       "description": "Implémentez des politiques d'autorisation RBAC, ABAC ou hybrides avec évaluation en temps réel, latence sous-milliseconde et pistes d'audit complètes.",
       "ctaDocs": "Voir la Documentation",
@@ -1626,26 +1626,26 @@
     },
     "faq": {
       "title": "Questions Fréquentes",
-      "description": "Questions courantes sur Aether FGA et l'autorisation.",
+      "description": "Questions courantes sur Aether Identity et l'autorisation.",
       "rbacVsAbac": {
         "title": "Quelle est la différence entre RBAC et ABAC?",
-        "answer": "RBAC (Contrôle d'Accès Basé sur les Rôles) attribue des permissions aux rôles qui sont ensuite attribués aux utilisateurs. ABAC (Contrôle d'Accès Basé sur les Attributs) utilise les attributs du sujet, de la ressource et de l'environnement pour prendre des décisions d'autorisation. Aether prend en charge les deux modèles et vous permet de les combiner pour des politiques hybrides."
+        "answer": "RBAC (Contrôle d'Accès Basé sur les Rôles) attribue des permissions aux rôles qui sont ensuite attribués aux utilisateurs. ABAC (Contrôle d'Accès Basé sur les Attributs) utilise les attributs du sujet, de la ressource et de l'environnement pour prendre des décisions d'autorisation. Aether Identity prend en charge les deux modèles et vous permet de les combiner pour des politiques hybrides."
       },
       "policyUpdates": {
-        "title": "Comment Aether gère-t-il les mises à jour des politiques?",
-        "answer": "Aether utilise un système de versioning des politiques avec mises à jour atomiques. Les changements sont validés avant le déploiement, et vous pouvez revenir aux versions précédentes. La propagation en temps réel aux nœuds d'autorisation assure des mises à jour de politique sous-seconde sur votre infrastructure."
+        "title": "Comment Aether Identity gère-t-il les mises à jour des politiques?",
+        "answer": "Aether Identity utilise un système de versioning des politiques avec mises à jour atomiques. Les changements sont validés avant le déploiement, et vous pouvez revenir aux versions précédentes. La propagation en temps réel aux nœuds d'autorisation assure des mises à jour de politique sous-seconde sur votre infrastructure."
       },
       "integration": {
-        "title": "Aether peut-il s'intégrer avec mon fournisseur d'identité existant?",
-        "answer": "Oui, Aether s'intègre avec tout fournisseur d'identité OIDC ou SAML. Il peut synchroniser les groupes et attributs depuis Active Directory, LDAP ou les fournisseurs d'identité cloud. Le moteur d'autorisation utilise ces attributs pour l'évaluation des politiques sans duplication des données utilisateur."
+        "title": "Aether Identity peut-il s'intégrer avec mon fournisseur d'identité existant?",
+        "answer": "Oui, Aether Identity s'intègre avec tout fournisseur d'identité OIDC ou SAML. Il peut synchroniser les groupes et attributs depuis Active Directory, LDAP ou les fournisseurs d'identité cloud. Le moteur d'autorisation utilise ces attributs pour l'évaluation des politiques sans duplication des données utilisateur."
       },
       "freeTier": {
-        "title": "Y a-t-il un tarif gratuit pour Aether FGA?",
-        "answer": "Oui, Aether FGA Community Edition est gratuit et open source. Pour les exigences de haut débit, les SLAs entreprise et le support dédié, contactez notre équipe commerciale."
+        "title": "Y a-t-il un tarif gratuit pour Aether Identity?",
+        "answer": "Oui, Aether Identity Community Edition est gratuit et open source. Pour les exigences de haut débit, les SLAs entreprise et le support dédié, contactez notre équipe commerciale."
       },
       "performance": {
         "title": "Comment garantissez-vous la performance de l'autorisation?",
-        "answer": "Aether utilise un moteur d'évaluation des politiques optimisé avec politiques pré-compilées, mise en cache des attributs et indexation intelligente. Notre architecture supporte la mise à l'échelle horizontale avec distribution des politiques sur plusieurs nœuds, offrant une latence sous-milliseconde à des millions de requêtes par seconde."
+        "answer": "Aether Identity utilise un moteur d'évaluation des politiques optimisé avec politiques pré-compilées, mise en cache des attributs et indexation intelligente. Notre architecture supporte la mise à l'échelle horizontale avec distribution des politiques sur plusieurs nœuds, offrant une latence sous-milliseconde à des millions de requêtes par seconde."
       }
     },
     "resources": {
@@ -2239,9 +2239,9 @@
     },
     "compare": {
       "title": "Comment Nous Comparons",
-      "description": "Découvrez pourquoi les organisations leaders choisissent Aether pour l'authentification machine-à-machine.",
+      "description": "Découvrez pourquoi les organisations leaders choisissent Aether Identity pour l'authentification machine-à-machine.",
       "feature": "Fonctionnalité",
-      "aether": "Aether Identity",
+      "aether": "Identity",
       "keycloak": "Keycloak",
       "auth0": "Auth0",
       "okta": "Okta"
@@ -2282,19 +2282,19 @@
       },
       "internalExternal": {
         "title": "Puis-je utiliser l'authentification M2M pour les API internes et externes?",
-        "answer": "Oui, Aether supporte la communication service-à-service interne et l'authentification API externe avec restrictions de scope et limitation de débit appropriées."
+        "answer": "Oui, Aether Identity supporte la communication service-à-service interne et l'authentification API externe avec restrictions de scope et limitation de débit appropriées."
       },
       "certRotation": {
         "title": "Comment gérez-vous la rotation des certificats pour mTLS?",
-        "answer": "Aether fait automatiquement tourner les certificats avant expiration en utilisant le standard SPIFFE. Cela nécessite zéro temps d'arrêt et aucune intervention manuelle."
+        "answer": "Aether Identity fait automatiquement tourner les certificats avant expiration en utilisant le standard SPIFFE. Cela nécessite zéro temps d'arrêt et aucune intervention manuelle."
       },
       "serviceAccounts": {
         "title": "Y a-t-il une limite sur le nombre de comptes service?",
-        "answer": "Non, Aether supporte les comptes service illimités. Vous pouvez en créer autant que nécessaire pour votre architecture de microservices."
+        "answer": "Non, Aether Identity supporte les comptes service illimités. Vous pouvez en créer autant que nécessaire pour votre architecture de microservices."
       },
       "jwtValidation": {
         "title": "Supportez-vous la validation JWT pour vérification offline?",
-        "answer": "Oui, Aether émet des JWT signés qui peuvent être validés offline en utilisant des clés publiques, éliminant le besoin d'appels réseau pendant l'autorisation."
+        "answer": "Oui, Aether Identity émet des JWT signés qui peuvent être validés offline en utilisant des clés publiques, éliminant le besoin d'appels réseau pendant l'autorisation."
       }
     },
     "resources": {
@@ -2630,24 +2630,24 @@
       "title": "Questions Fréquentes",
       "description": "Questions courantes sur la gestion d'identité pour services financiers.",
       "psd2": {
-        "title": "Comment Aether supporte-t-il la conformité PSD2?",
-        "answer": "Aether fournit un support intégré pour les exigences PSD2, y compris l'authentification forte (SCA), les API de communication sécurisées pour l'accès TPP, la gestion du consentement et le lien dynamique. Notre solution est régulièrement mise à jour pour refléter les dernières directives EBA."
+        "title": "Comment Aether Identity supporte-t-il la conformité PSD2?",
+        "answer": "Aether Identity fournit un support intégré pour les exigences PSD2, y compris l'authentification forte (SCA), les API de communication sécurisées pour l'accès TPP, la gestion du consentement et le lien dynamique. Notre solution est régulièrement mise à jour pour refléter les dernières directives EBA."
       },
       "integration": {
-        "title": "Aether peut-il s'intégrer à nos systèmes bancaires existants?",
-        "answer": "Oui, Aether fournit des intégrations pré-construites avec les principales plateformes bancaires incluant Fis, Temenos, Avaloq et Oracle Flexcube. Notre équipe de professionnels peut également construire des intégrations personnalisées pour les systèmes hérités."
+        "title": "Aether Identity peut-il s'intégrer à nos systèmes bancaires existants?",
+        "answer": "Oui, Aether Identity fournit des intégrations pré-construites avec les principales plateformes bancaires incluant Fis, Temenos, Avaloq et Oracle Flexcube. Notre équipe de professionnels peut également construire des intégrations personnalisées pour les systèmes hérités."
       },
       "performance": {
-        "title": "Comment Aether gère-t-il l'authentification à haut volume pour les plateformes de trading?",
-        "answer": "Aether est conçu pour les scénarios de haute performance avec une latence d'authentification inférieure à 10ms. Notre architecture distribuée supporte la mise à l'échelle horizontale et peut gérer des millions d'authentifications par jour avec 99,99% de disponibilité."
+        "title": "Comment Aether Identity gère-t-il l'authentification à haut volume pour les plateformes de trading?",
+        "answer": "Aether Identity est conçu pour les scénarios de haute performance avec une latence d'authentification inférieure à 10ms. Notre architecture distribuée supporte la mise à l'échelle horizontale et peut gérer des millions d'authentifications par jour avec 99,99% de disponibilité."
       },
       "pci": {
-        "title": "Aether est-il certifié PCI-DSS?",
-        "answer": "Aether peut être déployé de manière conforme PCI-DSS. Lorsqu'il est déployé selon nos directives de sécurité et combiné avec votre infrastructure карт, Aether vous aide à répondre aux exigences PCI-DSS pour l'authentification et le contrôle d'accès."
+        "title": "Aether Identity est-il certifié PCI-DSS?",
+        "answer": "Aether Identity peut être déployé de manière conforme PCI-DSS. Lorsqu'il est déployé selon nos directives de sécurité et combiné avec votre infrastructure карт, Aether Identity vous aide à répondre aux exigences PCI-DSS pour l'authentification et le contrôle d'accès."
       },
       "premise": {
         "title": "Offrez-vous un déploiement sur site pour les banques avec des exigences strictes de résidence des données?",
-        "answer": "Oui, Aether supporte le déploiement sur site complet, y compris les installations air-gapped. Nous proposons également des déploiements cloud dans des régions spécifiques pour répondre aux exigences de résidence des données dans des juridictions comme l'Allemagne, la France et la Suisse."
+        "answer": "Oui, Aether Identity supporte le déploiement sur site complet, y compris les installations air-gapped. Nous proposons également des déploiements cloud dans des régions spécifiques pour répondre aux exigences de résidence des données dans des juridictions comme l'Allemagne, la France et la Suisse."
       }
     },
     "resources": {
@@ -3022,7 +3022,7 @@
       "description": "Aether répond aux normes de sécurité et d'accessibilité gouvernementales les plus exigeantes."
     },
     "benefits": {
-      "title": "Pourquoi les Agences Gouvernementales Choisissent Aether",
+      "title": "Pourquoi les Agences Gouvernementales Choisissent Aether Identity",
       "description": "Réduisez les coûts, accélérez la conformité et maintenez une souveraineté complète sur les données citoyens.",
       "ato": {
         "title": "Processus ATO Plus Rapide",
@@ -3078,7 +3078,7 @@
     },
     "compliance": {
       "title": "Conçu pour la Conformité",
-      "description": "Aether est conçu pour aider votre agence à répondre aux exigences de conformité de sécurité et d'accessibilité les plus exigeantes.",
+      "description": "Aether Identity est conçu pour aider votre agence à répondre aux exigences de conformité de sécurité et d'accessibilité les plus exigeantes.",
       "fips": "Modules cryptographiques",
       "tls": "Transport sécurisé",
       "nist": "Contrôles SP 800-53",
@@ -3088,24 +3088,24 @@
       "title": "Questions Fréquentes",
       "description": "Questions courantes sur les solutions d'identité gouvernementales.",
       "fedramp": {
-        "title": "Aether est-il autorisé FedRAMP?",
+        "title": "Aether Identity est-il autorisé FedRAMP?",
         "answer": "Nous sommes actuellement sur le parcours d'autorisation FedRAMP avec AWS GovCloud et Azure Government. Notre option de déploiement sur site permet aux agences de utiliser leur ATO existant."
       },
       "piv": {
-        "title": "Aether supporte-t-il les cartes PIV/PIV-I?",
-        "answer": "Oui, Aether supporte entièrement les cartes PIV (Personal Identity Verification) et PIV-I (PIV-Interoperable) pour l'authentification des employés gouvernementaux."
+        "title": "Aether Identity supporte-t-il les cartes PIV/PIV-I?",
+        "answer": "Oui, Aether Identity supporte entièrement les cartes PIV (Personal Identity Verification) et PIV-I (PIV-Interoperable) pour l'authentification des employés gouvernementaux."
       },
       "airgap": {
-        "title": "Aether peut-il être déployé dans un environnement air-gapped?",
-        "answer": "Oui, Aether supporte les déploiements air-gapped sans dépendances réseau externes. Tous les composants peuvent fonctionner entièrement hors ligne."
+        "title": "Aether Identity peut-il être déployé dans un environnement air-gapped?",
+        "answer": "Oui, Aether Identity supporte les déploiements air-gapped sans dépendances réseau externes. Tous les composants peuvent fonctionner entièrement hors ligne."
       },
       "agencies": {
-        "title": "Quelles agences utilisent actuellement Aether?",
-        "answer": "Aether est utilisé par diverses agences gouvernementales fédérales, étatiques et locales.Contactez notre équipe gouvernementale pour des études de cas spécifiques."
+        "title": "Quelles agences utilisent actuellement Aether Identity?",
+        "answer": "Aether Identity est utilisé par diverses agences gouvernementales fédérales, étatiques et locales.Contactez notre équipe gouvernementale pour des études de cas spécifiques."
       },
       "section508": {
-        "title": "Comment Aether gère-t-il l'accessibilité Section 508?",
-        "answer": "Aether est construit avec la conformité Section 508 et WCAG 2.1 AA à l'esprit. Nos composants UI sont entièrement accessibles et subissent des audits d'accessibilité réguliers."
+        "title": "Comment Aether Identity gère-t-il l'accessibilité Section 508?",
+        "answer": "Aether Identity est construit avec la conformité Section 508 et WCAG 2.1 AA à l'esprit. Nos composants UI sont entièrement accessibles et subissent des audits d'accessibilité réguliers."
       }
     },
     "resources": {
@@ -3122,7 +3122,7 @@
     },
     "cta": {
       "title": "Sécurisez Votre Infrastructure d'Identité Gouvernementale",
-      "description": "Rejoignez les agences gouvernementales fédérales, étatiques et locales qui font confiance à Aether pour leurs besoins de gestion d'identité.",
+      "description": "Rejoignez les agences gouvernementales fédérales, étatiques et locales qui font confiance à Aether Identity pour leurs besoins de gestion d'identité.",
       "contact": "Contacter les Ventes Gouvernementales",
       "docs": "Voir la Documentation"
     }

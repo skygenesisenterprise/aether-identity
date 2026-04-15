@@ -16,7 +16,7 @@ export default function LoginPage() {
           <div className="space-y-8">
             <div>
               <h2 className="text-3xl font-bold leading-tight text-balance">
-                Bienvenue sur le Portail Officiel de Sky Genesis Enterprise
+                Bienvenue sur le Portail Officiel
               </h2>
               <p className="mt-4 text-primary-foreground/80 leading-relaxed">
                 Accédez à vos services enterprise en toute sécurité.

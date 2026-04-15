@@ -986,7 +986,7 @@
     },
     "comparison": {
       "title": "How We Compare",
-      "description": "See why organizations choose Aether SSO over cloud-only alternatives.",
+      "description": "See why organizations choose Aether Identity over cloud-only alternatives.",
       "feature": "Feature",
       "selfHosted": "Self-hosted SSO",
       "saml": "SAML 2.0 Support",
@@ -1015,23 +1015,23 @@
     },
     "cta": {
       "title": "Ready to Modernize Your SSO?",
-      "description": "Deploy Aether SSO and gain complete control over your authentication infrastructure. Open source, self-hosted, enterprise-ready.",
+      "description": "Deploy Aether Identity and gain complete control over your authentication infrastructure. Open source, self-hosted, enterprise-ready.",
       "getStarted": "Get Started",
       "contactSales": "Contact Sales"
     },
     "faq": {
       "title": "Frequently Asked Questions",
-      "description": "Common questions about Aether SSO.",
+      "description": "Common questions about Aether Identity.",
       "diff": {
-        "title": "How does Aether SSO differ from Auth0 or Okta?",
-        "answer": "Aether SSO is self-hosted, giving you complete control over your identity infrastructure. Unlike cloud services, there are no per-user fees, and your data never leaves your network. It's ideal for organizations with strict data sovereignty requirements."
+        "title": "How does Aether Identity differ from Auth0 or Okta?",
+        "answer": "Aether Identity is self-hosted, giving you complete control over your identity infrastructure. Unlike cloud services, there are no per-user fees, and your data never leaves your network. It's ideal for organizations with strict data sovereignty requirements."
       },
       "multiIdp": {
-        "title": "Can Aether federate with multiple identity providers?",
-        "answer": "Yes, Aether supports identity brokering - you can connect multiple IdPs (Okta, Azure AD, Ping Identity, etc.) and present a unified authentication interface to your applications."
+        "title": "Can Aether Identity federate with multiple identity providers?",
+        "answer": "Yes, Aether Identity supports identity brokering - you can connect multiple IdPs (Okta, Azure AD, Ping Identity, etc.) and present a unified authentication interface to your applications."
       },
       "legacy": {
-        "title": "Does Aether work with legacy applications?",
+        "title": "Does Aether Identity work with legacy applications?",
         "answer": "Yes, the built-in application gateway can protect any HTTP-based application without requiring code changes. It handles session management and can even bridge between SAML and OAuth."
       },
       "migration": {
@@ -1498,7 +1498,7 @@
     },
     "comparison": {
       "title": "How We Compare",
-      "description": "See why organizations choose Aether Identity MFA over cloud-only alternatives.",
+      "description": "See why organizations choose Aether Identity over cloud-only alternatives.",
       "feature": "Feature"
     },
     "code": {
@@ -1507,7 +1507,7 @@
       "cta": "Quickstart Guides"
     },
     "benefits": {
-      "title": "Why Choose Aether MFA?",
+      "title": "Why Choose Aether Identity?",
       "description": "The most secure and flexible MFA solution for modern enterprises.",
       "vendorLockin": "Zero Vendor Lock-In",
       "vendorLockinDesc": "Self-hosted solution means you own your authentication infrastructure. Migrate anytime with standard protocols.",
@@ -1520,31 +1520,31 @@
     },
     "faq": {
       "title": "Frequently Asked Questions",
-      "description": "Common questions about Aether MFA.",
+      "description": "Common questions about Aether Identity.",
       "duo": {
-        "title": "How does Aether MFA compare to Duo Security?",
-        "answer": "Aether MFA offers all the features of Duo with self-hosted deployment, no per-user pricing, and full data sovereignty. You retain complete control over your authentication infrastructure."
+        "title": "How does Aether Identity compare to Duo Security?",
+        "answer": "Aether Identity offers all the features of Duo with self-hosted deployment, no per-user pricing, and full data sovereignty. You retain complete control over your authentication infrastructure."
       },
       "idp": {
         "title": "Can Aether integrate with our existing IdP?",
-        "answer": "Yes, Aether MFA integrates with any OAuth 2.0/OIDC provider, SAML IdP, or can operate as a standalone MFA solution. It works alongside Okta, Azure AD, Keycloak, and more."
+        "answer": "Yes, Aether Identity integrates with any OAuth 2.0/OIDC provider, SAML IdP, or can operate as a standalone MFA solution. It works alongside Okta, Azure AD, Keycloak, and more."
       },
       "loss": {
         "title": "What happens if a user loses their second factor?",
-        "answer": "Aether provides multiple recovery options including backup codes, trusted device recovery, and admin-initiated recovery with identity verification. Recovery is logged for compliance."
+        "answer": "Aether Identity provides multiple recovery options including backup codes, trusted device recovery, and admin-initiated recovery with identity verification. Recovery is logged for compliance."
       },
       "passwordless": {
         "title": "Is passwordless authentication supported?",
-        "answer": "Yes, Aether fully supports WebAuthn/FIDO2 for passwordless authentication. Users can authenticate with hardware keys, biometric sensors, or device-based credentials."
+        "answer": "Yes, Aether Identity fully supports WebAuthn/FIDO2 for passwordless authentication. Users can authenticate with hardware keys, biometric sensors, or device-based credentials."
       },
       "enforce": {
         "title": "Can we enforce MFA for specific users or groups?",
-        "answer": "Yes, Aether's policy engine allows granular enforcement rules based on user attributes, groups, IP ranges, risk scores, or any custom conditions."
+        "answer": "Yes, Aether Identity's policy engine allows granular enforcement rules based on user attributes, groups, IP ranges, risk scores, or any custom conditions."
       }
     },
     "cta": {
       "title": "Secure Your Authentication Today",
-      "description": "Deploy Aether MFA and gain complete control over your authentication security. Open source, self-hosted, enterprise-ready.",
+      "description": "Deploy Aether Identity and gain complete control over your authentication security. Open source, self-hosted, enterprise-ready.",
       "getStarted": "Get Started",
       "contactSales": "Contact Sales"
     }

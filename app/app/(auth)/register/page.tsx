@@ -16,7 +16,7 @@ export default function RegisterPage() {
           <div className="space-y-8">
             <div>
               <h2 className="text-3xl font-bold leading-tight text-balance">
-                Rejoindre le Portail Officiel de Sky Genesis Enterprise
+                Rejoindre le Portail Officiel
               </h2>
               <p className="mt-4 text-primary-foreground/80 leading-relaxed">
                 Créez votre compte pour accéder à l&apos;ensemble des services enterprise.

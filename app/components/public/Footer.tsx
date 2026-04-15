@@ -17,10 +17,10 @@ function getDefaultFooterLinks(locale: string): Record<string, FooterLinkGroup> 
     developers: {
       title: "Developers",
       links: [
-        { name: "Documentation", href: `${prefix}/docs` },
-        { name: "API Reference", href: `${prefix}/docs/api` },
-        { name: "SDKs", href: `${prefix}/docs/sdks` },
-        { name: "Quickstarts", href: `${prefix}/docs/quickstarts` },
+        { name: "Documentation", href: `${prefix}/developer` },
+        { name: "API Reference", href: `${prefix}/developer/api` },
+        { name: "SDKs", href: `${prefix}/developer/sdks` },
+        { name: "Quickstarts", href: `${prefix}/developer/quickstarts` },
         { name: "Status Page", href: "https://status.skygenesisenterprise.com" },
       ],
     },
@@ -28,10 +28,10 @@ function getDefaultFooterLinks(locale: string): Record<string, FooterLinkGroup> 
       title: "Resources",
       links: [
         { name: "Blog", href: `${prefix}/blog` },
-        { name: "Case Studies", href: `${prefix}/case-studies` },
+        { name: "Case Studies", href: `${prefix}/resources/case-studies` },
         { name: "Whitepapers", href: `${prefix}/resources/whitepapers` },
         { name: "Webinars", href: `${prefix}/resources/webinars` },
-        { name: "Community", href: "/discord" },
+        { name: "Community", href: `${prefix}/resources/community` },
       ],
     },
     company: {

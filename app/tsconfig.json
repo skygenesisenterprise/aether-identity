@@ -27,6 +27,7 @@
       "@/styles/*": ["./styles/*"],
       "@/hooks/*": ["./hooks/*"],
       "@/services/*": ["./services"],
+      "@/i18n/*": ["./i18n/*"],
       "@/types/*": ["./types/*"]
     },
     "baseUrl": ".",
