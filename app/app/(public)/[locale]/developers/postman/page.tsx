@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -10,106 +11,10 @@ import {
   Layers,
   Clock,
   CheckCircle2,
-  Settings,
-  Key,
-  Users,
-  Shield,
-  Globe,
   BookOpen,
   Code2,
-  FileJson,
   Box,
-  Zap,
 } from "lucide-react";
-
-const features = [
-  {
-    icon: Download,
-    title: "One-Click Import",
-    description:
-      "Import our collection directly into Postman with a single click. All endpoints and authentication pre-configured.",
-  },
-  {
-    icon: Play,
-    title: "Ready-to-Run Examples",
-    description:
-      "Pre-built request examples for every endpoint. Just add your credentials and start testing.",
-  },
-  {
-    icon: Layers,
-    title: "Environment Variables",
-    description:
-      "Built-in environment support for easy switching between development, staging, and production.",
-  },
-  {
-    icon: Clock,
-    title: "Save Time",
-    description:
-      "No more copying requests or writing scripts from scratch. Everything you need is included.",
-  },
-];
-
-const collections = [
-  {
-    name: "OAuth 2.0 Flows",
-    description: "Authorization code, PKCE, client credentials, and refresh token flows",
-    endpoints: 12,
-  },
-  {
-    name: "User Management",
-    description: "Create, read, update, and delete users with role assignments",
-    endpoints: 8,
-  },
-  {
-    name: "Client Management",
-    description: "Register and manage OAuth clients and applications",
-    endpoints: 6,
-  },
-  {
-    name: "Session Control",
-    description: "List, revoke, and manage active user sessions",
-    endpoints: 5,
-  },
-  {
-    name: "Role & Permissions",
-    description: "Create roles, assign permissions, and manage access policies",
-    endpoints: 7,
-  },
-  {
-    name: "Audit Logs",
-    description: "Query and export audit logs for compliance and security",
-    endpoints: 4,
-  },
-];
-
-const benefits = [
-  "No authentication setup required - variables handle it all",
-  "Automatic token refresh for long-lived testing sessions",
-  "Request scripts for common workflows",
-  "Response examples for every endpoint",
-  "Variable inheritance across collections",
-  "Compatible with Postman CLI and Newman",
-];
-
-const languages = [
-  "cURL",
-  "JavaScript (Fetch)",
-  "Python (Requests)",
-  "Go",
-  "Java",
-  ".NET",
-  "Ruby",
-  "PHP",
-];
-
-const includedItems = [
-  "50+ pre-configured requests",
-  "Environment templates",
-  "Collection scripts",
-  "Response examples",
-  "Request templates",
-  "Authentication helpers",
-];
 
 export default async function DevelopersPostmanPage({
   params,
@@ -117,6 +22,92 @@ export default async function DevelopersPostmanPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "DevelopersPostman" });
+
+  const features = [
+    {
+      icon: Download,
+      title: t("features.oneClick"),
+      description: t("features.oneClickDesc"),
+    },
+    {
+      icon: Play,
+      title: t("features.readyRun"),
+      description: t("features.readyRunDesc"),
+    },
+    {
+      icon: Layers,
+      title: t("features.environment"),
+      description: t("features.environmentDesc"),
+    },
+    {
+      icon: Clock,
+      title: t("features.saveTime"),
+      description: t("features.saveTimeDesc"),
+    },
+  ];
+
+  const collections = [
+    {
+      name: t("collections.oauthFlows"),
+      description: t("collections.oauthFlowsDesc"),
+      endpoints: 12,
+    },
+    {
+      name: t("collections.userManagement"),
+      description: t("collections.userManagementDesc"),
+      endpoints: 8,
+    },
+    {
+      name: t("collections.clientManagement"),
+      description: t("collections.clientManagementDesc"),
+      endpoints: 6,
+    },
+    {
+      name: t("collections.sessionControl"),
+      description: t("collections.sessionControlDesc"),
+      endpoints: 5,
+    },
+    {
+      name: t("collections.rolePermissions"),
+      description: t("collections.rolePermissionsDesc"),
+      endpoints: 7,
+    },
+    {
+      name: t("collections.auditLogs"),
+      description: t("collections.auditLogsDesc"),
+      endpoints: 4,
+    },
+  ];
+
+  const benefits = [
+    t("benefits.noAuth"),
+    t("benefits.autoRefresh"),
+    t("benefits.scripts"),
+    t("benefits.examples"),
+    t("benefits.inheritance"),
+    t("benefits.cli"),
+  ];
+
+  const languages = [
+    t("languages.curl"),
+    t("languages.jsFetch"),
+    t("languages.python"),
+    t("languages.go"),
+    t("languages.java"),
+    t("languages.dotnet"),
+    t("languages.ruby"),
+    t("languages.php"),
+  ];
+
+  const includedItems = [
+    t("included.requests"),
+    t("included.environment"),
+    t("included.scripts"),
+    t("included.responseExamples"),
+    t("included.templates"),
+    t("included.helpers"),
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -129,25 +120,24 @@ export default async function DevelopersPostmanPage({
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                Postman Collection
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                Test the API in Seconds
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Import our Postman collection and start exploring the Aether Identity API
-                immediately. No setup required.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
                 <Button size="lg" className="gap-2 h-12 px-6 text-base">
                   <Download className="h-4 w-4" />
-                  Import Collection
+                  {t("hero.ctaImport")}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
-                <Link href="/developers/api">
+                <Link href={`/${locale}/developers/api`}>
                   <Button variant="outline" size="lg" className="gap-2 h-12 px-6 text-base">
                     <BookOpen className="h-4 w-4" />
-                    API Documentation
+                    {t("hero.ctaDocs")}
                   </Button>
                 </Link>
               </div>
@@ -160,15 +150,35 @@ export default async function DevelopersPostmanPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Everything You Need to Get Started
+                {t("features.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Our Postman collection includes everything you need to test and explore the API
-                without writing a single line of code.
+                {t("features.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {features.map((feature) => (
+              {[
+                {
+                  icon: Download,
+                  title: t("features.oneClick"),
+                  description: t("features.oneClickDesc"),
+                },
+                {
+                  icon: Play,
+                  title: t("features.readyRun"),
+                  description: t("features.readyRunDesc"),
+                },
+                {
+                  icon: Layers,
+                  title: t("features.environment"),
+                  description: t("features.environmentDesc"),
+                },
+                {
+                  icon: Clock,
+                  title: t("features.saveTime"),
+                  description: t("features.saveTimeDesc"),
+                },
+              ].map((feature) => (
                 <div key={feature.title} className="group">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-foreground/5 group-hover:bg-foreground/10 transition-colors">
@@ -190,11 +200,10 @@ export default async function DevelopersPostmanPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Organized by Resource
+                {t("collections.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Requests are organized into logical collections, making it easy to find what you
-                need and test specific workflows.
+                {t("collections.description")}
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -207,7 +216,9 @@ export default async function DevelopersPostmanPage({
                   <p className="text-sm text-muted-foreground mb-4">{collection.description}</p>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Box className="h-4 w-4" />
-                    <span>{collection.endpoints} endpoints</span>
+                    <span>
+                      {collection.endpoints} {t("collections.endpoints")}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -221,14 +232,20 @@ export default async function DevelopersPostmanPage({
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-balance">
-                  Built for Developers
+                  {t("benefits.title")}
                 </h2>
                 <p className="mt-4 text-lg text-background/70 leading-relaxed">
-                  We've thought of everything so you can focus on building. No more struggling with
-                  authentication or manually crafting requests.
+                  {t("benefits.description")}
                 </p>
                 <div className="mt-8 grid gap-3">
-                  {benefits.map((benefit) => (
+                  {[
+                    t("benefits.noAuth"),
+                    t("benefits.autoRefresh"),
+                    t("benefits.scripts"),
+                    t("benefits.examples"),
+                    t("benefits.inheritance"),
+                    t("benefits.cli"),
+                  ].map((benefit) => (
                     <div key={benefit} className="flex items-center gap-3">
                       <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
                       <span className="text-sm text-background/80">{benefit}</span>
@@ -239,17 +256,17 @@ export default async function DevelopersPostmanPage({
               <div className="grid gap-4">
                 <div className="p-6 rounded-lg bg-background/5 border border-background/10">
                   <Terminal className="h-8 w-8 text-background mb-4" />
-                  <h3 className="text-lg font-semibold text-background mb-2">Works with Newman</h3>
-                  <p className="text-sm text-background/60">
-                    Run collections from the command line for CI/CD integration
-                  </p>
+                  <h3 className="text-lg font-semibold text-background mb-2">
+                    {t("benefits.newman")}
+                  </h3>
+                  <p className="text-sm text-background/60">{t("benefits.newmanDesc")}</p>
                 </div>
                 <div className="p-6 rounded-lg bg-background/5 border border-background/10">
                   <Code2 className="h-8 w-8 text-background mb-4" />
-                  <h3 className="text-lg font-semibold text-background mb-2">Code Generation</h3>
-                  <p className="text-sm text-background/60">
-                    Generate code snippets in your preferred language
-                  </p>
+                  <h3 className="text-lg font-semibold text-background mb-2">
+                    {t("benefits.codeGen")}
+                  </h3>
+                  <p className="text-sm text-background/60">{t("benefits.codeGenDesc")}</p>
                 </div>
               </div>
             </div>
@@ -261,14 +278,21 @@ export default async function DevelopersPostmanPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                What's Included
+                {t("included.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Everything you need to test and explore the API, all in one package.
+                {t("included.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {includedItems.map((item) => (
+              {[
+                t("included.requests"),
+                t("included.environment"),
+                t("included.scripts"),
+                t("included.responseExamples"),
+                t("included.templates"),
+                t("included.helpers"),
+              ].map((item) => (
                 <div
                   key={item}
                   className="flex items-center gap-3 p-4 rounded-lg border border-border bg-card"
@@ -286,11 +310,10 @@ export default async function DevelopersPostmanPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Export to Any Language
+                {t("languages.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Use Postman's code generation to export requests in your preferred programming
-                language.
+                {t("languages.description")}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -311,10 +334,10 @@ export default async function DevelopersPostmanPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                How to Get Started
+                {t("howItWorks.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Import the collection and start testing in less than a minute.
+                {t("howItWorks.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-8">
@@ -322,30 +345,28 @@ export default async function DevelopersPostmanPage({
                 <div className="w-12 h-12 rounded-full bg-foreground/10 flex items-center justify-center mx-auto mb-4">
                   <span className="text-xl font-semibold text-foreground">1</span>
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">Click Import</h3>
-                <p className="text-sm text-muted-foreground">
-                  Click the import button and select "Import from URL" or drag the JSON file
-                </p>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {t("howItWorks.step1")}
+                </h3>
+                <p className="text-sm text-muted-foreground">{t("howItWorks.step1Desc")}</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 rounded-full bg-foreground/10 flex items-center justify-center mx-auto mb-4">
                   <span className="text-xl font-semibold text-foreground">2</span>
                 </div>
                 <h3 className="text-lg font-semibold text-foreground mb-2">
-                  Configure Environment
+                  {t("howItWorks.step2")}
                 </h3>
-                <p className="text-sm text-muted-foreground">
-                  Set your domain, client ID, and secret in the environment variables
-                </p>
+                <p className="text-sm text-muted-foreground">{t("howItWorks.step2Desc")}</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 rounded-full bg-foreground/10 flex items-center justify-center mx-auto mb-4">
                   <span className="text-xl font-semibold text-foreground">3</span>
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">Start Testing</h3>
-                <p className="text-sm text-muted-foreground">
-                  Send requests and explore the API. Authentication is handled automatically
-                </p>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {t("howItWorks.step3")}
+                </h3>
+                <p className="text-sm text-muted-foreground">{t("howItWorks.step3Desc")}</p>
               </div>
             </div>
           </div>
@@ -356,20 +377,18 @@ export default async function DevelopersPostmanPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Ready to Explore the API?
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Import our Postman collection and start testing the Aether Identity API today.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button size="lg" className="gap-2 h-12 px-8 text-base">
                   <Download className="h-4 w-4" />
-                  Import Collection
+                  {t("cta.ctaImport")}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
-                <Link href="/developers/api">
+                <Link href={`/${locale}/developers/api`}>
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    View API Docs
+                    {t("cta.ctaView")}
                   </Button>
                 </Link>
               </div>

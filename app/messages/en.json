@@ -3110,5 +3110,620 @@
       "contact": "Contact Government Sales",
       "docs": "View Documentation"
     }
+  },
+  "Developers": {
+    "hero": {
+      "badge": "Developer Resources",
+      "title": "Build with Aether Identity",
+      "description": "Official SDKs, libraries, and tools to integrate authentication into your applications. Get started in minutes with our quickstart guides.",
+      "ctaQuickstart": "Quickstart Guide",
+      "ctaApiRef": "API Reference"
+    },
+    "backendSdks": {
+      "title": "Backend SDKs",
+      "description": "Native SDKs for your server-side applications with full type safety and async support.",
+      "nodePopular": "Popular",
+      "pythonPopular": "Popular",
+      "goPopular": "Popular",
+      "node": "Node.js",
+      "python": "Python",
+      "go": "Go",
+      "java": "Java",
+      "dotnet": ".NET",
+      "rust": "Rust"
+    },
+    "installation": {
+      "title": "Installation in Seconds",
+      "description": "Install via your preferred package manager and start authenticating users in minutes, not hours.",
+      "cta": "View All SDKs",
+      "typescript": "TypeScript",
+      "esm": "ESM",
+      "cjs": "CJS",
+      "deno": "Deno"
+    },
+    "frontendSdks": {
+      "title": "Frontend SDKs",
+      "description": "Integrate authentication seamlessly into your web applications with our framework-specific SDKs.",
+      "reactDesc": "Hooks, providers, and components for React applications",
+      "vueDesc": "Composition API integration for Vue 3 applications",
+      "angularDesc": "Modules and services for Angular applications",
+      "svelteDesc": "Lightweight SDK for Svelte and SvelteKit"
+    },
+    "quickstart": {
+      "title": "Simple Authentication Flow",
+      "description": "Our SDKs handle the complexity of OAuth flows while giving you full control over the user experience.",
+      "cta": "Full Quickstart"
+    },
+    "mobileSdks": {
+      "title": "Mobile SDKs",
+      "description": "Native and cross-platform SDKs for iOS, Android, and hybrid applications.",
+      "iosDesc": "Native Swift SDK for iOS, macOS, and tvOS",
+      "androidDesc": "Kotlin-first SDK for Android applications",
+      "reactNativeDesc": "Cross-platform SDK for React Native apps",
+      "flutterDesc": "Dart SDK for Flutter cross-platform development"
+    },
+    "features": {
+      "title": "Why Developers Choose Identity",
+      "description": "Built by developers, for developers. Every SDK is designed with developer experience in mind.",
+      "performance": "Sub-15ms Token Validation",
+      "performanceDesc": "High-performance token verification with optimized caching and connection pooling for minimal latency.",
+      "security": "Built-in Security",
+      "securityDesc": "Automatic CSRF protection, input validation, and secure defaults for every integration.",
+      "oauth": "Full OAuth 2.0 Suite",
+      "oauthDesc": "Support for authorization code, PKCE, client credentials, refresh tokens, and device flows.",
+      "migration": "Easy Migration",
+      "migrationDesc": "Import existing users and configurations from Auth0, Okta, or any OAuth provider."
+    },
+    "frameworks": {
+      "title": "Supported Frameworks",
+      "description": "First-class support for popular frameworks with dedicated documentation and examples.",
+      "nextjs": "Next.js",
+      "remix": "Remix",
+      "nuxt": "Nuxt",
+      "express": "Express",
+      "fastify": "Fastify",
+      "nestjs": "NestJS",
+      "django": "Django",
+      "fastapi": "FastAPI",
+      "gin": "Gin",
+      "echo": "Echo"
+    },
+    "deployment": {
+      "title": "Deployment Options",
+      "description": "Choose your preferred deployment method. Aether Identity runs anywhere from bare metal to serverless.",
+      "docker": "Docker",
+      "dockerDesc": "Official Docker images with multi-stage builds",
+      "kubernetes": "Kubernetes",
+      "kubernetesDesc": "Helm charts and operator for K8s deployments",
+      "cloud": "Cloud Providers",
+      "cloudDesc": "One-click deployment to AWS, GCP, Azure",
+      "baremetal": "Bare Metal",
+      "baremetalDesc": "Binary releases for any Linux server"
+    },
+    "verify": {
+      "title": "Verify Tokens with Ease",
+      "description": "Extract user information and permissions from access tokens with a single call.",
+      "typeSafe": "Type-safe responses",
+      "autoRefresh": "Automatic refresh",
+      "errorHandling": "Built-in error handling",
+      "cta": "Full API Docs"
+    },
+    "protocols": {
+      "title": "Supported Protocols",
+      "description": "Industry-standard protocols for maximum compatibility with your existing infrastructure.",
+      "oauth": "OAuth 2.0",
+      "oauthDesc": "Authorization framework",
+      "oidc": "OpenID Connect",
+      "oidcDesc": "Identity layer on top of OAuth 2.0",
+      "saml": "SAML 2.0",
+      "samlDesc": "Enterprise SSO support",
+      "ldap": "LDAP",
+      "ldapDesc": "Directory integration",
+      "webauthn": "WebAuthn",
+      "webauthnDesc": "Passwordless authentication",
+      "scim": "SCIM",
+      "scimDesc": "User provisioning standard"
+    },
+    "tools": {
+      "title": "Developer Tools",
+      "description": "Additional tools to enhance your development workflow and operational efficiency.",
+      "cli": "CLI",
+      "cliDesc": "Command-line interface for management",
+      "terraform": "Terraform",
+      "terraformDesc": "Infrastructure as Code provider",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "Metrics and monitoring exporter",
+      "grafana": "Grafana",
+      "grafanaDesc": "Pre-built dashboard templates"
+    },
+    "resources": {
+      "title": "Everything You Need",
+      "description": "Documentation, examples, and resources to help you succeed with Aether Identity.",
+      "documentation": "Documentation",
+      "documentationDesc": "Comprehensive guides and API reference",
+      "codeExamples": "Code Examples",
+      "codeExamplesDesc": "Real-world integration patterns",
+      "interactiveApi": "Interactive API",
+      "interactiveApiDesc": "Try API endpoints directly",
+      "sdkSource": "SDK Source",
+      "sdkSourceDesc": "Open source SDK repositories"
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "description": "Follow our quickstart guide to integrate authentication into your application in minutes.",
+      "startBuilding": "Start Building",
+      "browseDocs": "Browse Documentation"
+    }
+  },
+  "DevelopersSDKS": {
+    "hero": {
+      "badge": "Developer SDKs",
+      "title": "Integrate Identity Into Your Stack",
+      "description": "Official SDKs for every major language and platform. Built for developers, with full type safety, excellent documentation, and enterprise support.",
+      "ctaQuickstarts": "View Quickstarts",
+      "ctaApi": "API Reference"
+    },
+    "features": {
+      "title": "Why Choose Our SDKs",
+      "performance": "High Performance",
+      "performanceDesc": "Sub-15ms token validation with connection pooling and caching.",
+      "security": "Secure by Default",
+      "securityDesc": "PKCE enforcement, encrypted tokens, and automatic rotation.",
+      "userSync": "User Sync",
+      "userSyncDesc": "Unified sessions across all SDKs and platforms.",
+      "documentation": "Well Documented",
+      "documentationDesc": "Comprehensive guides, API reference, and migration guides."
+    },
+    "backend": {
+      "title": "Server-Side Integration",
+      "description": "Robust SDKs for your backend services. Handle authentication, authorization, and user management with full type safety."
+    },
+    "frontend": {
+      "title": "Browser & SPA Integration",
+      "description": "Lightweight SDKs for web applications. Universal JavaScript support with React, Vue, and Angular."
+    },
+    "mobile": {
+      "title": "Native Mobile Integration",
+      "description": "Native SDKs for iOS and Android. Full platform integration with biometrics, keychain, and push notifications."
+    },
+    "platforms": {
+      "title": "Supported Platforms",
+      "description": "Official SDKs for every major platform. Community-maintained SDKs also available for Ruby, PHP, Rust, and Elixir.",
+      "cta": "View All Quickstarts",
+      "node": "Node.js",
+      "python": "Python",
+      "go": "Go",
+      "java": "Java",
+      "dotnet": ".NET",
+      "react": "React",
+      "vue": "Vue",
+      "angular": "Angular",
+      "ios": "iOS",
+      "android": "Android"
+    },
+    "sdks": {
+      "nodeName": "Node.js",
+      "nodeDesc": "Full-featured SDK for Node.js and Deno. Supports ESM, CommonJS, and TypeScript with full type definitions.",
+      "nodeFeatures": "OAuth 2.0 flows, Token validation, User management, MFA support",
+      "pythonName": "Python",
+      "pythonDesc": "Python SDK with async support. Fully typed with complete API coverage and Django/FastAPI integrations.",
+      "pythonFeatures": "Async/await, Django integration, FastAPI middleware, Type hints",
+      "goName": "Go",
+      "goDesc": "High-performance Go SDK with context support. Zero dependencies and built for production workloads.",
+      "goFeatures": "Context support, Connection pooling, Zero dependencies, Native go.mod",
+      "javaName": "Java",
+      "javaDesc": "Enterprise Java SDK with Spring Boot auto-configuration and Jakarta EE support.",
+      "javaFeatures": "Spring Boot, Jakarta EE, Reactive support, XML/JSON",
+      "dotnetName": ".NET",
+      "dotnetDesc": ".NET SDK with full async support, LINQ integration, and ASP.NET Core middleware.",
+      "dotnetFeatures": "ASP.NET Core, Entity Framework, Blazor support, Async streams",
+      "reactName": "React",
+      "reactDesc": "React hooks and context for authentication. Supports Server Components and client-side mounting.",
+      "reactFeatures": "Hooks API, Context provider, SSR compatible, Tiny bundle",
+      "vueName": "Vue",
+      "vueDesc": "Vue 3 composition API plugin with Pinia store integration and auto-refresh.",
+      "vueFeatures": "Composition API, Pinia store, Auto-refresh, Router hooks",
+      "angularName": "Angular",
+      "angularDesc": "Angular module with HTTP interceptors, guards, and reactive state management.",
+      "angularFeatures": "HTTP interceptors, Route guards, RxJS observables, Lazy loading",
+      "iosName": "iOS",
+      "iosDesc": "Native Swift SDK with Combine support, ASWebAuthenticationSession, and Keychain integration.",
+      "iosFeatures": "Combine, Keychain, Passkeys, WidgetKit",
+      "androidName": "Android",
+      "androidDesc": "Kotlin SDK with Coroutines, Jetpack Compose support, and BiometricPrompt integration.",
+      "androidFeatures": "Coroutines, Jetpack Compose, Biometric, WorkManager"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "description": "Common questions about our SDKs and integration options.",
+      "which": {
+        "title": "Which SDK should I use?",
+        "answer": "Choose the SDK matching your application's language and framework. For server-side applications, we recommend Node.js (TypeScript), Go, or Python. For frontend, use React, Vue, or Angular SDKs. For mobile, use iOS or Android SDKs."
+      },
+      "other": {
+        "title": "Do you support other languages?",
+        "answer": "Yes! We have community-maintained SDKs for Ruby, PHP, Rust, and Elixir. Check our GitHub for the full list. Enterprise support is available for our officially maintained SDKs."
+      },
+      "refresh": {
+        "title": "How do I handle token refresh?",
+        "answer": "All SDKs handle token refresh automatically. The access token is refreshed before expiration using the refresh token. You can configure refresh timing or disable auto-refresh if needed."
+      },
+      "multiple": {
+        "title": "Can I use multiple SDKs in one app?",
+        "answer": "Absolutely. Many applications use a frontend SDK for SPA authentication and a backend SDK for API authorization. Both share the same Aether domain and user sessions are unified across SDKs."
+      },
+      "enterprise": {
+        "title": "What's included in enterprise support?",
+        "answer": "Enterprise support includes priority bug fixes, dedicated Slack channel, SLA guarantees, custom integrations, and direct access to our engineering team. Contact sales for pricing."
+      }
+    },
+    "cta": {
+      "title": "Ready to Integrate?",
+      "description": "Choose your platform and start integrating in minutes. All SDKs include comprehensive guides and enterprise support.",
+      "getStarted": "Get Started",
+      "contactSales": "Contact Sales"
+    }
+  },
+  "DevelopersQuickstarts": {
+    "hero": {
+      "badge": "Quickstart Guides",
+      "title": "Start Building with Identity",
+      "description": "Choose your platform and get up and running with authentication in minutes. From web apps to mobile and infrastructure, we have you covered.",
+      "ctaBrowse": "Browse Guides",
+      "ctaDocs": "Full Documentation"
+    },
+    "categories": {
+      "title": "Choose Your Path",
+      "description": "Select the category that matches your project to find the perfect starting point. Each guide includes code examples and best practices.",
+      "webApps": "Web Applications",
+      "webAppsDesc": "Full-stack web applications with popular frameworks like Next.js, React, Vue, and Angular.",
+      "backend": "Backend Services",
+      "backendDesc": "Server-side integration with Node.js, Python, Go, Java, and .NET applications.",
+      "mobile": "Mobile Apps",
+      "mobileDesc": "Native and cross-platform mobile applications for iOS, Android, React Native, and Flutter.",
+      "infrastructure": "Infrastructure",
+      "infrastructureDesc": "Deploy and manage Aether Identity with Docker, Kubernetes, or bare metal servers."
+    },
+    "code": {
+      "title": "Code That Speaks for Itself",
+      "description": "Clean, readable code that just works. Our SDKs handle the complexity of OAuth 2.0 so you can focus on building your application.",
+      "pkce": "Authorization code flow with PKCE",
+      "tokenRefresh": "Automatic token refresh",
+      "session": "Session management",
+      "logout": "Logout handling"
+    },
+    "benefits": {
+      "title": "Why Start Here?",
+      "description": "Our quickstart guides are designed to get you productive quickly while following security best practices.",
+      "fast": "Get Started in Minutes",
+      "fastDesc": "Pre-configured templates and step-by-step guides help you integrate authentication quickly.",
+      "secure": "Secure by Default",
+      "secureDesc": "Every quickstart includes best practices for security, token management, and session handling.",
+      "docs": "Well Documented",
+      "docsDesc": "Each guide covers installation, configuration, and common use cases with practical examples.",
+      "production": "Production Ready",
+      "productionDesc": "Templates follow production best practices with error handling, logging, and monitoring."
+    },
+    "comparison": {
+      "title": "Not Sure Where to Start?",
+      "description": "We can help you choose the right approach for your specific use case.",
+      "spa": "SPA vs Traditional",
+      "spaDesc": "Choose the best approach for your application architecture",
+      "mobileAuth": "Mobile Authentication",
+      "mobileAuthDesc": "Compare native SDKs vs web-based authentication",
+      "deployment": "Self-hosted vs Cloud",
+      "deploymentDesc": "Deployment options and infrastructure requirements"
+    },
+    "tools": {
+      "title": "More Than Just Code",
+      "description": "Supplement your development with additional tools and resources."
+    },
+    "cta": {
+      "title": "Ready to Integrate?",
+      "description": "Choose your platform and start building secure authentication today.",
+      "getStarted": "Get Started",
+      "viewAll": "View All SDKs"
+    }
+  },
+  "DevelopersPostman": {
+    "hero": {
+      "badge": "Postman Collection",
+      "title": "Test the API in Seconds",
+      "description": "Import our Postman collection and start exploring the Aether Identity API immediately. No setup required.",
+      "ctaImport": "Import Collection",
+      "ctaDocs": "API Documentation"
+    },
+    "features": {
+      "title": "Everything You Need to Get Started",
+      "description": "Our Postman collection includes everything you need to test and explore the API without writing a single line of code.",
+      "oneClick": "One-Click Import",
+      "oneClickDesc": "Import our collection directly into Postman with a single click. All endpoints and authentication pre-configured.",
+      "readyRun": "Ready-to-Run Examples",
+      "readyRunDesc": "Pre-built request examples for every endpoint. Just add your credentials and start testing.",
+      "environment": "Environment Variables",
+      "environmentDesc": "Built-in environment support for easy switching between development, staging, and production.",
+      "saveTime": "Save Time",
+      "saveTimeDesc": "No more copying requests or writing scripts from scratch. Everything you need is included."
+    },
+    "collections": {
+      "title": "Organized by Resource",
+      "description": "Requests are organized into logical collections, making it easy to find what you need and test specific workflows.",
+      "oauthFlows": "OAuth 2.0 Flows",
+      "oauthFlowsDesc": "Authorization code, PKCE, client credentials, and refresh token flows",
+      "userManagement": "User Management",
+      "userManagementDesc": "Create, read, update, and delete users with role assignments",
+      "clientManagement": "Client Management",
+      "clientManagementDesc": "Register and manage OAuth clients and applications",
+      "sessionControl": "Session Control",
+      "sessionControlDesc": "List, revoke, and manage active user sessions",
+      "rolePermissions": "Role & Permissions",
+      "rolePermissionsDesc": "Create roles, assign permissions, and manage access policies",
+      "auditLogs": "Audit Logs",
+      "auditLogsDesc": "Query and export audit logs for compliance and security",
+      "endpoints": "endpoints"
+    },
+    "included": {
+      "title": "What's Included",
+      "description": "Everything you need to test and explore the API, all in one package.",
+      "requests": "50+ pre-configured requests",
+      "environment": "Environment templates",
+      "scripts": "Collection scripts",
+      "responseExamples": "Response examples",
+      "templates": "Request templates",
+      "helpers": "Authentication helpers"
+    },
+    "languages": {
+      "title": "Export to Any Language",
+      "description": "Use Postman's code generation to export requests in your preferred programming language.",
+      "curl": "cURL",
+      "jsFetch": "JavaScript (Fetch)",
+      "python": "Python (Requests)",
+      "go": "Go",
+      "java": "Java",
+      "dotnet": ".NET",
+      "ruby": "Ruby",
+      "php": "PHP"
+    },
+    "howItWorks": {
+      "title": "How to Get Started",
+      "description": "Import the collection and start testing in less than a minute.",
+      "step1": "Click Import",
+      "step1Desc": "Click the import button and select \"Import from URL\" or drag the JSON file",
+      "step2": "Configure Environment",
+      "step2Desc": "Set your domain, client ID, and secret in the environment variables",
+      "step3": "Start Testing",
+      "step3Desc": "Send requests and explore the API. Authentication is handled automatically"
+    },
+    "cta": {
+      "title": "Ready to Explore the API?",
+      "description": "Import our Postman collection and start testing the Aether Identity API today.",
+      "ctaImport": "Import Collection",
+      "ctaView": "View API Docs"
+    }
+  },
+  "DevelopersExtensions": {
+    "hero": {
+      "badge": "Extensions Platform",
+      "title": "Extend Every Aspect of Your Authentication",
+      "description": "Build custom authentication flows, integrate third-party services, and add new capabilities without modifying core code.",
+      "ctaCreate": "Create an Extension",
+      "ctaBrowse": "Browse Extensions"
+    },
+    "metrics": {
+      "title": "Extensions by the Numbers",
+      "community": "Community extensions",
+      "downloads": "Monthly downloads",
+      "official": "Official integrations",
+      "overhead": "Extension overhead"
+    },
+    "categories": {
+      "title": "Extension Categories",
+      "description": "From authentication hooks to notification handlers, extend every part of the authentication lifecycle.",
+      "authPlugins": "Auth Plugins",
+      "authPluginsDesc": "Extend authentication flows with custom providers, MFA methods, and identity verification.",
+      "webhooks": "Event Hooks",
+      "webhooksDesc": "Trigger custom actions on user events, login attempts, or account changes.",
+      "storage": "Storage Connectors",
+      "storageDesc": "Connect to custom databases, LDAP directories, or external user stores.",
+      "notifications": "Notification",
+      "notificationsDesc": "Send notifications via SMS, email, push, or third-party messaging platforms."
+    },
+    "popular": {
+      "title": "Popular Extensions",
+      "description": "Get started quickly with our most-used community and official extensions.",
+      "cta": "View All Extensions"
+    },
+    "code": {
+      "title": "Build Extensions in Minutes",
+      "description": "Our extension SDK provides simple APIs to hook into any authentication event. Publish to npm to share with the community.",
+      "cta": "Extension Guide"
+    },
+    "useCases": {
+      "title": "Common Use Cases",
+      "description": "See what other organizations are building with the extensions platform."
+    },
+    "integrations": {
+      "title": "Featured Integrations",
+      "description": "Official extensions for the tools and platforms you use every day."
+    },
+    "features": {
+      "title": "Why Use Extensions",
+      "description": "Built for performance, security, and ease of use from the ground up.",
+      "loading": "Instant Loading",
+      "loadingDesc": "Extensions load in under 5ms with optimized hot-reload.",
+      "sandbox": "Sandboxed Execution",
+      "sandboxDesc": "Each extension runs in isolation with minimal permissions.",
+      "overhead": "Zero Overhead",
+      "overheadDesc": "Extensions are lazy-loaded only when needed.",
+      "distribution": "Easy Distribution",
+      "distributionDesc": "Publish to npm or install directly from GitHub."
+    },
+    "community": {
+      "title": "Built by the Community",
+      "description": "Discover extensions created by our developer community and partners.",
+      "cta": "Contribute on GitHub"
+    },
+    "devices": {
+      "title": "Cross-Device Authentication",
+      "description": "Extensions support authentication flows across all your users devices."
+    },
+    "cta": {
+      "title": "Start Building Extensions",
+      "description": "Create custom authentication flows in minutes with our extension SDK.",
+      "ctaQuickstart": "Extension Quickstart",
+      "ctaApi": "API Reference"
+    }
+  },
+  "DevelopersCLI": {
+    "hero": {
+      "badge": "Command Line Interface",
+      "title": "Manage Your Identity Infrastructure from the Terminal",
+      "description": "A powerful, developer-friendly CLI for managing applications, users, and configurations. Integrate seamlessly into your development workflow.",
+      "ctaInstall": "Install CLI",
+      "ctaExplore": "Explore Commands"
+    },
+    "features": {
+      "title": "Everything You Need",
+      "description": "Built for developers who prefer the terminal. Fast, intuitive, and powerful.",
+      "install": "Quick Installation",
+      "installDesc": "Install the CLI with a single command via npm, Homebrew, or download the binary directly. Get started in seconds.",
+      "commands": "Intuitive Commands",
+      "commandsDesc": "Human-readable commands for managing applications, users, and configurations. No YAML expertise required.",
+      "plugins": "Plugin System",
+      "pluginsDesc": "Extend functionality with plugins for custom providers, templates, and integrations with your existing tools.",
+      "security": "Secure by Default",
+      "securityDesc": "Built-in security checks, secret management, and compliance validation before every deployment.",
+      "environment": "Multi-Environment",
+      "environmentDesc": "Deploy to development, staging, and production with environment-specific configurations.",
+      "updates": "Automated Updates",
+      "updatesDesc": "Keep your CLI and templates up to date with automatic update checks and migration helpers."
+    },
+    "installation": {
+      "title": "Install in Seconds",
+      "description": "Choose your preferred package manager or download the binary directly."
+    },
+    "code": {
+      "title": "From Zero to Deploy",
+      "description": "Initialize a project, authenticate, and deploy your first application in minutes. No configuration files required.",
+      "cta": "Full Documentation"
+    },
+    "commands": {
+      "title": "Common Commands",
+      "description": "Learn the most frequently used commands to manage your identity infrastructure."
+    },
+    "useCases": {
+      "title": "Built for Real Workflows",
+      "description": "The CLI is designed around common development workflows and automation needs.",
+      "apps": "Application Management",
+      "appsDesc": "Create, configure, and manage OAuth applications without touching YAML files.",
+      "users": "User Administration",
+      "usersDesc": "Onboard users, assign roles, and manage permissions from the command line.",
+      "security": "Security Operations",
+      "securityDesc": "Rotate secrets, audit access, and enforce security policies across your infrastructure.",
+      "config": "Configuration Management",
+      "configDesc": "Version control your identity configuration and deploy changes across environments."
+    },
+    "integrations": {
+      "title": "Integrations",
+      "description": "Seamlessly integrate the CLI into your existing development tools and workflows."
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "description": "Common questions about the Aether CLI.",
+      "autocomplete": {
+        "title": "Does the CLI support autocomplete?",
+        "answer": "Yes, the CLI includes built-in shell completion for bash, zsh, and fish. Run `identity completion generate` to set it up."
+      },
+      "multipleDomains": {
+        "title": "Can I use the CLI with multiple domains?",
+        "answer": "Yes, you can authenticate with multiple domains and switch between them using `identity login --switch` or the `--domain` flag."
+      },
+      "dryRun": {
+        "title": "Is there a dry-run mode?",
+        "answer": "Yes, most commands support `--dry-run` to preview changes before applying them. This helps prevent accidental modifications."
+      },
+      "upgrade": {
+        "title": "How do I upgrade the CLI?",
+        "answer": "Run `identity update` to check for and install the latest version. You can also pin to specific versions with npm."
+      }
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "description": "Install the CLI and start managing your identity infrastructure from the terminal.",
+      "ctaInstall": "Install CLI",
+      "ctaDocs": "View Documentation"
+    }
+  },
+  "DevelopersAPI": {
+    "hero": {
+      "badge": "REST API",
+      "title": "Programmatic Access to Aether Identity",
+      "description": "Build custom integrations with our comprehensive REST API. Manage users, clients, sessions, and more with straightforward HTTP requests.",
+      "ctaRef": "API Reference",
+      "ctaPostman": "Postman Collection"
+    },
+    "capabilities": {
+      "title": "API Capabilities",
+      "description": "Everything you need to build identity management into your applications. Full CRUD operations with enterprise-grade security.",
+      "oauth": "OAuth 2.0 & OIDC",
+      "oauthDesc": "Full implementation of authorization code, PKCE, client credentials, and refresh token flows with OpenID Connect support.",
+      "users": "User Management",
+      "usersDesc": "RESTful endpoints for user CRUD operations, group management, and role assignments with pagination and filtering.",
+      "tokens": "Token Management",
+      "tokensDesc": "Issue, validate, refresh, and revoke tokens with configurable lifetimes and scope-based permissions.",
+      "security": "Security & Compliance",
+      "securityDesc": "Built-in protection against common attacks, comprehensive audit logging, and compliance reporting.",
+      "sessions": "Session Control",
+      "sessionsDesc": "Global session management with single sign-on, concurrent session limits, and device tracking.",
+      "events": "Real-Time Events",
+      "eventsDesc": "Webhooks and server-sent events for authentication events, user changes, and system alerts."
+    },
+    "endpoints": {
+      "title": "Available Endpoints",
+      "description": "RESTful endpoints for all identity management operations. Consistent URL patterns and standard HTTP methods."
+    },
+    "code": {
+      "title": "Simple HTTP-Based Integration",
+      "description": "No SDK required. Use any HTTP client in any language. Our API follows REST conventions and returns JSON for predictable integration.",
+      "cta": "Full API Docs"
+    },
+    "flows": {
+      "title": "Supported OAuth Flows",
+      "description": "Industry-standard authentication flows for different application types and use cases.",
+      "authCode": "Authorization Code + PKCE",
+      "authCodeDesc": "Recommended for web and mobile applications",
+      "clientCreds": "Client Credentials",
+      "clientCredsDesc": "Server-to-server authentication",
+      "refresh": "Refresh Token",
+      "refreshDesc": "Long-lived session management",
+      "device": "Device Flow",
+      "deviceDesc": "For CLI tools and IoT devices"
+    },
+    "limits": {
+      "title": "Performance & Limits",
+      "description": "Designed for high throughput with generous rate limits. Enterprise plans include higher limits and dedicated support.",
+      "rate": "Requests/minute",
+      "tokenValidity": "Token validity",
+      "refreshToken": "Refresh token",
+      "maxClaims": "Max claims",
+      "latency": "Sub-15ms Response",
+      "latencyDesc": "Optimized token validation with connection pooling",
+      "cdn": "Global CDN",
+      "cdnDesc": "Low-latency access from anywhere in the world"
+    },
+    "features": {
+      "title": "Developer Experience",
+      "description": "Built with developers in mind. Predictable responses, clear errors, and comprehensive tooling."
+    },
+    "resources": {
+      "title": "API Resources",
+      "description": "Everything you need to integrate with Aether Identity API."
+    },
+    "cta": {
+      "title": "Start Building with the API",
+      "description": "Explore our API reference and start integrating Aether Identity into your applications today.",
+      "ctaRef": "API Reference",
+      "ctaPostman": "Try in Postman"
+    }
   }
 }

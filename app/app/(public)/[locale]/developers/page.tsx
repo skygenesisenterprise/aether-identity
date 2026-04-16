@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -10,8 +11,6 @@ import {
   BookOpen,
   Zap,
   Shield,
-  GitBranch,
-  Layers,
   ArrowRight,
   CheckCircle2,
   Box,
@@ -24,29 +23,30 @@ import {
   Container,
   Server,
   Cloud,
+  Key,
 } from "lucide-react";
 
 const languages = [
-  { name: "Node.js", icon: "node", version: "v3.0.0", popularity: "Popular" },
-  { name: "Python", icon: "python", version: "v2.8.0", popularity: "Popular" },
-  { name: "Go", icon: "go", version: "v1.5.0", popularity: "Popular" },
-  { name: "Java", icon: "java", version: "v2.3.0", popularity: "" },
-  { name: ".NET", icon: "dotnet", version: "v2.1.0", popularity: "" },
-  { name: "Rust", icon: "rust", version: "v1.0.0", popularity: "" },
+  { name: "Node.js", icon: "node", version: "v3.0.0", popularityKey: "backendSdks.nodePopular" },
+  { name: "Python", icon: "python", version: "v2.8.0", popularityKey: "backendSdks.pythonPopular" },
+  { name: "Go", icon: "go", version: "v1.5.0", popularityKey: "backendSdks.goPopular" },
+  { name: "Java", icon: "java", version: "v2.3.0", popularityKey: "" },
+  { name: ".NET", icon: "dotnet", version: "v2.1.0", popularityKey: "" },
+  { name: "Rust", icon: "rust", version: "v1.0.0", popularityKey: "" },
 ];
 
 const frontendSdks = [
-  { name: "React", description: "Hooks, providers, and components for React applications" },
-  { name: "Vue", description: "Composition API integration for Vue 3 applications" },
-  { name: "Angular", description: "Modules and services for Angular applications" },
-  { name: "Svelte", description: "Lightweight SDK for Svelte and SvelteKit" },
+  { name: "React", descriptionKey: "frontendSdks.reactDesc" },
+  { name: "Vue", descriptionKey: "frontendSdks.vueDesc" },
+  { name: "Angular", descriptionKey: "frontendSdks.angularDesc" },
+  { name: "Svelte", descriptionKey: "frontendSdks.svelteDesc" },
 ];
 
 const mobileSdks = [
-  { name: "iOS (Swift)", description: "Native Swift SDK for iOS, macOS, and tvOS" },
-  { name: "Android (Kotlin)", description: "Kotlin-first SDK for Android applications" },
-  { name: "React Native", description: "Cross-platform SDK for React Native apps" },
-  { name: "Flutter", description: "Dart SDK for Flutter cross-platform development" },
+  { name: "iOS (Swift)", descriptionKey: "mobileSdks.iosDesc" },
+  { name: "Android (Kotlin)", descriptionKey: "mobileSdks.androidDesc" },
+  { name: "React Native", descriptionKey: "mobileSdks.reactNativeDesc" },
+  { name: "Flutter", descriptionKey: "mobileSdks.flutterDesc" },
 ];
 
 const sampleCode = [
@@ -103,118 +103,81 @@ if (permissions.includes('admin:access')) {
   },
 ];
 
-const features = [
-  {
-    icon: Zap,
-    title: "Sub-15ms Token Validation",
-    description:
-      "High-performance token verification with optimized caching and connection pooling for minimal latency.",
-  },
-  {
-    icon: Shield,
-    title: "Built-in Security",
-    description:
-      "Automatic CSRF protection, input validation, and secure defaults for every integration.",
-  },
-  {
-    icon: Layers,
-    title: "Full OAuth 2.0 Suite",
-    description:
-      "Support for authorization code, PKCE, client credentials, refresh tokens, and device flows.",
-  },
-  {
-    icon: GitBranch,
-    title: "Easy Migration",
-    description:
-      "Import existing users and configurations from Auth0, Okta, or any OAuth provider.",
-  },
-];
-
 const integrationTools = [
   {
     icon: Container,
-    title: "Docker",
-    description: "Official Docker images with multi-stage builds",
+    titleKey: "deployment.docker",
+    descriptionKey: "deployment.dockerDesc",
     link: "/docs/installation/docker",
   },
   {
     icon: Layers3,
-    title: "Kubernetes",
-    description: "Helm charts and operator for K8s deployments",
+    titleKey: "deployment.kubernetes",
+    descriptionKey: "deployment.kubernetesDesc",
     link: "/docs/installation/kubernetes",
   },
   {
     icon: Cloud,
-    title: "Cloud Providers",
-    description: "One-click deployment to AWS, GCP, Azure",
+    titleKey: "deployment.cloud",
+    descriptionKey: "deployment.cloudDesc",
     link: "/docs/installation/cloud",
   },
   {
     icon: Server,
-    title: "Bare Metal",
-    description: "Binary releases for any Linux server",
+    titleKey: "deployment.baremetal",
+    descriptionKey: "deployment.baremetalDesc",
     link: "/docs/installation/binary",
   },
 ];
 
-const frameworks = [
-  "Next.js",
-  "Remix",
-  "Nuxt",
-  "Express",
-  "Fastify",
-  "NestJS",
-  "Django",
-  "FastAPI",
-  "Gin",
-  "Echo",
-];
+const frameworks: string[] = [];
 
 const tools = [
-  { name: "CLI", description: "Command-line interface for management" },
-  { name: "Terraform", description: "Infrastructure as Code provider" },
-  { name: "Prometheus", description: "Metrics and monitoring exporter" },
-  { name: "Grafana", description: "Pre-built dashboard templates" },
+  { nameKey: "tools.cli", descriptionKey: "tools.cliDesc" },
+  { nameKey: "tools.terraform", descriptionKey: "tools.terraformDesc" },
+  { nameKey: "tools.prometheus", descriptionKey: "tools.prometheusDesc" },
+  { nameKey: "tools.grafana", descriptionKey: "tools.grafanaDesc" },
 ];
 
 const protocols = [
-  { name: "OAuth 2.0", description: "Authorization framework" },
-  { name: "OpenID Connect", description: "Identity layer on top of OAuth 2.0" },
-  { name: "SAML 2.0", description: "Enterprise SSO support" },
-  { name: "LDAP", description: "Directory integration" },
-  { name: "WebAuthn", description: "Passwordless authentication" },
-  { name: "SCIM", description: "User provisioning standard" },
+  { nameKey: "protocols.oauth", descriptionKey: "protocols.oauthDesc" },
+  { nameKey: "protocols.oidc", descriptionKey: "protocols.oidcDesc" },
+  { nameKey: "protocols.saml", descriptionKey: "protocols.samlDesc" },
+  { nameKey: "protocols.ldap", descriptionKey: "protocols.ldapDesc" },
+  { nameKey: "protocols.webauthn", descriptionKey: "protocols.webauthnDesc" },
+  { nameKey: "protocols.scim", descriptionKey: "protocols.scimDesc" },
 ];
 
 const resources = [
   {
     icon: BookOpen,
-    title: "Documentation",
-    description: "Comprehensive guides and API reference",
+    title: "resources.documentation",
+    description: "resources.documentationDesc",
   },
   {
     icon: FileCode,
-    title: "Code Examples",
-    description: "Real-world integration patterns",
+    title: "resources.codeExamples",
+    description: "resources.codeExamplesDesc",
   },
   {
     icon: Terminal,
-    title: "Interactive API",
-    description: "Try API endpoints directly",
+    title: "resources.interactiveApi",
+    description: "resources.interactiveApiDesc",
   },
   {
     icon: Hexagon,
-    title: "SDK Source",
-    description: "Open source SDK repositories",
+    title: "resources.sdkSource",
+    description: "resources.sdkSourceDesc",
   },
 ];
 
 export default async function DevelopersPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Developers" });
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-     <Header locale={locale as import("@/lib/locale").Locale} />
+      <Header locale={locale as import("@/lib/locale").Locale} />
 
       <main className="flex-1">
         {/* Hero Section */}
@@ -223,26 +186,25 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                Developer Resources
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                Build with Aether Identity
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Official SDKs, libraries, and tools to integrate authentication into your
-                applications. Get started in minutes with our quickstart guides.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
-                <Link href="/docs/quickstarts">
+                <Link href={`/${locale}/docs/quickstarts`}>
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    Quickstart Guide
+                    {t("hero.ctaQuickstart")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/docs/api-reference">
+                <Link href={`/${locale}/docs/api-reference`}>
                   <Button variant="outline" size="lg" className="gap-2 h-12 px-6 text-base">
                     <Terminal className="h-4 w-4" />
-                    API Reference
+                    {t("hero.ctaApiRef")}
                   </Button>
                 </Link>
               </div>
@@ -254,10 +216,11 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
         <section className="py-20 lg:py-28 border-b border-border bg-muted/30">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Backend SDKs</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("backendSdks.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Native SDKs for your server-side applications with full type safety and async
-                support.
+                {t("backendSdks.description")}
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -275,9 +238,9 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
                       <div className="text-sm text-muted-foreground">{lang.version}</div>
                     </div>
                   </div>
-                  {lang.popularity && (
+                  {lang.popularityKey && (
                     <span className="px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded">
-                      {lang.popularity}
+                      {t(lang.popularityKey)}
                     </span>
                   )}
                 </div>
@@ -292,14 +255,18 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-balance">
-                  Installation in Seconds
+                  {t("installation.title")}
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                  Install via your preferred package manager and start authenticating users in
-                  minutes, not hours.
+                  {t("installation.description")}
                 </p>
                 <div className="mt-8 flex flex-wrap gap-2">
-                  {["TypeScript", "ESM", "CJS", "Deno"].map((feature) => (
+                  {[
+                    t("installation.typescript"),
+                    t("installation.esm"),
+                    t("installation.cjs"),
+                    t("installation.deno"),
+                  ].map((feature) => (
                     <span
                       key={feature}
                       className="px-3 py-1.5 text-sm bg-muted rounded-md text-foreground"
@@ -309,10 +276,10 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
                   ))}
                 </div>
                 <div className="mt-8">
-                  <Link href="/docs/sdks/backend">
+                  <Link href={`/${locale}/docs/sdks/backend`}>
                     <Button variant="secondary" size="lg" className="gap-2">
                       <Package className="h-4 w-4" />
-                      View All SDKs
+                      {t("installation.cta")}
                     </Button>
                   </Link>
                 </div>
@@ -328,10 +295,11 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
         <section className="py-20 lg:py-28 border-b border-border bg-muted/30">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Frontend SDKs</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("frontendSdks.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Integrate authentication seamlessly into your web applications with our
-                framework-specific SDKs.
+                {t("frontendSdks.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -342,7 +310,9 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
                 >
                   <Box className="h-8 w-8 text-foreground mb-4" />
                   <h3 className="text-lg font-semibold text-foreground mb-2">{sdk.name}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{sdk.description}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {t(sdk.descriptionKey)}
+                  </p>
                 </div>
               ))}
             </div>
@@ -355,17 +325,16 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-balance">
-                  Simple Authentication Flow
+                  {t("quickstart.title")}
                 </h2>
                 <p className="mt-4 text-lg text-background/70 leading-relaxed">
-                  Our SDKs handle the complexity of OAuth flows while giving you full control over
-                  the user experience.
+                  {t("quickstart.description")}
                 </p>
                 <div className="mt-8">
-                  <Link href="/docs/quickstarts">
+                  <Link href={`/${locale}/docs/quickstarts`}>
                     <Button variant="secondary" size="lg" className="gap-2">
                       <Zap className="h-4 w-4" />
-                      Full Quickstart
+                      {t("quickstart.cta")}
                     </Button>
                   </Link>
                 </div>
@@ -381,9 +350,11 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
         <section className="py-20 lg:py-28 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Mobile SDKs</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("mobileSdks.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Native and cross-platform SDKs for iOS, Android, and hybrid applications.
+                {t("mobileSdks.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -394,7 +365,9 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
                 >
                   <Package className="h-8 w-8 text-foreground mb-4" />
                   <h3 className="text-lg font-semibold text-foreground mb-2">{sdk.name}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{sdk.description}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {t(sdk.descriptionKey)}
+                  </p>
                 </div>
               ))}
             </div>
@@ -406,15 +379,31 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Why Developers Choose Identity
+                {t("features.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Built by developers, for developers. Every SDK is designed with developer experience
-                in mind.
+                {t("features.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {features.map((feature) => (
+              {[
+                {
+                  icon: Zap,
+                  title: t("features.performance"),
+                  description: t("features.performanceDesc"),
+                },
+                {
+                  icon: Shield,
+                  title: t("features.security"),
+                  description: t("features.securityDesc"),
+                },
+                { icon: Key, title: t("features.oauth"), description: t("features.oauthDesc") },
+                {
+                  icon: Settings,
+                  title: t("features.migration"),
+                  description: t("features.migrationDesc"),
+                },
+              ].map((feature) => (
                 <div key={feature.title} className="group">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-foreground/5 group-hover:bg-foreground/10 transition-colors">
@@ -436,15 +425,25 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Supported Frameworks
+                {t("frameworks.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                First-class support for popular frameworks with dedicated documentation and
-                examples.
+                {t("frameworks.description")}
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              {frameworks.map((framework) => (
+              {[
+                t("frameworks.nextjs"),
+                t("frameworks.remix"),
+                t("frameworks.nuxt"),
+                t("frameworks.express"),
+                t("frameworks.fastify"),
+                t("frameworks.nestjs"),
+                t("frameworks.django"),
+                t("frameworks.fastapi"),
+                t("frameworks.gin"),
+                t("frameworks.echo"),
+              ].map((framework) => (
                 <div
                   key={framework}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card"
@@ -462,26 +461,25 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Deployment Options
+                {t("deployment.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Choose your preferred deployment method. Aether Identity runs anywhere from bare metal to
-                serverless.
+                {t("deployment.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {integrationTools.map((tool) => (
                 <Link
-                  key={tool.title}
-                  href={tool.link}
+                  key={tool.titleKey}
+                  href={`${locale}${tool.link}`}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors group"
                 >
                   <tool.icon className="h-8 w-8 text-foreground mb-4" />
                   <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:underline">
-                    {tool.title}
+                    {t(tool.titleKey)}
                   </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {tool.description}
+                    {t(tool.descriptionKey)}
                   </p>
                 </Link>
               ))}
@@ -495,13 +493,13 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-balance">
-                  Verify Tokens with Ease
+                  {t("verify.title")}
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                  Extract user information and permissions from access tokens with a single call.
+                  {t("verify.description")}
                 </p>
                 <div className="mt-8 space-y-3">
-                  {["Type-safe responses", "Automatic refresh", "Built-in error handling"].map(
+                  {[t("verify.typeSafe"), t("verify.autoRefresh"), t("verify.errorHandling")].map(
                     (item) => (
                       <div key={item} className="flex items-center gap-2">
                         <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
@@ -511,10 +509,10 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
                   )}
                 </div>
                 <div className="mt-8">
-                  <Link href="/docs/api-reference">
+                  <Link href={`/${locale}/docs/api-reference`}>
                     <Button variant="secondary" size="lg" className="gap-2">
                       <BookOpen className="h-4 w-4" />
-                      Full API Docs
+                      {t("verify.cta")}
                     </Button>
                   </Link>
                 </div>
@@ -531,23 +529,24 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Supported Protocols
+                {t("protocols.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Industry-standard protocols for maximum compatibility with your existing
-                infrastructure.
+                {t("protocols.description")}
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {protocols.map((protocol) => (
                 <div
-                  key={protocol.name}
+                  key={protocol.nameKey}
                   className="flex items-center gap-3 p-4 rounded-lg border border-border bg-card"
                 >
                   <Workflow className="h-5 w-5 text-foreground shrink-0" />
                   <div>
-                    <div className="font-medium text-foreground">{protocol.name}</div>
-                    <div className="text-sm text-muted-foreground">{protocol.description}</div>
+                    <div className="font-medium text-foreground">{t(protocol.nameKey)}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {t(protocol.descriptionKey)}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -560,22 +559,22 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Developer Tools
+                {t("tools.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Additional tools to enhance your development workflow and operational efficiency.
+                {t("tools.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {tools.map((tool) => (
                 <div
-                  key={tool.name}
+                  key={tool.nameKey}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
                 >
                   <Settings className="h-8 w-8 text-foreground mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{tool.name}</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">{t(tool.nameKey)}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {tool.description}
+                    {t(tool.descriptionKey)}
                   </p>
                 </div>
               ))}
@@ -588,10 +587,10 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Everything You Need
+                {t("resources.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Documentation, examples, and resources to help you succeed with Aether Identity.
+                {t("resources.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -601,9 +600,11 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors cursor-pointer"
                 >
                   <resource.icon className="h-8 w-8 text-foreground mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{resource.title}</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    {t(resource.title)}
+                  </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {resource.description}
+                    {t(resource.description)}
                   </p>
                 </div>
               ))}
@@ -616,22 +617,19 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Ready to Get Started?
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Follow our quickstart guide to integrate authentication into your application in
-                minutes.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link href={`/${locale}/company/contact`}>
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                    Start Building
+                    {t("cta.startBuilding")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/docs">
+                <Link href={`/${locale}/docs`}>
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    Browse Documentation
+                    {t("cta.browseDocs")}
                   </Button>
                 </Link>
               </div>

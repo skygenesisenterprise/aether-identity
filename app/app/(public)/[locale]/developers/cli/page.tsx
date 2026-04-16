@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -199,6 +200,7 @@ const faqs = [
 
 export default async function CliPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "DevelopersCLI" });
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -211,25 +213,24 @@ export default async function CliPage({ params }: { params: Promise<{ locale: st
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <Terminal className="h-4 w-4" />
-                Command Line Interface
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                Manage Your Identity Infrastructure from the Terminal
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                A powerful, developer-friendly CLI for managing applications, users, and
-                configurations. Integrate seamlessly into your development workflow.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
                 <Link href="#installation">
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    Install CLI
+                    {t("hero.ctaInstall")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="#commands">
                   <Button variant="outline" size="lg" className="gap-2 h-12 px-6 text-base">
-                    Explore Commands
+                    {t("hero.ctaExplore")}
                   </Button>
                 </Link>
               </div>
@@ -242,14 +243,45 @@ export default async function CliPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Everything You Need
+                {t("features.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Built for developers who prefer the terminal. Fast, intuitive, and powerful.
+                {t("features.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {cliFeatures.map((feature) => (
+              {[
+                {
+                  icon: Download,
+                  title: t("features.install"),
+                  description: t("features.installDesc"),
+                },
+                {
+                  icon: Terminal,
+                  title: t("features.commands"),
+                  description: t("features.commandsDesc"),
+                },
+                {
+                  icon: Plug,
+                  title: t("features.plugins"),
+                  description: t("features.pluginsDesc"),
+                },
+                {
+                  icon: Shield,
+                  title: t("features.security"),
+                  description: t("features.securityDesc"),
+                },
+                {
+                  icon: Cloud,
+                  title: t("features.environment"),
+                  description: t("features.environmentDesc"),
+                },
+                {
+                  icon: RefreshCw,
+                  title: t("features.updates"),
+                  description: t("features.updatesDesc"),
+                },
+              ].map((feature) => (
                 <div key={feature.title} className="group">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-foreground/5 group-hover:bg-foreground/10 transition-colors">
@@ -271,14 +303,32 @@ export default async function CliPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Install in Seconds
+                {t("installation.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Choose your preferred package manager or download the binary directly.
+                {t("installation.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {installationMethods.map((method) => (
+              {[
+                {
+                  method: "npm",
+                  command: "npm install -g @aether-identity/cli",
+                  badge: "Recommended",
+                },
+                { method: "Homebrew", command: "brew install aether-identity/cli", badge: null },
+                {
+                  method: "Docker",
+                  command: "docker run -it skygenesisenterprise/aether-identity/cli:latest",
+                  badge: null,
+                },
+                {
+                  method: "Binary",
+                  command:
+                    "curl -fsSL https://identity.skygenesisenterprise.com/cli/install.sh | sh",
+                  badge: null,
+                },
+              ].map((method) => (
                 <div
                   key={method.method}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
@@ -306,17 +356,16 @@ export default async function CliPage({ params }: { params: Promise<{ locale: st
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-balance">
-                  From Zero to Deploy
+                  {t("code.title")}
                 </h2>
                 <p className="mt-4 text-lg text-background/70 leading-relaxed">
-                  Initialize a project, authenticate, and deploy your first application in minutes.
-                  No configuration files required.
+                  {t("code.description")}
                 </p>
                 <div className="mt-8">
-                  <Link href="/docs/cli">
+                  <Link href={`/${locale}/docs/cli`}>
                     <Button variant="secondary" size="lg" className="gap-2">
                       <FileText className="h-4 w-4" />
-                      Full Documentation
+                      {t("code.cta")}
                     </Button>
                   </Link>
                 </div>
@@ -333,10 +382,10 @@ export default async function CliPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Common Commands
+                {t("commands.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Learn the most frequently used commands to manage your identity infrastructure.
+                {t("commands.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -370,14 +419,27 @@ export default async function CliPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Built for Real Workflows
+                {t("useCases.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                The CLI is designed around common development workflows and automation needs.
+                {t("useCases.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
-              {useCases.map((useCase) => (
+              {[
+                { icon: Server, title: t("useCases.apps"), description: t("useCases.appsDesc") },
+                { icon: Users, title: t("useCases.users"), description: t("useCases.usersDesc") },
+                {
+                  icon: Shield,
+                  title: t("useCases.security"),
+                  description: t("useCases.securityDesc"),
+                },
+                {
+                  icon: Database,
+                  title: t("useCases.config"),
+                  description: t("useCases.configDesc"),
+                },
+              ].map((useCase) => (
                 <div
                   key={useCase.title}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
@@ -397,9 +459,11 @@ export default async function CliPage({ params }: { params: Promise<{ locale: st
         <section className="py-20 lg:py-28 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">Integrations</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("integrations.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Seamlessly integrate the CLI into your existing development tools and workflows.
+                {t("integrations.description")}
               </p>
             </div>
             <div className="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
@@ -422,14 +486,22 @@ export default async function CliPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Frequently Asked Questions
+                {t("faq.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Common questions about the Aether CLI.
+                {t("faq.description")}
               </p>
             </div>
             <div className="max-w-3xl mx-auto space-y-4">
-              {faqs.map((faq) => (
+              {[
+                { question: t("faq.autocomplete.title"), answer: t("faq.autocomplete.answer") },
+                {
+                  question: t("faq.multipleDomains.title"),
+                  answer: t("faq.multipleDomains.answer"),
+                },
+                { question: t("faq.dryRun.title"), answer: t("faq.dryRun.answer") },
+                { question: t("faq.upgrade.title"), answer: t("faq.upgrade.answer") },
+              ].map((faq) => (
                 <div key={faq.question} className="p-6 rounded-lg border border-border bg-card">
                   <h3 className="text-base font-semibold text-foreground mb-2">{faq.question}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{faq.answer}</p>
@@ -444,21 +516,19 @@ export default async function CliPage({ params }: { params: Promise<{ locale: st
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Ready to Get Started?
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Install the CLI and start managing your identity infrastructure from the terminal.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link href="#installation">
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                    Install CLI
+                    {t("cta.ctaInstall")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/docs/cli">
+                <Link href={`/${locale}/docs/cli`}>
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    View Documentation
+                    {t("cta.ctaDocs")}
                   </Button>
                 </Link>
               </div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -144,6 +145,7 @@ const comparisonOptions = [
 
 export default async function QuickstartsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "DevelopersQuickstarts" });
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -156,26 +158,25 @@ export default async function QuickstartsPage({ params }: { params: Promise<{ lo
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                Quickstart Guides
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                Start Building with Identity
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Choose your platform and get up and running with authentication in minutes. From web
-                apps to mobile and infrastructure, we have you covered.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
                 <Link href="#categories">
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    Browse Guides
+                    {t("hero.ctaBrowse")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/docs">
+                <Link href={`/${locale}/docs`}>
                   <Button variant="outline" size="lg" className="gap-2 h-12 px-6 text-base">
                     <BookOpen className="h-4 w-4" />
-                    Full Documentation
+                    {t("hero.ctaDocs")}
                   </Button>
                 </Link>
               </div>
@@ -188,15 +189,39 @@ export default async function QuickstartsPage({ params }: { params: Promise<{ lo
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Choose Your Path
+                {t("categories.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Select the category that matches your project to find the perfect starting point.
-                Each guide includes code examples and best practices.
+                {t("categories.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
-              {quickstartCategories.map((category) => (
+              {[
+                {
+                  icon: Laptop,
+                  title: t("categories.webApps"),
+                  description: t("categories.webAppsDesc"),
+                  guides: ["Next.js", "React", "Vue", "Angular", "Svelte"],
+                },
+                {
+                  icon: Server,
+                  title: t("categories.backend"),
+                  description: t("categories.backendDesc"),
+                  guides: ["Node.js", "Python", "Go", "Java", ".NET"],
+                },
+                {
+                  icon: Smartphone,
+                  title: t("categories.mobile"),
+                  description: t("categories.mobileDesc"),
+                  guides: ["iOS (Swift)", "Android (Kotlin)", "React Native", "Flutter"],
+                },
+                {
+                  icon: Container,
+                  title: t("categories.infrastructure"),
+                  description: t("categories.infrastructureDesc"),
+                  guides: ["Docker", "Kubernetes", "Binary", "Helm"],
+                },
+              ].map((category) => (
                 <div
                   key={category.title}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
@@ -237,18 +262,17 @@ export default async function QuickstartsPage({ params }: { params: Promise<{ lo
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-balance">
-                  Code That Speaks for Itself
+                  {t("code.title")}
                 </h2>
                 <p className="mt-4 text-lg text-background/70 leading-relaxed">
-                  Clean, readable code that just works. Our SDKs handle the complexity of OAuth 2.0
-                  so you can focus on building your application.
+                  {t("code.description")}
                 </p>
                 <div className="mt-8 space-y-3">
                   {[
-                    "Authorization code flow with PKCE",
-                    "Automatic token refresh",
-                    "Session management",
-                    "Logout handling",
+                    t("code.pkce"),
+                    t("code.tokenRefresh"),
+                    t("code.session"),
+                    t("code.logout"),
                   ].map((feature) => (
                     <div key={feature} className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
@@ -269,15 +293,27 @@ export default async function QuickstartsPage({ params }: { params: Promise<{ lo
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Why Start Here?
+                {t("benefits.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Our quickstart guides are designed to get you productive quickly while following
-                security best practices.
+                {t("benefits.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {benefits.map((benefit) => (
+              {[
+                { icon: Zap, title: t("benefits.fast"), description: t("benefits.fastDesc") },
+                {
+                  icon: Shield,
+                  title: t("benefits.secure"),
+                  description: t("benefits.secureDesc"),
+                },
+                { icon: BookOpen, title: t("benefits.docs"), description: t("benefits.docsDesc") },
+                {
+                  icon: Rocket,
+                  title: t("benefits.production"),
+                  description: t("benefits.productionDesc"),
+                },
+              ].map((benefit) => (
                 <div key={benefit.title} className="group">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-foreground/5 group-hover:bg-foreground/10 transition-colors">
@@ -299,14 +335,30 @@ export default async function QuickstartsPage({ params }: { params: Promise<{ lo
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Not Sure Where to Start?
+                {t("comparison.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                We can help you choose the right approach for your specific use case.
+                {t("comparison.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
-              {comparisonOptions.map((option) => (
+              {[
+                {
+                  title: t("comparison.spa"),
+                  description: t("comparison.spaDesc"),
+                  link: "/docs/quickstarts/spa",
+                },
+                {
+                  title: t("comparison.mobileAuth"),
+                  description: t("comparison.mobileAuthDesc"),
+                  link: "/docs/quickstarts/mobile",
+                },
+                {
+                  title: t("comparison.deployment"),
+                  description: t("comparison.deploymentDesc"),
+                  link: "/docs/quickstarts/deployment",
+                },
+              ].map((option) => (
                 <div
                   key={option.title}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
@@ -316,7 +368,7 @@ export default async function QuickstartsPage({ params }: { params: Promise<{ lo
                     {option.description}
                   </p>
                   <Link
-                    href={option.link}
+                    href={`${locale}${option.link}`}
                     className="text-sm font-medium text-foreground hover:text-foreground/70 inline-flex items-center gap-1"
                   >
                     Learn more <ArrowRight className="h-3 w-3" />
@@ -332,10 +384,10 @@ export default async function QuickstartsPage({ params }: { params: Promise<{ lo
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                More Than Just Code
+                {t("tools.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Supplement your development with additional tools and resources.
+                {t("tools.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -381,21 +433,19 @@ export default async function QuickstartsPage({ params }: { params: Promise<{ lo
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Ready to Integrate?
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Choose your platform and start building secure authentication today.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link href="#categories">
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                    Get Started
+                    {t("cta.getStarted")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/developers">
+                <Link href={`/${locale}/developers`}>
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    View All SDKs
+                    {t("cta.viewAll")}
                   </Button>
                 </Link>
               </div>

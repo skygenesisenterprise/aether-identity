@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { routing } from "./i18n/routing";
+import { routing } from "@/i18n/routing";
 
 type Locale = (typeof routing.locales)[number];
 

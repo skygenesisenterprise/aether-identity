@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -169,6 +170,7 @@ const features = [
 
 export default async function ExtensionsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "DevelopersExtensions" });
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -181,26 +183,25 @@ export default async function ExtensionsPage({ params }: { params: Promise<{ loc
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                Extensions Platform
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                Extend Every Aspect of Your Authentication
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Build custom authentication flows, integrate third-party services, and add new
-                capabilities without modifying core code.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
-                <Link href="/docs/extensions">
+                <Link href={`/${locale}/docs/extensions`}>
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    Create an Extension
+                    {t("hero.ctaCreate")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/docs/extensions/browse">
+                <Link href={`/${locale}/docs/extensions/browse`}>
                   <Button variant="outline" size="lg" className="gap-2 h-12 px-6 text-base">
                     <Plug className="h-4 w-4" />
-                    Browse Extensions
+                    {t("hero.ctaBrowse")}
                   </Button>
                 </Link>
               </div>
@@ -212,7 +213,12 @@ export default async function ExtensionsPage({ params }: { params: Promise<{ loc
         <section className="py-16 border-b border-border bg-muted/30">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-              {metrics.map((metric) => (
+              {[
+                { value: "100+", label: t("metrics.community") },
+                { value: "500K+", label: t("metrics.downloads") },
+                { value: "50+", label: t("metrics.official") },
+                { value: "< 5ms", label: t("metrics.overhead") },
+              ].map((metric) => (
                 <div key={metric.label}>
                   <div className="text-3xl sm:text-4xl font-semibold text-foreground">
                     {metric.value}
@@ -229,15 +235,35 @@ export default async function ExtensionsPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Extension Categories
+                {t("categories.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                From authentication hooks to notification handlers, extend every part of the
-                authentication lifecycle.
+                {t("categories.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {extensionTypes.map((type) => (
+              {[
+                {
+                  icon: Puzzle,
+                  title: t("categories.authPlugins"),
+                  description: t("categories.authPluginsDesc"),
+                },
+                {
+                  icon: Webhook,
+                  title: t("categories.webhooks"),
+                  description: t("categories.webhooksDesc"),
+                },
+                {
+                  icon: Database,
+                  title: t("categories.storage"),
+                  description: t("categories.storageDesc"),
+                },
+                {
+                  icon: MessageSquare,
+                  title: t("categories.notifications"),
+                  description: t("categories.notificationsDesc"),
+                },
+              ].map((type) => (
                 <div key={type.title} className="group">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-foreground/5 group-hover:bg-foreground/10 transition-colors">
@@ -259,10 +285,10 @@ export default async function ExtensionsPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Popular Extensions
+                {t("popular.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Get started quickly with our most-used community and official extensions.
+                {t("popular.description")}
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -287,10 +313,10 @@ export default async function ExtensionsPage({ params }: { params: Promise<{ loc
               ))}
             </div>
             <div className="mt-8 text-center">
-              <Link href="/docs/extensions/browse">
+              <Link href={`/${locale}/docs/extensions/browse`}>
                 <Button variant="secondary" size="lg" className="gap-2">
                   <Box className="h-4 w-4" />
-                  View All Extensions
+                  {t("popular.cta")}
                 </Button>
               </Link>
             </div>
@@ -303,17 +329,16 @@ export default async function ExtensionsPage({ params }: { params: Promise<{ loc
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-balance">
-                  Build Extensions in Minutes
+                  {t("code.title")}
                 </h2>
                 <p className="mt-4 text-lg text-background/70 leading-relaxed">
-                  Our extension SDK provides simple APIs to hook into any authentication event.
-                  Publish to npm to share with the community.
+                  {t("code.description")}
                 </p>
                 <div className="mt-8">
-                  <Link href="/docs/extensions/quickstart">
+                  <Link href={`/${locale}/docs/extensions/quickstart`}>
                     <Button variant="secondary" size="lg" className="gap-2">
                       <FileCode className="h-4 w-4" />
-                      Extension Guide
+                      {t("code.cta")}
                     </Button>
                   </Link>
                 </div>
@@ -330,14 +355,27 @@ export default async function ExtensionsPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Common Use Cases
+                {t("useCases.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                See what other organizations are building with the extensions platform.
+                {t("useCases.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {useCases.map((useCase) => (
+              {[
+                {
+                  icon: Fingerprint,
+                  title: t("useCases.biometric"),
+                  description: t("useCases.biometricDesc"),
+                },
+                {
+                  icon: Smartphone,
+                  title: t("useCases.mobilePush"),
+                  description: t("useCases.mobilePushDesc"),
+                },
+                { icon: Shield, title: t("useCases.fraud"), description: t("useCases.fraudDesc") },
+                { icon: Globe, title: t("useCases.social"), description: t("useCases.socialDesc") },
+              ].map((useCase) => (
                 <div
                   key={useCase.title}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
@@ -358,10 +396,10 @@ export default async function ExtensionsPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Featured Integrations
+                {t("integrations.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Official extensions for the tools and platforms you use every day.
+                {t("integrations.description")}
               </p>
             </div>
             <div className="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
@@ -383,14 +421,31 @@ export default async function ExtensionsPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Why Use Extensions
+                {t("features.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Built for performance, security, and ease of use from the ground up.
+                {t("features.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {features.map((feature) => (
+              {[
+                { icon: Zap, title: t("features.loading"), description: t("features.loadingDesc") },
+                {
+                  icon: Lock,
+                  title: t("features.sandbox"),
+                  description: t("features.sandboxDesc"),
+                },
+                {
+                  icon: Gauge,
+                  title: t("features.overhead"),
+                  description: t("features.overheadDesc"),
+                },
+                {
+                  icon: Share2,
+                  title: t("features.distribution"),
+                  description: t("features.distributionDesc"),
+                },
+              ].map((feature) => (
                 <div key={feature.title} className="group">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-foreground/5 group-hover:bg-foreground/10 transition-colors">
@@ -412,10 +467,10 @@ export default async function ExtensionsPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Built by the Community
+                {t("community.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Discover extensions created by our developer community and partners.
+                {t("community.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -440,7 +495,7 @@ export default async function ExtensionsPage({ params }: { params: Promise<{ loc
               <Link href="https://github.com/skygenesisenterprise/aether-extensions">
                 <Button variant="outline" size="lg" className="gap-2">
                   <Box className="h-4 w-4" />
-                  Contribute on GitHub
+                  {t("community.cta")}
                 </Button>
               </Link>
             </div>
@@ -452,10 +507,10 @@ export default async function ExtensionsPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Cross-Device Authentication
+                {t("devices.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Extensions support authentication flows across all your users devices.
+                {t("devices.description")}
               </p>
             </div>
             <div className="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
@@ -484,21 +539,19 @@ export default async function ExtensionsPage({ params }: { params: Promise<{ loc
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Start Building Extensions
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Create custom authentication flows in minutes with our extension SDK.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/docs/extensions/quickstart">
+                <Link href={`/${locale}/docs/extensions/quickstart`}>
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                    Extension Quickstart
+                    {t("cta.ctaQuickstart")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/docs/api-reference/extensions">
+                <Link href={`/${locale}/docs/api-reference/extensions`}>
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    API Reference
+                    {t("cta.ctaApi")}
                   </Button>
                 </Link>
               </div>

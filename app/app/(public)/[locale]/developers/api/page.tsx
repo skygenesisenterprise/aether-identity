@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/public/Header";
 import { Footer } from "@/components/public/Footer";
 import { Button } from "@/components/ui/button";
@@ -198,6 +199,7 @@ export default async function DevelopersApiPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "DevelopersAPI" });
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -210,26 +212,25 @@ export default async function DevelopersApiPage({
             <div className="max-w-4xl">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                REST API
+                {t("hero.badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight text-balance">
-                Programmatic Access to Aether Identity
+                {t("hero.title")}
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Build custom integrations with our comprehensive REST API. Manage users, clients,
-                sessions, and more with straightforward HTTP requests.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-start gap-4">
                 <Link href="/docs/api-reference">
                   <Button size="lg" className="gap-2 h-12 px-6 text-base">
-                    API Reference
+                    {t("hero.ctaRef")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="/developers/postman">
                   <Button variant="outline" size="lg" className="gap-2 h-12 px-6 text-base">
                     <Terminal className="h-4 w-4" />
-                    Postman Collection
+                    {t("hero.ctaPostman")}
                   </Button>
                 </Link>
               </div>
@@ -242,15 +243,45 @@ export default async function DevelopersApiPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                API Capabilities
+                {t("capabilities.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Everything you need to build identity management into your applications. Full CRUD
-                operations with enterprise-grade security.
+                {t("capabilities.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {apiCapabilities.map((capability) => (
+              {[
+                {
+                  icon: Lock,
+                  title: t("capabilities.oauth"),
+                  description: t("capabilities.oauthDesc"),
+                },
+                {
+                  icon: Users,
+                  title: t("capabilities.users"),
+                  description: t("capabilities.usersDesc"),
+                },
+                {
+                  icon: Key,
+                  title: t("capabilities.tokens"),
+                  description: t("capabilities.tokensDesc"),
+                },
+                {
+                  icon: Shield,
+                  title: t("capabilities.security"),
+                  description: t("capabilities.securityDesc"),
+                },
+                {
+                  icon: Globe,
+                  title: t("capabilities.sessions"),
+                  description: t("capabilities.sessionsDesc"),
+                },
+                {
+                  icon: Activity,
+                  title: t("capabilities.events"),
+                  description: t("capabilities.eventsDesc"),
+                },
+              ].map((capability) => (
                 <div key={capability.title} className="group">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-foreground/5 group-hover:bg-foreground/10 transition-colors">
@@ -272,11 +303,10 @@ export default async function DevelopersApiPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Available Endpoints
+                {t("endpoints.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                RESTful endpoints for all identity management operations. Consistent URL patterns
-                and standard HTTP methods.
+                {t("endpoints.description")}
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -314,11 +344,10 @@ export default async function DevelopersApiPage({
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-balance">
-                  Simple HTTP-Based Integration
+                  {t("code.title")}
                 </h2>
                 <p className="mt-4 text-lg text-background/70 leading-relaxed">
-                  No SDK required. Use any HTTP client in any language. Our API follows REST
-                  conventions and returns JSON for predictable integration.
+                  {t("code.description")}
                 </p>
                 <div className="mt-8 flex flex-wrap gap-2">
                   {["cURL", "Fetch", "Axios", "Requests", "HTTP.rb", "Net::HTTP"].map((tool) => (
@@ -334,7 +363,7 @@ export default async function DevelopersApiPage({
                   <Link href="/docs/api-reference">
                     <Button variant="secondary" size="lg" className="gap-2">
                       <BookOpen className="h-4 w-4" />
-                      Full API Docs
+                      {t("code.cta")}
                     </Button>
                   </Link>
                 </div>
@@ -351,15 +380,27 @@ export default async function DevelopersApiPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Supported OAuth Flows
+                {t("flows.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Industry-standard authentication flows for different application types and use
-                cases.
+                {t("flows.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {authFlows.map((flow) => (
+              {[
+                { icon: Key, name: t("flows.authCode"), description: t("flows.authCodeDesc") },
+                {
+                  icon: Server,
+                  name: t("flows.clientCreds"),
+                  description: t("flows.clientCredsDesc"),
+                },
+                {
+                  icon: RefreshCwIcon,
+                  name: t("flows.refresh"),
+                  description: t("flows.refreshDesc"),
+                },
+                { icon: HardDrive, name: t("flows.device"), description: t("flows.deviceDesc") },
+              ].map((flow) => (
                 <div
                   key={flow.name}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
@@ -381,14 +422,18 @@ export default async function DevelopersApiPage({
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                  Performance & Limits
+                  {t("limits.title")}
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                  Designed for high throughput with generous rate limits. Enterprise plans include
-                  higher limits and dedicated support.
+                  {t("limits.description")}
                 </p>
                 <div className="mt-8 grid grid-cols-2 gap-4">
-                  {limits.map((limit) => (
+                  {[
+                    { value: "1,000", label: t("limits.rate") },
+                    { value: "1 hour", label: t("limits.tokenValidity") },
+                    { value: "30 days", label: t("limits.refreshToken") },
+                    { value: "100", label: t("limits.maxClaims") },
+                  ].map((limit) => (
                     <div key={limit.label} className="p-4 rounded-lg bg-card border border-border">
                       <div className="text-2xl font-semibold text-foreground">{limit.value}</div>
                       <div className="text-sm text-muted-foreground">{limit.label}</div>
@@ -399,17 +444,15 @@ export default async function DevelopersApiPage({
               <div className="grid gap-4">
                 <div className="p-6 rounded-lg bg-card border border-border">
                   <Gauge className="h-8 w-8 text-foreground mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">Sub-15ms Response</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Optimized token validation with connection pooling
-                  </p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    {t("limits.latency")}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">{t("limits.latencyDesc")}</p>
                 </div>
                 <div className="p-6 rounded-lg bg-card border border-border">
                   <Zap className="h-8 w-8 text-foreground mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">Global CDN</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Low-latency access from anywhere in the world
-                  </p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">{t("limits.cdn")}</h3>
+                  <p className="text-sm text-muted-foreground">{t("limits.cdnDesc")}</p>
                 </div>
               </div>
             </div>
@@ -421,15 +464,21 @@ export default async function DevelopersApiPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Developer Experience
+                {t("features.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Built with developers in mind. Predictable responses, clear errors, and
-                comprehensive tooling.
+                {t("features.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {features.map((feature) => (
+              {[
+                { name: t("features.rest"), description: t("features.restDesc") },
+                { name: t("features.json"), description: t("features.jsonDesc") },
+                { name: t("features.pagination"), description: t("features.paginationDesc") },
+                { name: t("features.filtering"), description: t("features.filteringDesc") },
+                { name: t("features.versioning"), description: t("features.versioningDesc") },
+                { name: t("features.openapi"), description: t("features.openapiDesc") },
+              ].map((feature) => (
                 <div
                   key={feature.name}
                   className="flex items-start gap-3 p-6 rounded-lg border border-border bg-card"
@@ -449,13 +498,36 @@ export default async function DevelopersApiPage({
         <section className="py-20 lg:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">API Resources</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+                {t("resources.title")}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                Everything you need to integrate with Aether Identity API.
+                {t("resources.description")}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {resources.map((resource) => (
+              {[
+                {
+                  icon: BookOpen,
+                  title: t("resources.apiRef"),
+                  description: t("resources.apiRefDesc"),
+                },
+                {
+                  icon: ScrollText,
+                  title: t("resources.openapi"),
+                  description: t("resources.openapiDesc"),
+                },
+                {
+                  icon: Terminal,
+                  title: t("resources.postman"),
+                  description: t("resources.postmanDesc"),
+                },
+                {
+                  icon: Code2,
+                  title: t("resources.samples"),
+                  description: t("resources.samplesDesc"),
+                },
+              ].map((resource) => (
                 <div
                   key={resource.title}
                   className="p-6 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors cursor-pointer"
@@ -476,22 +548,19 @@ export default async function DevelopersApiPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-                Start Building with the API
+                {t("cta.title")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Explore our API reference and start integrating Aether Identity into your
-                applications today.
-              </p>
+              <p className="mt-4 text-lg text-muted-foreground">{t("cta.description")}</p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link href="/docs/api-reference">
                   <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                    API Reference
+                    {t("cta.ctaRef")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="/developers/postman">
                   <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                    Try in Postman
+                    {t("cta.ctaPostman")}
                   </Button>
                 </Link>
               </div>
