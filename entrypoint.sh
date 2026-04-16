@@ -5,7 +5,7 @@ set -e
 # Aether Identity - Service Entry Point
 # =============================================================================
 
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/go/bin:/go/bin:/root/go/bin:/root/.local/share/corepack"
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/go/bin:/go/bin:/root/go/bin:$HOME/.local/share/corepack/shims:$HOME/.local/bin"
 export NODE_ENV="${NODE_ENV:-development}"
 
 # =============================================================================
@@ -14,13 +14,15 @@ export NODE_ENV="${NODE_ENV:-development}"
 
 DB_HOST="${DB_HOST:-db}"
 DB_PORT="${DB_PORT:-5432}"
-DB_NAME="${DB_NAME:-etheria_account}"
 DB_USER="${DB_USER:-aether}"
-DB_PASSWORD="${DB_PASSWORD:-password}"
+DB_NAME="${DB_NAME:-etheria_account}"
+DB_PASSWORD="${DB_PASSWORD:-${POSTGRES_PASSWORD:-password}}"
 DB_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
 
 FRONTEND_PORT="${FRONTEND_PORT:-3000}"
 API_PORT="${API_PORT:-8080}"
+
+USE_EMBEDDED_DB="${USE_EMBEDDED_DB:-true}"
 
 # =============================================================================
 # Logging Functions
@@ -57,7 +59,6 @@ display_header() {
     log_info "Frontend: http://localhost:${FRONTEND_PORT}"
     log_info "API:      http://localhost:${API_PORT}"
     log_info "Database: ${DB_HOST}:${DB_PORT}/${DB_NAME}"
-    log_info "Admin:    admin@skygenesisenterprise.com / Admin123!"
     echo ""
 }
 
@@ -67,10 +68,77 @@ display_header() {
 
 setup_pnpm() {
     log_info "Configuring pnpm..."
-    rm -f /usr/local/bin/pnpm
-    corepack enable
-    corepack prepare pnpm@9.15.4 --activate
-    log_success "pnpm configured"
+    
+    if command -v pnpm >/dev/null 2>&1; then
+        log_success "pnpm already available"
+        return 0
+    fi
+    
+    npm install -g pnpm@9.15.4 2>/dev/null || true
+    
+    if command -v pnpm >/dev/null 2>&1; then
+        log_success "pnpm configured"
+        return 0
+    fi
+    
+    log_warn "pnpm not available, will try npx"
+}
+
+ensure_pnpm_path() {
+    if ! command -v pnpm >/dev/null 2>&1; then
+        if [ -f "$HOME/.local/share/corepack/shims/pnpm" ]; then
+            export PATH="$HOME/.local/share/corepack/shims:$PATH"
+        fi
+    fi
+}
+
+# =============================================================================
+# Database Setup
+# =============================================================================
+
+start_postgres() {
+    if [ "$USE_EMBEDDED_DB" != "true" ]; then
+        return 0
+    fi
+
+    log_info "Starting embedded PostgreSQL..."
+
+    mkdir -p /var/lib/postgresql/data
+    mkdir -p /run/postgresql
+    chown -R postgres:postgres /var/lib/postgresql /run/postgresql 2>/dev/null || true
+
+    if [ ! -d "/var/lib/postgresql/data/base" ]; then
+        log_info "Initializing PostgreSQL database..."
+        su - postgres -c "initdb -D /var/lib/postgresql/data" 2>&1 || true
+    fi
+
+    su - postgres -c "pg_ctl -D /var/lib/postgresql/data -l /var/lib/postgresql/logfile start -w" &
+    POSTGRES_PID=$!
+    echo "$POSTGRES_PID" > /tmp/postgres.pid
+
+    log_info "Waiting for PostgreSQL to be ready..."
+
+    MAX_RETRIES=30
+    RETRY_COUNT=0
+
+    while ! su - postgres -c "psql -l" >/dev/null 2>&1; do
+        RETRY_COUNT=$((RETRY_COUNT + 1))
+        if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
+            log_error "PostgreSQL failed to start"
+            if [ -f /var/lib/postgresql/logfile ]; then
+                log_error "PostgreSQL log: $(cat /var/lib/postgresql/logfile)"
+            fi
+            return 1
+        fi
+        sleep 1
+    done
+
+    log_info "Creating database user and schema..."
+    su - postgres -c "psql -c \"CREATE USER ${DB_USER} WITH PASSWORD '${DB_PASSWORD}' CREATEDB;\"" 2>/dev/null || true
+    su - postgres -c "psql -c \"CREATE DATABASE ${DB_NAME} OWNER ${DB_USER};\"" 2>/dev/null || true
+
+    log_success "PostgreSQL started"
+    return 0
 }
 
 # =============================================================================
@@ -78,8 +146,8 @@ setup_pnpm() {
 # =============================================================================
 
 wait_for_database() {
-    if [ "$SKIP_PRISMA_SETUP" = "true" ]; then
-        log_info "Database check skipped (handled by entrypoint script)"
+    if [ "$USE_EMBEDDED_DB" = "true" ]; then
+        log_info "Database already running (embedded)"
         return 0
     fi
 
@@ -88,12 +156,11 @@ wait_for_database() {
     MAX_RETRIES=30
     RETRY_COUNT=0
 
-    while ! PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c '\q' 2>/dev/null; do
+    while ! PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -c '\q' 2>/dev/null; do
         RETRY_COUNT=$((RETRY_COUNT + 1))
 
         if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
-            log_warn "Database not available after ${MAX_RETRIES} attempts"
-            log_warn "Continuing in mock mode - some features may not work"
+            log_error "Database not available after ${MAX_RETRIES} attempts"
             return 1
         fi
 
@@ -109,13 +176,10 @@ wait_for_database() {
 # Prisma Setup
 # =============================================================================
 
-setup_prisma() {
-    if [ "$SKIP_PRISMA_SETUP" = "true" ]; then
-        log_info "Skipping Prisma setup (handled by entrypoint script)"
-        return 0
-    fi
-
+run_migrations() {
     log_info "Setting up Prisma..."
+
+    ensure_pnpm_path
 
     PRISMA_DIR="/app/server/prisma"
 
@@ -129,10 +193,22 @@ setup_prisma() {
 
         if [ -f "schema.prisma" ]; then
             log_info "Generating Prisma client..."
-            npx prisma generate 2>/dev/null || log_warn "Prisma generate failed, continuing..."
+            PGPASSWORD="$DB_PASSWORD" DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}" \
+                npx prisma generate 2>/dev/null || log_warn "Prisma generate failed"
 
-            log_info "Running database migrations..."
-            npx prisma db push --accept-data-loss 2>/dev/null || log_warn "Prisma db push failed, continuing..."
+            log_info "Checking database state..."
+            TABLE_COUNT=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public';" 2>/dev/null || echo "0")
+            TABLE_COUNT=$(echo "$TABLE_COUNT" | xargs)
+
+            if [ -z "$TABLE_COUNT" ] || [ "$TABLE_COUNT" = "0" ]; then
+                log_info "Fresh database detected - creating schema from Prisma..."
+                PGPASSWORD="$DB_PASSWORD" DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}" \
+                    npx prisma db push --accept-data-loss 2>/dev/null || log_warn "Prisma db push failed"
+            else
+                log_info "Database already has $TABLE_COUNT tables - running migrations..."
+                PGPASSWORD="$DB_PASSWORD" DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}" \
+                    npx prisma db push --accept-data-loss 2>/dev/null || log_warn "Prisma db push failed"
+            fi
         fi
 
         log_success "Prisma setup complete"
@@ -149,7 +225,16 @@ start_frontend() {
     log_info "Starting Next.js on port ${FRONTEND_PORT}..."
 
     cd /app/app
-    pnpm next dev -p "$FRONTEND_PORT" -H 0.0.0.0 &
+    
+    PNPM_PATH="/root/.local/share/corepack/pnpm"
+    if [ -f "$PNPM_PATH" ]; then
+        "$PNPM_PATH" next dev -p "$FRONTEND_PORT" -H 0.0.0.0 &
+    elif command -v npx >/dev/null 2>&1; then
+        npx next dev -p "$FRONTEND_PORT" -H 0.0.0.0 &
+    else
+        log_error "Neither pnpm nor npx available"
+        return 1
+    fi
 
     NEXT_PID=$!
     echo "$NEXT_PID" > /tmp/next.pid
@@ -158,7 +243,7 @@ start_frontend() {
 
     # Wait for Next.js to be ready
     log_info "Waiting for Next.js to be ready..."
-    sleep 5
+    sleep 10
 
     # Verify it's running
     if kill -0 "$NEXT_PID" 2>/dev/null; then
@@ -213,6 +298,9 @@ monitor_services() {
         fi
         sleep 5
     done
+    
+    log_info "Monitoring stopped"
+    exit 0
 }
 
 # =============================================================================
@@ -234,6 +322,11 @@ cleanup() {
         rm -f /tmp/api.pid
     fi
 
+    if [ -f /tmp/postgres.pid ]; then
+        kill "$(cat /tmp/postgres.pid)" 2>/dev/null || true
+        rm -f /tmp/postgres.pid
+    fi
+
     log_info "All services stopped"
     exit 0
 }
@@ -248,14 +341,21 @@ main() {
     # Setup
     setup_pnpm
 
-    # Database check
-    if wait_for_database; then
-        setup_prisma
+    # Database setup - START FIRST
+    if [ "$USE_EMBEDDED_DB" = "true" ]; then
+        start_postgres || log_warn "Failed to start embedded database"
+        run_migrations
+    else
+        if wait_for_database; then
+            run_migrations
+        else
+            log_error "Database not available, starting without migrations..."
+        fi
     fi
 
-    # Start services
-    start_frontend || log_warn "Frontend failed to start"
-    start_api || log_warn "API failed to start"
+    # Start services - AFTER DB
+    start_frontend || log_error "Frontend failed to start"
+    start_api || log_error "API failed to start"
 
     # Monitor
     monitor_services

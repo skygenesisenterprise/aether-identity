@@ -44,6 +44,7 @@ RUN apk add --no-cache \
     build-base \
     libc6-compat \
     docker-cli \
+    postgresql \
     postgresql-client \
     openssl
 
@@ -95,6 +96,7 @@ COPY app/i18n/                ./app/i18n/
 COPY app/lib/                 ./app/lib/
 COPY app/public/              ./app/public/
 COPY app/styles/              ./app/styles/
+COPY app/messages/            ./app/messages/
 COPY server/prisma/           ./prisma/
 COPY scripts/                 ./app/scripts/
 

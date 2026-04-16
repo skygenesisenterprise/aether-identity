@@ -192,7 +192,7 @@ export default function UniversalLoginPage() {
   return (
     <div className="min-h-screen bg-muted/30">
       {loading && (
-        <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex items-center justify-center min-h-100">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       )}
