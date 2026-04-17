@@ -39,7 +39,7 @@ RUN cd /app/prisma && npm install --silent && npx prisma generate
 # ══════════════════════════════════════════════════════════════════════════════
 # Stage final — Image de production (Single Container)
 # ══════════════════════════════════════════════════════════════════════════════
-FROM alpine:3.19
+FROM alpine:3.23
 
 # ── Base Dependencies ─────────────────────────────────────────────────────────
 RUN apk add --no-cache \
