@@ -24,15 +24,15 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/enterprise.png",
+        url: "/enterprise-touch-icon.png",
         media: "(prefers-color-scheme: light)",
       },
       {
-        url: "/enterprise.png",
+        url: "/enterprise-touch-icon.png",
         media: "(prefers-color-scheme: dark)",
       },
       {
-        url: "/enterprise.png",
+        url: "/enterprise-touch-icon.png",
         type: "image/svg+xml",
       },
     ],

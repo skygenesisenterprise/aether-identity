@@ -8,9 +8,11 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/skygenesisenterprise/aether-identity/server/src/config"
+	"github.com/skygenesisenterprise/aether-identity/server/src/interfaces"
 	"github.com/skygenesisenterprise/aether-identity/server/src/middleware"
 	"github.com/skygenesisenterprise/aether-identity/server/src/routes"
 	"github.com/skygenesisenterprise/aether-identity/server/src/services"
+	"gorm.io/gorm"
 )
 
 func displayBanner() {
@@ -46,14 +48,84 @@ func main() {
 
 	cfg := config.LoadConfig()
 
-	serviceKeyService := services.NewServiceKeyService(nil)
+	// Initialize database if DSN is provided
+	var dbService interfaces.IDatabaseService
+	var db *gorm.DB
+
+	// Check if we should use embedded database
+	useEmbeddedDB := os.Getenv("USE_EMBEDDED_DB") == "true"
+
+	if useEmbeddedDB {
+		// For embedded DB, use Unix socket or TCP on localhost with the correct credentials
+		dbHost := os.Getenv("DB_HOST")
+		if dbHost == "" {
+			dbHost = "localhost"
+		}
+		dbPort := os.Getenv("DB_PORT")
+		if dbPort == "" {
+			dbPort = "5432"
+		}
+		dbUser := os.Getenv("DB_USER")
+		if dbUser == "" {
+			dbUser = "aether"
+		}
+		dbName := os.Getenv("DB_NAME")
+		if dbName == "" {
+			dbName = "etheria_account"
+		}
+		dbPassword := os.Getenv("DB_PASSWORD")
+		if dbPassword == "" {
+			dbPassword = os.Getenv("POSTGRES_PASSWORD")
+			if dbPassword == "" {
+				dbPassword = "password"
+			}
+		}
+
+		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+			dbHost, dbUser, dbPassword, dbName, dbPort)
+
+		var err error
+		dbService, err = services.NewDatabaseService(dsn)
+		if err != nil {
+			fmt.Printf("\033[1;33m[!] Warning: Failed to connect to embedded database: %v\033[0m\n", err)
+			fmt.Printf("\033[1;33m[!] Running in database-less mode\033[0m\n")
+		} else {
+			db = dbService.GetDB()
+			fmt.Printf("\033[1;32m[✓] Embedded database connected\033[0m\n")
+
+			serviceKeyService := services.NewServiceKeyService(db)
+			if err := serviceKeyService.EnsureSystemKey(cfg.SystemKey); err != nil {
+				fmt.Printf("\033[1;33m[!] Warning: Failed to ensure system key in database: %v\033[0m\n", err)
+			} else {
+				fmt.Printf("\033[1;32m[✓] System key validated in database\033[0m\n")
+			}
+		}
+	} else if dsn := os.Getenv("DATABASE_URL"); dsn != "" {
+		var err error
+		dbService, err = services.NewDatabaseService(dsn)
+		if err != nil {
+			fmt.Printf("\033[1;31m[✗] Failed to connect to database: %v\033[0m\n", err)
+			os.Exit(1)
+		}
+		db = dbService.GetDB()
+		fmt.Printf("\033[1;32m[✓] Database connected\033[0m\n")
+
+		serviceKeyService := services.NewServiceKeyService(db)
+		if err := serviceKeyService.EnsureSystemKey(cfg.SystemKey); err != nil {
+			fmt.Printf("\033[1;33m[!] Warning: Failed to ensure system key in database: %v\033[0m\n", err)
+		} else {
+			fmt.Printf("\033[1;32m[✓] System key validated in database\033[0m\n")
+		}
+	} else {
+		fmt.Printf("\033[1;33m[!] Warning: DATABASE_URL not set and USE_EMBEDDED_DB not enabled, running in database-less mode\033[0m\n")
+	}
 
 	router := gin.New()
 	router.Use(gin.Recovery())
 
 	router.Use(middleware.AdaptiveCORSMiddleware())
 
-	routes.SetupRoutes(router, cfg.SystemKey, serviceKeyService, nil)
+	routes.SetupRoutes(router, cfg.SystemKey, services.NewServiceKeyService(db), dbService)
 
 	addr := fmt.Sprintf(":%s", cfg.Port)
 	fmt.Printf("\033[1;32m[✓] Server starting on %s\033[0m\n", addr)

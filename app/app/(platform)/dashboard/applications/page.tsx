@@ -39,7 +39,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { applicationsApi } from "@/lib/api";
+import { applicationsApi } from "@/lib/api/client";
 import type { ApplicationType } from "@/lib/api/types";
 
 const applicationTypes = [

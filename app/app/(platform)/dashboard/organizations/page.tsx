@@ -32,7 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { organizationsApi } from "@/lib/api";
+import { organizationsApi } from "@/lib/api/client";
 import type { OrganizationType } from "@/lib/api/types";
 
 export default function OrganizationsPage() {

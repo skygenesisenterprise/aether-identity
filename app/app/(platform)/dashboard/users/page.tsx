@@ -52,7 +52,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { usersApi } from "@/lib/api";
+import { usersApi } from "@/lib/api/client";
 import type { DashboardUser } from "@/lib/api/types";
 
 function getStatusIcon(status: string) {

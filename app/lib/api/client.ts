@@ -682,7 +682,7 @@ export const usersApi = {
     if (params?.search) queryParams.search = params.search;
     if (params?.status) queryParams.status = params.status;
     if (params?.connection) queryParams.connection = params.connection;
-    return apiClient.get<DashboardUserListResponse>("/api/v1/users", { params: queryParams });
+    return apiClient.get<DashboardUserListResponse>("/api/v1/admin/users", { params: queryParams });
   },
 
   get: (id: string) => apiClient.get<DashboardUserResponse>(`/api/v1/users/${id}`),

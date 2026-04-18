@@ -188,3 +188,32 @@ func (s *ServiceKeyService) ListServiceKeysByUser(userID uint, page, limit int) 
 
 	return serviceKeys, count, nil
 }
+
+// EnsureSystemKey ensures the system key exists in the database
+func (s *ServiceKeyService) EnsureSystemKey(systemKey string) error {
+	if s.DB == nil {
+		return errors.New("database not initialized")
+	}
+
+	var existingKey models.ServiceKey
+	err := s.DB.Where("key = ? AND name = ?", systemKey, "System Key").First(&existingKey).Error
+
+	if err == nil {
+		return nil
+	}
+
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	systemKeyRecord := &models.ServiceKey{
+		Key:         systemKey,
+		Name:        "System Key",
+		Description: "System key used by the application for internal requests",
+		IsActive:    true,
+		CreatedBy:   0,
+		UpdatedBy:   0,
+	}
+
+	return s.DB.Create(systemKeyRecord).Error
+}

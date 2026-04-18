@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/skygenesisenterprise/aether-identity/server/src/models"
+	"github.com/skygenesisenterprise/aether-identity/server/src/services"
 )
 
 // AppAuthMiddleware est un middleware qui valide la clé système pour les requêtes de l'application
@@ -12,12 +14,16 @@ import (
 // les requêtes internes. La clé système est considérée comme une clé "système" et ne doit
 // être utilisée que par l'application elle-même.
 type AppAuthMiddleware struct {
-	systemKey string
+	systemKey         string
+	serviceKeyService *services.ServiceKeyService
 }
 
 // NewAppAuthMiddleware crée un nouveau AppAuthMiddleware
-func NewAppAuthMiddleware(systemKey string) *AppAuthMiddleware {
-	return &AppAuthMiddleware{systemKey: systemKey}
+func NewAppAuthMiddleware(systemKey string, serviceKeyService *services.ServiceKeyService) *AppAuthMiddleware {
+	return &AppAuthMiddleware{
+		systemKey:         systemKey,
+		serviceKeyService: serviceKeyService,
+	}
 }
 
 // Authenticate valide la clé système à partir de la requête
@@ -50,24 +56,44 @@ func (m *AppAuthMiddleware) Authenticate(c *gin.Context) {
 		return
 	}
 
-	// Vérifier si la clé correspond à la clé système
-	if serviceKey != m.systemKey {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"success": false,
-			"error":   "Invalid system key",
-			"message": "System key is invalid",
-		})
+	// First, try to validate the service key from the database
+	if m.serviceKeyService != nil && m.serviceKeyService.DB != nil {
+		isValid, err := m.serviceKeyService.ValidateServiceKey(serviceKey)
+		if err == nil && isValid {
+			serviceKeyDetails, err := m.serviceKeyService.GetServiceKeyByKey(serviceKey)
+			if err == nil {
+				c.Set("service_key", serviceKeyDetails)
+				c.Set("is_service_key", true)
+				c.Set("is_app_request", true)
+				c.Next()
+				return
+			}
+		}
+	}
+
+	// Fallback: check if this is the system key from config
+	if serviceKey == m.systemKey {
+		systemKeyDetails := &models.ServiceKey{
+			Key:         m.systemKey,
+			Name:        "System Key",
+			Description: "System key used by the application for internal requests",
+			IsActive:    true,
+		}
+		c.Set("service_key", systemKeyDetails)
+		c.Set("is_system_key", true)
+		c.Set("is_app_request", true)
+		c.Next()
 		return
 	}
 
-	// Attacher une indication au contexte que cette requête provient de l'application
-	c.Set("is_app_request", true)
-
-	// Continuer vers le prochain middleware
-	c.Next()
+	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+		"success": false,
+		"error":   "Invalid system key",
+		"message": "System key is invalid",
+	})
 }
 
 // AppAuth est une fonction de commodité pour créer le middleware
-func AppAuth(systemKey string) gin.HandlerFunc {
-	return NewAppAuthMiddleware(systemKey).Authenticate
+func AppAuth(systemKey string, serviceKeyService *services.ServiceKeyService) gin.HandlerFunc {
+	return NewAppAuthMiddleware(systemKey, serviceKeyService).Authenticate
 }

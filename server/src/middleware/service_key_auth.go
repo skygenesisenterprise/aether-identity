@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/skygenesisenterprise/aether-identity/server/src/models"
 	"github.com/skygenesisenterprise/aether-identity/server/src/services"
-	"github.com/gin-gonic/gin"
 )
 
 // ServiceKeyAuthMiddleware is a middleware that validates service keys
@@ -53,9 +53,23 @@ func (m *ServiceKeyAuthMiddleware) Authenticate(c *gin.Context) {
 		return
 	}
 
-	// First check if this is the system key
+	// First, try to validate the service key from the database
+	if m.ServiceKeyService != nil && m.ServiceKeyService.DB != nil {
+		isValid, err := m.ServiceKeyService.ValidateServiceKey(serviceKey)
+		if err == nil && isValid {
+			// Get the service key details from database
+			serviceKeyDetails, err := m.ServiceKeyService.GetServiceKeyByKey(serviceKey)
+			if err == nil {
+				c.Set("service_key", serviceKeyDetails)
+				c.Set("is_service_key", true)
+				c.Next()
+				return
+			}
+		}
+	}
+
+	// Fallback: check if this is the system key from config (for backwards compatibility)
 	if serviceKey == m.systemKey {
-		// Create a system key object to attach to the context
 		systemKeyDetails := &models.ServiceKey{
 			Key:         m.systemKey,
 			Name:        "System Key (Application)",
@@ -68,42 +82,11 @@ func (m *ServiceKeyAuthMiddleware) Authenticate(c *gin.Context) {
 		return
 	}
 
-	// Validate the service key
-	isValid, err := m.ServiceKeyService.ValidateServiceKey(serviceKey)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"success": false,
-			"error":   "Invalid service key",
-			"message": err.Error(),
-		})
-		return
-	}
-
-	if !isValid {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"success": false,
-			"error":   "Invalid service key",
-			"message": "Service key is invalid or expired",
-		})
-		return
-	}
-
-	// Get the service key details to attach to the context
-	serviceKeyDetails, err := m.ServiceKeyService.GetServiceKeyByKey(serviceKey)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"error":   "Internal server error",
-			"message": "Failed to retrieve service key details",
-		})
-		return
-	}
-
-	// Attach the service key to the context
-	c.Set("service_key", serviceKeyDetails)
-
-	// Continue to the next middleware
-	c.Next()
+	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+		"success": false,
+		"error":   "Invalid service key",
+		"message": "Service key is invalid or expired",
+	})
 }
 
 // ServiceKeyAuth is a convenience function to create the middleware

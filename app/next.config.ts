@@ -6,6 +6,8 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 const isProduction = process.env.NODE_ENV === "production";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["identity.skygenesisenterprise.com"],
+
   reactStrictMode: true,
   poweredByHeader: false,
 

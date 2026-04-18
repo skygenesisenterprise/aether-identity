@@ -19,8 +19,15 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 		apiV1.GET("/health", controllers.HealthCheck)
 		apiV1.HEAD("/health", controllers.HealthCheck)
 
+		authPublic := apiV1.Group("/auth")
+		authPublic.Use(middleware.DatabaseMiddleware(dbService))
+		{
+			authPublic.POST("/login", controllers.Login)
+			authPublic.POST("/register", controllers.Register)
+		}
+
 		protectedV1 := apiV1.Group("")
-		protectedV1.Use(middleware.AppAuth(systemKey))
+		protectedV1.Use(middleware.AppAuth(systemKey, serviceKeyService))
 		protectedV1.Use(middleware.DatabaseMiddleware(dbService))
 		{
 			protectedV1.GET("/check-email", controllers.CheckEmailAvailability)
@@ -39,8 +46,6 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 			authRoutes := protectedV1.Group("/auth")
 			authRoutes.Use(middleware.ServiceKeyAuth(serviceKeyService, systemKey))
 			{
-				authRoutes.POST("/login", controllers.Login)
-				authRoutes.POST("/register", controllers.Register)
 				authRoutes.POST("/logout", controllers.Logout)
 				authRoutes.POST("/refresh", controllers.RefreshToken)
 				authRoutes.POST("/token", controllers.Token)
@@ -437,7 +442,7 @@ func SetupRoutes(router *gin.Engine, systemKey string, serviceKeyService *servic
 	}
 
 	appRoutes := router.Group("/api/v1/app")
-	appRoutes.Use(middleware.AppAuth(systemKey))
+	appRoutes.Use(middleware.AppAuth(systemKey, serviceKeyService))
 	{
 		appRoutes.GET("/health", controllers.HealthCheck)
 		appRoutes.GET("/userinfo", middleware.AuthMiddleware(), controllers.UserInfo)
