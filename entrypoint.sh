@@ -110,6 +110,14 @@ start_postgres() {
     if [ ! -d "/var/lib/postgresql/data/base" ]; then
         log_info "Initializing PostgreSQL database..."
         su - postgres -c "initdb -D /var/lib/postgresql/data" 2>&1 || true
+    else
+        if [ -f "/var/lib/postgresql/data/postmaster.pid" ]; then
+            STALE_PID=$(cat /var/lib/postgresql/data/postmaster.pid 2>/dev/null)
+            if [ -n "$STALE_PID" ] && ! kill -0 "$STALE_PID" 2>/dev/null; then
+                log_warn "Removing stale postmaster.pid..."
+                rm -f /var/lib/postgresql/data/postmaster.pid
+            fi
+        fi
     fi
 
     su - postgres -c "pg_ctl -D /var/lib/postgresql/data -l /var/lib/postgresql/logfile start -w" &

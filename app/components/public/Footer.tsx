@@ -236,6 +236,7 @@ export async function Footer({ locale: initialLocale }: FooterProps) {
     { name: t("cookiePolicy"), href: `${prefix}/legal/cookies` },
     { name: "GDPR", href: `${prefix}/legal/gdpr` },
     { name: t("security"), href: `${prefix}/legal/security` },
+    { name: "licence", href: `${prefix}/legal/licence` },
   ];
 
   const socialLinks = [

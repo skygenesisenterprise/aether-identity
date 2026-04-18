@@ -1,7 +1,7 @@
 # ══════════════════════════════════════════════════════════════════════════════
 # Stage 1 — Go + Air
 # ══════════════════════════════════════════════════════════════════════════════
-FROM golang:1.26-alpine AS go-builder
+FROM golang:1.25-alpine AS go-builder
 
 RUN apk add --no-cache gcc musl-dev
 
@@ -23,7 +23,7 @@ FROM node:25-alpine AS node-builder
 
 WORKDIR /app/app
 
-RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+RUN npm install -g corepack --force && corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 COPY app/package.json app/pnpm-lock.yaml* ./
 
@@ -64,7 +64,7 @@ ENV GOPATH="/go"
 ENV PATH="${PATH}:/root/.local/share/corepack"
 
 # ── pnpm (requis pour lancer next dev) ───────────────────────────────────────
-RUN corepack enable && corepack prepare pnpm@9.15.4 --activate && \
+RUN npm install -g corepack --force && corepack enable && corepack prepare pnpm@9.15.4 --activate && \
     ln -sf /root/.local/share/corepack/pnpm /usr/local/bin/pnpm
 
 WORKDIR /app

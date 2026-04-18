@@ -7,8 +7,6 @@ import { GitHubIcon } from "@/components/ui/icons/GitHubIcon";
 import { FaqAccordion } from "@/components/public/FaqAccordion";
 import { CodeBlock } from "@/components/public/CodeBlock";
 import {
-  Shield,
-  Lock,
   Fingerprint,
   Smartphone,
   Mail,
@@ -16,12 +14,10 @@ import {
   Key,
   ArrowRight,
   Eye,
-  EyeOff,
   CheckCircle2,
   X,
   Gem,
   LockOpen,
-  RefreshCw,
   UserCheck,
   AlertTriangle,
   Zap,
@@ -307,7 +303,7 @@ export default async function MFAPage({ params }: { params: Promise<{ locale: st
                       Feature
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-semibold text-foreground">
-                      Aether MFA
+                      Identity
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-medium text-muted-foreground">
                       Okta

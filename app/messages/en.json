@@ -28,19 +28,6 @@
     "yes": "Yes",
     "no": "No"
   },
-  "Home": {
-    "hero": {
-      "title": "The Etheria Times",
-      "subtitle": "Breaking news and in-depth coverage"
-    },
-    "latestNews": "Latest News",
-    "trending": "Trending",
-    "readMore": "Read More"
-  },
-  "Meta": {
-    "title": "The Etheria Times - Live news and continuous information",
-    "description": "All the news live, news and information in continuous: politics, economy, society, culture, sports and international on The Etheria Times."
-  },
   "Public": {
     "hero": {
       "badge": "Open Source Identity Platform",
@@ -197,6 +184,111 @@
       "getStarted": "Get Started",
       "contactSales": "Contact Sales"
     },
+    "pricing": {
+      "hero": {
+        "title": "Simple, transparent pricing",
+        "description": "Choose the plan that fits your organization. The pricing below applies to our SaaS Cloud solutions. All plans also include the option to self-host Aether Identity completely free of charge with no per-authentication fees."
+      },
+      "tiers": {
+        "community": {
+          "name": "Community",
+          "description": "Perfect for small teams and personal projects",
+          "price": "Free",
+          "period": "",
+          "cta": "Get Started"
+        },
+        "professional": {
+          "name": "Professional",
+          "description": "For growing organizations needing more power",
+          "price": "€99",
+          "period": "/year",
+          "cta": "Start Free Trial"
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "description": "For large organizations with advanced needs",
+          "price": "Custom",
+          "period": "",
+          "cta": "Contact Sales"
+        },
+        "selfHosted": {
+          "name": "Self-Hosted",
+          "description": "Deploy on your own infrastructure. Full control.",
+          "price": "Free",
+          "period": "",
+          "cta": "Download",
+          "badge": "Open Source"
+        },
+        "mostPopular": "Most Popular"
+      },
+      "features": {
+        "users100": "Up to 100 users",
+        "users10000": "Up to 10,000 users",
+        "usersUnlimited": "Unlimited users",
+        "oauth": "OAuth 2.0 / OIDC",
+        "mfaBasic": "Basic MFA (TOTP)",
+        "mfaAdvanced": "Advanced MFA (WebAuthn, SMS)",
+        "mfaAdvancedFull": "Advanced MFA (WebAuthn, SMS, biometrics)",
+        "mfaAll": "Advanced MFA (all methods)",
+        "supportEmail": "Email support",
+        "supportPriority": "Priority email support",
+        "supportDedicated": "24/7 dedicated support",
+        "supportCommunity": "Community support",
+        "docsBasic": "Community documentation",
+        "docsFull": "Full documentation access",
+        "docsCustom": "Custom documentation",
+        "deploySelf": "Self-hosted deployment",
+        "deployBoth": "Self-hosted or cloud",
+        "auditBasic": "Basic audit logs (7 days)",
+        "auditExtended": "Extended audit logs (90 days)",
+        "auditUnlimited": "Unlimited audit logs",
+        "ssoBasic": "SSO connections",
+        "sso50": "Up to 50 SSO connections",
+        "ssoUnlimited": "Unlimited SSO connections",
+        "brandingCustom": "Custom branding",
+        "brandingFull": "Full white-label branding",
+        "slaNone": "No SLA (self-managed)",
+        "sla99": "SLA guarantee (99.9%)",
+        "slaHigh": "SLA guarantee (99.99%)",
+        "supportPriorityExcl": "Priority support",
+        "successManager": "Dedicated success manager"
+      },
+      "hrefs": {
+        "community": "/docs",
+        "professional": "/trial",
+        "enterprise": "/contact",
+        "selfHosted": "/docs"
+      },
+      "faq": {
+        "title": "Frequently asked questions",
+        "switchPlans": {
+          "question": "Can I switch plans later?",
+          "answer": "Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately and billing is prorated."
+        },
+        "paymentMethods": {
+          "question": "What payment methods do you accept?",
+          "answer": "We accept all major credit cards, bank transfers, and invoices for Enterprise customers. All payments are processed securely."
+        },
+        "freeTrial": {
+          "question": "Is there a free trial?",
+          "answer": "Yes, the Professional plan includes a 14-day free trial with full access to all features. No credit card required."
+        },
+        "exceedLimit": {
+          "question": "What happens when I exceed my user limit?",
+          "answer": "We will notify you when you approach your limit. You can upgrade to a higher plan or purchase additional user packs at any time."
+        },
+        "refunds": {
+          "question": "Do you offer refunds?",
+          "answer": "We offer a 30-day money-back guarantee for all paid plans. If you are not satisfied, contact us for a full refund."
+        }
+      },
+      "cta": {
+        "title": "Ready to get started?",
+        "description": "Deploy Aether Identity in minutes. No credit card required for the Community plan.",
+        "getStarted": "Get Started",
+        "contactSales": "Contact Sales"
+      }
+    },
     "footer": {
       "product": "Product",
       "solutions": "Solutions",
@@ -212,6 +304,7 @@
       "privacy": "Privacy Policy",
       "terms": "Terms of Service",
       "security": "Security",
+      "license": "License",
       "copyright": "© 2026 Aether Identity. All rights reserved.",
       "enterpriseproprietary": "A Sky Genesis Enterprise Product",
       "documentation": "Documentation",
@@ -3724,6 +3817,207 @@
       "description": "Explore our API reference and start integrating Aether Identity into your applications today.",
       "ctaRef": "API Reference",
       "ctaPostman": "Try in Postman"
+    }
+  },
+  "License": {
+    "badge": "MIT License",
+    "heroTitle": "MIT License",
+    "heroDescription": "Aether Identity is open source and distributed under the MIT License, one of the most permissive licenses available.",
+    "ctaGithub": "View on GitHub",
+    "ctaTerms": "View Terms of Service",
+    "aboutTitle": "About the MIT License",
+    "aboutDescription": "The MIT License is a permissive license that allows users to do anything with your code with proper attribution and no liability.",
+    "freeTitle": "Free to Use",
+    "freeDesc": "Use Aether Identity in personal and commercial projects at no cost.",
+    "openSourceTitle": "Open Source",
+    "openDesc": "Access the full source code and contribute to the project.",
+    "permissiveTitle": "Permissive",
+    "permissiveDesc": "Minimal restrictions - use, modify, and distribute with attribution.",
+    "licenseTextTitle": "License Text",
+    "licenseText": "MIT License\n\nCopyright (c) 2025 Sky Genesis Enterprise\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.",
+    "permissionsTitle": "You Can",
+    "permissionsDescription": "The MIT License grants you the following freedoms:",
+    "permCommercial": "Commercial Use",
+    "permCommercialDesc": "Use the software in commercial products and services.",
+    "permModify": "Modify",
+    "permModifyDesc": "Modify, adapt, and create derivative works.",
+    "permDistribute": "Distribute",
+    "permDistributeDesc": "Distribute, sublicense, and sell copies.",
+    "permPrivate": "Private Use",
+    "permPrivateDesc": "Use the software for private projects.",
+    "conditionsTitle": "Conditions",
+    "conditionsDescription": "The MIT License has minimal conditions:",
+    "condCopyright": "Copyright Notice",
+    "condCopyrightDesc": "You must include the original copyright notice in all copies.",
+    "condWarranty": "No Warranty",
+    "condWarrantyDesc": "The software is provided without any warranty.",
+    "questionsTitle": "Questions?",
+    "questionsDescription": "If you have questions about the license, please contact us.",
+    "contactButton": "Contact Us"
+  },
+  "Enterprise": {
+    "hero": {
+      "badge": "Enterprise Solutions",
+      "title": "Scalable Identity for Enterprise",
+      "description": "Get dedicated infrastructure, priority support, and advanced compliance features for your organization.",
+      "ctaContact": "Contact Sales",
+      "ctaTrial": "Start Free Trial"
+    },
+    "features": {
+      "title": "Enterprise Features",
+      "description": "Everything you need for enterprise-grade identity management.",
+      "dedicatedInfrastructure": {
+        "title": "Dedicated Infrastructure",
+        "description": "Private clusters with guaranteed resources and isolation."
+      },
+      "prioritizedSupport": {
+        "title": "24/7 Priority Support",
+        "description": "Direct access to our enterprise support team, around the clock."
+      },
+      "compliance": {
+        "title": "Advanced Compliance",
+        "description": "SOC 2, HIPAA, FedRAMP, and custom compliance reports."
+      },
+      "performance": {
+        "title": "Performance SLAs",
+        "description": "99.99% uptime guarantee with dedicated infrastructure."
+      },
+      "advancedAuth": {
+        "title": "Advanced Authentication",
+        "description": "FIDO2, passkeys, certificate-based auth, and more."
+      },
+      "audit": {
+        "title": "Audit & Reporting",
+        "description": "Comprehensive logs, reports, and compliance exports."
+      }
+    },
+    "plans": {
+      "title": "Pricing Plans",
+      "description": "Flexible plans to match your organization's needs.",
+      "mostPopular": "Most Popular",
+      "business": {
+        "name": "Business",
+        "price": "Custom",
+        "description": "For growing organizations",
+        "feature1": "Up to 100k authentications/mo",
+        "feature2": "Email support",
+        "feature3": "Standard compliance",
+        "feature4": "Basic analytics",
+        "cta": "Contact Sales"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": "Custom",
+        "description": "For large organizations",
+        "feature1": "Unlimited authentications",
+        "feature2": "24/7 priority support",
+        "feature3": "Advanced compliance",
+        "feature4": "Dedicated infrastructure",
+        "feature5": "Custom SLAs",
+        "cta": "Contact Sales"
+      }
+    },
+    "benefits": {
+      "tt": {
+        "title": "Faster Time to Value",
+        "description": "Get up and running in days, not months."
+      },
+      "scaling": {
+        "title": "Seamless Scaling",
+        "description": "Automatically scale with your user base."
+      },
+      "billing": {
+        "title": "Flexible Billing",
+        "description": "Annual or multi-year contracts available."
+      }
+    },
+    "compliance": {
+      "title": "Compliance Certifications",
+      "description": "Meet your industry's regulatory requirements.",
+      "soc2": "SOC 2 Type II",
+      "gdpr": "GDPR",
+      "hipaa": "HIPAA",
+      "iso27001": "ISO 27001",
+      "pci": "PCI DSS",
+      "pciDss": "FedRAMP Ready"
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "description": "Talk to our team about your enterprise needs.",
+      "contactSales": "Contact Sales",
+      "viewDocs": "View Documentation"
+    }
+  },
+  "Trial": {
+    "hero": {
+      "badge": "Free Trial",
+      "title": "Try Aether for Free",
+      "description": "Get full access to all features for 14 days. No credit card required.",
+      "ctaStart": "Quick Start Guide",
+      "ctaEnterprise": "View Enterprise Plans"
+    },
+    "features": {
+      "title": "What's Included",
+      "description": "Everything you need to evaluate Aether.",
+      "fullAccess": {
+        "title": "Full Feature Access",
+        "description": "All enterprise features available during the trial."
+      },
+      "duration": {
+        "title": "14 Days",
+        "description": "Plenty of time to test all use cases."
+      },
+      "teamSize": {
+        "title": "Up to 10 Users",
+        "description": "Invite your team to test collaboration."
+      },
+      "apis": {
+        "title": "Full API Access",
+        "description": "Test all integrations and SDKs."
+      }
+    },
+    "code": {
+      "title": "Get Started in Minutes",
+      "description": "Simple setup with our quickstart guides and comprehensive SDKs.",
+      "cta": "View All Quickstarts"
+    },
+    "deployment": {
+      "title": "Run It Your Way",
+      "description": "Deploy locally, in Docker, or use our managed cloud during trial.",
+      "local": {
+        "title": "Local Development",
+        "description": "Run Aether locally for full control."
+      },
+      "docker": {
+        "title": "Docker",
+        "description": "Single command deployment with Docker."
+      },
+      "cloud": {
+        "title": "Managed Cloud",
+        "description": "Try our hosted trial environment."
+      }
+    },
+    "included": {
+      "title": "Everything Included",
+      "description": "All core features are available during your trial.",
+      "oauth": "OAuth 2.0 / OpenID Connect",
+      "oauthDesc": "Full standards-compliant implementation",
+      "mfa": "Multi-Factor Authentication",
+      "mfaDesc": "TOTP, SMS, Email authenticators",
+      "federation": "Identity Federation",
+      "federationDesc": "SAML, OIDC, OAuth providers",
+      "rbac": "Role-Based Access Control",
+      "rbacDesc": "Granular permissions and policies",
+      "sessions": "Session Management",
+      "sessionsDesc": "Device management and force logout",
+      "docs": "Documentation",
+      "docsDesc": "Comprehensive guides and APIs"
+    },
+    "cta": {
+      "title": "Start Your Free Trial",
+      "description": "Get full access to Aether for 14 days.",
+      "getStarted": "View Quickstarts",
+      "contact": "Have Questions?"
     }
   }
 }

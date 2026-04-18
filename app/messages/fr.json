@@ -28,19 +28,7 @@
     "yes": "Oui",
     "no": "Non"
   },
-  "Home": {
-    "hero": {
-      "title": "The Etheria Times",
-      "subtitle": "Actualités en direct et analyses approfondies"
-    },
-    "latestNews": "Dernières actualités",
-    "trending": "Tendances",
-    "readMore": "Lire la suite"
-  },
-  "Meta": {
-    "title": "The Etheria Times - Actualités en direct et info en continu",
-    "description": "Toute l'actualité en direct, les news et infos en continu : politique, économie, société, culture, sport et international sur The Etheria Times."
-  },
+
   "Public": {
     "hero": {
       "badge": "Plateforme d'Identité Open Source",
@@ -197,6 +185,111 @@
       "getStarted": "Commencer",
       "contactSales": "Contacter les Ventes"
     },
+    "pricing": {
+      "hero": {
+        "title": "Tarifs simples et transparents",
+        "description": "Choisissez le tarif qui correspond à votre organisation. Les tarifs ci-dessous s'appliquent à nos solutions Cloud SaaS. Tous les tarifs incluent également la possibilité d'auto-héberger Aether Identity gratuitement sans frais par authentification."
+      },
+      "tiers": {
+        "community": {
+          "name": "Communauté",
+          "description": "Parfait pour les petites équipes et projets personnels",
+          "price": "Gratuit",
+          "period": "",
+          "cta": "Commencer"
+        },
+        "professional": {
+          "name": "Professionnel",
+          "description": "Pour les organisations en croissance ayant besoin de plus de puissance",
+          "price": "99€",
+          "period": "/an",
+          "cta": "Essai Gratuit"
+        },
+        "enterprise": {
+          "name": "Entreprise",
+          "description": "Pour les grandes organisations avec des besoins avancés",
+          "price": "Sur devis",
+          "period": "",
+          "cta": "Contacter les Ventes"
+        },
+        "selfHosted": {
+          "name": "Auto-Hébergé",
+          "description": "Déployez sur votre propre infrastructure. Contrôle total.",
+          "price": "Gratuit",
+          "period": "",
+          "cta": "Télécharger",
+          "badge": "Open Source"
+        },
+        "mostPopular": "Plus Populaire"
+      },
+      "features": {
+        "users100": "Jusqu'à 100 utilisateurs",
+        "users10000": "Jusqu'à 10 000 utilisateurs",
+        "usersUnlimited": "Utilisateurs illimités",
+        "oauth": "OAuth 2.0 / OIDC",
+        "mfaBasic": "MFA basique (TOTP)",
+        "mfaAdvanced": "MFA avancé (WebAuthn, SMS)",
+        "mfaAdvancedFull": "MFA avancé (WebAuthn, SMS, biométrie)",
+        "mfaAll": "MFA avancé (toutes méthodes)",
+        "supportEmail": "Support email",
+        "supportPriority": "Support email prioritaire",
+        "supportDedicated": "Support dédié 24/7",
+        "supportCommunity": "Support communautaire",
+        "docsBasic": "Documentation communautaire",
+        "docsFull": "Accès documentation complet",
+        "docsCustom": "Documentation personnalisée",
+        "deploySelf": "Déploiement auto-hébergé",
+        "deployBoth": "Auto-hébergé ou cloud",
+        "auditBasic": "Journaux d'audit basiques (7 jours)",
+        "auditExtended": "Journaux d'audit étendus (90 jours)",
+        "auditUnlimited": "Journaux d'audit illimités",
+        "ssoBasic": "Connexions SSO",
+        "sso50": "Jusqu'à 50 connexions SSO",
+        "ssoUnlimited": "Connexions SSO illimitées",
+        "brandingCustom": "Personnalisation de marque",
+        "brandingFull": "Marque blanche complète",
+        "slaNone": "Pas de SLA (gestion auto)",
+        "sla99": "Garantie SLA (99,9%)",
+        "slaHigh": "Garantie SLA (99,99%)",
+        "supportPriorityExcl": "Support prioritaire",
+        "successManager": "Responsable de compte dédié"
+      },
+      "hrefs": {
+        "community": "/fr/docs",
+        "professional": "/fr/trial",
+        "enterprise": "/fr/contact",
+        "selfHosted": "/fr/docs"
+      },
+      "faq": {
+        "title": "Questions fréquentes",
+        "switchPlans": {
+          "question": "Puis-je changer de tarif plus tard?",
+          "answer": "Oui, vous pouvez passer à un tarif supérieur ou inférieur à tout moment. Les modifications prennent effet immédiatement et la facturation est au prorata."
+        },
+        "paymentMethods": {
+          "question": "Quels moyens de paiement acceptez-vous?",
+          "answer": "Nous acceptons toutes les principales cartes de crédit, les virements bancaires et les factures pour les clients Entreprise. Tous les paiements sont traités de manière sécurisée."
+        },
+        "freeTrial": {
+          "question": "Y a-t-il un essai gratuit?",
+          "answer": "Oui, le tarif Professionnel inclut un essai gratuit de 14 jours avec accès complet à toutes les fonctionnalités. Aucune carte de crédit requise."
+        },
+        "exceedLimit": {
+          "question": "Que se passe-t-il lorsque je dépasse ma limite d'utilisateurs?",
+          "answer": "Nous vous préviendrons lorsque vous approchez de votre limite. Vous pouvez passer à un tarif supérieur ou acheter des packs d'utilisateurs supplémentaires à tout moment."
+        },
+        "refunds": {
+          "question": "Proposez-vous des remboursements?",
+          "answer": "Nous proposons une garantie remboursement de 30 jours pour tous les tarifs payants. Si vous n'êtes pas satisfait, contactez-nous pour un remboursement complet."
+        }
+      },
+      "cta": {
+        "title": "Prêt à commencer?",
+        "description": "Déployez Aether Identity en minutes. Aucune carte de crédit requise pour le tarif Communauté.",
+        "getStarted": "Commencer",
+        "contactSales": "Contacter les Ventes"
+      }
+    },
     "footer": {
       "product": "Produit",
       "solutions": "Solutions",
@@ -212,6 +305,7 @@
       "privacy": "Politique de Confidentialité",
       "terms": "Conditions d'Utilisation",
       "security": "Sécurité",
+      "license": "Licence",
       "copyright": "© 2026 Aether Identity. Tous droits réservés.",
       "enterpriseproprietary": "Un Produit de Sky Genesis Enterprise",
       "documentation": "Documentation",
@@ -944,7 +1038,8 @@
       "title": "Identité d'Entreprise, Sans Compromis",
       "description": "Gestion d'identité complète pour grandes organisations. Support dédié, mise à l'échelle illimitée et certifications de sécurité demanded par votre industrie.",
       "ctaPlans": "Voir les Tarifs",
-      "ctaContact": "Contacter les Ventes"
+      "ctaContact": "Contacter les Ventes",
+      "ctaTrial": "Essai Gratuit"
     },
     "features": {
       "title": "Conçu pour les Entreprises",
@@ -960,7 +1055,45 @@
       "mfa": "MFA Avancé",
       "mfaDesc": "TOTP, WebAuthn, notifications push, SMS et vérification par email avec politiques adaptatives basées sur les risques.",
       "federation": "Fédération d'Utilisateurs",
-      "federationDesc": "Intégration transparente avec Active Directory, LDAP et fournisseurs d'identité externes."
+      "federationDesc": "Intégration transparente avec Active Directory, LDAP et fournisseurs d'identité externes.",
+      "dedicatedInfrastructure": {
+        "title": "Infrastructure Dédiée",
+        "description": "Clusters privés avec ressources garanties et isolation."
+      },
+      "prioritizedSupport": {
+        "title": "Support Prioritaire 24/7",
+        "description": "Accès direct à notre équipe de support entreprise, à tout moment."
+      },
+      "compliance": {
+        "title": "Conformité Avancée",
+        "description": "SOC 2, HIPAA, FedRAMP et rapports de conformité personnalisés."
+      },
+      "performance": {
+        "title": "Contrats de Performance",
+        "description": "Garantie de disponibilité 99,99% avec infrastructure dédiée."
+      },
+      "advancedAuth": {
+        "title": "Authentification Avancée",
+        "description": "FIDO2, passkeys, authentification par certificat, et plus."
+      },
+      "audit": {
+        "title": "Audit et Rapports",
+        "description": "Journaux complets, rapports et exports de conformité."
+      }
+    },
+    "benefits": {
+      "tt": {
+        "title": "Valeur plus Rapide",
+        "description": "Lancez-vous en quelques jours, pas en mois."
+      },
+      "scaling": {
+        "title": "Mise à l'Échelle Simplifiée",
+        "description": "Scalez automatiquement avec votre base d'utilisateurs."
+      },
+      "billing": {
+        "title": "Facturation Flexible",
+        "description": "Contrats annuels ou pluriannuels disponibles."
+      }
     },
     "included": {
       "title": "Tout Inclus",
@@ -1097,7 +1230,9 @@
     "cta": {
       "title": "Prêt à Commencer?",
       "description": "Contactez notre équipe entreprise pour discuter de vos besoins de gestion d'identité.",
-      "cta": "Contacter les Ventes"
+      "cta": "Contacter les Ventes",
+      "contactSales": "Contacter les Ventes",
+      "viewDocs": "Voir la Documentation"
     }
   },
   "SSO": {
@@ -2785,24 +2920,24 @@
       "title": "Questions Fréquentes",
       "description": "Questions courantes sur la gestion d'identité dans la santé.",
       "hipaa": {
-        "title": "Aether est-il certifié HIPAA?",
+        "title": "Aether Identity est-il certifié HIPAA?",
         "answer": "Aether Identity est conçu pour répondre aux exigences de la règle de sécurité HIPAA. Nous fournissons un accord de partenaire commercial (BAA) pour tous les déploiements de santé et pouvons vous aider avec votre documentation de conformité."
       },
       "ehr": {
         "title": "Pouvons-nous nous intégrer à notre système EHR existant?",
-        "answer": "Oui, Aether supporte les intégrations SAML 2.0, OAuth 2.0/OpenID Connect et SCIM avec toutes les plateformes EHR majeures incluant Epic, Cerner, Allscripts et MEDITECH."
+        "answer": "Oui, Aether Identity supporte les intégrations SAML 2.0, OAuth 2.0/OpenID Connect et SCIM avec toutes les plateformes EHR majeures incluant Epic, Cerner, Allscripts et MEDITECH."
       },
       "consent": {
         "title": "Comment gérez-vous le consentement des patients pour le partage de données?",
-        "answer": "Aether supporte la gestion granulaire du consentement à travers des politiques basées sur les attributs. Vous pouvez définir quels types de données peuvent être partagés avec quelles parties en fonction des dossiers de consentement des patients."
+        "answer": "Aether Identity supporte la gestion granulaire du consentement à travers des politiques basées sur les attributs. Vous pouvez définir quels types de données peuvent être partagés avec quelles parties en fonction des dossiers de consentement des patients."
       },
       "credentials": {
         "title": "Le personnel de santé peut-il utiliser ses identifiants hospitaliers existants?",
-        "answer": "Oui, Aether supporte la fédération d'utilisateurs avec Active Directory, LDAP et les systèmes IAM existants. Le personnel peut continuer à utiliser ses identifiants hospitaliers tout en gagnant un accès SSO aux applications cliniques."
+        "answer": "Oui, Aether Identity supporte la fédération d'utilisateurs avec Active Directory, LDAP et les systèmes IAM existants. Le personnel peut continuer à utiliser ses identifiants hospitaliers tout en gagnant un accès SSO aux applications cliniques."
       },
       "emergency": {
         "title": "Offrez-vous des procédures d'accès d'urgence (break-glass)?",
-        "answer": "Oui, Aether supporte les flux de travail d'accès d'urgence avec approvisionnement de privilèges élevé, approbation à deux acteurs et documentation post-accès obligatoire."
+        "answer": "Oui, Aether Identity supporte les flux de travail d'accès d'urgence avec approvisionnement de privilèges élevé, approbation à deux acteurs et documentation post-accès obligatoire."
       }
     },
     "resources": {
@@ -3740,6 +3875,114 @@
       "description": "Explorez notre référence API et commencez à intégrer Aether Identity dans vos applications aujourd'hui.",
       "ctaRef": "Référence API",
       "ctaPostman": "Essayer sur Postman"
+    }
+  },
+  "License": {
+    "badge": "Licence MIT",
+    "heroTitle": "Licence MIT",
+    "heroDescription": "Aether Identity est open source et distribué sous la Licence MIT, l'une des licences les plus permissives disponibles.",
+    "ctaGithub": "Voir sur GitHub",
+    "ctaTerms": "Voir les Conditions d'Utilisation",
+    "aboutTitle": "À Propos de la Licence MIT",
+    "aboutDescription": "La Licence MIT est une licence permissive qui permet aux utilisateurs de faire ce qu'ils veulent avec votre code avec une attribution appropriée et sans responsabilité.",
+    "freeTitle": "Utilisation Gratuite",
+    "freeDesc": "Utilisez Aether Identity dans des projets personnels et commerciaux sans frais.",
+    "openSourceTitle": "Open Source",
+    "openDesc": "Accédez au code source complet et contribuez au projet.",
+    "permissiveTitle": "Permissive",
+    "permissiveDesc": "Restrictions minimales - utilisez, modifiez et distribuez avec attribution.",
+    "licenseTextTitle": "Texte de la Licence",
+    "licenseText": "Licence MIT\n\nCopyright (c) 2025 Sky Genesis Enterprise\n\nPermission est hereby accordée, gratuitement, à toute personne obtient une copie de ce logiciel et des fichiers de documentation associés (le « Logiciel »), pour dealt dans le Logiciel sans restriction, y compris sans limitation les droits d'utiliser, copier, modifier, fusionner, publier, distribuer, sous-licencier et/ou vendre des copies du Logiciel, et pour permettre aux personnes auxquelles le Logiciel est fourni de le faire, sous réserve des conditions suivantes :\n\nL'avis de copyright ci-dessus et cet avis de permission doivent être inclus dans toutes les copies ou parties substantielles du Logiciel.\n\nLE LOGICIEL EST FOURNI « EN L'ÉTAT », SANS GARANTIE D'AUCUN TYPE, EXPRESSE OU IMPLICITE, Y COMPRIS MAIS SANS S'Y LIMITER LES GARANTIES DE QUALITÉ MARCHANDE, D'ADÉQUATION À UN USAGE PARTICULIER ET D'ABSENCE DE CONTREFASON. EN AUCUN CAS LES AUTEURS OU LES DÉTENTEURS DU COPYRIGHT NE SERONT RESPONSABLES DE TOUT RÉCLAMATION, DOMMAGE OU AUTRE RESPONSABILITÉ, QUE CE SOIT DANS UNE ACTION EN RESPONSABILITÉ CONTRACTUELLE, DÉLICTUELLE OU AUTRE, DÉCOULANT DE, OU EN CONNECTION AVEC LE LOGICIEL OU L'UTILISATION OU AUTRES TRANSACTIONS DANS LE LOGICIEL.",
+    "permissionsTitle": "Vous Pouvez",
+    "permissionsDescription": "La Licence MIT vous accorde les libertés suivantes :",
+    "permCommercial": "Usage Commercial",
+    "permCommercialDesc": "Utiliser le logiciel dans des produits et services commerciaux.",
+    "permModify": "Modifier",
+    "permModifyDesc": "Modifier, adapter et créer des œuvres dérivées.",
+    "permDistribute": "Distribuer",
+    "permDistributeDesc": "Distribuer, sous-licencier et vendre des copies.",
+    "permPrivate": "Usage Privé",
+    "permPrivateDesc": "Utiliser le logiciel pour des projets privés.",
+    "conditionsTitle": "Conditions",
+    "conditionsDescription": "La Licence MIT a des conditions minimales :",
+    "condCopyright": "Avis de Copyright",
+    "condCopyrightDesc": "Vous devez inclure l'avis de copyright original dans toutes les copies.",
+    "condWarranty": "Pas de Garantie",
+    "condWarrantyDesc": "Le logiciel est fourni sans aucune garantie.",
+    "questionsTitle": "Questions ?",
+    "questionsDescription": "Si vous avez des questions sur la licence, veuillez nous contacter.",
+    "contactButton": "Contactez-nous"
+  },
+  "Trial": {
+    "hero": {
+      "badge": "Essai Gratuit",
+      "title": "Essayez Aether Gratuitement",
+      "description": "Accédez à toutes les fonctionnalités pendant 14 jours. Aucune carte de crédit requise.",
+      "ctaStart": "Guide de Démarrage",
+      "ctaEnterprise": "Voir les Plans Entreprise"
+    },
+    "features": {
+      "title": "Inclus",
+      "description": "Tout ce dont vous avez besoin pour évaluer Aether.",
+      "fullAccess": {
+        "title": "Accès Complet aux Fonctionnalités",
+        "description": "Toutes les fonctionnalités entreprise disponibles pendant l'essai."
+      },
+      "duration": {
+        "title": "14 Jours",
+        "description": "Assez de temps pour tester tous les cas d'usage."
+      },
+      "teamSize": {
+        "title": "Jusqu'à 10 Utilisateurs",
+        "description": "Invitez votre équipe pour tester la collaboration."
+      },
+      "apis": {
+        "title": "Accès API Complet",
+        "description": "Testez toutes les intégrations et SDKs."
+      }
+    },
+    "code": {
+      "title": "Démarrez en Minutes",
+      "description": "Configuration simple avec nos guides et SDKs complets.",
+      "cta": "Voir tous les Quickstarts"
+    },
+    "deployment": {
+      "title": "Exécutez à Votre Façon",
+      "description": "Déployez localement, dans Docker, ou utilisez notre cloud géré pendant l'essai.",
+      "local": {
+        "title": "Développement Local",
+        "description": "Exécutez Aether localement pour un contrôle total."
+      },
+      "docker": {
+        "title": "Docker",
+        "description": "Déploiement en une commande avec Docker."
+      },
+      "cloud": {
+        "title": "Cloud Géré",
+        "description": "Essayez notre environnement d'essai hébergé."
+      }
+    },
+    "included": {
+      "title": "Tout Inclus",
+      "description": "Toutes les fonctionnalités principales sont disponibles pendant votre essai.",
+      "oauth": "OAuth 2.0 / OpenID Connect",
+      "oauthDesc": "Implémentation conforme aux standards",
+      "mfa": "Authentification Multi-Facteurs",
+      "mfaDesc": "TOTP, SMS, Email authenticators",
+      "federation": "Fédération d'Identité",
+      "federationDesc": "Fournisseurs SAML, OIDC, OAuth",
+      "rbac": "Contrôle d'Accès Basé sur les Rôles",
+      "rbacDesc": "Permissions et politiques granulaires",
+      "sessions": "Gestion des Sessions",
+      "sessionsDesc": "Gestion des appareils et déconnexion forcée",
+      "docs": "Documentation",
+      "docsDesc": "Guides et APIs complets"
+    },
+    "cta": {
+      "title": "Commencez Votre Essai Gratuit",
+      "description": "Accédez à Aether pendant 14 jours.",
+      "getStarted": "Voir les Quickstarts",
+      "contact": "Des Questions?"
     }
   }
 }
