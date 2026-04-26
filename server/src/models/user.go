@@ -29,25 +29,8 @@ type User struct {
 	TotpSecret  *string `gorm:"size:255;column:totp_secret" json:"-"`
 	TotpEnabled bool    `gorm:"default:false;column:totp_enabled" json:"totpEnabled"`
 
-	// Relations
-	Profile                 *Profile
-	Accounts                []Account
-	Sessions                []Session
-	UserRoles               []UserRole
-	ApiKeys                 []ApiKey
-	PasswordResets          []PasswordResetToken
-	EmailVerifs             []EmailVerificationToken
-	OauthAuthorizationCodes []OAuthAuthorizationCode
-	OauthAccessTokens       []OAuthAccessToken
-	OauthRefreshTokens      []OAuthRefreshToken
-	OauthConsents           []OAuthConsent
-	CreatedServiceKeys      []ServiceKey `gorm:"foreignKey:CreatedBy"`
-	UpdatedServiceKeys      []ServiceKey `gorm:"foreignKey:UpdatedBy"`
-	ServiceKeyUsages        []ServiceKeyUsage
-	UserDomains             []UserDomain
-	Memberships             []Membership
-	OwnedOrganizations      []Organization `gorm:"foreignKey:OwnerID"`
-	DatabaseBackups         []DatabaseBackup
+	// Role for admin checks
+	Role string `gorm:"size:50;column:role" json:"role"`
 }
 
 // TableName spécifie le nom de la table pour le modèle User
@@ -64,7 +47,6 @@ type Profile struct {
 	Locale      *string `gorm:"size:10" json:"locale,omitempty"`
 	Timezone    *string `gorm:"size:50" json:"timezone,omitempty"`
 	Bio         *string `gorm:"type:text" json:"bio,omitempty"`
-	User        User    `gorm:"foreignKey:UserID"`
 }
 
 func (Profile) TableName() string {
@@ -86,8 +68,6 @@ type Account struct {
 	SessionState      *string    `gorm:"size:255;column:session_state" json:"sessionState,omitempty"`
 	CreatedAt         time.Time  `gorm:"column:created_at" json:"createdAt"`
 	UpdatedAt         time.Time  `gorm:"column:updated_at" json:"updatedAt"`
-
-	User User `gorm:"foreignKey:UserID"`
 }
 
 func (Account) TableName() string {
@@ -103,8 +83,6 @@ type Session struct {
 	Expires      time.Time `json:"expires"`
 	CreatedAt    time.Time `gorm:"column:created_at" json:"createdAt"`
 	UpdatedAt    time.Time `gorm:"column:updated_at" json:"updatedAt"`
-
-	User User `gorm:"foreignKey:UserID"`
 }
 
 func (Session) TableName() string {

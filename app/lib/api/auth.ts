@@ -1,21 +1,28 @@
 import type { AuthResponse, TokenResponse } from "./types";
 export type { TokenResponse } from "./types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+function getApiBaseUrl(): string {
+  // Always use relative path to go through Next.js proxy to avoid CORS issues
+  // The proxy forwards /api/* to the Go backend
+  return "";
+}
 
 class AuthApiService {
   private baseURL: string;
 
-  constructor(baseURL: string = API_BASE_URL) {
+  constructor(baseURL: string = getApiBaseUrl()) {
     this.baseURL = baseURL;
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`;
+    // Always use relative path
+    const url = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+
+    console.log("[AuthApi] request:", url, options.method || "GET");
 
     const config: RequestInit = {
       ...options,
-      credentials: "include",
+      credentials: "same-origin",
       headers: {
         "Content-Type": "application/json",
         ...options.headers,
@@ -25,7 +32,16 @@ class AuthApiService {
     console.log("[Auth API] Request:", { url, method: options.method, body: options.body });
 
     const response = await fetch(url, config);
-    const data = await response.json();
+
+    const contentType = response.headers.get("content-type");
+    let data;
+    if (contentType && contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      console.log("[Auth API] Non-JSON response:", text);
+      throw new Error(text || `Request failed with status ${response.status}`);
+    }
 
     console.log("[Auth API] Response:", { status: response.status, data });
 

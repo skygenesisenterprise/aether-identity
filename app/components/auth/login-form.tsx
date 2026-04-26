@@ -45,9 +45,12 @@ export function LoginForm() {
       if (response.data) {
         authApi.storeTokens(response.data.accessToken, response.data.refreshToken);
         authApi.storeUser(response.data.user);
+        
+        window.location.href = "/inbox";
+        return;
       }
 
-      router.push("/dashboard");
+      router.push("/inbox");
     } catch (err) {
       setError("Network error. Please try again.");
     } finally {
@@ -56,7 +59,7 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
         <div className="flex items-center gap-2 rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
           <AlertCircle className="h-4 w-4 shrink-0" />
@@ -64,7 +67,7 @@ export function LoginForm() {
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         <Label htmlFor="email" className="text-sm font-medium text-foreground">
           Email / Username
         </Label>
@@ -82,7 +85,7 @@ export function LoginForm() {
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         <Label htmlFor="password" className="text-sm font-medium text-foreground">
           Password
         </Label>

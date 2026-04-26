@@ -21,12 +21,12 @@ type OAuthClient struct {
 	AllowedOrigins []string  `gorm:"type:text[];column:allowed_origins" json:"allowedOrigins"`
 	IsActive       bool      `gorm:"default:true;column:is_active" json:"isActive"`
 	CreatedAt      time.Time `gorm:"column:created_at" json:"createdAt"`
-	UpdatedAt      time.Time `gorm:"column:updated_at" json:"updatedAt"`
+	UpdatedAt      time.Time `gorm:"column:updated_at" json:"createdAt"`
 
-	AuthorizationCodes []OAuthAuthorizationCode
-	AccessTokens       []OAuthAccessToken
-	RefreshTokens      []OAuthRefreshToken
-	Consents           []OAuthConsent
+	AuthorizationCodes []OAuthAuthorizationCode `gorm:"foreignKey:ClientID;references:ClientID"`
+	AccessTokens       []OAuthAccessToken      `gorm:"foreignKey:ClientID;references:ClientID"`
+	RefreshTokens      []OAuthRefreshToken   `gorm:"foreignKey:ClientID;references:ClientID"`
+	Consents         []OAuthConsent     `gorm:"foreignKey:ClientID;references:ClientID"`
 }
 
 func (OAuthClient) TableName() string {
@@ -48,8 +48,8 @@ type OAuthAuthorizationCode struct {
 	UsedAt        *time.Time `gorm:"column:used_at" json:"usedAt,omitempty"`
 	CreatedAt     time.Time  `gorm:"column:created_at" json:"createdAt"`
 
-	Client OAuthClient `gorm:"foreignKey:ClientID"`
-	User   User        `gorm:"foreignKey:UserID"`
+	Client *OAuthClient `gorm:"foreignKey:ClientID;references:ClientID"`
+	User   *User       `gorm:"foreignKey:UserID;references:ID"`
 }
 
 func (OAuthAuthorizationCode) TableName() string {
@@ -69,8 +69,8 @@ type OAuthAccessToken struct {
 	CreatedAt time.Time      `gorm:"column:created_at" json:"createdAt"`
 	DeletedAt gorm.DeletedAt `gorm:"index;column:deleted_at" json:"-"`
 
-	Client OAuthClient `gorm:"foreignKey:ClientID"`
-	User   User        `gorm:"foreignKey:UserID"`
+	Client *OAuthClient `gorm:"foreignKey:ClientID;references:ClientID"`
+	User   *User       `gorm:"foreignKey:UserID;references:ID"`
 }
 
 func (OAuthAccessToken) TableName() string {
@@ -90,8 +90,8 @@ type OAuthRefreshToken struct {
 	CreatedAt time.Time      `gorm:"column:created_at" json:"createdAt"`
 	DeletedAt gorm.DeletedAt `gorm:"index;column:deleted_at" json:"-"`
 
-	Client OAuthClient `gorm:"foreignKey:ClientID"`
-	User   User        `gorm:"foreignKey:UserID"`
+	Client *OAuthClient `gorm:"foreignKey:ClientID;references:ClientID"`
+	User   *User       `gorm:"foreignKey:UserID;references:ID"`
 }
 
 func (OAuthRefreshToken) TableName() string {
@@ -109,8 +109,8 @@ type OAuthConsent struct {
 	CreatedAt time.Time  `gorm:"column:created_at" json:"createdAt"`
 	UpdatedAt time.Time  `gorm:"column:updated_at" json:"updatedAt"`
 
-	User   User        `gorm:"foreignKey:UserID"`
-	Client OAuthClient `gorm:"foreignKey:ClientID"`
+	User   *User       `gorm:"foreignKey:UserID;references:ID"`
+	Client *OAuthClient `gorm:"foreignKey:ClientID;references:ClientID"`
 }
 
 func (OAuthConsent) TableName() string {

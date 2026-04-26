@@ -34,7 +34,7 @@ build-server:
 	docker build -f Dockerfile -t $(APP_NAME)-server:latest --target backend-builder .
 
 build-dev:
-	docker build --no-cache -f Dockerfile.dev -t $(APP_NAME)-dev:latest .
+	docker build --no-cache -f Dockerfile.dev -t $(APP_NAME):latest .
 
 build-cloud:
 	docker build --no-cache -f Dockerfile.cloud -t $(APP_NAME):latest .
@@ -65,7 +65,7 @@ prune:
 rmi-dev:
 	docker stop $(APP_NAME) 2>/dev/null || true
 	docker rm $(APP_NAME) 2>/dev/null || true
-	docker rmi $(APP_NAME)-dev:latest 2>/dev/null || true
+	docker rmi $(APP_NAME):latest 2>/dev/null || true
 
 dev-up:
 	docker compose -f docker-compose.dev.yml up -d

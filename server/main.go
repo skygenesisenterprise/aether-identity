@@ -93,6 +93,10 @@ func main() {
 			db = dbService.GetDB()
 			fmt.Printf("\033[1;32m[✓] Embedded database connected\033[0m\n")
 
+			// Initialiser la variable globale pour la compatibilité avec les controllers
+			services.DB = db
+			fmt.Printf("\033[1;32m[✓] Global DB reference initialized\033[0m\n")
+
 			serviceKeyService := services.NewServiceKeyService(db)
 			if err := serviceKeyService.EnsureSystemKey(cfg.SystemKey); err != nil {
 				fmt.Printf("\033[1;33m[!] Warning: Failed to ensure system key in database: %v\033[0m\n", err)
@@ -109,6 +113,10 @@ func main() {
 		}
 		db = dbService.GetDB()
 		fmt.Printf("\033[1;32m[✓] Database connected\033[0m\n")
+
+		// Initialiser la variable globale pour la compatibilité avec les controllers
+		services.DB = db
+		fmt.Printf("\033[1;32m[✓] Global DB reference initialized\033[0m\n")
 
 		serviceKeyService := services.NewServiceKeyService(db)
 		if err := serviceKeyService.EnsureSystemKey(cfg.SystemKey); err != nil {

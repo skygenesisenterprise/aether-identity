@@ -26,7 +26,7 @@ type OAuthProvidersConfig struct {
 
 // LoadOAuthProvidersConfig charge la configuration des providers OAuth
 func LoadOAuthProvidersConfig() *OAuthProvidersConfig {
-	baseURL := getEnv("BASE_URL", "http://localhost:8080")
+	baseURL := getEnv("BASE_URL", "http://localhost:3000")
 
 	return &OAuthProvidersConfig{
 		GitHub:    loadGitHubConfig(baseURL),

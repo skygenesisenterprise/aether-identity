@@ -138,7 +138,7 @@ export default function LogsStreamPage() {
     };
 
     connectSSE();
-    eventSourceRef.current = eventSource;
+    eventSourceRef.current = eventSourceRef.current;
 
     return () => {
       if (eventSourceRef.current) {

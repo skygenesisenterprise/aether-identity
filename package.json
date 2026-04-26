@@ -108,6 +108,7 @@
     "@loglayer/transport-pino": "^3.0.2",
     "@prisma/client": "^7.4.0",
     "@radix-ui/react-slot": "^1.2.4",
+    "bcrypt": "^6.0.0",
     "class-variance-authority": "^0.7.1",
     "loglayer": "^9.1.0",
     "next-intl": "^4.9.0",

@@ -249,6 +249,7 @@ model OAuthClient {
   clientSecretExpiresAt DateTime?  @map("client_secret_expires_at")
   redirectUris       String[]  @map("redirect_uris")
   grantTypes         String[]  @map("grant_types")
+  scopes             String[]  @map("scopes")
   tokenEndpointAuthMethod String?  @map("token_endpoint_auth_method")
   isConfidential    Boolean   @default(false) @map("is_confidential")
   isActive         Boolean   @default(true) @map("is_active")
@@ -272,6 +273,7 @@ model OAuthAuthorizationCode {
   userId     String   @db.Uuid @map("user_id")
   code       String   @unique
   redirectUri String   @map("redirect_uri")
+  scopes     String[] @map("scopes")
   nonce      String?
   codeChallenge String? @map("code_challenge")
   codeChallengeMethod String? @map("code_challenge_method")
@@ -289,7 +291,7 @@ model OAuthAccessToken {
   userId     String   @db.Uuid @map("user_id")
   token      String   @unique
   expiresAt  DateTime @map("expires_at")
-  scope      String?
+  scopes     String[] @map("scopes")
   createdAt  DateTime @default(now()) @map("created_at")
 
   client OAuthClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
@@ -303,8 +305,9 @@ model OAuthRefreshToken {
   userId     String    @db.Uuid @map("user_id")
   token      String    @unique
   expiresAt  DateTime?  @map("expires_at")
-  scope      String?
+  scopes     String[]  @map("scopes")
   revoked    Boolean   @default(false)
+  revokedAt  DateTime? @map("revoked_at")
   createdAt  DateTime   @default(now()) @map("created_at")
 
   client OAuthClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
@@ -318,6 +321,7 @@ model OAuthConsent {
   userId   String   @db.Uuid @map("user_id")
   scope    String[]
   createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
 
   client OAuthClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
 

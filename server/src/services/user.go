@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/skygenesisenterprise/aether-identity/server/src/models"
 	"golang.org/x/crypto/bcrypt"
@@ -97,7 +98,13 @@ func (s *UserService) AuthenticateUser(email, password string) (*models.User, er
 		return nil, errors.New("no password set")
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(*user.PasswordHash), []byte(password)); err != nil {
+	hashToCheck := *user.PasswordHash
+	// Convertir $2b$ en $2a$ pour la compatibilité avec les hashes générés par Node.js
+	if strings.HasPrefix(hashToCheck, "$2b$") {
+		hashToCheck = "$2a$" + hashToCheck[4:]
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(hashToCheck), []byte(password)); err != nil {
 		return nil, errors.New("invalid password")
 	}
 

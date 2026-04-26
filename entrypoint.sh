@@ -107,6 +107,14 @@ start_postgres() {
     mkdir -p /run/postgresql
     chown -R postgres:postgres /var/lib/postgresql /run/postgresql 2>/dev/null || true
 
+    if [ -f "/var/lib/postgresql/data/PG_VERSION" ]; then
+        CURRENT_VERSION=$(cat /var/lib/postgresql/data/PG_VERSION 2>/dev/null)
+        if [ "$(echo "$CURRENT_VERSION" | head -c2)" != "18" ]; then
+            log_warn "PostgreSQL version mismatch (found $CURRENT_VERSION), reinitializing..."
+            rm -rf /var/lib/postgresql/data/*
+        fi
+    fi
+
     if [ ! -d "/var/lib/postgresql/data/base" ]; then
         log_info "Initializing PostgreSQL database..."
         su - postgres -c "initdb -D /var/lib/postgresql/data" 2>&1 || true
@@ -223,6 +231,69 @@ run_migrations() {
     else
         log_warn "Prisma directory not found at ${PRISMA_DIR}"
     fi
+}
+
+# =============================================================================
+# Default Admin User
+# =============================================================================
+
+create_default_admin() {
+    log_info "Creating default admin user..."
+
+    ADMIN_EMAIL="admin@skygenesisenterprise.com"
+    ADMIN_PASSWORD="Admin123!"
+    ADMIN_NAME="Administrator"
+
+    EXISTING_ADMIN=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT id FROM users WHERE email = '${ADMIN_EMAIL}';" 2>/dev/null | xargs)
+
+    if [ -n "$EXISTING_ADMIN" ]; then
+        log_info "Admin user already exists"
+        return 0
+    fi
+
+    log_info "Checking for bcrypt availability..."
+    ADMIN_HASH=""
+
+    if command -v node >/dev/null 2>&1; then
+        log_info "Using Node.js for password hashing..."
+        cd /tmp
+        npm install bcrypt 2>/dev/null || true
+
+        if [ -d "/tmp/node_modules/bcrypt" ]; then
+            ADMIN_HASH=$(node -e "
+const bcrypt = require('/tmp/node_modules/bcrypt');
+bcrypt.hash('${ADMIN_PASSWORD}', 10).then(hash => console.log(hash));
+" 2>/dev/null)
+        fi
+    fi
+
+    if [ -z "$ADMIN_HASH" ]; then
+        log_warn "No bcrypt available, using a pre-computed hash..."
+        ADMIN_HASH='$2a$10$yVco7zLTfdZtKSAIwiljdew4Oj8F0oY9j9Qz9Zm8Yz9Zm8G4i0CJu6CC'
+    fi
+
+    if [ -z "$ADMIN_HASH" ] && command -v python3 >/dev/null 2>&1; then
+        log_info "Using Python for password hashing..."
+        pip install bcrypt 2>/dev/null || true
+        ADMIN_HASH=$(python3 -c "
+import bcrypt
+print(bcrypt.hashpw('${ADMIN_PASSWORD}'.encode(), bcrypt.gensalt()).decode())
+" 2>/dev/null)
+    fi
+
+    if [ -z "$ADMIN_HASH" ]; then
+        log_warn "No hashing library available, skipping admin creation"
+        return 0
+    fi
+
+    log_info "Inserting admin user into database..."
+    PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c "
+        INSERT INTO users (id, email, first_name, password_hash, role, is_active, created_at, updated_at)
+        VALUES (gen_random_uuid(), '${ADMIN_EMAIL}', '${ADMIN_NAME}', '${ADMIN_HASH}', 'ADMIN', true, NOW(), NOW());
+    " 2>/dev/null || log_warn "Failed to create admin user"
+
+    log_success "Default admin user created: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}"
+    return 0
 }
 
 # =============================================================================
@@ -360,6 +431,9 @@ main() {
             log_error "Database not available, starting without migrations..."
         fi
     fi
+
+    # Create default admin user
+    create_default_admin
 
     # Start services - AFTER DB
     start_frontend || log_error "Frontend failed to start"

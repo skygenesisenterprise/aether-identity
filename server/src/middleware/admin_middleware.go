@@ -31,15 +31,8 @@ func AdminMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Vérifier si l'utilisateur est un administrateur
-		isAdmin := false
-		for _, userRole := range user.UserRoles {
-			if userRole.Role.Name == "admin" {
-				isAdmin = true
-				break
-			}
-		}
-		if !isAdmin {
+		// Vérifier si l'utilisateur est un administrateur via le champ role
+		if user.Role != "ADMIN" {
 			c.JSON(http.StatusForbidden, gin.H{
 				"error": "Forbidden",
 			})

@@ -5,7 +5,7 @@ export * from "./client";
 export const registerApi = {
   register: async (email: string, username: string, password: string) => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/api/v1/auth/register`,
+      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/api/v1/auth/register`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -23,7 +23,7 @@ export const registerApi = {
 export const forgotApi = {
   requestReset: async (email: string) => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/api/v1/auth/reset-password`,
+      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/api/v1/auth/reset-password`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

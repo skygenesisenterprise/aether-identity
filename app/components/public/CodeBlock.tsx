@@ -65,7 +65,7 @@ export function CodeBlock({
 
   if (!mounted || !selectedLang) {
     return (
-      <div className="relative rounded-lg border border-background/20 bg-background/5 overflow-hidden h-[200px]" />
+      <div className="relative rounded-lg border border-background/20 bg-background/5 overflow-hidden h-50" />
     );
   }
 
