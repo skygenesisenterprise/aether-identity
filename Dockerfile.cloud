@@ -18,7 +18,7 @@ RUN CGO_ENABLED=1 GOOS=linux \
 # ══════════════════════════════════════════════════════════════════════════════
 # Stage 2 — Node.js / pnpm (Next.js Build)
 # ══════════════════════════════════════════════════════════════════════════════
-FROM node:25-alpine AS node-builder
+FROM node:26-alpine AS node-builder
 
 WORKDIR /app
 

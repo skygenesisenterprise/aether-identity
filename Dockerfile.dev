@@ -19,7 +19,7 @@ RUN mkdir -p /app/tmp && go build -o /app/tmp/aether-server ./server/
 # ══════════════════════════════════════════════════════════════════════════════
 # Stage 2 — Node.js / pnpm
 # ══════════════════════════════════════════════════════════════════════════════
-FROM node:25-alpine AS node-builder
+FROM node:26-alpine AS node-builder
 
 WORKDIR /app/app
 
@@ -32,7 +32,7 @@ RUN pnpm install --ignore-scripts
 # ══════════════════════════════════════════════════════════════════════════════
 # Stage final
 # ══════════════════════════════════════════════════════════════════════════════
-FROM node:25-alpine
+FROM node:26-alpine
 
 RUN apk add --no-cache \
     ca-certificates \
