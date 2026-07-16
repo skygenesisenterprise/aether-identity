@@ -55,7 +55,7 @@
     "framer-motion": "^12.38.0",
     "google": "link:next/fond/google",
     "input-otp": "1.4.2",
-    "loglayer": "^9.1.0",
+    "loglayer": "^9.4.0",
     "lucide-react": "^1.14.0",
     "next": "16.2.4",
     "next-intl": "^4.8.3",
