@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "ZenthCloud PostgreSQL",
+      "Group": "Servers",
+      "Host": "postgresql",
+      "Port": 5432,
+      "Username": "postgres",
+      "SSLMode": "prefer",
+      "MaintenanceDB": "postgres"
+    }
+  }
+}

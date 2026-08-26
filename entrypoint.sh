@@ -1,450 +1,500 @@
 #!/bin/sh
 set -e
 
-# =============================================================================
-# Aether Identity - Service Entry Point
-# =============================================================================
-
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/go/bin:/go/bin:/root/go/bin:$HOME/.local/share/corepack/shims:$HOME/.local/bin"
+export PATH="/usr/local/go/bin:/go/bin:/root/go/bin:/root/.local/share/corepack:/root/.local/share/corepack/shims:/usr/local/bin:/usr/bin:/bin:${PATH}"
 export NODE_ENV="${NODE_ENV:-development}"
+export LOG_LEVEL="${LOG_LEVEL:-info}"
+export PRISMA_SCHEMA_DEPLOY="${PRISMA_SCHEMA_DEPLOY:-true}"
+export PRISMA_SCHEMA_DEPLOY_STRATEGY="${PRISMA_SCHEMA_DEPLOY_STRATEGY:-push}"
+export ALLOW_MIGRATION_FAILURE="${ALLOW_MIGRATION_FAILURE:-false}"
+export PRISMA_MIGRATE_DEPLOY="${PRISMA_MIGRATE_DEPLOY:-true}"
+export PRISMA_HOT_RELOAD="${PRISMA_HOT_RELOAD:-false}"
+export PRISMA_POLL_INTERVAL="${PRISMA_POLL_INTERVAL:-5}"
 
-# =============================================================================
-# Configuration
-# =============================================================================
+# ── Logging ────────────────────────────────────────────────────────────────────
 
-DB_HOST="${DB_HOST:-db}"
-DB_PORT="${DB_PORT:-5432}"
-DB_USER="${DB_USER:-aether}"
-DB_NAME="${DB_NAME:-etheria_account}"
-DB_PASSWORD="${DB_PASSWORD:-${POSTGRES_PASSWORD:-password}}"
-DB_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
-
-FRONTEND_PORT="${FRONTEND_PORT:-3000}"
-API_PORT="${API_PORT:-8080}"
-
-USE_EMBEDDED_DB="${USE_EMBEDDED_DB:-true}"
-
-# =============================================================================
-# Logging Functions
-# =============================================================================
-
-log_info() {
-    echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - $1"
+timestamp_utc() {
+    date -u '+%Y-%m-%dT%H:%M:%SZ'
 }
 
-log_success() {
-    echo "[✓]  $(date '+%Y-%m-%d %H:%M:%S') - $1"
+should_log() {
+    requested_level="$1"
+
+    case "${LOG_LEVEL:-info}" in
+        debug)  return 0 ;;
+        info)   [ "${requested_level}" != "debug" ] ;;
+        warn)   [ "${requested_level}" = "warn" ] || [ "${requested_level}" = "error" ] ;;
+        error)  [ "${requested_level}" = "error" ] ;;
+        *)      return 0 ;;
+    esac
+}
+
+log_debug() {
+    if should_log debug; then
+        echo "[DEBUG] $(timestamp_utc) - $1"
+    fi
+}
+
+log_info() {
+    if should_log info; then
+        echo "[INFO] $(timestamp_utc) - $1"
+    fi
 }
 
 log_warn() {
-    echo "[!]  $(date '+%Y-%m-%d %H:%M:%S') - $1"
+    if should_log warn; then
+        echo "[WARN] $(timestamp_utc) - $1" >&2
+    fi
 }
 
 log_error() {
-    echo "[X]  $(date '+%Y-%m-%d %H:%M:%S') - $1" >&2
+    if should_log error; then
+        echo "[ERROR] $(timestamp_utc) - $1" >&2
+    fi
 }
 
-# =============================================================================
-# Header Display
-# =============================================================================
+# ── Runtime defaults ──────────────────────────────────────────────────────────
+
+configure_runtime() {
+    export USE_EMBEDDED_DB="${USE_EMBEDDED_DB:-false}"
+    export FRONTEND_PORT="${FRONTEND_PORT:-3000}"
+    export API_PORT="${API_PORT:-8080}"
+    export SERVER_PORT="${SERVER_PORT:-${API_PORT}}"
+    if [ "${NODE_ENV}" = "production" ]; then
+        export GIN_MODE="${GIN_MODE:-release}"
+    else
+        export GIN_MODE="${GIN_MODE:-debug}"
+    fi
+}
+
+# ── Display ───────────────────────────────────────────────────────────────────
 
 display_header() {
     echo ""
-    echo "╔══════════════════════════════════════════════════════════════════════╗"
-    echo "║                    Aether Identity                                   ║"
-    echo "║               Enterprise Account Management                          ║"
-    echo "║                   Version 1.0.0-alpha                                ║"
-    echo "╚══════════════════════════════════════════════════════════════════════╝"
+    echo "Aether Identity container"
     echo ""
+    log_info "Node env: ${NODE_ENV}"
     log_info "Frontend: http://localhost:${FRONTEND_PORT}"
     log_info "API:      http://localhost:${API_PORT}"
-    log_info "Database: ${DB_HOST}:${DB_PORT}/${DB_NAME}"
     echo ""
 }
 
-# =============================================================================
-# System Setup
-# =============================================================================
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
 setup_pnpm() {
-    log_info "Configuring pnpm..."
-    
     if command -v pnpm >/dev/null 2>&1; then
-        log_success "pnpm already available"
         return 0
     fi
-    
-    npm install -g pnpm@9.15.4 2>/dev/null || true
-    
+
+    if command -v corepack >/dev/null 2>&1; then
+        corepack enable >/dev/null 2>&1 || true
+        corepack prepare pnpm@9.15.4 --activate >/dev/null 2>&1 || true
+    fi
+
     if command -v pnpm >/dev/null 2>&1; then
-        log_success "pnpm configured"
         return 0
     fi
-    
-    log_warn "pnpm not available, will try npx"
+
+    log_warn "pnpm is not available; falling back to npx where possible"
 }
 
-ensure_pnpm_path() {
-    if ! command -v pnpm >/dev/null 2>&1; then
-        if [ -f "$HOME/.local/share/corepack/shims/pnpm" ]; then
-            export PATH="$HOME/.local/share/corepack/shims:$PATH"
+find_backend_binary() {
+    for binary in \
+        /app/server/aether-server \
+        /app/tmp/aether-server
+    do
+        if [ -x "${binary}" ]; then
+            echo "${binary}"
+            return 0
         fi
-    fi
+    done
+
+    return 1
 }
 
-# =============================================================================
-# Database Setup
-# =============================================================================
+find_prisma_dir() {
+    for dir in /prisma /app/prisma /app/server/prisma ./server/prisma; do
+        if [ -f "${dir}/schema.prisma" ]; then
+            echo "${dir}"
+            return 0
+        fi
+    done
+    return 1
+}
 
-start_postgres() {
-    if [ "$USE_EMBEDDED_DB" != "true" ]; then
+find_prisma_bin() {
+    for bin in \
+        /prisma/node_modules/.bin/prisma \
+        /app/prisma/node_modules/.bin/prisma \
+        /app/server/prisma/node_modules/.bin/prisma \
+        ./node_modules/.bin/prisma \
+        ./server/prisma/node_modules/.bin/prisma
+    do
+        if [ -x "${bin}" ]; then
+            echo "${bin}"
+            return 0
+        fi
+    done
+
+    if command -v prisma >/dev/null 2>&1; then
+        command -v prisma
         return 0
     fi
 
-    log_info "Starting embedded PostgreSQL..."
-
-    mkdir -p /var/lib/postgresql/data
-    mkdir -p /run/postgresql
-    chown -R postgres:postgres /var/lib/postgresql /run/postgresql 2>/dev/null || true
-
-    if [ -f "/var/lib/postgresql/data/PG_VERSION" ]; then
-        CURRENT_VERSION=$(cat /var/lib/postgresql/data/PG_VERSION 2>/dev/null)
-        if [ "$(echo "$CURRENT_VERSION" | head -c2)" != "18" ]; then
-            log_warn "PostgreSQL version mismatch (found $CURRENT_VERSION), reinitializing..."
-            rm -rf /var/lib/postgresql/data/*
-        fi
+    if command -v npx >/dev/null 2>&1; then
+        echo "npx prisma"
+        return 0
     fi
 
-    if [ ! -d "/var/lib/postgresql/data/base" ]; then
-        log_info "Initializing PostgreSQL database..."
-        su - postgres -c "initdb -D /var/lib/postgresql/data" 2>&1 || true
+    return 1
+}
+
+run_prisma_schema_deploy() {
+    if [ "${PRISMA_SCHEMA_DEPLOY:-true}" != "true" ]; then
+        log_info "Prisma schema deployment disabled"
+        return 0
+    fi
+
+    if [ -z "${DATABASE_URL:-}" ]; then
+        log_error "DATABASE_URL is required to deploy the Prisma schema"
+        return 1
+    fi
+
+    prisma_dir="$(find_prisma_dir || true)"
+    if [ -z "${prisma_dir}" ]; then
+        log_warn "Prisma schema not found; skipping database schema setup"
+        return 0
+    fi
+
+    cd "${prisma_dir}"
+
+    prisma_bin="$(find_prisma_bin || true)"
+    if [ -z "${prisma_bin}" ] && [ -f package.json ] && command -v npm >/dev/null 2>&1; then
+        log_info "Installing Prisma dependencies..."
+        if [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund || return 1
+        else
+            npm install --no-audit --no-fund || return 1
+        fi
+        prisma_bin="$(find_prisma_bin || true)"
+    fi
+
+    if [ -z "${prisma_bin}" ]; then
+        log_error "Prisma CLI is not available"
+        return 1
+    fi
+
+    case "${PRISMA_SCHEMA_DEPLOY_STRATEGY:-push}" in
+        migrate)
+            log_info "Generating Prisma client..."
+            # shellcheck disable=SC2086
+            DATABASE_URL="${DATABASE_URL}" ${prisma_bin} generate
+
+            if [ "${PRISMA_MIGRATE_DEPLOY:-true}" != "true" ]; then
+                log_info "Prisma migrate deploy disabled"
+                return 0
+            fi
+
+            log_info "Deploying Prisma migrations"
+            # shellcheck disable=SC2086
+            DATABASE_URL="${DATABASE_URL}" ${prisma_bin} migrate deploy
+            ;;
+        push)
+            log_info "Pushing Prisma schema"
+            # shellcheck disable=SC2086
+            DATABASE_URL="${DATABASE_URL}" ${prisma_bin} db push --accept-data-loss
+            ;;
+        *)
+            log_error "Unknown PRISMA_SCHEMA_DEPLOY_STRATEGY: ${PRISMA_SCHEMA_DEPLOY_STRATEGY}"
+            return 1
+            ;;
+    esac
+
+    log_info "Prisma schema deployed"
+}
+
+# ── Prisma hot-reload watcher ───────────────────────────────────────────────
+
+start_prisma_watcher() {
+    schema_path="${SCHEMA_PATH:-/app/server/prisma/schema.prisma}"
+    schema_dir="$(dirname "${schema_path}")"
+    migrations_dir="${schema_dir}/migrations"
+    deploy_script="${DEPLOY_SCRIPT:-/usr/local/bin/deploy-schema.sh}"
+    poll_interval="${PRISMA_POLL_INTERVAL:-5}"
+
+    if [ ! -f "${schema_path}" ]; then
+        log_warn "Schema file not found at ${schema_path}; watcher disabled"
+        return 0
+    fi
+
+    compute_combined_hash() {
+        schema_hash=$(sha256sum "${schema_path}" 2>/dev/null | awk '{print $1}' || echo "")
+        mig_hash=""
+        if [ -d "${migrations_dir}" ]; then
+            mig_hash=$(find "${migrations_dir}" -type f -name "*.sql" -o -name "migration_lock.toml" 2>/dev/null \
+                | sort \
+                | xargs -d '\n' sha256sum 2>/dev/null \
+                | sha256sum \
+                | awk '{print $1}' || echo "")
+        fi
+        echo "${schema_hash}|${mig_hash}"
+    }
+
+    run_migration() {
+        log_info "Change detected — deploying migrations..."
+        if [ -x "${deploy_script}" ]; then
+            "${deploy_script}" || log_warn "Migration deploy failed (hot-reload)"
+        else
+            run_prisma_schema_deploy || log_warn "Migration deploy failed (hot-reload)"
+        fi
+    }
+
+    if command -v inotifywait >/dev/null 2>&1; then
+        log_info "Watching schema and migrations for changes (inotify)"
+        log_info "  • schema    : ${schema_path}"
+        log_info "  • migrations: ${migrations_dir}"
+        while true; do
+            inotifywait -qq -e modify,create,delete,move "${schema_path}" 2>/dev/null || {
+                inotifywait -qq -e modify,create,delete,move -r "${migrations_dir}" 2>/dev/null || {
+                    sleep "${poll_interval}"
+                    continue
+                }
+            }
+            run_migration
+        done
     else
-        if [ -f "/var/lib/postgresql/data/postmaster.pid" ]; then
-            STALE_PID=$(cat /var/lib/postgresql/data/postmaster.pid 2>/dev/null)
-            if [ -n "$STALE_PID" ] && ! kill -0 "$STALE_PID" 2>/dev/null; then
-                log_warn "Removing stale postmaster.pid..."
-                rm -f /var/lib/postgresql/data/postmaster.pid
+        log_info "Watching schema and migrations for changes (polling every ${poll_interval}s)"
+        log_info "  • schema    : ${schema_path}"
+        log_info "  • migrations: ${migrations_dir}"
+        prev_hash=""
+        while true; do
+            curr_hash="$(compute_combined_hash)"
+            if [ -n "${prev_hash}" ] && [ "${curr_hash}" != "${prev_hash}" ]; then
+                run_migration
             fi
+            prev_hash="${curr_hash}"
+            sleep "${poll_interval}"
+        done
+    fi
+}
+
+# ── PostgreSQL role ─────────────────────────────────────────────────────────
+
+run_postgresql() {
+    export PGDATA="${PGDATA:-/var/lib/postgresql/data}"
+    export LANG="${LANG:-C.UTF-8}"
+    export LC_ALL="${LC_ALL:-C.UTF-8}"
+
+    log_info "PostgreSQL container starting"
+    log_info "Data directory: ${PGDATA}"
+
+    # Root-level setup: ensure directories exist and are owned by postgres
+    mkdir -p "$PGDATA" /var/run/postgresql
+    chown -R postgres:postgres "$PGDATA" /var/run/postgresql
+
+    # Initialize the database cluster if the data directory is empty
+    if [ ! -f "$PGDATA/PG_VERSION" ]; then
+        log_info "Initializing PostgreSQL data directory..."
+        gosu postgres initdb -D "$PGDATA" --encoding=UTF8 --locale=C.UTF-8 --auth-host=trust --auth-local=trust
+        {
+            echo "listen_addresses = '*'"
+            echo "port = 5432"
+        } >> "$PGDATA/postgresql.conf"
+    fi
+
+    # Ensure Docker network connections are allowed (development only)
+    if [ -f "$PGDATA/pg_hba.conf" ]; then
+        if ! grep -q "^host all all all " "$PGDATA/pg_hba.conf"; then
+            log_info "Allowing connections from any host in pg_hba.conf"
+            {
+                echo ""
+                echo "# Allow connections from any host (development only)"
+                echo "host all all all trust"
+            } >> "$PGDATA/pg_hba.conf"
         fi
     fi
 
-    su - postgres -c "pg_ctl -D /var/lib/postgresql/data -l /var/lib/postgresql/logfile start -w" &
-    POSTGRES_PID=$!
-    echo "$POSTGRES_PID" > /tmp/postgres.pid
+    # Start PostgreSQL in the background
+    gosu postgres postgres -D "$PGDATA" -c listen_addresses='*' -c port=5432 &
+    pg_pid=$!
 
-    log_info "Waiting for PostgreSQL to be ready..."
+    trap "kill ${pg_pid} 2>/dev/null; wait ${pg_pid} 2>/dev/null" SIGTERM SIGINT
 
-    MAX_RETRIES=30
-    RETRY_COUNT=0
-
-    while ! su - postgres -c "psql -l" >/dev/null 2>&1; do
-        RETRY_COUNT=$((RETRY_COUNT + 1))
-        if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
-            log_error "PostgreSQL failed to start"
-            if [ -f /var/lib/postgresql/logfile ]; then
-                log_error "PostgreSQL log: $(cat /var/lib/postgresql/logfile)"
-            fi
+    log_info "Waiting for PostgreSQL to accept connections..."
+    retry=0
+    max_retry=60
+    until pg_isready -U "${POSTGRES_USER:-postgres}" -q 2>/dev/null; do
+        retry=$((retry + 1))
+        if [ "${retry}" -ge "${max_retry}" ]; then
+            log_error "PostgreSQL did not become ready within ${max_retry}s"
+            return 1
+        fi
+        if ! kill -0 ${pg_pid} 2>/dev/null; then
+            log_error "PostgreSQL process exited unexpectedly"
             return 1
         fi
         sleep 1
     done
+    log_info "PostgreSQL is accepting connections"
 
-    log_info "Creating database user and schema..."
-    su - postgres -c "psql -c \"CREATE USER ${DB_USER} WITH PASSWORD '${DB_PASSWORD}' CREATEDB;\"" 2>/dev/null || true
-    su - postgres -c "psql -c \"CREATE DATABASE ${DB_NAME} OWNER ${DB_USER};\"" 2>/dev/null || true
+    # Create the requested role/database (mirrors the official image behaviour)
+    db_user="${POSTGRES_USER:-postgres}"
+    db_pass="${POSTGRES_PASSWORD:-}"
+    db_name="${POSTGRES_DB:-postgres}"
 
-    log_success "PostgreSQL started"
-    return 0
-}
-
-# =============================================================================
-# Database Health Check
-# =============================================================================
-
-wait_for_database() {
-    if [ "$USE_EMBEDDED_DB" = "true" ]; then
-        log_info "Database already running (embedded)"
-        return 0
+    if [ "${db_user}" != "postgres" ]; then
+        log_info "Creating role: ${db_user}"
+        gosu postgres psql -v ON_ERROR_STOP=1 --username postgres -tc "SELECT 1 FROM pg_roles WHERE rolname='${db_user}'" | grep -q 1 || \
+            gosu postgres psql -v ON_ERROR_STOP=1 --username postgres -c "CREATE ROLE \"${db_user}\" WITH SUPERUSER LOGIN PASSWORD '${db_pass}'" || true
+    fi
+    if [ "${db_name}" != "postgres" ]; then
+        log_info "Creating database: ${db_name}"
+        gosu postgres psql -v ON_ERROR_STOP=1 --username postgres -tc "SELECT 1 FROM pg_database WHERE datname='${db_name}'" | grep -q 1 || \
+            gosu postgres psql -v ON_ERROR_STOP=1 --username postgres -c "CREATE DATABASE \"${db_name}\" OWNER \"${db_user}\"" || true
     fi
 
-    log_info "Waiting for database to be ready..."
+    # Prisma schema deployment
+    if ! run_prisma_schema_deploy; then
+        if [ "${ALLOW_MIGRATION_FAILURE}" = "true" ]; then
+            log_warn "Prisma schema deployment failed; continuing because ALLOW_MIGRATION_FAILURE=true"
+        else
+            log_error "Prisma schema deployment failed"
+            return 1
+        fi
+    fi
 
-    MAX_RETRIES=30
-    RETRY_COUNT=0
+    # Hot-reload watcher (background)
+    if [ "${PRISMA_HOT_RELOAD}" = "true" ]; then
+        start_prisma_watcher &
+    fi
 
-    while ! PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -c '\q' 2>/dev/null; do
-        RETRY_COUNT=$((RETRY_COUNT + 1))
+    # Forward signals and wait for PostgreSQL to exit
+    wait ${pg_pid}
+}
 
-        if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
-            log_error "Database not available after ${MAX_RETRIES} attempts"
+# ── Commands ──────────────────────────────────────────────────────────────────
+
+run_server() {
+    configure_runtime
+    setup_pnpm
+
+    if [ "${NODE_ENV}" = "production" ]; then
+        log_info "Aether Identity frontend starting (static)"
+        log_info "Frontend listening on 0.0.0.0:${FRONTEND_PORT}"
+
+        if [ ! -d /app/out ]; then
+            log_error "Static frontend build not found at /app/out"
             return 1
         fi
 
-        log_info "Waiting for database... (${RETRY_COUNT}/${MAX_RETRIES})"
-        sleep 2
-    done
-
-    log_success "Database connected"
-    return 0
-}
-
-# =============================================================================
-# Prisma Setup
-# =============================================================================
-
-run_migrations() {
-    log_info "Setting up Prisma..."
-
-    ensure_pnpm_path
-
-    PRISMA_DIR="/app/server/prisma"
-
-    if [ -d "$PRISMA_DIR" ]; then
-        cd "$PRISMA_DIR"
-
-        if [ -f "package.json" ]; then
-            log_info "Installing Prisma dependencies..."
-            npm install --silent 2>/dev/null || true
+        http_server_args="/app/out -a 0.0.0.0 -p ${FRONTEND_PORT} -c-1 -e html"
+        if [ "${HTTP_ACCESS_LOGS}" != "true" ]; then
+            http_server_args="${http_server_args} --silent"
         fi
 
-        if [ -f "schema.prisma" ]; then
-            log_info "Generating Prisma client..."
-            PGPASSWORD="$DB_PASSWORD" DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}" \
-                npx prisma generate 2>/dev/null || log_warn "Prisma generate failed"
+        log_info "Starting static frontend"
+        # shellcheck disable=SC2086
+        exec http-server ${http_server_args}
+    fi
 
-            log_info "Checking database state..."
-            TABLE_COUNT=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public';" 2>/dev/null || echo "0")
-            TABLE_COUNT=$(echo "$TABLE_COUNT" | xargs)
+    log_info "Aether Identity frontend starting (development)"
+    log_info "Frontend listening on 0.0.0.0:${FRONTEND_PORT}"
 
-            if [ -z "$TABLE_COUNT" ] || [ "$TABLE_COUNT" = "0" ]; then
-                log_info "Fresh database detected - creating schema from Prisma..."
-                PGPASSWORD="$DB_PASSWORD" DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}" \
-                    npx prisma db push --accept-data-loss 2>/dev/null || log_warn "Prisma db push failed"
-            else
-                log_info "Database already has $TABLE_COUNT tables - running migrations..."
-                PGPASSWORD="$DB_PASSWORD" DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}" \
-                    npx prisma db push --accept-data-loss 2>/dev/null || log_warn "Prisma db push failed"
-            fi
-        fi
-
-        log_success "Prisma setup complete"
+    if [ -d /app/apps ]; then
+        cd /app/apps
+    elif [ -d ./apps ]; then
+        cd ./apps
     else
-        log_warn "Prisma directory not found at ${PRISMA_DIR}"
+        log_error "Next.js app directory not found at /app/apps or ./apps"
+        return 1
     fi
+    rm -rf .next/cache 2>/dev/null || true
+
+    if command -v pnpm >/dev/null 2>&1; then
+        exec pnpm next dev -p "${FRONTEND_PORT}" -H 0.0.0.0 --turbopack "$@"
+    fi
+
+    if command -v npx >/dev/null 2>&1; then
+        exec npx next dev -p "${FRONTEND_PORT}" -H 0.0.0.0 --turbopack "$@"
+    fi
+
+    log_error "Neither pnpm nor npx is available"
+    return 1
 }
 
-# =============================================================================
-# Default Admin User
-# =============================================================================
+run_worker() {
+    configure_runtime
 
-create_default_admin() {
-    log_info "Creating default admin user..."
+    log_info "Aether Identity API starting"
+    log_info "Backend runtime configured for 0.0.0.0:${SERVER_PORT}"
 
-    ADMIN_EMAIL="admin@skygenesisenterprise.com"
-    ADMIN_PASSWORD="Admin123!"
-    ADMIN_NAME="Administrator"
-
-    EXISTING_ADMIN=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT id FROM users WHERE email = '${ADMIN_EMAIL}';" 2>/dev/null | xargs)
-
-    if [ -n "$EXISTING_ADMIN" ]; then
-        log_info "Admin user already exists"
-        return 0
-    fi
-
-    log_info "Checking for bcrypt availability..."
-    ADMIN_HASH=""
-
-    if command -v node >/dev/null 2>&1; then
-        log_info "Using Node.js for password hashing..."
-        cd /tmp
-        npm install bcrypt 2>/dev/null || true
-
-        if [ -d "/tmp/node_modules/bcrypt" ]; then
-            ADMIN_HASH=$(node -e "
-const bcrypt = require('/tmp/node_modules/bcrypt');
-bcrypt.hash('${ADMIN_PASSWORD}', 10).then(hash => console.log(hash));
-" 2>/dev/null)
-        fi
-    fi
-
-    if [ -z "$ADMIN_HASH" ]; then
-        log_warn "No bcrypt available, using a pre-computed hash..."
-        ADMIN_HASH='$2a$10$yVco7zLTfdZtKSAIwiljdew4Oj8F0oY9j9Qz9Zm8Yz9Zm8G4i0CJu6CC'
-    fi
-
-    if [ -z "$ADMIN_HASH" ] && command -v python3 >/dev/null 2>&1; then
-        log_info "Using Python for password hashing..."
-        pip install bcrypt 2>/dev/null || true
-        ADMIN_HASH=$(python3 -c "
-import bcrypt
-print(bcrypt.hashpw('${ADMIN_PASSWORD}'.encode(), bcrypt.gensalt()).decode())
-" 2>/dev/null)
-    fi
-
-    if [ -z "$ADMIN_HASH" ]; then
-        log_warn "No hashing library available, skipping admin creation"
-        return 0
-    fi
-
-    log_info "Inserting admin user into database..."
-    PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c "
-        INSERT INTO users (id, email, first_name, password_hash, role, is_active, created_at, updated_at)
-        VALUES (gen_random_uuid(), '${ADMIN_EMAIL}', '${ADMIN_NAME}', '${ADMIN_HASH}', 'ADMIN', true, NOW(), NOW());
-    " 2>/dev/null || log_warn "Failed to create admin user"
-
-    log_success "Default admin user created: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}"
-    return 0
-}
-
-# =============================================================================
-# Service Starters
-# =============================================================================
-
-start_frontend() {
-    log_info "Starting Next.js on port ${FRONTEND_PORT}..."
-
-    cd /app/app
-    
-    PNPM_PATH="/root/.local/share/corepack/pnpm"
-    if [ -f "$PNPM_PATH" ]; then
-        "$PNPM_PATH" next dev -p "$FRONTEND_PORT" -H 0.0.0.0 &
-    elif command -v npx >/dev/null 2>&1; then
-        npx next dev -p "$FRONTEND_PORT" -H 0.0.0.0 &
-    else
-        log_error "Neither pnpm nor npx available"
+    if [ -z "${DATABASE_URL:-}" ]; then
+        log_error "DATABASE_URL is required for the Go API"
         return 1
     fi
 
-    NEXT_PID=$!
-    echo "$NEXT_PID" > /tmp/next.pid
-
-    log_info "Next.js started (PID: $NEXT_PID)"
-
-    # Wait for Next.js to be ready
-    log_info "Waiting for Next.js to be ready..."
-    sleep 10
-
-    # Verify it's running
-    if kill -0 "$NEXT_PID" 2>/dev/null; then
-        log_success "Next.js is ready"
-    else
-        log_error "Next.js failed to start"
-        return 1
-    fi
-}
-
-start_api() {
-    log_info "Starting Go API server on port ${API_PORT}..."
-
-    cd /app
-    air -c /app/.air.toml &
-
-    API_PID=$!
-    echo "$API_PID" > /tmp/api.pid
-
-    log_info "Go API server started (PID: $API_PID)"
-
-    # Wait a moment for the API to initialize
-    sleep 3
-
-    # Verify it's running
-    if kill -0 "$API_PID" 2>/dev/null; then
-        log_success "Go API server is ready"
-    else
-        log_error "Go API server failed to start"
-        return 1
-    fi
-}
-
-# =============================================================================
-# Service Monitor
-# =============================================================================
-
-monitor_services() {
-    log_info "All services started successfully!"
-    echo ""
-    echo "══════════════════════════════════════════════════════════════════════"
-    echo "  Services are running. Press Ctrl+C to stop."
-    echo "══════════════════════════════════════════════════════════════════════"
-    echo ""
-
-    # Monitor both processes
-    while true; do
-        # Check if either process died
-        if ! kill -0 "$NEXT_PID" 2>/dev/null || ! kill -0 "$API_PID" 2>/dev/null; then
-            log_error "A service has stopped unexpectedly!"
-            break
-        fi
-        sleep 5
-    done
-    
-    log_info "Monitoring stopped"
-    exit 0
-}
-
-# =============================================================================
-# Cleanup Handler
-# =============================================================================
-
-cleanup() {
-    echo ""
-    log_info "Stopping services..."
-
-    # Read PIDs
-    if [ -f /tmp/next.pid ]; then
-        kill "$(cat /tmp/next.pid)" 2>/dev/null || true
-        rm -f /tmp/next.pid
-    fi
-
-    if [ -f /tmp/api.pid ]; then
-        kill "$(cat /tmp/api.pid)" 2>/dev/null || true
-        rm -f /tmp/api.pid
-    fi
-
-    if [ -f /tmp/postgres.pid ]; then
-        kill "$(cat /tmp/postgres.pid)" 2>/dev/null || true
-        rm -f /tmp/postgres.pid
-    fi
-
-    log_info "All services stopped"
-    exit 0
-}
-
-# =============================================================================
-# Main Execution
-# =============================================================================
-
-main() {
-    display_header
-
-    # Setup
-    setup_pnpm
-
-    # Database setup - START FIRST
-    if [ "$USE_EMBEDDED_DB" = "true" ]; then
-        start_postgres || log_warn "Failed to start embedded database"
-        run_migrations
-    else
-        if wait_for_database; then
-            run_migrations
+    if ! run_prisma_schema_deploy; then
+        if [ "${ALLOW_MIGRATION_FAILURE}" = "true" ]; then
+            log_warn "Prisma schema deployment failed; continuing because ALLOW_MIGRATION_FAILURE=true"
         else
-            log_error "Database not available, starting without migrations..."
+            log_error "Prisma schema deployment failed"
+            return 1
         fi
     fi
 
-    # Create default admin user
-    create_default_admin
+    backend_binary="$(find_backend_binary || true)"
+    if [ -z "${backend_binary}" ]; then
+        log_error "Go backend binary not found at /app/server/aether-server"
+        return 1
+    fi
 
-    # Start services - AFTER DB
-    start_frontend || log_error "Frontend failed to start"
-    start_api || log_error "API failed to start"
-
-    # Monitor
-    monitor_services
+    log_info "Starting Go backend"
+    exec "${backend_binary}" worker "$@"
 }
 
-# Trap for cleanup
-trap cleanup SIGINT SIGTERM
+run_air() {
+    configure_runtime
 
-# Run
-main
+    log_info "Aether Identity API starting (hot-reload)"
+
+    if ! run_prisma_schema_deploy; then
+        if [ "${ALLOW_MIGRATION_FAILURE}" = "true" ]; then
+            log_warn "Prisma schema deployment failed; continuing because ALLOW_MIGRATION_FAILURE=true"
+        else
+            log_error "Prisma schema deployment failed"
+            return 1
+        fi
+    fi
+
+    log_info "Starting air for Go hot-reload"
+    cd /app
+    exec air "$@"
+}
+
+# ── Entrypoint ────────────────────────────────────────────────────────────────
+
+role="${1:-server}"
+
+case "${role}" in
+    server)
+        shift || true
+        run_server "$@"
+        ;;
+    worker)
+        shift || true
+        run_worker "$@"
+        ;;
+    air)
+        shift || true
+        run_air "$@"
+        ;;
+    postgresql)
+        shift || true
+        run_postgresql "$@"
+        ;;
+    *)
+        configure_runtime
+        display_header
+        exec "$@"
+        ;;
+esac
