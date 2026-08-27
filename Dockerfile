@@ -8,7 +8,7 @@
 # ══════════════════════════════════════════════════════════════════════════════
 # Stage 1 — Go builder (API/worker binary + Air for hot-reload)
 # ══════════════════════════════════════════════════════════════════════════════
-FROM golang:1.26-alpine AS go-builder
+FROM golang:1.27-alpine AS go-builder
 
 RUN apk add --no-cache gcc musl-dev
 
