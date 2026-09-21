@@ -51,7 +51,7 @@
     "clean:deps": "pnpm -r exec rm -rf node_modules && rm -rf node_modules pnpm-lock.yaml"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.1",
+    "@changesets/cli": "^3.0.3",
     "@prisma/client": "7.4.0",
     "@types/node": "^25.2.3",
     "concurrently": "^9.2.1",
