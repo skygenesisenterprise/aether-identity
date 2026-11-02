@@ -112,6 +112,6 @@
     "class-variance-authority": "^0.7.1",
     "loglayer": "^9.1.0",
     "next-intl": "^4.9.0",
-    "pino": "^10.3.1"
+    "pino": "^10.4.0"
   }
 }
